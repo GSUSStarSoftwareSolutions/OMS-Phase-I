@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/Order%20Module/firstpage.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/admin/admin%20list.dart';
@@ -44,7 +45,7 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
   final controller = TextEditingController();
   String token = window.sessionStorage["token"] ?? " ";
   String userId = window.sessionStorage['userId'] ?? '';
-
+  final ScrollController horizontalScroll = ScrollController();
 
   final FocusNode _focusNode = FocusNode();
   Map<String, bool> _isHovered = {
@@ -59,15 +60,29 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blueAccent, '/Customer_Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[800],
+            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+            // color: Color.fromRGBO(224, 59, 48, 1.0),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8), // Radius for top-left corner
+              topRight: Radius.circular(8), // No radius for top-right corner
+              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+            ),
+          ),child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blueAccent, '/Customer_Order_List')),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
       _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Customer_Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Customer_Return_List'),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Customer_Return_List'),
     ];
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Orders'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Orders'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -77,25 +92,28 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -688,7 +706,7 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
                       height: 984,
                       width: 200,
                       color: const Color(0xFFF7F6FA),
-                      padding: const EdgeInsets.only(left: 20, top: 30),
+                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: _buildMenuItems(context),
@@ -759,245 +777,499 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
                               color: Colors.black, // Border color
                             ),
                           ),
-                          Expanded(child: SingleChildScrollView(child: Column(children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right:100),
-                              child: SizedBox(
-                                width: screenWidth,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  // mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding:  EdgeInsets.only(right: maxWidth * 0.08,top: 30),
-                                      child:  Text(' Order Date',style: TextStyle(fontSize: maxWidth * 0.010,color: Colors.black87),),
-                                    ),
-                                    const SizedBox(height: 5,),
-                                    SizedBox(
-                                      height: 39,
-                                      width: maxWidth *0.13,
-                                      child: Column(
-                                        children: [
-                                          Expanded(
-                                            child: TextFormField(
-                                              controller: _dateController,
-                                              // Replace with your TextEditingController
-                                              readOnly: true,
-                                              decoration: InputDecoration(
-                                                suffixIcon: Padding(
-                                                  padding: const EdgeInsets.only(right: 20),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        top: 2, left: 10),
-                                                    child: IconButton(
-                                                      icon: const Padding(
-                                                        padding: EdgeInsets.only(bottom: 16),
-                                                        child: Icon(Icons.calendar_month),
-                                                      ),
-                                                      iconSize: 20,
-                                                      onPressed: () {
-                                                        // _showDatePicker(context);
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                                hintText: '        Select Date',
-                                                fillColor: Colors.grey.shade100,
-                                                contentPadding: const EdgeInsets.symmetric(
-                                                    horizontal: 8, vertical: 8),
-                                                border: InputBorder.none,
-                                                filled: true,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    //  ),
-                                    // SizedBox(height: 20.h),
-
-                                  ],
-                                ),
-
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 100,right: 100,top: 50),
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFFFFFFF), // background: #FFFFFF
-                                  boxShadow: [BoxShadow(
-                                    offset: Offset(0, 3),
-                                    blurRadius: 6,
-                                    color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                                  )],
-                                  // border: Border.all(
-                                  //   // border: 2px
-                                  //   color: Color(0xFFB2C2D3), // border: #B2C2D3
-                                  // ),
-                                  borderRadius: BorderRadius.all(Radius.circular(4)), // border-radius: 8px
-                                ),
-                                child: Table(
-                                  border: TableBorder.all(color: const Color(0xFFB2C2D3),borderRadius: BorderRadius.circular(4)),
-
-                                  columnWidths: const {
-                                    0: FlexColumnWidth(2),
-                                    1: FlexColumnWidth(1.4),
-                                  },
-                                  children: [
-                                    row1,
-                                    row2,
-                                    row3,
-                                  ],
-                                ),
-                              ),
-                            ),
-
-
-                            Padding(
-                              padding: const EdgeInsets.only(top: 60,left: 100,right: 100,bottom: 30),
-                              child: Container(
-                                //width: screenWidth * 0.8,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFFFFF), // background: #FFFFFF
-                                  boxShadow: [const BoxShadow(
-                                    offset: Offset(0, 3),
-                                    blurRadius: 6,
-                                    color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                                  )],
-                                  border: Border.all(
-                                    // border: 2px
-                                    color: const Color(0xFFB2C2D3), // border: #B2C2D3
+    if(constraints.maxWidth >= 1300)...{
+      Expanded(child: SingleChildScrollView(child: Column(children: [
+        Padding(
+          padding: const EdgeInsets.only(right:100),
+          child: SizedBox(
+            width: screenWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              // mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding:  EdgeInsets.only(right: maxWidth * 0.08,top: 30),
+                  child:  Text(' Order Date',style: TextStyle(fontSize: maxWidth * 0.010,color: Colors.black87),),
+                ),
+                const SizedBox(height: 5,),
+                SizedBox(
+                  height: 39,
+                  width: maxWidth *0.13,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _dateController,
+                          // Replace with your TextEditingController
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 2, left: 10),
+                                child: IconButton(
+                                  icon: const Padding(
+                                    padding: EdgeInsets.only(bottom: 16),
+                                    child: Icon(Icons.calendar_month),
                                   ),
-                                  borderRadius: const BorderRadius.all(Radius.circular(8)), // border-radius: 8px
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Padding(
-                                      padding: EdgeInsets.only(top: 10, left: 30),
-                                      child: Text(
-                                        'Add Products',
-                                        style: TextStyle(fontSize: 19,color: Colors.black),
-                                      ),
-
-
-
-                                    ),
-                                    const SizedBox(height: 10),
-                                    SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child:
-
-                                      DataTable(
-                                        border: const TableBorder(
-                                          top: BorderSide(width:1 ,color: Colors.grey),
-                                          bottom: BorderSide(width:1 ,color: Colors.grey),
-                                          horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
-                                          verticalInside: BorderSide(width: 1,color: Colors.grey),
-                                        ),
-                                        // border: TableBorder.all(color: const Color(0xFFB2C2D3)),
-                                        columnSpacing: screenWidth * 0.066,
-                                        headingRowHeight: 40,
-                                        columns: const [
-                                          DataColumn(label: Text('Product Name')),
-                                          DataColumn(label: Text('Category')),
-                                          DataColumn(label: Text('Sub Category')),
-                                          DataColumn(label: Text('Price')),
-                                          DataColumn(label: Text('Qty')),
-                                          DataColumn(label: Text('Amount')),
-                                          DataColumn(label: Text('TAX')),
-                                          DataColumn(label: Text('Discount')),
-                                          DataColumn(label: Text('Total Amount')),
-                                        ],
-                                        rows: const [],
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 30, top: 25),
-                                          child: SizedBox(
-                                            width: screenWidth * 0.1,
-                                            child: OutlinedButton(
-                                              // onPressed: handleButtonPress,
-                                              //my copy
-                                              onPressed: ()
-
-                                              {
-                                                String validateFields() {
-                                                  if (ContactPersonController.text.isEmpty || ContactPersonController.text.length <= 2) {
-                                                    return 'Please enter a contact person name';
-                                                  }
-                                                  if (ContactNumberController.text.isEmpty || ContactNumberController.text.length != 10) {
-                                                    return 'Please enter a valid phone number.';
-                                                  }
-                                                  if (deliveryaddressController.text.isEmpty) {
-                                                    return 'Please fill delivery address.';
-                                                  }
-                                                  if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                                                    return 'Please fill Email Address Format @gmail.com';
-                                                  }
-                                                  if (ShippingAddress.text.isEmpty) {
-                                                    return 'Please fill Shipping address ';
-                                                  }
-
-
-                                                  return '';
-                                                }
-                                                String validationMessage = validateFields();
-                                                if (validationMessage == '') {
-                                                  Map<String, dynamic> data = {
-                                                    'CusId':userId,
-                                                    'deliveryLocation': EmailIdController.text,
-                                                    'ContactName': ContactPersonController.text,
-                                                    'Address': deliveryaddressController.text,
-                                                    'ContactNumber': ContactNumberController.text,
-                                                    'Comments': ShippingAddress.text,
-                                                    'date': _dateController.text,
-                                                  };
-                                                  context.go('/Search_products',extra: data);
-                                                  //   context.go('/Home/Orders/Create_Order/Add_Product',extra: data);
-
-                                                } else {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(validationMessage),
-                                                    ),
-                                                  );
-                                                }
-                                              },
-
-                                              style: OutlinedButton.styleFrom(
-                                                backgroundColor: Colors.blue[800],
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(4),
-                                                ),
-                                                side: BorderSide.none,
-                                              ),
-                                              child: const Center(
-                                                child: Text(
-                                                  '+ Add Products',
-                                                  style: TextStyle(color: Colors.white),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Container(
-                                        height: 1,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
+                                  iconSize: 20,
+                                  onPressed: () {
+                                    // _showDatePicker(context);
+                                  },
                                 ),
                               ),
                             ),
-                          ],),))
+                            hintText: '        Select Date',
+                            fillColor: Colors.grey.shade100,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 8),
+                            border: InputBorder.none,
+                            filled: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                //  ),
+                // SizedBox(height: 20.h),
+
+              ],
+            ),
+
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 100,right: 100,top: 50),
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFFFFFFFF), // background: #FFFFFF
+              boxShadow: [BoxShadow(
+                offset: Offset(0, 3),
+                blurRadius: 6,
+                color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+              )],
+              // border: Border.all(
+              //   // border: 2px
+              //   color: Color(0xFFB2C2D3), // border: #B2C2D3
+              // ),
+              borderRadius: BorderRadius.all(Radius.circular(4)), // border-radius: 8px
+            ),
+            child: Table(
+              border: TableBorder.all(color: const Color(0xFFB2C2D3),borderRadius: BorderRadius.circular(4)),
+
+              columnWidths: const {
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(1.4),
+              },
+              children: [
+                row1,
+                row2,
+                row3,
+              ],
+            ),
+          ),
+        ),
+
+
+        Padding(
+          padding: const EdgeInsets.only(top: 60,left: 100,right: 100,bottom: 30),
+          child: Container(
+            //width: screenWidth * 0.8,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFFFF), // background: #FFFFFF
+              boxShadow: [const BoxShadow(
+                offset: Offset(0, 3),
+                blurRadius: 6,
+                color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+              )],
+              border: Border.all(
+                // border: 2px
+                color: const Color(0xFFB2C2D3), // border: #B2C2D3
+              ),
+              borderRadius: const BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 10, left: 30),
+                  child: Text(
+                    'Add Products',
+                    style: TextStyle(fontSize: 19,color: Colors.black),
+                  ),
+
+
+
+                ),
+                const SizedBox(height: 10),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child:
+
+                  DataTable(
+                    border: const TableBorder(
+                      top: BorderSide(width:1 ,color: Colors.grey),
+                      bottom: BorderSide(width:1 ,color: Colors.grey),
+                      horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
+                      verticalInside: BorderSide(width: 1,color: Colors.grey),
+                    ),
+                    // border: TableBorder.all(color: const Color(0xFFB2C2D3)),
+                    columnSpacing: screenWidth * 0.066,
+                    headingRowHeight: 40,
+                    columns: const [
+                      DataColumn(label: Text('Product Name')),
+                      DataColumn(label: Text('Category')),
+                      DataColumn(label: Text('Sub Category')),
+                      DataColumn(label: Text('Price')),
+                      DataColumn(label: Text('Qty')),
+                      DataColumn(label: Text('Amount')),
+                      DataColumn(label: Text('TAX')),
+                      DataColumn(label: Text('Discount')),
+                      DataColumn(label: Text('Total Amount')),
+                    ],
+                    rows: const [],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30, top: 25),
+                      child: SizedBox(
+                        width: screenWidth * 0.15,
+                        child: OutlinedButton(
+                          // onPressed: handleButtonPress,
+                          //my copy
+                          onPressed: ()
+
+                          {
+                            String validateFields() {
+                              if (ContactPersonController.text.isEmpty || ContactPersonController.text.length <= 2) {
+                                return 'Please enter a contact person name';
+                              }
+                              if (ContactNumberController.text.isEmpty || ContactNumberController.text.length != 10) {
+                                return 'Please enter a valid phone number.';
+                              }
+                              if (deliveryaddressController.text.isEmpty) {
+                                return 'Please fill delivery address.';
+                              }
+                              if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
+                                return 'Please fill Email Address Format @gmail.com';
+                              }
+                              if (ShippingAddress.text.isEmpty) {
+                                return 'Please fill Shipping address ';
+                              }
+
+
+                              return '';
+                            }
+                            String validationMessage = validateFields();
+                            if (validationMessage == '') {
+                              Map<String, dynamic> data = {
+                                'CusId':userId,
+                                'deliveryLocation': EmailIdController.text,
+                                'ContactName': ContactPersonController.text,
+                                'Address': deliveryaddressController.text,
+                                'ContactNumber': ContactNumberController.text,
+                                'Comments': ShippingAddress.text,
+                                'date': _dateController.text,
+                              };
+                              context.go('/Search_products',extra: data);
+                              //   context.go('/Home/Orders/Create_Order/Add_Product',extra: data);
+
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(validationMessage),
+                                ),
+                              );
+                            }
+                          },
+
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.blue[800],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            side: BorderSide.none,
+                          ),
+                          child: const Center(
+                            child: Text(
+                              '+ Add Products',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Container(
+                    height: 1,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],),))
+    }
+    else...{
+      Expanded(child: AdaptiveScrollbar(
+
+        position: ScrollbarPosition.bottom,controller: horizontalScroll,
+        child: SingleChildScrollView(
+          controller: horizontalScroll,
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+            child: Column(children: [
+            SizedBox(
+              width: 1700,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                // mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:  EdgeInsets.only(right: 220,top: 30),
+                    child:  Text(' Order Date',style: TextStyle(fontSize:15,color: Colors.black87),),
+                  ),
+                  const SizedBox(height: 5,),
+                  Padding(
+                    padding:  EdgeInsets.only(right: 100),
+                    child: SizedBox(
+                      height: 39,
+                      width: 200,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _dateController,
+                              // Replace with your TextEditingController
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 2, left: 10),
+                                    child: IconButton(
+                                      icon: const Padding(
+                                        padding: EdgeInsets.only(bottom: 16),
+                                        child: Icon(Icons.calendar_month),
+                                      ),
+                                      iconSize: 20,
+                                      onPressed: () {
+                                        // _showDatePicker(context);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                hintText: '        Select Date',
+                                fillColor: Colors.grey.shade100,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 8),
+                                border: InputBorder.none,
+                                filled: true,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  //  ),
+                  // SizedBox(height: 20.h),
+
+
+            Padding(
+              padding: const EdgeInsets.only(left: 100,right: 100,top: 50),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFFFFF), // background: #FFFFFF
+                  boxShadow: [BoxShadow(
+                    offset: Offset(0, 3),
+                    blurRadius: 6,
+                    color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                  )],
+                  // border: Border.all(
+                  //   // border: 2px
+                  //   color: Color(0xFFB2C2D3), // border: #B2C2D3
+                  // ),
+                  borderRadius: BorderRadius.all(Radius.circular(4)), // border-radius: 8px
+                ),
+                child: Table(
+                  border: TableBorder.all(color: const Color(0xFFB2C2D3),borderRadius: BorderRadius.circular(4)),
+
+                  columnWidths: const {
+                    0: FlexColumnWidth(2),
+                    1: FlexColumnWidth(1.4),
+                  },
+                  children: [
+                    row1,
+                    row2,
+                    row3,
+                  ],
+                ),
+              ),
+            ),
+
+
+            Padding(
+              padding: const EdgeInsets.only(top: 60,left: 100,right: 100,bottom: 30),
+              child: Container(
+                //width: screenWidth * 0.8,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFFFF), // background: #FFFFFF
+                  boxShadow: [const BoxShadow(
+                    offset: Offset(0, 3),
+                    blurRadius: 6,
+                    color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                  )],
+                  border: Border.all(
+                    // border: 2px
+                    color: const Color(0xFFB2C2D3), // border: #B2C2D3
+                  ),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10, left: 30),
+                      child: Text(
+                        'Add Products',
+                        style: TextStyle(fontSize: 19,color: Colors.black),
+                      ),
+
+
+
+                    ),
+                    const SizedBox(height: 10),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child:
+
+                      DataTable(
+                        border: const TableBorder(
+                          top: BorderSide(width:1 ,color: Colors.grey),
+                          bottom: BorderSide(width:1 ,color: Colors.grey),
+                          horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
+                          verticalInside: BorderSide(width: 1,color: Colors.grey),
+                        ),
+                        // border: TableBorder.all(color: const Color(0xFFB2C2D3)),
+                        columnSpacing: 118.5,
+                        headingRowHeight: 40,
+                        columns: const [
+                          DataColumn(label: Text('Product Name')),
+                          DataColumn(label: Text('Category')),
+                          DataColumn(label: Text('Sub Category')),
+                          DataColumn(label: Text('Price')),
+                          DataColumn(label: Text('Qty')),
+                          DataColumn(label: Text('Amount')),
+                          DataColumn(label: Text('TAX')),
+                          DataColumn(label: Text('Discount')),
+                          DataColumn(label: Text('Total Amount')),
+                        ],
+                        rows: const [],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, top: 25),
+                          child: SizedBox(
+                            width: screenWidth * 0.1,
+                            child: OutlinedButton(
+                              // onPressed: handleButtonPress,
+                              //my copy
+                              onPressed: ()
+
+                              {
+                                String validateFields() {
+                                  if (ContactPersonController.text.isEmpty || ContactPersonController.text.length <= 2) {
+                                    return 'Please enter a contact person name';
+                                  }
+                                  if (ContactNumberController.text.isEmpty || ContactNumberController.text.length != 10) {
+                                    return 'Please enter a valid phone number.';
+                                  }
+                                  if (deliveryaddressController.text.isEmpty) {
+                                    return 'Please fill delivery address.';
+                                  }
+                                  if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
+                                    return 'Please fill Email Address Format @gmail.com';
+                                  }
+                                  if (ShippingAddress.text.isEmpty) {
+                                    return 'Please fill Shipping address ';
+                                  }
+
+
+                                  return '';
+                                }
+                                String validationMessage = validateFields();
+                                if (validationMessage == '') {
+                                  Map<String, dynamic> data = {
+                                    'CusId':userId,
+                                    'deliveryLocation': EmailIdController.text,
+                                    'ContactName': ContactPersonController.text,
+                                    'Address': deliveryaddressController.text,
+                                    'ContactNumber': ContactNumberController.text,
+                                    'Comments': ShippingAddress.text,
+                                    'date': _dateController.text,
+                                  };
+                                  context.go('/Search_products',extra: data);
+                                  //   context.go('/Home/Orders/Create_Order/Add_Product',extra: data);
+
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(validationMessage),
+                                    ),
+                                  );
+                                }
+                              },
+
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: Colors.blue[800],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                side: BorderSide.none,
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  '+ Add Products',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        height: 1,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+                ],
+              ),
+
+            ),
+          ],),),
+        ),
+      ))
+    }
+
 
 
                           // SizedBox(height: 900.h),

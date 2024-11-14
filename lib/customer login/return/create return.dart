@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -38,7 +39,7 @@ class _ReqReturnState extends State<ReqReturn> {
   final _controller = TextEditingController();
   List<dynamic> _orderDetails = [];
   late TextEditingController _dateController;
-
+  final ScrollController horizontalScroll = ScrollController();
   List<TextEditingController> _qtyControllers = [];
   String? _errorText;
   String _enteredValues = '';
@@ -79,15 +80,29 @@ class _ReqReturnState extends State<ReqReturn> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Customer_Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
+      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Customer_Order_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Customer_Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blueAccent, '/Customer_Return_List'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Customer_Payment_List'),
+      Container(
+    decoration: BoxDecoration(
+    color: Colors.blue[800],
+    // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+    // color: Color.fromRGBO(224, 59, 48, 1.0),
+    borderRadius: const BorderRadius.only(
+    topLeft: Radius.circular(8), // Radius for top-left corner
+    topRight: Radius.circular(8), // No radius for top-right corner
+    bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+    bottomRight: Radius.circular(8), // No radius for bottom-right corner
+    ),
+    ),child: _buildMenuItem('Return', Icons.keyboard_return, Colors.white, '/Customer_Return_List')),
     ];
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Return'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Return'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -97,25 +112,28 @@ class _ReqReturnState extends State<ReqReturn> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -634,10 +652,9 @@ class _ReqReturnState extends State<ReqReturn> {
                   // Added Align widget for the left side menu
                   alignment: Alignment.topLeft,
                   child: Container(
-                    height: 1400,
                     width: 200,
                     color: const Color(0xFFF7F6FA),
-                    padding: const EdgeInsets.only(left: 20, top: 30),
+                    padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: _buildMenuItems(context),
@@ -678,7 +695,7 @@ class _ReqReturnState extends State<ReqReturn> {
                                 },
                               ),
                               const Padding(
-                                padding: EdgeInsets.only(left: 30,top: 5),
+                                padding: EdgeInsets.only(left: 15,top: 5),
                                 child: Text(
                                   'Order Return',
                                   style: TextStyle(
@@ -789,623 +806,137 @@ class _ReqReturnState extends State<ReqReturn> {
                           height: 0.3, // Border height
                           color: Colors.black, // Border color
                         ),
-                        Expanded(child: SingleChildScrollView(child: Column(children: [
+                        if(constraints.maxWidth >= 1350)...{
+                          Expanded(
+                              child: SingleChildScrollView(
+                                child:
 
-                          Padding(
-                            padding: const EdgeInsets.only(right:100),
-                            child: SizedBox(
-                              width: maxWidth,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                // mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
+                                Column(children: [
+
                                   Padding(
-                                    padding:  EdgeInsets.only(right: maxWidth * 0.08,
-                                        //   * 0.089,
-                                        top: 20),
-                                    child:  Text('Return Date',style: TextStyle(fontSize: maxWidth * 0.0090),),
-                                  ),
-                                  DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: const Color(0xFFEBF3FF), width: 1),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
+                                    padding: const EdgeInsets.only(right:100),
                                     child: SizedBox(
-                                      height: 39,
-                                      width: maxWidth *0.13,
+                                      width: maxWidth,
                                       child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        // mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
-                                          Expanded(
-                                            child: TextFormField(
-                                              controller: _dateController,
-                                              // Replace with your TextEditingController
-                                              readOnly: true,
-                                              decoration: InputDecoration(
-                                                suffixIcon: Padding(
-                                                  padding: const EdgeInsets.only(right: 20),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        top: 2, left: 10),
-                                                    child: IconButton(
-                                                      icon: const Padding(
-                                                        padding: EdgeInsets.only(bottom: 16),
-                                                        child: Icon(Icons.calendar_month),
+                                          Padding(
+                                            padding:  EdgeInsets.only(right: maxWidth * 0.08,
+                                                //   * 0.089,
+                                                top: 20),
+                                            child:  Text('Return Date',style: TextStyle(fontSize: maxWidth * 0.0090),),
+                                          ),
+                                          DecoratedBox(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: const Color(0xFFEBF3FF), width: 1),
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: SizedBox(
+                                              height: 39,
+                                              width: maxWidth *0.13,
+                                              child: Column(
+                                                children: [
+                                                  Expanded(
+                                                    child: TextFormField(
+                                                      controller: _dateController,
+                                                      // Replace with your TextEditingController
+                                                      readOnly: true,
+                                                      decoration: InputDecoration(
+                                                        suffixIcon: Padding(
+                                                          padding: const EdgeInsets.only(right: 20),
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                top: 2, left: 10),
+                                                            child: IconButton(
+                                                              icon: const Padding(
+                                                                padding: EdgeInsets.only(bottom: 16),
+                                                                child: Icon(Icons.calendar_month),
+                                                              ),
+                                                              iconSize: 20,
+                                                              onPressed: () {
+                                                                // _showDatePicker(context);
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        hintText: 'Select Date',
+                                                        fillColor: Colors.white,
+                                                        contentPadding: const EdgeInsets.symmetric(
+                                                            horizontal: 8, vertical: 8),
+                                                        border: InputBorder.none,
+                                                        filled: true,
                                                       ),
-                                                      iconSize: 20,
-                                                      onPressed: () {
-                                                        // _showDatePicker(context);
-                                                      },
                                                     ),
                                                   ),
-                                                ),
-                                                hintText: 'Select Date',
-                                                fillColor: Colors.white,
-                                                contentPadding: const EdgeInsets.symmetric(
-                                                    horizontal: 8, vertical: 8),
-                                                border: InputBorder.none,
-                                                filled: true,
+                                                ],
                                               ),
                                             ),
                                           ),
+                                          // SizedBox(height: 20.h),
+
                                         ],
                                       ),
+
                                     ),
                                   ),
-                                  // SizedBox(height: 20.h),
-
-                                ],
-                              ),
-
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color(0xff00000029),
-                                    offset: Offset(0, 3),
-                                    blurRadius: 6,
-                                  ),
-                                ],
-                                color: const Color(0xFFFFFFFF),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text('Invoice Number'),
-                                                  SizedBox(width: 5,),
-                                                  Text('*', style: TextStyle(color: Colors.red),),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 5,),
-                                              SizedBox(
-                                                height: 40,
-                                                child: TextFormField(
-                                                  controller: _controller,
-                                                  focusNode: _focusNode,
-                                                  // onEditingComplete: _fetchOrderDetails,
-                                                  decoration: InputDecoration(
-                                                      filled: true,
-                                                      contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
-                                                      fillColor: Colors.grey.shade200,
-                                                      border: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.circular(5.0),
-                                                        borderSide: BorderSide.none,
-                                                      ),
-                                                      hintText: 'INV_03312'
-
-                                                  ),
-                                                  inputFormatters: [
-                                                    UpperCaseTextFormatter(),
-                                                    FilteringTextInputFormatter.allow(
-                                                        RegExp("[a-zA-Z_0-9]")),
-                                                    // Allow only letters, numbers, and single space
-                                                    FilteringTextInputFormatter.deny(
-                                                        RegExp(r'^\s')),
-                                                    // Disallow starting with a space
-                                                    FilteringTextInputFormatter.deny(
-                                                        RegExp(r'\s\s')),
-                                                    // Disallow multiple spaces
-                                                  ],
-                                                  validator: (value) {
-                                                    if (_controller.text != null && _controller.text.trim().isEmpty) {
-                                                      return 'Please enter a product name';
-                                                    }
-                                                    return null;
-                                                  },
-
-                                                ),
-                                              ),
-                                            ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Color(0xff00000029),
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
                                           ),
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text('Reason'),
-                                                  SizedBox(width: 5,),
-                                                  Text('*', style: TextStyle(color: Colors.red),),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 5,),
-                                              SizedBox(
-                                                height: 40,
-                                                child:
-                                                DropdownButtonFormField<String>(
-
-                                                  decoration: InputDecoration(
-                                                    filled: true,
-                                                    fillColor: Colors.grey.shade200,
-                                                    border: OutlineInputBorder(
-                                                      borderRadius: BorderRadius.circular(5.0),
-                                                      borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
-                                                    ),
-                                                    contentPadding: const EdgeInsets.symmetric(
-                                                        horizontal: 8, vertical: 8),
-                                                  ),
-                                                  value: _selectedReason,
-                                                  onChanged: (String? value) {
-                                                    setState(() {
-                                                      _selectedReason = value!;
-                                                      _reasonController.text = value;
-                                                    });
-                                                  },
-                                                  items:<String>['Reason for return', 'Option 1', 'Option 2'].map<DropdownMenuItem<String>>((String value) {
-                                                    return DropdownMenuItem<String>(
-                                                      value: value,
-                                                      child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.black,),),
-                                                    );
-                                                  }).toList(),
-                                                  isExpanded: true,
-                                                  //     hint: const Text('Reason for return'),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text('Contact Person'),
-                                                  SizedBox(width: 5,),
-                                                  Text('*', style: TextStyle(color: Colors.red),),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 5,),
-                                              SizedBox(
-                                                height: 40,
-                                                child: TextFormField(
-                                                  controller: ContactpersonController,
-                                                  decoration:  InputDecoration(
-                                                      filled: true,
-                                                      fillColor: Colors.grey.shade200,
-                                                      border: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.circular(5.0),
-                                                        borderSide: BorderSide.none,
-                                                      ),
-                                                      contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
-                                                      hintText: 'Person Name'
-                                                  ),
-                                                  inputFormatters: [
-                                                    FilteringTextInputFormatter.allow(
-                                                        RegExp("[a-zA-Z ]")),
-                                                    // Allow only letters, numbers, and single space
-                                                    FilteringTextInputFormatter.deny(
-                                                        RegExp(r'^\s')),
-                                                    // Disallow starting with a space
-                                                    FilteringTextInputFormatter.deny(
-                                                        RegExp(r'\s\s')),
-                                                    // Disallow multiple spaces
-                                                  ],
-                                                  validator: (value) {
-                                                    if (ContactpersonController.text != null && ContactpersonController.text.trim().isEmpty) {
-                                                      return 'Please enter a product name';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text('Email'),
-                                                  SizedBox(width: 5,),
-                                                  Text('*', style: TextStyle(color: Colors.red),),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 5,),
-                                              SizedBox(
-                                                height: 40,
-                                                child: TextFormField(
-                                                  controller: EmailAddressController,
-                                                  decoration: InputDecoration(
-                                                    filled: true,
-                                                    fillColor: Colors.grey.shade200,
-                                                    border: OutlineInputBorder(
-                                                      borderRadius: BorderRadius.circular(5.0),
-                                                      borderSide: BorderSide.none,
-                                                    ),
-                                                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                                                    hintText: 'Person Email',
-                                                    // errorText: _errorText,
-                                                  ),
-                                                  inputFormatters: [
-                                                    FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
-                                                    FilteringTextInputFormatter.deny(RegExp(r'^\s')),
-                                                    FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
-                                                  ],
-                                                  validator: (value) {
-                                                    setState(() {
-                                                      if (value!.isEmpty) {
-                                                        _errorText = 'Please enter Valid email address';
-                                                      } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
-                                                        _errorText = 'Please enter valid email address';
-                                                      } else {
-                                                        _errorText = null;
-                                                      }
-                                                    });
-                                                    if(_errorText != null){
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(content: Text(_errorText!)),
-                                                      );
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          Padding(
-                            padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFFFFF),
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color(0xFF00000029),
-                                    offset: Offset(0, 3),
-                                    blurRadius: 6,
-                                  ),
-                                ],
-                              ),
-
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-
-                                  const Padding(
-                                    padding: EdgeInsets.only(top: 10,left: 30),
-                                    child: Text(
-                                      'Add Products',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                        fontFamily: 'Titillium Web',
+                                        ],
+                                        color: const Color(0xFFFFFFFF),
                                       ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    width: maxWidth,
-                                    decoration: const BoxDecoration(
-                                      border: Border(
-                                        top: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
-                                        bottom: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                                      child: Table(
-                                        columnWidths: const {
-                                          0: FlexColumnWidth(1),
-                                          1: FlexColumnWidth(3),
-                                          2: FlexColumnWidth(2),
-                                          3: FlexColumnWidth(2),
-                                          4: FlexColumnWidth(2),
-                                          5: FlexColumnWidth(1),
-                                          6: FlexColumnWidth(1.2),
-                                          7: FlexColumnWidth(2),
-                                          8: FlexColumnWidth(2),
-                                        },
-                                        children:  const [
-                                          TableRow(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
                                               children: [
-                                                TableCell(child: Padding(
-                                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "SN",
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        //  fontSize: 12,
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      const Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          Text('Invoice Number'),
+                                                          SizedBox(width: 5,),
+                                                          Text('*', style: TextStyle(color: Colors.red),),
+                                                        ],
                                                       ),
-                                                    ),
-                                                  ),
-                                                ),),
-                                                TableCell(child: Padding(
-                                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                  child: Center(
-                                                    child: Text(
-                                                      'Product Name',
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        //  fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),),
-                                                TableCell(child: Padding(
-                                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Category",
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        // fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),),
-                                                TableCell(child: Padding(
-                                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Sub Category",
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        // fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),),
-
-                                                TableCell(child: Padding(
-                                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Price",
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        // fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),),
-                                                TableCell(child: Padding(
-                                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "QTY",
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        // fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),),
-                                                TableCell(child: Padding(
-                                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Return QTY",
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        //  fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),),
-                                                TableCell(child: Padding(
-                                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Invoice Amount",
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        //  fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),),
-                                                TableCell(child: Padding(
-                                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Credit Request",
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        // fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),),
-                                              ]
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemCount: _orderDetails.length,
-                                    itemBuilder: (context, index) {
-                                      if (index >= _orderDetails.length || index >= _qtyControllers.length) {
-                                        return const SizedBox.shrink(); // Return an empty widget if the index is out of range
-                                      }
-                                      Map<String, dynamic> item = _orderDetails[index];
-                                      return Table(
-                                        border: const TableBorder(
-                                          bottom: BorderSide(width:1 ,color: Colors.grey),
-                                          //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
-                                          verticalInside: BorderSide(width: 1,color: Colors.grey),
-                                        ),
-                                        columnWidths: const {
-                                          0: FlexColumnWidth(1),
-                                          1: FlexColumnWidth(3),
-                                          2: FlexColumnWidth(2),
-                                          3: FlexColumnWidth(2),
-                                          4: FlexColumnWidth(2),
-                                          5: FlexColumnWidth(1),
-                                          6: FlexColumnWidth(1.2),
-                                          7: FlexColumnWidth(2),
-                                          8: FlexColumnWidth(2),
-                                        },
-
-                                        children: [
-                                          TableRow(
-                                              children:[
-                                                TableCell(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only( left: 10,
-                                                        right: 10,
-                                                        top: 15,
-                                                        bottom: 5),
-                                                    child: Center(child: Text('${index + 1}')),
-                                                  ),
-                                                ),
-                                                TableCell(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                    child: Container(
-                                                      height: 35,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey.shade200,
-                                                        borderRadius: BorderRadius.circular(4.0),
-                                                      ),
-                                                      child: Center(child: Text(item['productName'],textAlign: TextAlign.center,)),
-                                                    ),
-                                                  ),
-                                                ),
-                                                TableCell(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                    child: Container(
-                                                      height: 35,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey.shade200,
-                                                        borderRadius: BorderRadius.circular(4.0),
-                                                      ),
-                                                      child: Center(child: Text(item['category'],textAlign: TextAlign.center,)),
-                                                    ),
-                                                  ),
-                                                ),
-                                                TableCell(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                    child: Container(
-                                                      height: 35,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey.shade200,
-                                                        borderRadius: BorderRadius.circular(4.0),
-                                                      ),
-                                                      child: Center(child: Text(item['subCategory'])),
-                                                    ),
-                                                  ),
-                                                ),
-
-                                                TableCell(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                    child: Container(
-                                                      height: 35,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey.shade200,
-                                                        borderRadius: BorderRadius.circular(4.0),
-                                                      ),
-                                                      child: Center(child: Text(item['price'].toString())),
-                                                    ),
-                                                  ),
-                                                ),
-                                                TableCell(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                    child: Container(
-                                                      height: 35,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey.shade200,
-                                                        borderRadius: BorderRadius.circular(4.0),
-                                                      ),
-                                                      child: Center(child: Text(item['qty'].toString())),
-                                                    ),
-                                                  ),
-                                                ),
-                                                TableCell(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                    child: Container(
-                                                      height: 35,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey.shade200,
-                                                        borderRadius: BorderRadius.circular(4.0),
-                                                      ),
-                                                      child: Center(
+                                                      const SizedBox(height: 5,),
+                                                      SizedBox(
+                                                        height: 40,
                                                         child: TextFormField(
-                                                          controller: _qtyControllers[index],
-                                                          textAlign: TextAlign.center, // Center alignment
-                                                          decoration: const InputDecoration(
-                                                              border: InputBorder.none, // Remove underline
-                                                              contentPadding: EdgeInsets.only(
-                                                                  bottom: 12
-                                                              )
-                                                            //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
+                                                          controller: _controller,
+                                                          focusNode: _focusNode,
+                                                          // onEditingComplete: _fetchOrderDetails,
+                                                          decoration: InputDecoration(
+                                                              filled: true,
+                                                              contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
+                                                              fillColor: Colors.grey.shade200,
+                                                              border: OutlineInputBorder(
+                                                                borderRadius: BorderRadius.circular(5.0),
+                                                                borderSide: BorderSide.none,
+                                                              ),
+                                                              hintText: 'INV_03312'
+
                                                           ),
                                                           inputFormatters: [
-                                                            LengthLimitingTextInputFormatter(4),
+                                                            UpperCaseTextFormatter(),
                                                             FilteringTextInputFormatter.allow(
-                                                                RegExp("[0-9]")),
+                                                                RegExp("[a-zA-Z_0-9]")),
                                                             // Allow only letters, numbers, and single space
                                                             FilteringTextInputFormatter.deny(
                                                                 RegExp(r'^\s')),
@@ -1414,332 +945,1797 @@ class _ReqReturnState extends State<ReqReturn> {
                                                                 RegExp(r'\s\s')),
                                                             // Disallow multiple spaces
                                                           ],
-                                                          onChanged: (value) {
-                                                            setState(() {
-                                                              if (value.isEmpty) {
-                                                                item['enteredQty'] = 0;
-                                                                item['totalAmount2'] = 0;
-                                                                _qtyControllers[index].clear();
-                                                              } else {
-                                                                int enteredQty = int.parse(value);
+                                                          validator: (value) {
+                                                            if (_controller.text != null && _controller.text.trim().isEmpty) {
+                                                              return 'Please enter a product name';
+                                                            }
+                                                            return null;
+                                                          },
 
-                                                                if (enteredQty > (item['qty']?? 0) || enteredQty == 0) {
-                                                                  //  if (enteredQty > (item['qty']?? 0) || (item['qty'] == 0)) {
-                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                    const SnackBar(content: Text('Return qty must be less than or equal to the order qty.')),
-                                                                  );
-                                                                  // Clear the entered value
-                                                                  item['enteredQty'] = 0;
-                                                                  _qtyControllers[index].clear();
-                                                                  //  _textController.clear(); // Clear the text field
-                                                                } else {
-                                                                  item['enteredQty'] = enteredQty;
-                                                                  item['totalAmount2'] = (item['totalAmount']  / item['qty'])  * enteredQty;
-                                                                }
-                                                              }
-                                                              // calculate the total amount
-                                                              totalAmount = _orderDetails.fold(0.0, (sum, item) => sum + (item['totalAmount2']?? 0));
-                                                              totalController.text = totalAmount.toStringAsFixed(2); // update the totalController
-                                                              print('enteredqty');
-                                                              print(_qtyControllers[index].text);
-                                                              print(item['enteredQty']);
-                                                              print(_qtyControllers[index].text);
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      const Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          Text('Reason'),
+                                                          SizedBox(width: 5,),
+                                                          Text('*', style: TextStyle(color: Colors.red),),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 5,),
+                                                      SizedBox(
+                                                        height: 40,
+                                                        child:
+                                                        DropdownButtonFormField<String>(
+
+                                                          decoration: InputDecoration(
+                                                            filled: true,
+                                                            fillColor: Colors.grey.shade200,
+                                                            border: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(5.0),
+                                                              borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
+                                                            ),
+                                                            contentPadding: const EdgeInsets.symmetric(
+                                                                horizontal: 8, vertical: 8),
+                                                          ),
+                                                          value: _selectedReason,
+                                                          onChanged: (String? value) {
+                                                            setState(() {
+                                                              _selectedReason = value!;
+                                                              _reasonController.text = value;
                                                             });
+                                                          },
+                                                          items:<String>['Reason for return', 'Option 1', 'Option 2'].map<DropdownMenuItem<String>>((String value) {
+                                                            return DropdownMenuItem<String>(
+                                                              value: value,
+                                                              child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.black,),),
+                                                            );
+                                                          }).toList(),
+                                                          isExpanded: true,
+                                                          //     hint: const Text('Reason for return'),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      const Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          Text('Contact Person'),
+                                                          SizedBox(width: 5,),
+                                                          Text('*', style: TextStyle(color: Colors.red),),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 5,),
+                                                      SizedBox(
+                                                        height: 40,
+                                                        child: TextFormField(
+                                                          controller: ContactpersonController,
+                                                          decoration:  InputDecoration(
+                                                              filled: true,
+                                                              fillColor: Colors.grey.shade200,
+                                                              border: OutlineInputBorder(
+                                                                borderRadius: BorderRadius.circular(5.0),
+                                                                borderSide: BorderSide.none,
+                                                              ),
+                                                              contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
+                                                              hintText: 'Person Name'
+                                                          ),
+                                                          inputFormatters: [
+                                                            FilteringTextInputFormatter.allow(
+                                                                RegExp("[a-zA-Z ]")),
+                                                            // Allow only letters, numbers, and single space
+                                                            FilteringTextInputFormatter.deny(
+                                                                RegExp(r'^\s')),
+                                                            // Disallow starting with a space
+                                                            FilteringTextInputFormatter.deny(
+                                                                RegExp(r'\s\s')),
+                                                            // Disallow multiple spaces
+                                                          ],
+                                                          validator: (value) {
+                                                            if (ContactpersonController.text != null && ContactpersonController.text.trim().isEmpty) {
+                                                              return 'Please enter a product name';
+                                                            }
+                                                            return null;
                                                           },
                                                         ),
                                                       ),
-                                                    ),
+                                                    ],
                                                   ),
                                                 ),
-                                                TableCell(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                    child: Container(
-                                                      height: 35,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey.shade200,
-                                                        borderRadius: BorderRadius.circular(4.0),
+                                                const SizedBox(width: 16),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      const Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          Text('Email'),
+                                                          SizedBox(width: 5,),
+                                                          Text('*', style: TextStyle(color: Colors.red),),
+                                                        ],
                                                       ),
-                                                      child: Center(child: Text(item['totalAmount'].toString())),
-                                                    ),
+                                                      const SizedBox(height: 5,),
+                                                      SizedBox(
+                                                        height: 40,
+                                                        child: TextFormField(
+                                                          controller: EmailAddressController,
+                                                          decoration: InputDecoration(
+                                                            filled: true,
+                                                            fillColor: Colors.grey.shade200,
+                                                            border: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(5.0),
+                                                              borderSide: BorderSide.none,
+                                                            ),
+                                                            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                                            hintText: 'Person Email',
+                                                            // errorText: _errorText,
+                                                          ),
+                                                          inputFormatters: [
+                                                            FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
+                                                            FilteringTextInputFormatter.deny(RegExp(r'^\s')),
+                                                            FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
+                                                          ],
+                                                          validator: (value) {
+                                                            setState(() {
+                                                              if (value!.isEmpty) {
+                                                                _errorText = 'Please enter Valid email address';
+                                                              } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
+                                                                _errorText = 'Please enter valid email address';
+                                                              } else {
+                                                                _errorText = null;
+                                                              }
+                                                            });
+                                                            if(_errorText != null){
+                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                SnackBar(content: Text(_errorText!)),
+                                                              );
+                                                            }
+                                                            return null;
+                                                          },
+                                                        ),
+                                                      )
+                                                    ],
                                                   ),
                                                 ),
-                                                TableCell(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                    child: Container(
-                                                      height: 35,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey.shade200,
-                                                        borderRadius: BorderRadius.circular(4.0),
-                                                      ),
-                                                      child: Center(child: Text(item['totalAmount2']!= null? item['totalAmount2'].toString() : '0'),
-                                                      ),
-                                                    ),
-                                                  ),
-
-                                                ),
-                                              ]
-                                          )
-                                        ],
-
-                                      );
-                                    },
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 16),
+
                                   Padding(
-                                    padding: const EdgeInsets.only(right: 25 ,top: 5,bottom: 5),
-                                    child: Align(
-                                      alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFFFFF),
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Color(0xFF00000029),
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
+                                          ),
+                                        ],
+                                      ),
+
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+
+                                          const Padding(
+                                            padding: EdgeInsets.only(top: 10,left: 30),
+                                            child: Text(
+                                              'Add Products',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                                fontFamily: 'Titillium Web',
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Container(
+                                            width: maxWidth,
+                                            decoration: const BoxDecoration(
+                                              border: Border(
+                                                top: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
+                                                bottom: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                              child: Table(
+                                                columnWidths: const {
+                                                  0: FlexColumnWidth(1),
+                                                  1: FlexColumnWidth(3),
+                                                  2: FlexColumnWidth(2),
+                                                  3: FlexColumnWidth(2),
+                                                  4: FlexColumnWidth(2),
+                                                  5: FlexColumnWidth(1),
+                                                  6: FlexColumnWidth(1.2),
+                                                  7: FlexColumnWidth(2),
+                                                  8: FlexColumnWidth(2),
+                                                },
+                                                children:  const [
+                                                  TableRow(
+                                                      children: [
+                                                        TableCell(child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "SN",
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                //  fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),),
+                                                        TableCell(child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'Product Name',
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                //  fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),),
+                                                        TableCell(child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Category",
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                // fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),),
+                                                        TableCell(child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Sub Category",
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                // fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),),
+
+                                                        TableCell(child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Price",
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                // fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),),
+                                                        TableCell(child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "QTY",
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                // fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),),
+                                                        TableCell(child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Return QTY",
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                //  fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),),
+                                                        TableCell(child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Invoice Amount",
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                //  fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),),
+                                                        TableCell(child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Credit Request",
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                // fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),),
+                                                      ]
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          ListView.builder(
+                                            shrinkWrap: true,
+                                            physics: const NeverScrollableScrollPhysics(),
+                                            itemCount: _orderDetails.length,
+                                            itemBuilder: (context, index) {
+                                              if (index >= _orderDetails.length || index >= _qtyControllers.length) {
+                                                return const SizedBox.shrink(); // Return an empty widget if the index is out of range
+                                              }
+                                              Map<String, dynamic> item = _orderDetails[index];
+                                              return Table(
+                                                border: const TableBorder(
+                                                  bottom: BorderSide(width:1 ,color: Colors.grey),
+                                                  //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
+                                                  verticalInside: BorderSide(width: 1,color: Colors.grey),
+                                                ),
+                                                columnWidths: const {
+                                                  0: FlexColumnWidth(1),
+                                                  1: FlexColumnWidth(3),
+                                                  2: FlexColumnWidth(2),
+                                                  3: FlexColumnWidth(2),
+                                                  4: FlexColumnWidth(2),
+                                                  5: FlexColumnWidth(1),
+                                                  6: FlexColumnWidth(1.2),
+                                                  7: FlexColumnWidth(2),
+                                                  8: FlexColumnWidth(2),
+                                                },
+
+                                                children: [
+                                                  TableRow(
+                                                      children:[
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only( left: 10,
+                                                                right: 10,
+                                                                top: 15,
+                                                                bottom: 5),
+                                                            child: Center(child: Text('${index + 1}')),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              width: 50,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius.circular(4.0),
+                                                              ),
+                                                              child: Center(child: Text(item['productName'],textAlign: TextAlign.center,)),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              width: 50,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius.circular(4.0),
+                                                              ),
+                                                              child: Center(child: Text(item['category'],textAlign: TextAlign.center,)),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              width: 50,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius.circular(4.0),
+                                                              ),
+                                                              child: Center(child: Text(item['subCategory'])),
+                                                            ),
+                                                          ),
+                                                        ),
+
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              width: 50,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius.circular(4.0),
+                                                              ),
+                                                              child: Center(child: Text(item['price'].toString())),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              width: 50,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius.circular(4.0),
+                                                              ),
+                                                              child: Center(child: Text(item['qty'].toString())),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              width: 50,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius.circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: TextFormField(
+                                                                  controller: _qtyControllers[index],
+                                                                  textAlign: TextAlign.center, // Center alignment
+                                                                  decoration: const InputDecoration(
+                                                                      border: InputBorder.none, // Remove underline
+                                                                      contentPadding: EdgeInsets.only(
+                                                                          bottom: 12
+                                                                      )
+                                                                    //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
+                                                                  ),
+                                                                  inputFormatters: [
+                                                                    LengthLimitingTextInputFormatter(4),
+                                                                    FilteringTextInputFormatter.allow(
+                                                                        RegExp("[0-9]")),
+                                                                    // Allow only letters, numbers, and single space
+                                                                    FilteringTextInputFormatter.deny(
+                                                                        RegExp(r'^\s')),
+                                                                    // Disallow starting with a space
+                                                                    FilteringTextInputFormatter.deny(
+                                                                        RegExp(r'\s\s')),
+                                                                    // Disallow multiple spaces
+                                                                  ],
+                                                                  onChanged: (value) {
+                                                                    setState(() {
+                                                                      if (value.isEmpty) {
+                                                                        item['enteredQty'] = 0;
+                                                                        item['totalAmount2'] = 0;
+                                                                        _qtyControllers[index].clear();
+                                                                      } else {
+                                                                        int enteredQty = int.parse(value);
+
+                                                                        if (enteredQty > (item['qty']?? 0) || enteredQty == 0) {
+                                                                          //  if (enteredQty > (item['qty']?? 0) || (item['qty'] == 0)) {
+                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                            const SnackBar(content: Text('Return qty must be less than or equal to the order qty.')),
+                                                                          );
+                                                                          // Clear the entered value
+                                                                          item['enteredQty'] = 0;
+                                                                          _qtyControllers[index].clear();
+                                                                          //  _textController.clear(); // Clear the text field
+                                                                        } else {
+                                                                          item['enteredQty'] = enteredQty;
+                                                                          item['totalAmount2'] = (item['totalAmount']  / item['qty'])  * enteredQty;
+                                                                        }
+                                                                      }
+                                                                      // calculate the total amount
+                                                                      totalAmount = _orderDetails.fold(0.0, (sum, item) => sum + (item['totalAmount2']?? 0));
+                                                                      totalController.text = totalAmount.toStringAsFixed(2); // update the totalController
+                                                                      print('enteredqty');
+                                                                      print(_qtyControllers[index].text);
+                                                                      print(item['enteredQty']);
+                                                                      print(_qtyControllers[index].text);
+                                                                    });
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              width: 50,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius.circular(4.0),
+                                                              ),
+                                                              child: Center(child: Text(item['totalAmount'].toString())),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              width: 50,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius.circular(4.0),
+                                                              ),
+                                                              child: Center(child: Text(item['totalAmount2']!= null? item['totalAmount2'].toString() : '0'),
+                                                              ),
+                                                            ),
+                                                          ),
+
+                                                        ),
+                                                      ]
+                                                  )
+                                                ],
+
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 25 ,top: 5,bottom: 5),
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Container(
+                                                height: 40,
+                                                padding: const EdgeInsets.only(left: 15,right: 10,top: 6,bottom: 2),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(color: const Color(0xFF0277BD)),
+                                                  borderRadius: BorderRadius.circular(2.0),
+                                                  color: Colors.white,
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(bottom: 2),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      RichText(text:
+                                                      TextSpan(
+                                                        children: [
+                                                          const TextSpan(
+                                                            text:  'Total Credit',
+                                                            style: TextStyle(
+                                                                fontSize: 14,
+                                                                color: Colors.blue
+                                                              // fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                          const TextSpan(
+                                                            text: '  ₹',
+                                                            style: TextStyle(
+                                                              color: Colors.black,
+                                                            ),
+                                                          ),
+                                                          TextSpan(
+                                                            text: totalController.text,
+                                                            style: const TextStyle(
+                                                              color: Colors.black,
+                                                            ),
+                                                          ) ],
+                                                      ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFFFFF),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Color(0xFF00000029),
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
+                                          ),
+                                        ],
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsets.only(left: 30),
+                                                child: Text(
+                                                  'Image Upload',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14,
+                                                    fontFamily: 'Titillium Web',
+                                                  ),
+                                                ),
+                                              ),
+                                              const Spacer(),
+
+                                              Padding(
+                                                padding:  const EdgeInsets.only(right: 30),
+                                                child: Padding(
+                                                  padding:  EdgeInsets.only(left: maxWidth * 0.15),
+                                                  child: OutlinedButton.icon(
+                                                    icon: const Icon(Icons.upload,color: Colors.white,size: 18,),
+                                                    label: const Text('Upload',style: TextStyle(color: Colors.white,),),
+                                                    onPressed: () {
+                                                      if(_controller.text.isNotEmpty) {
+                                                        Map<String,
+                                                            dynamic> orderDetailsMap = {
+                                                          'emailAddress': EmailAddressController
+                                                              .text,
+                                                          'contactPerson': ContactpersonController
+                                                              .text,
+                                                          'reason': _selectedReason,
+                                                          'otherField': _controller
+                                                              .text,
+                                                          'orderDetails': _orderDetails,
+                                                          'totalAmount2': totalController
+                                                              .text,
+                                                          'notes': NotesController.text,
+                                                          'customerId': customerIdController.text,
+                                                          'orderId': OrderIDController.text,
+                                                          'shipAddres': ShippingAddressController.text,
+                                                          'ContactNumber': ContactPerson.text,
+                                                        };
+                                                        print(
+                                                            'return design module file');
+                                                        print(orderDetailsMap);
+                                                        print(_orderDetails);
+                                                        context.go(
+                                                            '/Cus_Add_Image',
+                                                            extra: {
+                                                              'orderDetails': _orderDetails,
+                                                              'imageSizeString': widget.imageSizeString,
+                                                              'storeImages': widget
+                                                                  .storeImages,
+                                                              'imageSizeStrings': widget
+                                                                  .imageSizeStrings,
+                                                              'orderDetailsMap': orderDetailsMap,
+                                                              'customerId': customerIdController.text,
+                                                            });
+                                                      }
+                                                      else{
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          const SnackBar(
+                                                            content: Text('Please Enter Invoice Number'),
+                                                            //  backgroundColor: Colors.red,
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
+                                                    style: OutlinedButton.styleFrom(
+                                                      backgroundColor:
+                                                      Colors.blue[800],
+                                                      // Button background color
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                        BorderRadius.circular(
+                                                            5), // Rounded corners
+                                                      ),
+                                                      side: BorderSide.none, // No outline
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const Divider(
+                                            color: Color(0xFFB2C2D3), // Choose a color that contrasts with the background
+                                            thickness: 1, // Set a non-zero thickness
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Column(
+                                            children: [
+                                              if(widget.storeImages != '')
+                                                Column(
+                                                  children: List.generate(widget.storeImages.length, (i) {
+                                                    return Row(
+                                                      children: [
+                                                        const Padding(
+                                                          padding: EdgeInsets.only(left: 30),
+                                                          child: Icon(Icons.image,color: Colors.blue,size: 30,),
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(left: 15),
+                                                          child: Text(
+                                                            '${widget.storeImages[i].split('-')[0]}',
+                                                            style: const TextStyle(fontSize: 18),
+                                                          ),
+                                                        ),
+                                                        const Spacer(),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(right: 30), // add 10 pixels of space to the left
+                                                          child: Text('${widget.imageSizeStrings[i]}', style: const TextStyle(fontSize: 18)),
+                                                        ),
+                                                        IconButton(
+                                                          icon: const Icon(Icons.delete_forever_rounded,color: Colors.deepOrange,size: 35,),
+                                                          onPressed: () {
+                                                            if (i < widget.storeImages.length - 0) {
+                                                              setState(() {
+                                                                widget.storeImages.removeAt(i);
+                                                                widget.imageSizeString!.removeAt(i);
+                                                                widget.imageSizeStrings.removeAt(i);
+                                                              });
+                                                            } else {
+                                                              setState(() {
+                                                                widget.storeImages.removeAt(i);
+                                                                widget.imageSizeStrings.removeAt(i - 1);
+                                                              });
+                                                            }
+                                                          },
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }),
+                                                )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 50,right: 100,top: 30,bottom: 20),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFFFFF),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Color(0xFF00000029),
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
+                                          ),
+                                        ],
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('Notes', style: TextStyle(fontWeight: FontWeight.bold)),
+                                            const SizedBox(height: 8),
+                                            TextFormField(
+                                              controller:  NotesController,
+                                              decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor: Colors.grey.shade200,
+                                                border: InputBorder.none,
+                                              ),
+                                              maxLines: 5, // To make it a single line text field
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],),))
+                        }
+                        else...{
+                          Expanded(
+                                                        child: SingleChildScrollView(
+                          child:
+
+                          AdaptiveScrollbar(
+                            position: ScrollbarPosition.top,controller: horizontalScroll,
+                            child: SingleChildScrollView(
+                                controller: horizontalScroll,
+                              scrollDirection: Axis.horizontal,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  width: 1700,
+                                  child: Column(children: [
+
+                                    Padding(
+                                      padding: const EdgeInsets.only(right:100),
+                                      child: SizedBox(
+                                        width: 1700,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          // mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding:  const EdgeInsets.only(right: 130,
+                                                  //   * 0.089,
+                                                  top: 20),
+                                              child:  Text('Return Date',style: TextStyle(fontSize: maxWidth * 0.0090),),
+                                            ),
+                                            DecoratedBox(
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: const Color(0xFFEBF3FF), width: 1),
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: SizedBox(
+                                                height: 39,
+                                                width: 170,
+                                                child: Column(
+                                                  children: [
+                                                    Expanded(
+                                                      child: TextFormField(
+                                                        controller: _dateController,
+                                                        // Replace with your TextEditingController
+                                                        readOnly: true,
+                                                        decoration: InputDecoration(
+                                                          suffixIcon: Padding(
+                                                            padding: const EdgeInsets.only(right: 20),
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(
+                                                                  top: 2, left: 10),
+                                                              child: IconButton(
+                                                                icon: const Padding(
+                                                                  padding: EdgeInsets.only(bottom: 16),
+                                                                  child: Icon(Icons.calendar_month),
+                                                                ),
+                                                                iconSize: 20,
+                                                                onPressed: () {
+                                                                  // _showDatePicker(context);
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          hintText: 'Select Date',
+                                                          fillColor: Colors.white,
+                                                          contentPadding: const EdgeInsets.symmetric(
+                                                              horizontal: 8, vertical: 8),
+                                                          border: InputBorder.none,
+                                                          filled: true,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            // SizedBox(height: 20.h),
+
+                                          ],
+                                        ),
+
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
                                       child: Container(
-                                        height: 40,
-                                        padding: const EdgeInsets.only(left: 15,right: 10,top: 6,bottom: 2),
                                         decoration: BoxDecoration(
-                                          border: Border.all(color: const Color(0xFF0277BD)),
-                                          borderRadius: BorderRadius.circular(2.0),
-                                          color: Colors.white,
+                                          border: Border.all(color: Colors.grey),
+                                          borderRadius: BorderRadius.circular(8),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(0xff00000029),
+                                              offset: Offset(0, 3),
+                                              blurRadius: 6,
+                                            ),
+                                          ],
+                                          color: const Color(0xFFFFFFFF),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.only(bottom: 2),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              RichText(text:
-                                              TextSpan(
+                                              Row(
                                                 children: [
-                                                  const TextSpan(
-                                                    text:  'Total Credit',
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.blue
-                                                      // fontWeight: FontWeight.bold,
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Invoice Number'),
+                                                            SizedBox(width: 5,),
+                                                            Text('*', style: TextStyle(color: Colors.red),),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        SizedBox(
+                                                          height: 40,
+                                                          child: TextFormField(
+                                                            controller: _controller,
+                                                            focusNode: _focusNode,
+                                                            // onEditingComplete: _fetchOrderDetails,
+                                                            decoration: InputDecoration(
+                                                                filled: true,
+                                                                contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
+                                                                fillColor: Colors.grey.shade200,
+                                                                border: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.circular(5.0),
+                                                                  borderSide: BorderSide.none,
+                                                                ),
+                                                                hintText: 'INV_03312'
+
+                                                            ),
+                                                            inputFormatters: [
+                                                              UpperCaseTextFormatter(),
+                                                              FilteringTextInputFormatter.allow(
+                                                                  RegExp("[a-zA-Z_0-9]")),
+                                                              // Allow only letters, numbers, and single space
+                                                              FilteringTextInputFormatter.deny(
+                                                                  RegExp(r'^\s')),
+                                                              // Disallow starting with a space
+                                                              FilteringTextInputFormatter.deny(
+                                                                  RegExp(r'\s\s')),
+                                                              // Disallow multiple spaces
+                                                            ],
+                                                            validator: (value) {
+                                                              if (_controller.text != null && _controller.text.trim().isEmpty) {
+                                                                return 'Please enter a product name';
+                                                              }
+                                                              return null;
+                                                            },
+
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  const TextSpan(
-                                                    text: '  ₹',
-                                                    style: TextStyle(
-                                                      color: Colors.black,
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Reason'),
+                                                            SizedBox(width: 5,),
+                                                            Text('*', style: TextStyle(color: Colors.red),),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        SizedBox(
+                                                          height: 40,
+                                                          child:
+                                                          DropdownButtonFormField<String>(
+
+                                                            decoration: InputDecoration(
+                                                              filled: true,
+                                                              fillColor: Colors.grey.shade200,
+                                                              border: OutlineInputBorder(
+                                                                borderRadius: BorderRadius.circular(5.0),
+                                                                borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
+                                                              ),
+                                                              contentPadding: const EdgeInsets.symmetric(
+                                                                  horizontal: 8, vertical: 8),
+                                                            ),
+                                                            value: _selectedReason,
+                                                            onChanged: (String? value) {
+                                                              setState(() {
+                                                                _selectedReason = value!;
+                                                                _reasonController.text = value;
+                                                              });
+                                                            },
+                                                            items:<String>['Reason for return', 'Option 1', 'Option 2'].map<DropdownMenuItem<String>>((String value) {
+                                                              return DropdownMenuItem<String>(
+                                                                value: value,
+                                                                child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.black,),),
+                                                              );
+                                                            }).toList(),
+                                                            isExpanded: true,
+                                                            //     hint: const Text('Reason for return'),
+                                                          ),
+                                                        )
+                                                      ],
                                                     ),
                                                   ),
-                                                  TextSpan(
-                                                    text: totalController.text,
-                                                    style: const TextStyle(
-                                                      color: Colors.black,
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Contact Person'),
+                                                            SizedBox(width: 5,),
+                                                            Text('*', style: TextStyle(color: Colors.red),),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        SizedBox(
+                                                          height: 40,
+                                                          child: TextFormField(
+                                                            controller: ContactpersonController,
+                                                            decoration:  InputDecoration(
+                                                                filled: true,
+                                                                fillColor: Colors.grey.shade200,
+                                                                border: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.circular(5.0),
+                                                                  borderSide: BorderSide.none,
+                                                                ),
+                                                                contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
+                                                                hintText: 'Person Name'
+                                                            ),
+                                                            inputFormatters: [
+                                                              FilteringTextInputFormatter.allow(
+                                                                  RegExp("[a-zA-Z ]")),
+                                                              // Allow only letters, numbers, and single space
+                                                              FilteringTextInputFormatter.deny(
+                                                                  RegExp(r'^\s')),
+                                                              // Disallow starting with a space
+                                                              FilteringTextInputFormatter.deny(
+                                                                  RegExp(r'\s\s')),
+                                                              // Disallow multiple spaces
+                                                            ],
+                                                            validator: (value) {
+                                                              if (ContactpersonController.text != null && ContactpersonController.text.trim().isEmpty) {
+                                                                return 'Please enter a product name';
+                                                              }
+                                                              return null;
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ) ],
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Email'),
+                                                            SizedBox(width: 5,),
+                                                            Text('*', style: TextStyle(color: Colors.red),),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        SizedBox(
+                                                          height: 40,
+                                                          child: TextFormField(
+                                                            controller: EmailAddressController,
+                                                            decoration: InputDecoration(
+                                                              filled: true,
+                                                              fillColor: Colors.grey.shade200,
+                                                              border: OutlineInputBorder(
+                                                                borderRadius: BorderRadius.circular(5.0),
+                                                                borderSide: BorderSide.none,
+                                                              ),
+                                                              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                                              hintText: 'Person Email',
+                                                              // errorText: _errorText,
+                                                            ),
+                                                            inputFormatters: [
+                                                              FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
+                                                              FilteringTextInputFormatter.deny(RegExp(r'^\s')),
+                                                              FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
+                                                            ],
+                                                            validator: (value) {
+                                                              setState(() {
+                                                                if (value!.isEmpty) {
+                                                                  _errorText = 'Please enter Valid email address';
+                                                                } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
+                                                                  _errorText = 'Please enter valid email address';
+                                                                } else {
+                                                                  _errorText = null;
+                                                                }
+                                                              });
+                                                              if(_errorText != null){
+                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                  SnackBar(content: Text(_errorText!)),
+                                                                );
+                                                              }
+                                                              return null;
+                                                            },
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFFFFF),
+                                          border: Border.all(color: Colors.grey),
+                                          borderRadius: BorderRadius.circular(8),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(0xFF00000029),
+                                              offset: Offset(0, 3),
+                                              blurRadius: 6,
+                                            ),
+                                          ],
+                                        ),
+
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+
+                                            const Padding(
+                                              padding: EdgeInsets.only(top: 10,left: 30),
+                                              child: Text(
+                                                'Add Products',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14,
+                                                  fontFamily: 'Titillium Web',
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Container(
+                                              width: 1700,
+                                              decoration: const BoxDecoration(
+                                                border: Border(
+                                                  top: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
+                                                  bottom: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
+                                                ),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                                child: Table(
+                                                  columnWidths: const {
+                                                    0: FlexColumnWidth(1),
+                                                    1: FlexColumnWidth(3),
+                                                    2: FlexColumnWidth(2),
+                                                    3: FlexColumnWidth(2),
+                                                    4: FlexColumnWidth(2),
+                                                    5: FlexColumnWidth(1),
+                                                    6: FlexColumnWidth(1.2),
+                                                    7: FlexColumnWidth(2),
+                                                    8: FlexColumnWidth(2),
+                                                  },
+                                                  children:  const [
+                                                    TableRow(
+                                                        children: [
+                                                          TableCell(child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "SN",
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  //  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),),
+                                                          TableCell(child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Product Name',
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  //  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),),
+                                                          TableCell(child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "Category",
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  // fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),),
+                                                          TableCell(child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "Sub Category",
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  // fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),),
+
+                                                          TableCell(child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "Price",
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  // fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),),
+                                                          TableCell(child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "QTY",
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  // fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),),
+                                                          TableCell(child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "Return QTY",
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  //  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),),
+                                                          TableCell(child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "Invoice Amount",
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  //  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),),
+                                                          TableCell(child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "Credit Request",
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  // fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),),
+                                                        ]
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            ListView.builder(
+                                              shrinkWrap: true,
+                                              physics: const NeverScrollableScrollPhysics(),
+                                              itemCount: _orderDetails.length,
+                                              itemBuilder: (context, index) {
+                                                if (index >= _orderDetails.length || index >= _qtyControllers.length) {
+                                                  return const SizedBox.shrink(); // Return an empty widget if the index is out of range
+                                                }
+                                                Map<String, dynamic> item = _orderDetails[index];
+                                                return Table(
+                                                  border: const TableBorder(
+                                                    bottom: BorderSide(width:1 ,color: Colors.grey),
+                                                    //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
+                                                    verticalInside: BorderSide(width: 1,color: Colors.grey),
+                                                  ),
+                                                  columnWidths: const {
+                                                    0: FlexColumnWidth(1),
+                                                    1: FlexColumnWidth(3),
+                                                    2: FlexColumnWidth(2),
+                                                    3: FlexColumnWidth(2),
+                                                    4: FlexColumnWidth(2),
+                                                    5: FlexColumnWidth(1),
+                                                    6: FlexColumnWidth(1.2),
+                                                    7: FlexColumnWidth(2),
+                                                    8: FlexColumnWidth(2),
+                                                  },
+
+                                                  children: [
+                                                    TableRow(
+                                                        children:[
+                                                          TableCell(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only( left: 10,
+                                                                  right: 10,
+                                                                  top: 15,
+                                                                  bottom: 5),
+                                                              child: Center(child: Text('${index + 1}')),
+                                                            ),
+                                                          ),
+                                                          TableCell(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                              child: Container(
+                                                                height: 35,
+                                                                width: 50,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.grey.shade200,
+                                                                  borderRadius: BorderRadius.circular(4.0),
+                                                                ),
+                                                                child: Center(child: Text(item['productName'],textAlign: TextAlign.center,)),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          TableCell(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                              child: Container(
+                                                                height: 35,
+                                                                width: 50,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.grey.shade200,
+                                                                  borderRadius: BorderRadius.circular(4.0),
+                                                                ),
+                                                                child: Center(child: Text(item['category'],textAlign: TextAlign.center,)),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          TableCell(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                              child: Container(
+                                                                height: 35,
+                                                                width: 50,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.grey.shade200,
+                                                                  borderRadius: BorderRadius.circular(4.0),
+                                                                ),
+                                                                child: Center(child: Text(item['subCategory'])),
+                                                              ),
+                                                            ),
+                                                          ),
+
+                                                          TableCell(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                              child: Container(
+                                                                height: 35,
+                                                                width: 50,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.grey.shade200,
+                                                                  borderRadius: BorderRadius.circular(4.0),
+                                                                ),
+                                                                child: Center(child: Text(item['price'].toString())),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          TableCell(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                              child: Container(
+                                                                height: 35,
+                                                                width: 50,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.grey.shade200,
+                                                                  borderRadius: BorderRadius.circular(4.0),
+                                                                ),
+                                                                child: Center(child: Text(item['qty'].toString())),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          TableCell(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                              child: Container(
+                                                                height: 35,
+                                                                width: 50,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.grey.shade200,
+                                                                  borderRadius: BorderRadius.circular(4.0),
+                                                                ),
+                                                                child: Center(
+                                                                  child: TextFormField(
+                                                                    controller: _qtyControllers[index],
+                                                                    textAlign: TextAlign.center, // Center alignment
+                                                                    decoration: const InputDecoration(
+                                                                        border: InputBorder.none, // Remove underline
+                                                                        contentPadding: EdgeInsets.only(
+                                                                            bottom: 12
+                                                                        )
+                                                                      //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
+                                                                    ),
+                                                                    inputFormatters: [
+                                                                      LengthLimitingTextInputFormatter(4),
+                                                                      FilteringTextInputFormatter.allow(
+                                                                          RegExp("[0-9]")),
+                                                                      // Allow only letters, numbers, and single space
+                                                                      FilteringTextInputFormatter.deny(
+                                                                          RegExp(r'^\s')),
+                                                                      // Disallow starting with a space
+                                                                      FilteringTextInputFormatter.deny(
+                                                                          RegExp(r'\s\s')),
+                                                                      // Disallow multiple spaces
+                                                                    ],
+                                                                    onChanged: (value) {
+                                                                      setState(() {
+                                                                        if (value.isEmpty) {
+                                                                          item['enteredQty'] = 0;
+                                                                          item['totalAmount2'] = 0;
+                                                                          _qtyControllers[index].clear();
+                                                                        } else {
+                                                                          int enteredQty = int.parse(value);
+
+                                                                          if (enteredQty > (item['qty']?? 0) || enteredQty == 0) {
+                                                                            //  if (enteredQty > (item['qty']?? 0) || (item['qty'] == 0)) {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(content: Text('Return qty must be less than or equal to the order qty.')),
+                                                                            );
+                                                                            // Clear the entered value
+                                                                            item['enteredQty'] = 0;
+                                                                            _qtyControllers[index].clear();
+                                                                            //  _textController.clear(); // Clear the text field
+                                                                          } else {
+                                                                            item['enteredQty'] = enteredQty;
+                                                                            item['totalAmount2'] = (item['totalAmount']  / item['qty'])  * enteredQty;
+                                                                          }
+                                                                        }
+                                                                        // calculate the total amount
+                                                                        totalAmount = _orderDetails.fold(0.0, (sum, item) => sum + (item['totalAmount2']?? 0));
+                                                                        totalController.text = totalAmount.toStringAsFixed(2); // update the totalController
+                                                                        print('enteredqty');
+                                                                        print(_qtyControllers[index].text);
+                                                                        print(item['enteredQty']);
+                                                                        print(_qtyControllers[index].text);
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          TableCell(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                              child: Container(
+                                                                height: 35,
+                                                                width: 50,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.grey.shade200,
+                                                                  borderRadius: BorderRadius.circular(4.0),
+                                                                ),
+                                                                child: Center(child: Text(item['totalAmount'].toString())),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          TableCell(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                              child: Container(
+                                                                height: 35,
+                                                                width: 50,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.grey.shade200,
+                                                                  borderRadius: BorderRadius.circular(4.0),
+                                                                ),
+                                                                child: Center(child: Text(item['totalAmount2']!= null? item['totalAmount2'].toString() : '0'),
+                                                                ),
+                                                              ),
+                                                            ),
+
+                                                          ),
+                                                        ]
+                                                    )
+                                                  ],
+
+                                                );
+                                              },
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Padding(
+                                              padding: const EdgeInsets.only(right: 25 ,top: 5,bottom: 5),
+                                              child: Align(
+                                                alignment: Alignment.centerRight,
+                                                child: Container(
+                                                  height: 40,
+                                                  padding: const EdgeInsets.only(left: 15,right: 10,top: 6,bottom: 2),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(color: const Color(0xFF0277BD)),
+                                                    borderRadius: BorderRadius.circular(2.0),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(bottom: 2),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        RichText(text:
+                                                        TextSpan(
+                                                          children: [
+                                                            const TextSpan(
+                                                              text:  'Total Credit',
+                                                              style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors.blue
+                                                                // fontWeight: FontWeight.bold,
+                                                              ),
+                                                            ),
+                                                            const TextSpan(
+                                                              text: '  ₹',
+                                                              style: TextStyle(
+                                                                color: Colors.black,
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                              text: totalController.text,
+                                                              style: const TextStyle(
+                                                                color: Colors.black,
+                                                              ),
+                                                            ) ],
+                                                        ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFFFFF),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(0xFF00000029),
+                                              offset: Offset(0, 3),
+                                              blurRadius: 6,
+                                            ),
+                                          ],
+                                          border: Border.all(color: Colors.grey),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+
+                                            const SizedBox(height: 8),
+                                            Row(
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.only(left: 30),
+                                                  child: Text(
+                                                    'Image Upload',
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 14,
+                                                      fontFamily: 'Titillium Web',
+                                                    ),
+                                                  ),
+                                                ),
+                                                const Spacer(),
+
+                                                Padding(
+                                                  padding:  const EdgeInsets.only(right: 30),
+                                                  child: Padding(
+                                                    padding:  EdgeInsets.only(left: maxWidth * 0.15),
+                                                    child: OutlinedButton.icon(
+                                                      icon: const Icon(Icons.upload,color: Colors.white,size: 18,),
+                                                      label: const Text('Upload',style: TextStyle(color: Colors.white,),),
+                                                      onPressed: () {
+                                                        if(_controller.text.isNotEmpty) {
+                                                          Map<String,
+                                                              dynamic> orderDetailsMap = {
+                                                            'emailAddress': EmailAddressController
+                                                                .text,
+                                                            'contactPerson': ContactpersonController
+                                                                .text,
+                                                            'reason': _selectedReason,
+                                                            'otherField': _controller
+                                                                .text,
+                                                            'orderDetails': _orderDetails,
+                                                            'totalAmount2': totalController
+                                                                .text,
+                                                            'notes': NotesController.text,
+                                                            'customerId': customerIdController.text,
+                                                            'orderId': OrderIDController.text,
+                                                            'shipAddres': ShippingAddressController.text,
+                                                            'ContactNumber': ContactPerson.text,
+                                                          };
+                                                          print(
+                                                              'return design module file');
+                                                          print(orderDetailsMap);
+                                                          print(_orderDetails);
+                                                          context.go(
+                                                              '/Cus_Add_Image',
+                                                              extra: {
+                                                                'orderDetails': _orderDetails,
+                                                                'imageSizeString': widget.imageSizeString,
+                                                                'storeImages': widget
+                                                                    .storeImages,
+                                                                'imageSizeStrings': widget
+                                                                    .imageSizeStrings,
+                                                                'orderDetailsMap': orderDetailsMap,
+                                                                'customerId': customerIdController.text,
+                                                              });
+                                                        }
+                                                        else{
+                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                            const SnackBar(
+                                                              content: Text('Please Enter Invoice Number'),
+                                                              //  backgroundColor: Colors.red,
+                                                            ),
+                                                          );
+                                                        }
+                                                      },
+                                                      style: OutlinedButton.styleFrom(
+                                                        backgroundColor:
+                                                        Colors.blue[800],
+                                                        // Button background color
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                          BorderRadius.circular(
+                                                              5), // Rounded corners
+                                                        ),
+                                                        side: BorderSide.none, // No outline
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const Divider(
+                                              color: Color(0xFFB2C2D3), // Choose a color that contrasts with the background
+                                              thickness: 1, // Set a non-zero thickness
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Column(
+                                              children: [
+                                                if(widget.storeImages != '')
+                                                  Column(
+                                                    children: List.generate(widget.storeImages.length, (i) {
+                                                      return Row(
+                                                        children: [
+                                                          const Padding(
+                                                            padding: EdgeInsets.only(left: 30),
+                                                            child: Icon(Icons.image,color: Colors.blue,size: 30,),
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(left: 15),
+                                                            child: Text(
+                                                              '${widget.storeImages[i].split('-')[0]}',
+                                                              style: const TextStyle(fontSize: 18),
+                                                            ),
+                                                          ),
+                                                          const Spacer(),
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(right: 30), // add 10 pixels of space to the left
+                                                            child: Text('${widget.imageSizeStrings[i]}', style: const TextStyle(fontSize: 18)),
+                                                          ),
+                                                          IconButton(
+                                                            icon: const Icon(Icons.delete_forever_rounded,color: Colors.deepOrange,size: 35,),
+                                                            onPressed: () {
+                                                              if (i < widget.storeImages.length - 0) {
+                                                                setState(() {
+                                                                  widget.storeImages.removeAt(i);
+                                                                  widget.imageSizeString!.removeAt(i);
+                                                                  widget.imageSizeStrings.removeAt(i);
+                                                                });
+                                                              } else {
+                                                                setState(() {
+                                                                  widget.storeImages.removeAt(i);
+                                                                  widget.imageSizeStrings.removeAt(i - 1);
+                                                                });
+                                                              }
+                                                            },
+                                                          ),
+                                                        ],
+                                                      );
+                                                    }),
+                                                  )
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50,right: 100,top: 30,bottom: 20),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFFFFF),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(0xFF00000029),
+                                              offset: Offset(0, 3),
+                                              blurRadius: 6,
+                                            ),
+                                          ],
+                                          border: Border.all(color: Colors.grey),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('Notes', style: TextStyle(fontWeight: FontWeight.bold)),
+                                              const SizedBox(height: 8),
+                                              TextFormField(
+                                                controller:  NotesController,
+                                                decoration: InputDecoration(
+                                                  filled: true,
+                                                  fillColor: Colors.grey.shade200,
+                                                  border: InputBorder.none,
+                                                ),
+                                                maxLines: 5, // To make it a single line text field
                                               )
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFFFFF),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color(0xFF00000029),
-                                    offset: Offset(0, 3),
-                                    blurRadius: 6,
-                                  ),
-                                ],
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      const Padding(
-                                        padding: EdgeInsets.only(left: 30),
-                                        child: Text(
-                                          'Image Upload',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                            fontFamily: 'Titillium Web',
-                                          ),
-                                        ),
-                                      ),
-                                      const Spacer(),
-
-                                      Padding(
-                                        padding:  const EdgeInsets.only(right: 30),
-                                        child: Padding(
-                                          padding:  EdgeInsets.only(left: maxWidth * 0.15),
-                                          child: OutlinedButton.icon(
-                                            icon: const Icon(Icons.upload,color: Colors.white,size: 18,),
-                                            label: const Text('Upload',style: TextStyle(color: Colors.white,),),
-                                            onPressed: () {
-                                              if(_controller.text.isNotEmpty) {
-                                                Map<String,
-                                                    dynamic> orderDetailsMap = {
-                                                  'emailAddress': EmailAddressController
-                                                      .text,
-                                                  'contactPerson': ContactpersonController
-                                                      .text,
-                                                  'reason': _selectedReason,
-                                                  'otherField': _controller
-                                                      .text,
-                                                  'orderDetails': _orderDetails,
-                                                  'totalAmount2': totalController
-                                                      .text,
-                                                  'notes': NotesController.text,
-                                                  'customerId': customerIdController.text,
-                                                  'orderId': OrderIDController.text,
-                                                  'shipAddres': ShippingAddressController.text,
-                                                  'ContactNumber': ContactPerson.text,
-                                                };
-                                                print(
-                                                    'return design module file');
-                                                print(orderDetailsMap);
-                                                print(_orderDetails);
-                                                context.go(
-                                                    '/Cus_Add_Image',
-                                                    extra: {
-                                                      'orderDetails': _orderDetails,
-                                                      'imageSizeString': widget.imageSizeString,
-                                                      'storeImages': widget
-                                                          .storeImages,
-                                                      'imageSizeStrings': widget
-                                                          .imageSizeStrings,
-                                                      'orderDetailsMap': orderDetailsMap,
-                                                      'customerId': customerIdController.text,
-                                                    });
-                                              }
-                                              else{
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Please Enter Invoice Number'),
-                                                    //  backgroundColor: Colors.red,
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                            style: OutlinedButton.styleFrom(
-                                              backgroundColor:
-                                              Colors.blue[800],
-                                              // Button background color
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                BorderRadius.circular(
-                                                    5), // Rounded corners
-                                              ),
-                                              side: BorderSide.none, // No outline
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Divider(
-                                    color: Color(0xFFB2C2D3), // Choose a color that contrasts with the background
-                                    thickness: 1, // Set a non-zero thickness
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Column(
-                                    children: [
-                                      if(widget.storeImages != '')
-                                        Column(
-                                          children: List.generate(widget.storeImages.length, (i) {
-                                            return Row(
-                                              children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.only(left: 30),
-                                                  child: Icon(Icons.image,color: Colors.blue,size: 30,),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets.only(left: 15),
-                                                  child: Text(
-                                                    '${widget.storeImages[i].split('-')[0]}',
-                                                    style: const TextStyle(fontSize: 18),
-                                                  ),
-                                                ),
-                                                const Spacer(),
-                                                Padding(
-                                                  padding: const EdgeInsets.only(right: 30), // add 10 pixels of space to the left
-                                                  child: Text('${widget.imageSizeStrings[i]}', style: const TextStyle(fontSize: 18)),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(Icons.delete_forever_rounded,color: Colors.deepOrange,size: 35,),
-                                                  onPressed: () {
-                                                    if (i < widget.storeImages.length - 0) {
-                                                      setState(() {
-                                                        widget.storeImages.removeAt(i);
-                                                        widget.imageSizeString!.removeAt(i);
-                                                        widget.imageSizeStrings.removeAt(i);
-                                                      });
-                                                    } else {
-                                                      setState(() {
-                                                        widget.storeImages.removeAt(i);
-                                                        widget.imageSizeStrings.removeAt(i - 1);
-                                                      });
-                                                    }
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                          }),
-                                        )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 50,right: 100,top: 30,bottom: 20),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFFFFF),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color(0xFF00000029),
-                                    offset: Offset(0, 3),
-                                    blurRadius: 6,
-                                  ),
-                                ],
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Notes', style: TextStyle(fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 8),
-                                    TextFormField(
-                                      controller:  NotesController,
-                                      decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Colors.grey.shade200,
-                                        border: InputBorder.none,
-                                      ),
-                                      maxLines: 5, // To make it a single line text field
-                                    )
-                                  ],
+                                  ],),
                                 ),
                               ),
                             ),
-                          ),
-                        ],),))
+                          ),)),
+
+
+                        }
+
 
                       ],
                     ))

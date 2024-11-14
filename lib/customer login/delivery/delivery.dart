@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 import 'dart:math' as math;
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
@@ -32,6 +33,7 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
     'Total Amount',
     'Delivery Status'
   ];
+  final ScrollController horizontalScroll = ScrollController();
   List<double> columnWidths = [110, 110, 130, 125, 135];
   List<bool> columnSortState = [true, true, true, true, true];
   Timer? _searchDebounceTimer;
@@ -81,15 +83,29 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Customer_Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
-      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blueAccent, '/Customer_Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Customer_Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Customer_Return_List'),
+    _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
+      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Customer_Order_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
+      Container(decoration: BoxDecoration(
+        color: Colors.blue[800],
+         // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+        // color: Color.fromRGBO(224, 59, 48, 1.0),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(8), // Radius for top-left corner
+          topRight: Radius.circular(8), // No radius for top-right corner
+          bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+          bottomRight: Radius.circular(8), // No radius for bottom-right corner
+        ),
+      ),child: _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.white, '/Customer_Delivery_List')),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Customer_Payment_List'),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Customer_Return_List'),
     ];
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Delivery'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Delivery'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -99,25 +115,28 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -366,23 +385,41 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
         ),
         body: LayoutBuilder(builder: (context, constraints) {
           double maxWidth = constraints.maxWidth;
-          double maxHeight = constraints.maxHeight;
+
           return Stack(
             children: [
-              Align(
-// Added Align widget for the left side menu
-                alignment: Alignment.topLeft,
-                child: Container(
-                  height: 1400,
-                  width: 200,
-                  color: const Color(0xFFF7F6FA),
-                  padding: const EdgeInsets.only(left: 20, top: 30),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _buildMenuItems(context),
+
+              if(constraints.maxHeight <= 500)...{
+                SingleChildScrollView(
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      width: 200,
+                      color: const Color(0xFFF7F6FA),
+                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _buildMenuItems(context),
+                      ),
+                    ),
+                  ),
+                )
+
+              }
+              else...{
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    width: 200,
+                    color: const Color(0xFFF7F6FA),
+                    padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _buildMenuItems(context),
+                    ),
                   ),
                 ),
-              ),
+              },
               Padding(
                 padding: const EdgeInsets.only(left: 200, top: 0),
                 child: Container(
@@ -396,93 +433,233 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
               ),
               Positioned(
                 top: 0,
-                left: 0,
+                left: 201,
                 right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 201),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    color: Colors.white,
-                    height: 50,
-                    child: Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text(
-                            'Delivery List',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 40, left: 200),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-// Space above/below the border
-                  height: 0.3, // Border height
-                  color: Colors.black, // Border color
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                    left: 300, top: 120, right: maxWidth * 0.062, bottom: 15),
-                child: Container(
-                  width: maxWidth,
-                  height: 700,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: SizedBox(
-                      width: maxWidth * 0.79,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildSearchField(),
-                          const SizedBox(height: 10),
-                          Scrollbar(
-                            controller: _scrollController,
-                            thickness: 6,
-                            thumbVisibility: true,
-                            child: SingleChildScrollView(
-                              controller: _scrollController,
-                              scrollDirection: Axis.horizontal,
-                              child: buildDataTable(),
+                bottom: 0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        color: Colors.white,
+                        height: 50,
+                        child: const Row(
+                          children: [
+                             Padding(
+                              padding: EdgeInsets.only(left: 20),
+                              child: Text(
+                                'Delivery List',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                          ),
-                          SizedBox(),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 30),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(left: 0),
+                      // Space above/below the border
+                      height: 1,
+                      // width: 10  00,
+                      width: constraints.maxWidth,
+                      // Border height
+                      color: Colors.grey, // Border color
+                    ),
+                    if(constraints.maxWidth >= 1140)...{
+                      Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
                               children: [
-                                PaginationControls(
-                                  currentPage: currentPage,
-                                  totalPages: filteredData.length > itemsPerPage
-                                      ? totalPages
-                                      : 1,
-                                  // totalPages,
-                                  onPreviousPage: _goToPreviousPage,
-                                  onNextPage: _goToNextPage,
+                                Row(
+                                  children: [
+                                    Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 30,
+                                            top: 50,
+                                            right: 30,
+                                            bottom: 15),
+                                        child: Container(
+                                          height: 755,
+                                          width: maxWidth * 0.8,
+                                          decoration:BoxDecoration(
+                                            //   border: Border.all(color: Colors.grey),
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(8),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                spreadRadius: 3,
+                                                blurRadius: 3,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: SizedBox(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                buildSearchField(),
+                                                const SizedBox(height: 10),
+                                                Expanded(
+                                                  child: Scrollbar(
+                                                    controller:
+                                                    _scrollController,
+                                                    thickness: 6,
+                                                    thumbVisibility: true,
+                                                    child:
+                                                    SingleChildScrollView(
+                                                      controller:
+                                                      _scrollController,
+                                                      scrollDirection:
+                                                      Axis.horizontal,
+                                                      child: buildDataTable(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 1,
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets.only(
+                                                      right: 30),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                    children: [
+                                                      PaginationControls(
+                                                        currentPage:
+                                                        currentPage,
+                                                        totalPages: filteredData
+                                                            .length >
+                                                            itemsPerPage
+                                                            ? totalPages
+                                                            : 1,
+                                                        onPreviousPage:
+                                                        _goToPreviousPage,
+                                                        onNextPage:
+                                                        _goToNextPage,
+                                                        // onLastPage: _goToLastPage,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )),
+                                  ],
                                 ),
                               ],
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
+                          )),
+                    }
+                    else...{
+                      Expanded(
+                          child: AdaptiveScrollbar(
+
+                            position: ScrollbarPosition.bottom,controller: horizontalScroll,
+                            child: SingleChildScrollView(
+                              controller: horizontalScroll,
+                              scrollDirection: Axis.horizontal,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 30,
+                                                top: 50,
+                                                right: 30,
+                                                bottom: 15),
+                                            child: Container(
+                                              height: 755,
+                                              width: 1100,
+                                              decoration:BoxDecoration(
+                                                //   border: Border.all(color: Colors.grey),
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(8),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                    spreadRadius: 3,
+                                                    blurRadius: 3,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: SizedBox(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                                  children: [
+                                                    buildSearchField(),
+                                                    const SizedBox(height: 10),
+                                                    Expanded(
+                                                      child: Scrollbar(
+                                                        controller:
+                                                        _scrollController,
+                                                        thickness: 6,
+                                                        thumbVisibility: true,
+                                                        child:
+                                                        SingleChildScrollView(
+                                                          controller:
+                                                          _scrollController,
+                                                          scrollDirection:
+                                                          Axis.horizontal,
+                                                          child: buildDataTable2(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 1,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                      const EdgeInsets.only(
+                                                          right: 30),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                        children: [
+                                                          PaginationControls(
+                                                            currentPage:
+                                                            currentPage,
+                                                            totalPages: filteredData
+                                                                .length >
+                                                                itemsPerPage
+                                                                ? totalPages
+                                                                : 1,
+                                                            onPreviousPage:
+                                                            _goToPreviousPage,
+                                                            onNextPage:
+                                                            _goToNextPage,
+                                                            // onLastPage: _goToLastPage,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            )),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )),
+                    }
+                  ],
                 ),
               ),
+
             ],
           );
         }),
@@ -714,6 +891,286 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
       },
     );
   }
+  Widget buildDataTable2() {
+    if (isLoading) {
+      _loading = true;
+      var width = MediaQuery.of(context).size.width;
+      var Height = MediaQuery.of(context).size.height;
+      return Padding(
+        padding: EdgeInsets.only(
+            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
+        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+      );
+    }
+
+    if (filteredData.isEmpty) {
+      double right = MediaQuery.of(context).size.width;
+      return Column(
+        children: [
+          Container(
+              width:1100,
+              decoration: const BoxDecoration(
+                  color: Color(0xFFF7F7F7),
+                  border: Border.symmetric(
+                      horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+              child:
+
+              DataTable(
+                  showCheckboxColumn: false,
+                  headingRowHeight: 40,
+                  columns: [
+                    DataColumn(
+                        label: Container(
+                            child: Text(
+                              'Delivery Id',
+                              style: TextStyle(
+                                  color: Colors.indigo[900],
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold),
+                            ))),
+                    DataColumn(
+                        label: Container(
+                            child: Text(
+                              'Invoice Id',
+                              style: TextStyle(
+                                  color: Colors.indigo[900],
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold),
+                            ))),
+                    DataColumn(
+                        label: Container(
+                            child: Text(
+                              'Created Date',
+                              style: TextStyle(
+                                  color: Colors.indigo[900],
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold),
+                            ))),
+                    DataColumn(
+                        label: Container(
+                            child: Text(
+                              'Total Amount',
+                              style: TextStyle(
+                                  color: Colors.indigo[900],
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold),
+                            ))),
+                    DataColumn(
+                        label: Container(
+                            child: Text(
+                              'Delivery Status',
+                              style: TextStyle(
+                                  color: Colors.indigo[900],
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold),
+                            ))),
+                  ],
+                  rows: [])
+          ),
+          Padding(
+            padding:
+            EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            child: CustomDatafound(),
+          ),
+        ],
+      );
+    }
+    return LayoutBuilder(builder: (context, constraints) {
+      double right = MediaQuery.of(context).size.width;
+      return Column(
+        children: [
+          Container(
+              width: 1100,
+              decoration: const BoxDecoration(
+                  color: Color(0xFFF7F7F7),
+                  border: Border.symmetric(
+                      horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+              child:
+              DataTable(
+                  showCheckboxColumn: false,
+                  headingRowHeight: 40,
+                  columnSpacing: 35,
+                  columns: columns.map((column) {
+                    return DataColumn(
+                      label: Stack(
+                        children: [
+                          Container(
+                            padding: null,
+                            width: columnWidths[columns.indexOf(column)],
+                            // Dynamic width based on user interaction
+                            child: Row(
+                              children: [
+                                Text(
+                                  column,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.indigo[900],
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon:
+                                  _sortOrder[columns.indexOf(column)] == 'asc'
+                                      ? SizedBox(width: 12,
+                                      child: Image.asset("images/sort.png",color: Colors.grey,))
+                                      : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                  onPressed: () {
+                                    setState(() {
+                                      _sortOrder[columns.indexOf(column)] =
+                                      _sortOrder[columns.indexOf(column)] ==
+                                          'asc'
+                                          ? 'desc'
+                                          : 'asc';
+                                      _sortProducts(columns.indexOf(column),
+                                          _sortOrder[columns.indexOf(column)]);
+                                    });
+                                  },
+                                ),
+                                Spacer(),
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.resizeColumn,
+                                  child: GestureDetector(
+                                      onHorizontalDragUpdate: (details) {
+                                        setState(() {
+                                          columnWidths[columns.indexOf(column)] +=
+                                              details.delta.dx;
+                                          columnWidths[columns.indexOf(column)] =
+                                              columnWidths[
+                                              columns.indexOf(column)]
+                                                  .clamp(136.0, 300.0);
+                                        });
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 10, bottom: 10),
+                                        child: Row(
+                                          children: [
+                                            VerticalDivider(
+                                              width: 5,
+                                              thickness: 4,
+                                              color: Colors.grey,
+                                            )
+                                          ],
+                                        ),
+                                      )),
+                                ),
+
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      onSort: (columnIndex, ascending) {
+                        _sortOrder;
+                      },
+                    );
+                  }).toList(),
+                  rows: List.generate(
+                      math.min(itemsPerPage,
+                          filteredData.length - (currentPage - 1) * itemsPerPage),
+                          (index) {
+                        final detail =
+                        filteredData[(currentPage - 1) * itemsPerPage + index];
+                        final isSelected = _selectedProduct == detail;
+                        return DataRow(
+                          color: MaterialStateProperty.resolveWith<Color>((states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.blue.shade500.withOpacity(
+                                  0.8); // Add some opacity to the dark blue
+                            } else {
+                              return Colors.white.withOpacity(0.9);
+                            }
+                          }),
+                          cells: [
+                            DataCell(
+                              Container(
+                                width: columnWidths[0],
+                                // Same dynamic width as column headers
+                                child: Text(
+                                  detail.deliveryId!.toString(),
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? Colors.deepOrange[200]
+                                        : const Color(0xFFFFB315),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                width: columnWidths[1],
+                                child: Text(
+                                  detail.invoiceNo!,
+                                  style: const TextStyle(
+                                    color: Color(0xFFA6A6A6),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                width: columnWidths[2],
+                                child: Text(
+                                  detail.modifiedAt!,
+                                  style: const TextStyle(
+                                    color: Color(0xFFA6A6A6),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                width: columnWidths[3],
+                                child: Text(
+                                  detail.total.toString(),
+                                  style: const TextStyle(
+                                    color: Color(0xFFA6A6A6),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                width: columnWidths[4],
+                                child: Text(detail.deliveryStatus,
+                                    style: TextStyle(
+//fontSize: 16,
+                                        color: detail.deliveryStatus ==
+                                            "In Progress"
+                                            ? Colors.orange
+                                            : detail.deliveryStatus == "Delivered"
+                                            ? Colors.green
+                                            : Colors.grey)),
+                              ),
+                            ),
+                          ],
+                          // onSelectChanged: (selected) {
+                          //   if (selected != null && selected) {
+                          //     if (filteredData.length <= 9) {
+                          //       print(detail.deliveryStatus);
+                          //       context.go('/Delivery_View', extra: {
+                          //         'invoice': detail.invoiceNo,
+                          //         'deliveryStatus': detail.deliveryStatus,
+                          //         'deliveryId': detail.deliveryId,
+                          //       });
+                          //     } else {
+                          //       context.go('/Delivery_View', extra: {
+                          //         'invoice': detail.invoiceNo,
+                          //         'deliveryStatus': detail.deliveryStatus,
+                          //         'deliveryId': detail.deliveryId,
+                          //       });
+                          //     }
+                          //
+                          //   }
+                          // }
+                        );
+                      }))
+
+          ),
+        ],
+      );
+    });
+  }
 
   Widget buildDataTable() {
     if (isLoading) {
@@ -732,7 +1189,7 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
       return Column(
         children: [
           Container(
-              width: right * 0.78,
+              width: right - 200,
               decoration: const BoxDecoration(
                   color: Color(0xFFF7F7F7),
                   border: Border.symmetric(
@@ -804,7 +1261,7 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
       return Column(
         children: [
           Container(
-              width: right * 0.78,
+              width: right - 200,
               decoration: const BoxDecoration(
                   color: Color(0xFFF7F7F7),
                   border: Border.symmetric(
@@ -860,7 +1317,7 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
                                           columnWidths[columns.indexOf(column)] =
                                               columnWidths[
                                               columns.indexOf(column)]
-                                                  .clamp(50.0, 300.0);
+                                                  .clamp(136.0, 300.0);
                                         });
                                       },
                                       child: Padding(

@@ -2,6 +2,7 @@ import 'dart:html';
 import 'package:btb/Return%20Module/return%20first%20page.dart';
 import 'package:btb/Product%20Module/Edit.dart';
 import 'package:btb/Product Module/Product Screen.dart';
+import 'package:btb/admin/admin%20edit.dart';
 import 'package:btb/admin/admin%20list.dart';
 import 'package:btb/customer%20login/credit/credit%20list.dart';
 import 'package:btb/customer%20login/delivery/delivery.dart';
@@ -45,6 +46,7 @@ import 'Return Module/return module design.dart';
 import 'Return Module/return ontap.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'admin/create users.dart';
+import 'customer login/cus_dashboard/dash_cus.dart';
 import 'customer login/order/add to cart.dart';
 import 'customer login/order/draft list.dart';
 import 'customer login/order/editable view screen.dart';
@@ -155,6 +157,25 @@ class MyApp extends StatelessWidget {
           return CustomTransitionPage(
             key: state.pageKey,
             child: Createusr(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/Edit_User',
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: userEdit(EditUser: extra['EditUser'] ?? {},),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -673,6 +694,24 @@ class MyApp extends StatelessWidget {
           return CustomTransitionPage(
             key: state.pageKey,
             child: DashboardPage(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/Cus_Home',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: DashboardPage1(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(

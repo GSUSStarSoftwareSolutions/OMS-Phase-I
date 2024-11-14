@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/login/login.dart';
 import 'package:btb/Order%20Module/firstpage.dart';
 import 'package:btb/Order%20Module/fourthpage.dart';
@@ -44,6 +45,7 @@ class _FifthPageState extends State<FifthPage> {
   String _searchText = '';
   late Future<List<detail>> futureOrders;
   String searchQuery = '';
+  final ScrollController horizontalScroll = ScrollController();
   final String _category = '';
   double _total1 = 0.0;
   final List<String> list = ['  Name 1', '  Name 2', '  Name3'];
@@ -133,19 +135,33 @@ class _FifthPageState extends State<FifthPage> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Home', Icons.dashboard, Colors.blue[900]!, '/Home'),
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
       _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blueAccent, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Invoice'),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[800]  ,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8), // Radius for top-left corner
+              topRight: Radius.circular(8), // No radius for top-right corner
+              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+            ),
+          ),
+          child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.white
+              , '/Order_List')),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
       _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart, Colors.blue[900]!, '/Report_List'),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
+      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Orders'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Orders'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -155,25 +171,28 @@ class _FifthPageState extends State<FifthPage> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -329,7 +348,7 @@ class _FifthPageState extends State<FifthPage> {
       "contactPerson": contactPersonController.text,
       "contactNumber": contactNumberController.text,
       "comments":  ShippingAddress.text,
-      "status": "",
+      "status": "Not Started",
       "customerId": CusIdController.text,
       "total": data2['totalAmount'],
       "items": items,
@@ -932,7 +951,7 @@ class _FifthPageState extends State<FifthPage> {
                         height: 1200,
                         width: 200,
                         color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: _buildMenuItems(context),
@@ -1063,117 +1082,85 @@ class _FifthPageState extends State<FifthPage> {
                             width: constraints.maxWidth,// Border height
                             color: Colors.black, // Border color
                           ),
-                          Expanded(child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 100),
-                                  child: Container(
-                                      width: maxWidth,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Padding(
-                                            padding:  EdgeInsets.only(right: maxWidth * 0.08,top: 30),
-                                            child:  Text(' Order Date',style: TextStyle(fontSize: maxWidth * 0.010,color: Colors.black87),),
-                                          ),
-                                          // Padding(
-                                          //   padding:  EdgeInsets.only(top: 20,right: maxWidth * 0.085),
-                                          //   child: const Text(('Order Date')),
-                                          // ),
-                                          Padding(
-                                            padding:  const EdgeInsets.only( top:10),
-                                            child: DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: const Color(0xFFEBF3FF), width: 1),
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: Container(
-                                                height: 39,
-                                                width: maxWidth *0.13,
-                                                child: Column(
-                                                  children: [
-                                                    Expanded(
-                                                      child: TextFormField(
-                                                        controller: _dateController,
-                                                        // Replace with your TextEditingController
-                                                        readOnly: true,
-                                                        decoration: InputDecoration(
-                                                          suffixIcon: Padding(
-                                                            padding: const EdgeInsets.only(right: 20),
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(
-                                                                  top: 2, left: 10),
-                                                              child: IconButton(
-                                                                icon: const Padding(
-                                                                  padding: EdgeInsets.only(bottom: 16),
-                                                                  child: Icon(Icons.calendar_month),
+                          if(constraints.maxWidth >= 1300)...{
+                            Expanded(child:
+                            SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 100),
+                                    child: Container(
+                                        width: maxWidth,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Padding(
+                                              padding:  EdgeInsets.only(right: maxWidth * 0.08,top: 30),
+                                              child:  Text(' Order Date',style: TextStyle(fontSize: maxWidth * 0.010,color: Colors.black87),),
+                                            ),
+                                            // Padding(
+                                            //   padding:  EdgeInsets.only(top: 20,right: maxWidth * 0.085),
+                                            //   child: const Text(('Order Date')),
+                                            // ),
+                                            Padding(
+                                              padding:  const EdgeInsets.only( top:10),
+                                              child: DecoratedBox(
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: const Color(0xFFEBF3FF), width: 1),
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: Container(
+                                                  height: 39,
+                                                  width: maxWidth *0.13,
+                                                  child: Column(
+                                                    children: [
+                                                      Expanded(
+                                                        child: TextFormField(
+                                                          controller: _dateController,
+                                                          // Replace with your TextEditingController
+                                                          readOnly: true,
+                                                          decoration: InputDecoration(
+                                                            suffixIcon: Padding(
+                                                              padding: const EdgeInsets.only(right: 20),
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.only(
+                                                                    top: 2, left: 10),
+                                                                child: IconButton(
+                                                                  icon: const Padding(
+                                                                    padding: EdgeInsets.only(bottom: 16),
+                                                                    child: Icon(Icons.calendar_month),
+                                                                  ),
+                                                                  iconSize: 20,
+                                                                  onPressed: () {
+                                                                    // _showDatePicker(context);
+                                                                  },
                                                                 ),
-                                                                iconSize: 20,
-                                                                onPressed: () {
-                                                                  // _showDatePicker(context);
-                                                                },
                                                               ),
                                                             ),
+                                                            hintText: '        Select Date',
+                                                            fillColor: Colors.grey.shade200,
+                                                            contentPadding: const EdgeInsets.symmetric(
+                                                                horizontal: 8, vertical: 8),
+                                                            border: InputBorder.none,
+                                                            filled: true,
                                                           ),
-                                                          hintText: '        Select Date',
-                                                          fillColor: Colors.grey.shade200,
-                                                          contentPadding: const EdgeInsets.symmetric(
-                                                              horizontal: 8, vertical: 8),
-                                                          border: InputBorder.none,
-                                                          filled: true,
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
 
-                                        ],
-                                      )
-                                  ),
-                                ),
-                                //SizedBox(height: 20.h),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 100,right: 100,top: 50),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFFFFFFF), // background: #FFFFFF
-                                      boxShadow: [BoxShadow(
-                                        offset: Offset(0, 3),
-                                        blurRadius: 6,
-                                        color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                                      )],
-                                      // border: Border.all(
-                                      //   // border: 2px
-                                      //   color: Color(0xFFB2C2D3), // border: #B2C2D3
-                                      // ),
-                                      borderRadius: BorderRadius.all(Radius.circular(4)), // border-radius: 8px
-                                    ),
-                                    child: Table(
-                                      border: TableBorder.all(color: const Color(0xFFB2C2D3)),
-
-                                      columnWidths: const {
-                                        0: FlexColumnWidth(2),
-                                        1: FlexColumnWidth(1.4),
-                                      },
-                                      children: [
-                                        row1,
-                                        row2,
-                                        row3,
-                                      ],
+                                          ],
+                                        )
                                     ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 100, top: 50,right: 100,bottom: 10),
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width * 0.81,
+                                  //SizedBox(height: 20.h),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 100,right: 100,top: 50),
                                     child: Container(
-                                      width: maxWidth,
                                       decoration: BoxDecoration(
                                         color: Color(0xFFFFFFFF), // background: #FFFFFF
                                         boxShadow: [BoxShadow(
@@ -1181,454 +1168,582 @@ class _FifthPageState extends State<FifthPage> {
                                           blurRadius: 6,
                                           color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
                                         )],
-                                        border: Border.all(
-                                          // border: 2px
-                                          color: Color(0xFFB2C2D3), // border: #B2C2D3
-                                        ),
+                                        // border: Border.all(
+                                        //   // border: 2px
+                                        //   color: Color(0xFFB2C2D3), // border: #B2C2D3
+                                        // ),
                                         borderRadius: BorderRadius.all(Radius.circular(4)), // border-radius: 8px
-                                      ),                               child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Padding(
-                                          padding: EdgeInsets.only(top: 10, left: 30),
-                                          child: Text(
-                                            'Add Products',
-                                            style: TextStyle(
-                                              fontSize: 19,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Container(
-                                          width: maxWidth,
-                                          decoration: BoxDecoration(
-                                            border: Border(
-                                              top: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
-                                              bottom: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(top: 5, bottom: 5),
-                                            child: Table(
-                                              columnWidths: const {
-                                                0: FlexColumnWidth(0.9),
-                                                1: FlexColumnWidth(2.7),
-                                                2: FlexColumnWidth(2),
-                                                3: FlexColumnWidth(1.8),
-                                                4: FlexColumnWidth(2),
-                                                5: FlexColumnWidth(1),
-                                                6: FlexColumnWidth(2),
-                                                7: FlexColumnWidth(1),
-                                                8: FlexColumnWidth(1),
-                                                9: FlexColumnWidth(1),
-                                                10: FlexColumnWidth(1),
+                                      ),
+                                      child: Table(
+                                        border: TableBorder.all(color: const Color(0xFFB2C2D3)),
 
-                                              },
-                                              children: const [
-                                                TableRow(
-                                                  children: [
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Padding(
-                                                            padding: EdgeInsets.only(left: 12),
+                                        columnWidths: const {
+                                          0: FlexColumnWidth(2),
+                                          1: FlexColumnWidth(1.4),
+                                        },
+                                        children: [
+                                          row1,
+                                          row2,
+                                          row3,
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 100, top: 50,right: 100,bottom: 10),
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width * 0.81,
+                                      child: Container(
+                                        width: maxWidth,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFFFFFFFF), // background: #FFFFFF
+                                          boxShadow: [BoxShadow(
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
+                                            color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                          )],
+                                          border: Border.all(
+                                            // border: 2px
+                                            color: Color(0xFFB2C2D3), // border: #B2C2D3
+                                          ),
+                                          borderRadius: BorderRadius.all(Radius.circular(4)), // border-radius: 8px
+                                        ),                               child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.only(top: 10, left: 30),
+                                            child: Text(
+                                              'Add Products',
+                                              style: TextStyle(
+                                                fontSize: 19,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Container(
+                                            width: maxWidth,
+                                            decoration: BoxDecoration(
+                                              border: Border(
+                                                top: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
+                                                bottom: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                              child: Table(
+                                                columnWidths: const {
+                                                  0: FlexColumnWidth(0.9),
+                                                  1: FlexColumnWidth(2.7),
+                                                  2: FlexColumnWidth(2),
+                                                  3: FlexColumnWidth(1.8),
+                                                  4: FlexColumnWidth(2),
+                                                  5: FlexColumnWidth(1),
+                                                  6: FlexColumnWidth(2),
+                                                  7: FlexColumnWidth(1),
+                                                  8: FlexColumnWidth(1),
+                                                  9: FlexColumnWidth(1),
+                                                  10: FlexColumnWidth(1),
+
+                                                },
+                                                children: const [
+                                                  TableRow(
+                                                    children: [
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Padding(
+                                                              padding: EdgeInsets.only(left: 12),
+                                                              child: Text(
+                                                                'SN',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
                                                             child: Text(
-                                                              'SN',
+                                                              'Product Name',
                                                               style: TextStyle(fontWeight: FontWeight.bold),
                                                             ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'Product Name',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'Category',
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'Category',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'Sub Category',
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'Sub Category',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'Price',
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'Price',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'QTY',
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'QTY',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'Amount',
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'Amount',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'Disc.',
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'Disc.',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'TAX',
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'TAX',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'Total Amount',
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'Total Amount',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              '    ',
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                        child: Center(
-                                                          child: Text(
-                                                            '    ',
-                                                            style: TextStyle(fontWeight: FontWeight.bold),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        ListView.builder(
-                                          shrinkWrap: true,
-                                          physics: const NeverScrollableScrollPhysics(),
-                                          itemCount: widget.selectedProducts.length,
-                                          itemBuilder: (context, index) {
-                                            Product product = widget.selectedProducts[index];
-                                            return Table(
-                                              border: TableBorder(
-                                                bottom: BorderSide(width:1 ,color: Colors.grey),
-                                                //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
-                                                verticalInside: BorderSide(width: 1,color: Colors.grey),
-                                              ),
-                                              // border: TableBorder.all(color: const Color(0xFFB2C2D3)),
-                                              columnWidths: const {
-                                                0: FlexColumnWidth(1),
-                                                1: FlexColumnWidth(2.7),
-                                                2: FlexColumnWidth(2),
-                                                3: FlexColumnWidth(1.8),
-                                                4: FlexColumnWidth(2),
-                                                5: FlexColumnWidth(1),
-                                                6: FlexColumnWidth(2),
-                                                7: FlexColumnWidth(1),
-                                                8: FlexColumnWidth(1),
-                                                9: FlexColumnWidth(1),
-                                                10: FlexColumnWidth(1),
-
-                                              },
-                                              children: [
-                                                TableRow(
-                                                  children: [
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 15, bottom: 5),
-                                                        child: Center(
-                                                          child: Text(
-                                                            (index + 1).toString(),
-                                                            textAlign: TextAlign.center,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 150,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              product.productName,
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 150,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              product.category,
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              product.subCategory,
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              product.price.toString(),
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              product.quantity.toString(),
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              '${product.price * product.quantity}',
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              '${product.discount}',
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              '${product.tax}',
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              '${(product.totalAmount * product.quantity).toStringAsFixed(2)}',
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.symmetric(vertical: 20),
-                                                        child: InkWell(
-                                                          onTap: () {
-                                                            _deleteProduct(product);
-                                                          },
-                                                          child: const Icon(
-                                                            Icons.remove_circle_outline,
-                                                            size: 18,
-                                                            color: Colors.blue,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
+                                          ListView.builder(
+                                            shrinkWrap: true,
+                                            physics: const NeverScrollableScrollPhysics(),
+                                            itemCount: widget.selectedProducts.length,
+                                            itemBuilder: (context, index) {
+                                              Product product = widget.selectedProducts[index];
+                                              return Table(
+                                                border: TableBorder(
+                                                  bottom: BorderSide(width:1 ,color: Colors.grey),
+                                                  //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
+                                                  verticalInside: BorderSide(width: 1,color: Colors.grey),
                                                 ),
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                        Row(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 30, top: 20),
-                                              child: OutlinedButton(
-                                                onPressed: () {
-                                                  // List<Product> products = widget.selectedProducts;
-                                                  Product? selectedProduct;
-                                                  if (widget.selectedProducts.isNotEmpty) {
-                                                    // selectedProduct = null;
-                                                    print('No products selected');
-                                                    for (var selectedProduct in widget.selectedProducts) {
+                                                // border: TableBorder.all(color: const Color(0xFFB2C2D3)),
+                                                columnWidths: const {
+                                                  0: FlexColumnWidth(1),
+                                                  1: FlexColumnWidth(2.7),
+                                                  2: FlexColumnWidth(2),
+                                                  3: FlexColumnWidth(1.8),
+                                                  4: FlexColumnWidth(2),
+                                                  5: FlexColumnWidth(1),
+                                                  6: FlexColumnWidth(2),
+                                                  7: FlexColumnWidth(1),
+                                                  8: FlexColumnWidth(1),
+                                                  9: FlexColumnWidth(1),
+                                                  10: FlexColumnWidth(1),
+
+                                                },
+                                                children: [
+                                                  TableRow(
+                                                    children: [
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 15, bottom: 5),
+                                                          child: Center(
+                                                            child: Text(
+                                                              (index + 1).toString(),
+                                                              textAlign: TextAlign.center,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 10, bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 150,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.shade200,
+                                                              borderRadius: BorderRadius.circular(4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                product.productName,
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 10, bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 150,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.shade200,
+                                                              borderRadius: BorderRadius.circular(4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                product.category,
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 10, bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.shade200,
+                                                              borderRadius: BorderRadius.circular(4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                product.subCategory,
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 10, bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.shade200,
+                                                              borderRadius: BorderRadius.circular(4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                product.price.toString(),
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 10, bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.shade200,
+                                                              borderRadius: BorderRadius.circular(4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                product.quantity.toString(),
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 10, bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.shade200,
+                                                              borderRadius: BorderRadius.circular(4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                '${product.price * product.quantity}',
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 10, bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.shade200,
+                                                              borderRadius: BorderRadius.circular(4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                '${product.discount}',
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 10, bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.shade200,
+                                                              borderRadius: BorderRadius.circular(4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                '${product.tax}',
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              left: 10, right: 10, top: 10, bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.shade200,
+                                                              borderRadius: BorderRadius.circular(4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                '${(product.totalAmount * product.quantity).toStringAsFixed(2)}',
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.symmetric(vertical: 20),
+                                                          child: InkWell(
+                                                            onTap: () {
+                                                              _deleteProduct(product);
+                                                            },
+                                                            child: const Icon(
+                                                              Icons.remove_circle_outline,
+                                                              size: 18,
+                                                              color: Colors.blue,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 30, top: 20),
+                                                child: OutlinedButton(
+                                                  onPressed: () {
+                                                    // List<Product> products = widget.selectedProducts;
+                                                    Product? selectedProduct;
+                                                    if (widget.selectedProducts.isNotEmpty) {
+                                                      // selectedProduct = null;
+                                                      print('No products selected');
+                                                      for (var selectedProduct in widget.selectedProducts) {
+                                                        print('----yes');
+                                                        Map<String, dynamic> data = {
+                                                          'CusId':CusIdController.text,
+                                                          'deliveryLocation': EmailIdController.text,
+                                                          'ContactName': contactPersonController.text,
+                                                          'Address': deliveryAddressController.text,
+                                                          'ContactNumber': contactNumberController.text,
+                                                          'Comments': ShippingAddress.text,
+                                                          'date': _dateController.text,
+                                                          'actualamount': _total1,
+                                                        };
+                                                        data2 = data;
+                                                        print('----select');
+                                                        print(selectedProduct);
+                                                        print('data3');
+                                                        print(data2);
+                                                        print('products');
+                                                        print(products);
+                                                        //original
+                                                        context.go('/Add_products',extra: {
+                                                          // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
+                                                          'product': selectedProduct, // You need to pass a list of Product objects here
+                                                          'data': data2,
+                                                          'products': products,
+                                                          'selectedProducts': widget.selectedProducts,
+                                                          'inputText': '',
+                                                          'subText': 'hii',
+                                                          'notselect': 'selectedproduct',
+                                                        });
+                                                        // context.go('/Add_Product/PlaceOrder/Placed_Order_List', extra: {
+                                                        //   'products': products,
+                                                        //   'selectedProducts': selectedProducts,
+                                                        //   'selectedProduct': selectedProduct,
+                                                        //   'data': data2,
+                                                        //   'subText': 'hii',
+                                                        //   'inputText': '',
+                                                        //   'notselect': 'selectedproduct',
+                                                        // });
+                                                        //original code
+                                                        // Navigator.push(
+                                                        //   context,
+                                                        //   PageRouteBuilder(
+                                                        //     pageBuilder: (context,
+                                                        //         animation,
+                                                        //         secondaryAnimation) =>
+                                                        //         NextPage(
+                                                        //           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
+                                                        //           data: data2,
+                                                        //           product: selectedProduct,
+                                                        //           inputText: '',
+                                                        //           products: products,
+                                                        //           subText: 'hii',
+                                                        //           selectedProducts: widget.selectedProducts,
+                                                        //           notselect: 'selectedproduct',),
+                                                        //     transitionDuration:
+                                                        //     const Duration(
+                                                        //         milliseconds: 200),
+                                                        //     transitionsBuilder: (
+                                                        //         context,
+                                                        //         animation,
+                                                        //         secondaryAnimation,
+                                                        //         child) {
+                                                        //       return FadeTransition(
+                                                        //         opacity: animation,
+                                                        //         child: child,
+                                                        //       );
+                                                        //     },
+                                                        //   ),
+                                                        // );
+                                                      }
+
+                                                    }
+
+
+                                                    else {
+                                                      print("object");
+                                                      print(data2);
                                                       print('----yes');
                                                       Map<String, dynamic> data = {
-                                                        'CusId':CusIdController.text,
                                                         'deliveryLocation': EmailIdController.text,
-                                                        'ContactName': contactPersonController.text,
-                                                        'Address': deliveryAddressController.text,
-                                                        'ContactNumber': contactNumberController.text,
-                                                        'Comments': ShippingAddress.text,
-                                                        'date': _dateController.text,
-                                                        'actualamount': _total1,
+                                                        'CusId': CusIdController.text,
+                                                        'ContactName': contactPersonController
+                                                            .text,
+                                                        'Address': deliveryAddressController
+                                                            .text,
+                                                        'ContactNumber': contactNumberController
+                                                            .text,
+                                                        'Comments': ShippingAddress
+                                                            .text,
+                                                        'date': _selectedDate
+                                                            .toString(),
                                                       };
                                                       data2 = data;
-                                                      print('----select');
-                                                      print(selectedProduct);
-                                                      print('data3');
+                                                      print('details ');
                                                       print(data2);
-                                                      print('products');
-                                                      print(products);
-                                                      //original
-                                                      context.go('/Add_products',extra: {
+                                                      // Navigate to the page with empty data or handle it as needed
+                                                      context.go('/Cart_Selected_Products',extra: {
                                                         // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
-                                                        'product': selectedProduct, // You need to pass a list of Product objects here
+                                                        'product': Product(
+                                                            prodId: '',
+                                                            price: 0,
+                                                            productName: '',
+                                                            proId: '',
+                                                            category: '',
+                                                            selectedVariation: '',
+                                                            selectedUOM: '',
+                                                            subCategory: '',
+                                                            totalamount: 0,
+                                                            total: 0,
+                                                            tax: '',
+                                                            quantity: 0,
+                                                            discount: '',
+                                                            imageId: '',
+                                                            unit: '',
+                                                            totalAmount: 0.0,
+                                                            qty: 0), // You need to pass a list of Product objects here
                                                         'data': data2,
                                                         'products': products,
                                                         'selectedProducts': widget.selectedProducts,
@@ -1636,16 +1751,33 @@ class _FifthPageState extends State<FifthPage> {
                                                         'subText': 'hii',
                                                         'notselect': 'selectedproduct',
                                                       });
-                                                      // context.go('/Add_Product/PlaceOrder/Placed_Order_List', extra: {
-                                                      //   'products': products,
-                                                      //   'selectedProducts': selectedProducts,
-                                                      //   'selectedProduct': selectedProduct,
+                                                      // context.go('/Add_Products',extra: {
+                                                      //   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
+                                                      //   'product': Product(
+                                                      //       prodId: '',
+                                                      //       price: 0,
+                                                      //       productName: '',
+                                                      //       proId: '',
+                                                      //       category: '',
+                                                      //       selectedVariation: '',
+                                                      //       selectedUOM: '',
+                                                      //       subCategory: '',
+                                                      //       totalamount: 0,
+                                                      //       total: 0,
+                                                      //       tax: '',
+                                                      //       quantity: 0,
+                                                      //       discount: '',
+                                                      //       imageId: '',
+                                                      //       unit: '',
+                                                      //       totalAmount: 0.0,
+                                                      //       qty: 0), // You need to pass a list of Product objects here
                                                       //   'data': data2,
-                                                      //   'subText': 'hii',
+                                                      //   'products': products,
+                                                      //   'selectedProducts': widget.selectedProducts,
                                                       //   'inputText': '',
+                                                      //   'subText': 'hii',
                                                       //   'notselect': 'selectedproduct',
                                                       // });
-                                                      //original code
                                                       // Navigator.push(
                                                       //   context,
                                                       //   PageRouteBuilder(
@@ -1653,20 +1785,38 @@ class _FifthPageState extends State<FifthPage> {
                                                       //         animation,
                                                       //         secondaryAnimation) =>
                                                       //         NextPage(
-                                                      //           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
-                                                      //           data: data2,
-                                                      //           product: selectedProduct,
+                                                      //           data:data2,
+                                                      //           product: Product(
+                                                      //               prodId: '',
+                                                      //               price: 0,
+                                                      //               productName: '',
+                                                      //               proId: '',
+                                                      //               category: '',
+                                                      //               selectedVariation: '',
+                                                      //               selectedUOM: '',
+                                                      //               subCategory: '',
+                                                      //               totalamount: 0,
+                                                      //               total: 0,
+                                                      //               tax: '',
+                                                      //               quantity: 0,
+                                                      //               discount: '',
+                                                      //               imageId: '',
+                                                      //               unit: '',
+                                                      //               totalAmount: 0.0,
+                                                      //               qty: 0),
+                                                      //           // or you can pass a default product or null
                                                       //           inputText: '',
                                                       //           products: products,
                                                       //           subText: 'hii',
-                                                      //           selectedProducts: widget.selectedProducts,
-                                                      //           notselect: 'selectedproduct',),
-                                                      //     transitionDuration:
-                                                      //     const Duration(
+                                                      //           selectedProducts: widget
+                                                      //               .selectedProducts,
+                                                      //           // pass an empty list or null
+                                                      //           notselect: 'selectedproduct',
+                                                      //         ),
+                                                      //     transitionDuration: const Duration(
                                                       //         milliseconds: 200),
                                                       //     transitionsBuilder: (
-                                                      //         context,
-                                                      //         animation,
+                                                      //         context, animation,
                                                       //         secondaryAnimation,
                                                       //         child) {
                                                       //       return FadeTransition(
@@ -1677,404 +1827,1297 @@ class _FifthPageState extends State<FifthPage> {
                                                       //   ),
                                                       // );
                                                     }
-
-                                                  }
-
-
-                                                  else {
-                                                    print("object");
-                                                    print(data2);
-                                                    print('----yes');
-                                                    Map<String, dynamic> data = {
-                                                      'deliveryLocation': EmailIdController.text,
-                                                      'CusId': CusIdController.text,
-                                                      'ContactName': contactPersonController
-                                                          .text,
-                                                      'Address': deliveryAddressController
-                                                          .text,
-                                                      'ContactNumber': contactNumberController
-                                                          .text,
-                                                      'Comments': ShippingAddress
-                                                          .text,
-                                                      'date': _selectedDate
-                                                          .toString(),
-                                                    };
-                                                    data2 = data;
-                                                    print('details ');
-                                                    print(data2);
-                                                    // Navigate to the page with empty data or handle it as needed
-                                                    context.go('/Cart_Selected_Products',extra: {
-                                                      // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
-                                                      'product': Product(
-                                                          prodId: '',
-                                                          price: 0,
-                                                          productName: '',
-                                                          proId: '',
-                                                          category: '',
-                                                          selectedVariation: '',
-                                                          selectedUOM: '',
-                                                          subCategory: '',
-                                                          totalamount: 0,
-                                                          total: 0,
-                                                          tax: '',
-                                                          quantity: 0,
-                                                          discount: '',
-                                                          imageId: '',
-                                                          unit: '',
-                                                          totalAmount: 0.0,
-                                                          qty: 0), // You need to pass a list of Product objects here
-                                                      'data': data2,
-                                                      'products': products,
-                                                      'selectedProducts': widget.selectedProducts,
-                                                      'inputText': '',
-                                                      'subText': 'hii',
-                                                      'notselect': 'selectedproduct',
-                                                    });
-                                                    // context.go('/Add_Products',extra: {
-                                                    //   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
-                                                    //   'product': Product(
-                                                    //       prodId: '',
-                                                    //       price: 0,
-                                                    //       productName: '',
-                                                    //       proId: '',
-                                                    //       category: '',
-                                                    //       selectedVariation: '',
-                                                    //       selectedUOM: '',
-                                                    //       subCategory: '',
-                                                    //       totalamount: 0,
-                                                    //       total: 0,
-                                                    //       tax: '',
-                                                    //       quantity: 0,
-                                                    //       discount: '',
-                                                    //       imageId: '',
-                                                    //       unit: '',
-                                                    //       totalAmount: 0.0,
-                                                    //       qty: 0), // You need to pass a list of Product objects here
-                                                    //   'data': data2,
-                                                    //   'products': products,
-                                                    //   'selectedProducts': widget.selectedProducts,
-                                                    //   'inputText': '',
-                                                    //   'subText': 'hii',
-                                                    //   'notselect': 'selectedproduct',
-                                                    // });
-                                                    // Navigator.push(
-                                                    //   context,
-                                                    //   PageRouteBuilder(
-                                                    //     pageBuilder: (context,
-                                                    //         animation,
-                                                    //         secondaryAnimation) =>
-                                                    //         NextPage(
-                                                    //           data:data2,
-                                                    //           product: Product(
-                                                    //               prodId: '',
-                                                    //               price: 0,
-                                                    //               productName: '',
-                                                    //               proId: '',
-                                                    //               category: '',
-                                                    //               selectedVariation: '',
-                                                    //               selectedUOM: '',
-                                                    //               subCategory: '',
-                                                    //               totalamount: 0,
-                                                    //               total: 0,
-                                                    //               tax: '',
-                                                    //               quantity: 0,
-                                                    //               discount: '',
-                                                    //               imageId: '',
-                                                    //               unit: '',
-                                                    //               totalAmount: 0.0,
-                                                    //               qty: 0),
-                                                    //           // or you can pass a default product or null
-                                                    //           inputText: '',
-                                                    //           products: products,
-                                                    //           subText: 'hii',
-                                                    //           selectedProducts: widget
-                                                    //               .selectedProducts,
-                                                    //           // pass an empty list or null
-                                                    //           notselect: 'selectedproduct',
-                                                    //         ),
-                                                    //     transitionDuration: const Duration(
-                                                    //         milliseconds: 200),
-                                                    //     transitionsBuilder: (
-                                                    //         context, animation,
-                                                    //         secondaryAnimation,
-                                                    //         child) {
-                                                    //       return FadeTransition(
-                                                    //         opacity: animation,
-                                                    //         child: child,
-                                                    //       );
-                                                    //     },
-                                                    //   ),
-                                                    // );
-                                                  }
-                                                },
-                                                //                                            onPressed: () {
-                                                //                                              // List<Product> products = widget.selectedProducts;
-                                                //                                              Product? selectedProduct;
-                                                //                                              if (widget.selectedProducts.isNotEmpty) {
-                                                //                                                for (var selectedProduct in widget.selectedProducts) {
-                                                //                                                  print('----yes');
-                                                //                                                  Map<String, dynamic> data = {
-                                                //                                                    'deliveryLocation': data2['deliveryLocation'],
-                                                //                                                    'ContactName': contactPersonController.text,
-                                                //                                                    'Address': deliveryAddressController.text,
-                                                //                                                    'ContactNumber': contactNumberController.text,
-                                                //                                                    'Comments': commentsController.text,
-                                                //                                                    'date': _selectedDate.toString(),
-                                                //                                                  };
-                                                //                                                  data2 = data;
-                                                //                                                  print(selectedProduct);
-                                                //                                                  //original
-                                                //                                                  context.go('/Add_products',extra: {
-                                                //                                                   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
-                                                //                                                    'product': selectedProduct, // You need to pass a list of Product objects here
-                                                //                                                    'data': data2,
-                                                //                                                  'products': products,
-                                                //                                                    'selectedProducts': widget.selectedProducts,
-                                                //                                                    'inputText': '',
-                                                //                                                    'subText': 'hii',
-                                                //                                                    'notselect': 'selectedproduct',
-                                                //                                                  });
-                                                //                                                  // context.go('/Add_Product/PlaceOrder/Placed_Order_List', extra: {
-                                                //                                                  //   'products': products,
-                                                //                                                  //   'selectedProducts': selectedProducts,
-                                                //                                                  //   'selectedProduct': selectedProduct,
-                                                //                                                  //   'data': data2,
-                                                //                                                  //   'subText': 'hii',
-                                                //                                                  //   'inputText': '',
-                                                //                                                  //   'notselect': 'selectedproduct',
-                                                //                                                  // });
-                                                //                                                              //original
-                                                //                                                  // Navigator.push(
-                                                //                                                  //   context,
-                                                //                                                  //   PageRouteBuilder(
-                                                //                                                  //     pageBuilder: (context,
-                                                //                                                  //         animation,
-                                                //                                                  //         secondaryAnimation) =>
-                                                //                                                  //         NextPage(
-                                                //                                                  //           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
-                                                //                                                  //           data: data2,
-                                                //                                                  //           product: selectedProduct,
-                                                //                                                  //           inputText: '',
-                                                //                                                  //           products: products,
-                                                //                                                  //           subText: 'hii',
-                                                //                                                  //           selectedProducts: widget.selectedProducts,
-                                                //                                                  //           notselect: 'selectedproduct',),
-                                                //                                                  //     transitionDuration:
-                                                //                                                  //     const Duration(
-                                                //                                                  //         milliseconds: 200),
-                                                //                                                  //     transitionsBuilder: (
-                                                //                                                  //         context,
-                                                //                                                  //         animation,
-                                                //                                                  //         secondaryAnimation,
-                                                //                                                  //         child) {
-                                                //                                                  //       return FadeTransition(
-                                                //                                                  //         opacity: animation,
-                                                //                                                  //         child: child,
-                                                //                                                  //       );
-                                                //                                                  //     },
-                                                //                                                  //   ),
-                                                //                                                  // );
-                                                //                                                }
-                                                //
-                                                //                                              } else {
-                                                //                                                print('well');
-                                                //                                                selectedProduct =null;
-                                                //
-                                                // // Navigator.push(
-                                                // //                                                   context,
-                                                // //                                                   PageRouteBuilder(
-                                                // //                                                     pageBuilder: (context,
-                                                // //                                                         animation,
-                                                // //                                                         secondaryAnimation) =>
-                                                // //                                                         NextPage(
-                                                // //                                                           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
-                                                // //                                                           data: data2,
-                                                // //                                                           product: selectedProduct!,
-                                                // //                                                           inputText: '',
-                                                // //                                                           products: products,
-                                                // //                                                           subText: 'hii',
-                                                // //                                                           selectedProducts: widget.selectedProducts,
-                                                // //                                                           notselect: 'selectedproduct',),
-                                                // //                                                     transitionDuration:
-                                                // //                                                     const Duration(
-                                                // //                                                         milliseconds: 200),
-                                                // //                                                     transitionsBuilder: (
-                                                // //                                                         context,
-                                                // //                                                         animation,
-                                                // //                                                         secondaryAnimation,
-                                                // //                                                         child) {
-                                                // //                                                       return FadeTransition(
-                                                // //                                                         opacity: animation,
-                                                // //                                                         child: child,
-                                                // //                                                       );
-                                                // //                                                     },
-                                                // //                                                   ),
-                                                // //                                                 );
-                                                //                                              }
-                                                //
-                                                //
-                                                //                                            },
-                                                style: OutlinedButton.styleFrom(
-                                                  backgroundColor: Colors.blue[800],
-                                                  // Blue background color
-                                                  //  minimumSize: MaterialStateProperty.all(Size(200, 50)),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(5), // Optional: Square corners
+                                                  },
+                                                  //                                            onPressed: () {
+                                                  //                                              // List<Product> products = widget.selectedProducts;
+                                                  //                                              Product? selectedProduct;
+                                                  //                                              if (widget.selectedProducts.isNotEmpty) {
+                                                  //                                                for (var selectedProduct in widget.selectedProducts) {
+                                                  //                                                  print('----yes');
+                                                  //                                                  Map<String, dynamic> data = {
+                                                  //                                                    'deliveryLocation': data2['deliveryLocation'],
+                                                  //                                                    'ContactName': contactPersonController.text,
+                                                  //                                                    'Address': deliveryAddressController.text,
+                                                  //                                                    'ContactNumber': contactNumberController.text,
+                                                  //                                                    'Comments': commentsController.text,
+                                                  //                                                    'date': _selectedDate.toString(),
+                                                  //                                                  };
+                                                  //                                                  data2 = data;
+                                                  //                                                  print(selectedProduct);
+                                                  //                                                  //original
+                                                  //                                                  context.go('/Add_products',extra: {
+                                                  //                                                   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
+                                                  //                                                    'product': selectedProduct, // You need to pass a list of Product objects here
+                                                  //                                                    'data': data2,
+                                                  //                                                  'products': products,
+                                                  //                                                    'selectedProducts': widget.selectedProducts,
+                                                  //                                                    'inputText': '',
+                                                  //                                                    'subText': 'hii',
+                                                  //                                                    'notselect': 'selectedproduct',
+                                                  //                                                  });
+                                                  //                                                  // context.go('/Add_Product/PlaceOrder/Placed_Order_List', extra: {
+                                                  //                                                  //   'products': products,
+                                                  //                                                  //   'selectedProducts': selectedProducts,
+                                                  //                                                  //   'selectedProduct': selectedProduct,
+                                                  //                                                  //   'data': data2,
+                                                  //                                                  //   'subText': 'hii',
+                                                  //                                                  //   'inputText': '',
+                                                  //                                                  //   'notselect': 'selectedproduct',
+                                                  //                                                  // });
+                                                  //                                                              //original
+                                                  //                                                  // Navigator.push(
+                                                  //                                                  //   context,
+                                                  //                                                  //   PageRouteBuilder(
+                                                  //                                                  //     pageBuilder: (context,
+                                                  //                                                  //         animation,
+                                                  //                                                  //         secondaryAnimation) =>
+                                                  //                                                  //         NextPage(
+                                                  //                                                  //           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
+                                                  //                                                  //           data: data2,
+                                                  //                                                  //           product: selectedProduct,
+                                                  //                                                  //           inputText: '',
+                                                  //                                                  //           products: products,
+                                                  //                                                  //           subText: 'hii',
+                                                  //                                                  //           selectedProducts: widget.selectedProducts,
+                                                  //                                                  //           notselect: 'selectedproduct',),
+                                                  //                                                  //     transitionDuration:
+                                                  //                                                  //     const Duration(
+                                                  //                                                  //         milliseconds: 200),
+                                                  //                                                  //     transitionsBuilder: (
+                                                  //                                                  //         context,
+                                                  //                                                  //         animation,
+                                                  //                                                  //         secondaryAnimation,
+                                                  //                                                  //         child) {
+                                                  //                                                  //       return FadeTransition(
+                                                  //                                                  //         opacity: animation,
+                                                  //                                                  //         child: child,
+                                                  //                                                  //       );
+                                                  //                                                  //     },
+                                                  //                                                  //   ),
+                                                  //                                                  // );
+                                                  //                                                }
+                                                  //
+                                                  //                                              } else {
+                                                  //                                                print('well');
+                                                  //                                                selectedProduct =null;
+                                                  //
+                                                  // // Navigator.push(
+                                                  // //                                                   context,
+                                                  // //                                                   PageRouteBuilder(
+                                                  // //                                                     pageBuilder: (context,
+                                                  // //                                                         animation,
+                                                  // //                                                         secondaryAnimation) =>
+                                                  // //                                                         NextPage(
+                                                  // //                                                           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
+                                                  // //                                                           data: data2,
+                                                  // //                                                           product: selectedProduct!,
+                                                  // //                                                           inputText: '',
+                                                  // //                                                           products: products,
+                                                  // //                                                           subText: 'hii',
+                                                  // //                                                           selectedProducts: widget.selectedProducts,
+                                                  // //                                                           notselect: 'selectedproduct',),
+                                                  // //                                                     transitionDuration:
+                                                  // //                                                     const Duration(
+                                                  // //                                                         milliseconds: 200),
+                                                  // //                                                     transitionsBuilder: (
+                                                  // //                                                         context,
+                                                  // //                                                         animation,
+                                                  // //                                                         secondaryAnimation,
+                                                  // //                                                         child) {
+                                                  // //                                                       return FadeTransition(
+                                                  // //                                                         opacity: animation,
+                                                  // //                                                         child: child,
+                                                  // //                                                       );
+                                                  // //                                                     },
+                                                  // //                                                   ),
+                                                  // //                                                 );
+                                                  //                                              }
+                                                  //
+                                                  //
+                                                  //                                            },
+                                                  style: OutlinedButton.styleFrom(
+                                                    backgroundColor: Colors.blue[800],
+                                                    // Blue background color
+                                                    //  minimumSize: MaterialStateProperty.all(Size(200, 50)),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(5), // Optional: Square corners
+                                                    ),
+                                                    side: BorderSide.none, // No  outline
                                                   ),
-                                                  side: BorderSide.none, // No  outline
+                                                  child: const Text(
+                                                    '+ Add Products',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
                                                 ),
-                                                child: const Text(
-                                                  '+ Add Products',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 10),
+                                            child: Container(
+                                              // Space above/below the border
+                                              height: 1, // Border height
+                                              color: const Color(0xFFB2C2D3), // Border color
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top:9,bottom: 9),
+                                            child: Align(
+                                              alignment: const Alignment(0.74,0.8),
+                                              child: Container(
+                                                padding: const EdgeInsets.only(left: 15,right: 10,top: 2,bottom: 2),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(color: Colors.blue),
+                                                  borderRadius: BorderRadius.circular(3),
+                                                  color:  Colors.white,
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(bottom: 15,top: 15,left: 10,right: 10),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      RichText(text:
+                                                      TextSpan(
+                                                        children: [
+                                                          const TextSpan(
+                                                            text:  'Total',
+                                                            style: TextStyle(
+                                                                fontSize: 14,
+                                                                color: Colors.blue
+                                                              // fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                          const TextSpan(
+                                                            text: '  ₹',
+                                                            style: TextStyle(
+                                                              color: Colors.black,
+                                                            ),
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                            data2['totalAmount'] =_total.toStringAsFixed(2),
+                                                            style: const TextStyle(
+                                                              color: Colors.black,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      ),
+                                                      // Text(
+                                                      //   'Total',
+                                                      //   style: TextStyle(
+                                                      //     fontSize: 16,
+                                                      //     fontWeight: FontWeight.bold,
+                                                      //   ),
+                                                      // ),
+                                                      // SizedBox(width: 16.0),
+                                                      // Text(
+                                                      //   data2['totalAmount'] =_total.toString(),
+                                                      //   style: const TextStyle(
+                                                      //     color: Colors.black,
+                                                      //   ),
+                                                      // ),
+                                                      buildDataTable(),
+                                                    ],
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 10),
-                                          child: Container(
-                                            // Space above/below the border
-                                            height: 1, // Border height
-                                            color: const Color(0xFFB2C2D3), // Border color
                                           ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top:9,bottom: 9),
-                                          child: Align(
-                                            alignment: const Alignment(0.74,0.8),
-                                            child: Container(
-                                              padding: const EdgeInsets.only(left: 15,right: 10,top: 2,bottom: 2),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(color: Colors.blue),
-                                                borderRadius: BorderRadius.circular(3),
-                                                color:  Colors.white,
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(bottom: 15,top: 15,left: 10,right: 10),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    RichText(text:
-                                                    TextSpan(
+
+                                          // Padding(
+                                          //   padding:  EdgeInsets.only(top: 8, left:1100.w, bottom: 10,right: 50),
+                                          //   child: Row(
+                                          //     children: [
+                                          //       const SizedBox(width: 10), // add some space between the line and the text
+                                          //       SizedBox(
+                                          //         width: 220,
+                                          //         child: Container(
+                                          //           decoration: BoxDecoration(
+                                          //             border: Border.all(color: Colors.blue),
+                                          //           ),
+                                          //           child: Padding(
+                                          //             padding: const EdgeInsets.only(
+                                          //               top: 10,
+                                          //               bottom: 10,
+                                          //               left: 5,
+                                          //               right: 5,
+                                          //             ),
+                                          //             child: RichText(
+                                          //               text: TextSpan(
+                                          //                 children: [
+                                          //                   const TextSpan(
+                                          //                     text: '       ', // Add a space character
+                                          //                     style: TextStyle(
+                                          //                       fontSize: 10, // Set the font size to control the width of the gap
+                                          //                     ),
+                                          //                   ),
+                                          //                   const TextSpan(
+                                          //                     text: 'Total',
+                                          //                     style: TextStyle(
+                                          //                       fontWeight: FontWeight.bold,
+                                          //                       color: Colors.blue,
+                                          //                     ),
+                                          //                   ),
+                                          //                   const TextSpan(
+                                          //                     text: '           ', // Add a space character
+                                          //                     style: TextStyle(
+                                          //                       fontSize: 10, // Set the font size to control the width of the gap
+                                          //                     ),
+                                          //                   ),
+                                          //                   const TextSpan(
+                                          //                     text: '₹',
+                                          //                     style: TextStyle(
+                                          //                       color: Colors.black,
+                                          //                     ),
+                                          //                   ),
+                                          //                   TextSpan(
+                                          //                     text: data2['totalAmount'] = _total.toString(),
+                                          //                     style: const TextStyle(
+                                          //                       color: Colors.black,
+                                          //                     ),
+                                          //                   ),
+                                          //                 ],
+                                          //               ),
+                                          //             ),
+                                          //           ),
+                                          //         ),
+                                          //       ),
+                                          //     ],
+                                          //   ),
+                                          // ),
+                                        ],
+                                      ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ))
+                          }
+                          else...{
+                            Expanded(child:
+                            AdaptiveScrollbar(
+
+                              position: ScrollbarPosition.bottom,controller: horizontalScroll,
+                              child: SingleChildScrollView(
+                                controller: horizontalScroll,
+                                scrollDirection: Axis.horizontal,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 100),
+                                        child: Container(
+                                            width: 1700,
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              children: [
+                                                Padding(
+                                                  padding:  EdgeInsets.only(right: 170,top: 30),
+                                                  child:  Text(' Order Date',style: TextStyle(fontSize: 15,color: Colors.black87),),
+                                                ),
+                                                Padding(
+                                                  padding:  const EdgeInsets.only(right:50, top:10),
+                                                  child: DecoratedBox(
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: const Color(0xFFEBF3FF), width: 1),
+                                                      borderRadius: BorderRadius.circular(10),
+                                                    ),
+                                                    child: Container(
+                                                      height: 39,
+                                                      width: 200,
+                                                      child: Column(
+                                                        children: [
+                                                          Expanded(
+                                                            child: TextFormField(
+                                                              controller: _dateController,
+                                                              // Replace with your TextEditingController
+                                                              readOnly: true,
+                                                              decoration: InputDecoration(
+                                                                suffixIcon: Padding(
+                                                                  padding: const EdgeInsets.only(right: 20),
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.only(
+                                                                        top: 2, left: 10),
+                                                                    child: IconButton(
+                                                                      icon: const Padding(
+                                                                        padding: EdgeInsets.only(bottom: 16),
+                                                                        child: Icon(Icons.calendar_month),
+                                                                      ),
+                                                                      iconSize: 20,
+                                                                      onPressed: () {
+                                                                        // _showDatePicker(context);
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                hintText: '        Select Date',
+                                                                fillColor: Colors.grey.shade200,
+                                                                contentPadding: const EdgeInsets.symmetric(
+                                                                    horizontal: 8, vertical: 8),
+                                                                border: InputBorder.none,
+                                                                filled: true,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 100,right: 50,top: 50),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Color(0xFFFFFFFF), // background: #FFFFFF
+                                                      boxShadow: [BoxShadow(
+                                                        offset: Offset(0, 3),
+                                                        blurRadius: 6,
+                                                        color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                                      )],
+                                                      // border: Border.all(
+                                                      //   // border: 2px
+                                                      //   color: Color(0xFFB2C2D3), // border: #B2C2D3
+                                                      // ),
+                                                      borderRadius: BorderRadius.all(Radius.circular(4)), // border-radius: 8px
+                                                    ),
+                                                    child: Table(
+                                                      border: TableBorder.all(color: const Color(0xFFB2C2D3)),
+
+                                                      columnWidths: const {
+                                                        0: FlexColumnWidth(2),
+                                                        1: FlexColumnWidth(1.4),
+                                                      },
                                                       children: [
-                                                        const TextSpan(
-                                                          text:  'Total',
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              color: Colors.blue
-                                                            // fontWeight: FontWeight.bold,
+                                                        row1,
+                                                        row2,
+                                                        row3,
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 100, top: 50,right: 50,bottom: 10),
+                                                  child: SizedBox(
+                                                    width:1700,
+                                                    child: Container(
+                                                      width: 1700,
+                                                      decoration: BoxDecoration(
+                                                        color: Color(0xFFFFFFFF), // background: #FFFFFF
+                                                        boxShadow: [BoxShadow(
+                                                          offset: Offset(0, 3),
+                                                          blurRadius: 6,
+                                                          color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                                        )],
+                                                        border: Border.all(
+                                                          // border: 2px
+                                                          color: Color(0xFFB2C2D3), // border: #B2C2D3
+                                                        ),
+                                                        borderRadius: BorderRadius.all(Radius.circular(4)), // border-radius: 8px
+                                                      ),                               child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Padding(
+                                                          padding: EdgeInsets.only(top: 10, left: 30),
+                                                          child: Text(
+                                                            'Add Products',
+                                                            style: TextStyle(
+                                                              fontSize: 19,
+                                                              color: Colors.black,
+                                                            ),
                                                           ),
                                                         ),
-                                                        const TextSpan(
-                                                          text: '  ₹',
-                                                          style: TextStyle(
-                                                            color: Colors.black,
+                                                        const SizedBox(height: 10),
+                                                        Container(
+                                                          width: 1700,
+                                                          decoration: BoxDecoration(
+                                                            border: Border(
+                                                              top: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
+                                                              bottom: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
+                                                            ),
+                                                          ),
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                                            child: Table(
+                                                              columnWidths: const {
+                                                                0: FlexColumnWidth(0.9),
+                                                                1: FlexColumnWidth(2.7),
+                                                                2: FlexColumnWidth(2),
+                                                                3: FlexColumnWidth(1.8),
+                                                                4: FlexColumnWidth(2),
+                                                                5: FlexColumnWidth(1),
+                                                                6: FlexColumnWidth(2),
+                                                                7: FlexColumnWidth(1),
+                                                                8: FlexColumnWidth(1),
+                                                                9: FlexColumnWidth(1),
+                                                                10: FlexColumnWidth(1),
+
+                                                              },
+                                                              children: const [
+                                                                TableRow(
+                                                                  children: [
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Padding(
+                                                                            padding: EdgeInsets.only(left: 12),
+                                                                            child: Text(
+                                                                              'SN',
+                                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            'Product Name',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            'Category',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            'Sub Category',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            'Price',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            'QTY',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            'Amount',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            'Disc.',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            'TAX',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            'Total Amount',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            '    ',
+                                                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
-                                                        TextSpan(
-                                                          text:
-                                                          data2['totalAmount'] =_total.toStringAsFixed(2),
-                                                          style: const TextStyle(
-                                                            color: Colors.black,
+                                                        ListView.builder(
+                                                          shrinkWrap: true,
+                                                          physics: const NeverScrollableScrollPhysics(),
+                                                          itemCount: widget.selectedProducts.length,
+                                                          itemBuilder: (context, index) {
+                                                            Product product = widget.selectedProducts[index];
+                                                            return Table(
+                                                              border: TableBorder(
+                                                                bottom: BorderSide(width:1 ,color: Colors.grey),
+                                                                //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
+                                                                verticalInside: BorderSide(width: 1,color: Colors.grey),
+                                                              ),
+                                                              // border: TableBorder.all(color: const Color(0xFFB2C2D3)),
+                                                              columnWidths: const {
+                                                                0: FlexColumnWidth(1),
+                                                                1: FlexColumnWidth(2.7),
+                                                                2: FlexColumnWidth(2),
+                                                                3: FlexColumnWidth(1.8),
+                                                                4: FlexColumnWidth(2),
+                                                                5: FlexColumnWidth(1),
+                                                                6: FlexColumnWidth(2),
+                                                                7: FlexColumnWidth(1),
+                                                                8: FlexColumnWidth(1),
+                                                                9: FlexColumnWidth(1),
+                                                                10: FlexColumnWidth(1),
+
+                                                              },
+                                                              children: [
+                                                                TableRow(
+                                                                  children: [
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 15, bottom: 5),
+                                                                        child: Center(
+                                                                          child: Text(
+                                                                            (index + 1).toString(),
+                                                                            textAlign: TextAlign.center,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 10, bottom: 10),
+                                                                        child: Container(
+                                                                          height: 35,
+                                                                          width: 150,
+                                                                          decoration: BoxDecoration(
+                                                                            color: Colors.grey.shade200,
+                                                                            borderRadius: BorderRadius.circular(4.0),
+                                                                          ),
+                                                                          child: Center(
+                                                                            child: Text(
+                                                                              product.productName,
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 10, bottom: 10),
+                                                                        child: Container(
+                                                                          height: 35,
+                                                                          width: 150,
+                                                                          decoration: BoxDecoration(
+                                                                            color: Colors.grey.shade200,
+                                                                            borderRadius: BorderRadius.circular(4.0),
+                                                                          ),
+                                                                          child: Center(
+                                                                            child: Text(
+                                                                              product.category,
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 10, bottom: 10),
+                                                                        child: Container(
+                                                                          height: 35,
+                                                                          decoration: BoxDecoration(
+                                                                            color: Colors.grey.shade200,
+                                                                            borderRadius: BorderRadius.circular(4.0),
+                                                                          ),
+                                                                          child: Center(
+                                                                            child: Text(
+                                                                              product.subCategory,
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 10, bottom: 10),
+                                                                        child: Container(
+                                                                          height: 35,
+                                                                          decoration: BoxDecoration(
+                                                                            color: Colors.grey.shade200,
+                                                                            borderRadius: BorderRadius.circular(4.0),
+                                                                          ),
+                                                                          child: Center(
+                                                                            child: Text(
+                                                                              product.price.toString(),
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 10, bottom: 10),
+                                                                        child: Container(
+                                                                          height: 35,
+                                                                          decoration: BoxDecoration(
+                                                                            color: Colors.grey.shade200,
+                                                                            borderRadius: BorderRadius.circular(4.0),
+                                                                          ),
+                                                                          child: Center(
+                                                                            child: Text(
+                                                                              product.quantity.toString(),
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 10, bottom: 10),
+                                                                        child: Container(
+                                                                          height: 35,
+                                                                          decoration: BoxDecoration(
+                                                                            color: Colors.grey.shade200,
+                                                                            borderRadius: BorderRadius.circular(4.0),
+                                                                          ),
+                                                                          child: Center(
+                                                                            child: Text(
+                                                                              '${product.price * product.quantity}',
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 10, bottom: 10),
+                                                                        child: Container(
+                                                                          height: 35,
+                                                                          decoration: BoxDecoration(
+                                                                            color: Colors.grey.shade200,
+                                                                            borderRadius: BorderRadius.circular(4.0),
+                                                                          ),
+                                                                          child: Center(
+                                                                            child: Text(
+                                                                              '${product.discount}',
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 10, bottom: 10),
+                                                                        child: Container(
+                                                                          height: 35,
+                                                                          decoration: BoxDecoration(
+                                                                            color: Colors.grey.shade200,
+                                                                            borderRadius: BorderRadius.circular(4.0),
+                                                                          ),
+                                                                          child: Center(
+                                                                            child: Text(
+                                                                              '${product.tax}',
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            left: 10, right: 10, top: 10, bottom: 10),
+                                                                        child: Container(
+                                                                          height: 35,
+                                                                          decoration: BoxDecoration(
+                                                                            color: Colors.grey.shade200,
+                                                                            borderRadius: BorderRadius.circular(4.0),
+                                                                          ),
+                                                                          child: Center(
+                                                                            child: Text(
+                                                                              '${(product.totalAmount * product.quantity).toStringAsFixed(2)}',
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TableCell(
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.symmetric(vertical: 20),
+                                                                        child: InkWell(
+                                                                          onTap: () {
+                                                                            _deleteProduct(product);
+                                                                          },
+                                                                          child: const Icon(
+                                                                            Icons.remove_circle_outline,
+                                                                            size: 18,
+                                                                            color: Colors.blue,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(left: 30, top: 20),
+                                                              child: OutlinedButton(
+                                                                onPressed: () {
+                                                                  // List<Product> products = widget.selectedProducts;
+                                                                  Product? selectedProduct;
+                                                                  if (widget.selectedProducts.isNotEmpty) {
+                                                                    // selectedProduct = null;
+                                                                    print('No products selected');
+                                                                    for (var selectedProduct in widget.selectedProducts) {
+                                                                      print('----yes');
+                                                                      Map<String, dynamic> data = {
+                                                                        'CusId':CusIdController.text,
+                                                                        'deliveryLocation': EmailIdController.text,
+                                                                        'ContactName': contactPersonController.text,
+                                                                        'Address': deliveryAddressController.text,
+                                                                        'ContactNumber': contactNumberController.text,
+                                                                        'Comments': ShippingAddress.text,
+                                                                        'date': _dateController.text,
+                                                                        'actualamount': _total1,
+                                                                      };
+                                                                      data2 = data;
+                                                                      print('----select');
+                                                                      print(selectedProduct);
+                                                                      print('data3');
+                                                                      print(data2);
+                                                                      print('products');
+                                                                      print(products);
+                                                                      //original
+                                                                      context.go('/Add_products',extra: {
+                                                                        // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
+                                                                        'product': selectedProduct, // You need to pass a list of Product objects here
+                                                                        'data': data2,
+                                                                        'products': products,
+                                                                        'selectedProducts': widget.selectedProducts,
+                                                                        'inputText': '',
+                                                                        'subText': 'hii',
+                                                                        'notselect': 'selectedproduct',
+                                                                      });
+                                                                      // context.go('/Add_Product/PlaceOrder/Placed_Order_List', extra: {
+                                                                      //   'products': products,
+                                                                      //   'selectedProducts': selectedProducts,
+                                                                      //   'selectedProduct': selectedProduct,
+                                                                      //   'data': data2,
+                                                                      //   'subText': 'hii',
+                                                                      //   'inputText': '',
+                                                                      //   'notselect': 'selectedproduct',
+                                                                      // });
+                                                                      //original code
+                                                                      // Navigator.push(
+                                                                      //   context,
+                                                                      //   PageRouteBuilder(
+                                                                      //     pageBuilder: (context,
+                                                                      //         animation,
+                                                                      //         secondaryAnimation) =>
+                                                                      //         NextPage(
+                                                                      //           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
+                                                                      //           data: data2,
+                                                                      //           product: selectedProduct,
+                                                                      //           inputText: '',
+                                                                      //           products: products,
+                                                                      //           subText: 'hii',
+                                                                      //           selectedProducts: widget.selectedProducts,
+                                                                      //           notselect: 'selectedproduct',),
+                                                                      //     transitionDuration:
+                                                                      //     const Duration(
+                                                                      //         milliseconds: 200),
+                                                                      //     transitionsBuilder: (
+                                                                      //         context,
+                                                                      //         animation,
+                                                                      //         secondaryAnimation,
+                                                                      //         child) {
+                                                                      //       return FadeTransition(
+                                                                      //         opacity: animation,
+                                                                      //         child: child,
+                                                                      //       );
+                                                                      //     },
+                                                                      //   ),
+                                                                      // );
+                                                                    }
+
+                                                                  }
+
+
+                                                                  else {
+                                                                    print("object");
+                                                                    print(data2);
+                                                                    print('----yes');
+                                                                    Map<String, dynamic> data = {
+                                                                      'deliveryLocation': EmailIdController.text,
+                                                                      'CusId': CusIdController.text,
+                                                                      'ContactName': contactPersonController
+                                                                          .text,
+                                                                      'Address': deliveryAddressController
+                                                                          .text,
+                                                                      'ContactNumber': contactNumberController
+                                                                          .text,
+                                                                      'Comments': ShippingAddress
+                                                                          .text,
+                                                                      'date': _selectedDate
+                                                                          .toString(),
+                                                                    };
+                                                                    data2 = data;
+                                                                    print('details ');
+                                                                    print(data2);
+                                                                    // Navigate to the page with empty data or handle it as needed
+                                                                    context.go('/Cart_Selected_Products',extra: {
+                                                                      // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
+                                                                      'product': Product(
+                                                                          prodId: '',
+                                                                          price: 0,
+                                                                          productName: '',
+                                                                          proId: '',
+                                                                          category: '',
+                                                                          selectedVariation: '',
+                                                                          selectedUOM: '',
+                                                                          subCategory: '',
+                                                                          totalamount: 0,
+                                                                          total: 0,
+                                                                          tax: '',
+                                                                          quantity: 0,
+                                                                          discount: '',
+                                                                          imageId: '',
+                                                                          unit: '',
+                                                                          totalAmount: 0.0,
+                                                                          qty: 0), // You need to pass a list of Product objects here
+                                                                      'data': data2,
+                                                                      'products': products,
+                                                                      'selectedProducts': widget.selectedProducts,
+                                                                      'inputText': '',
+                                                                      'subText': 'hii',
+                                                                      'notselect': 'selectedproduct',
+                                                                    });
+                                                                    // context.go('/Add_Products',extra: {
+                                                                    //   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
+                                                                    //   'product': Product(
+                                                                    //       prodId: '',
+                                                                    //       price: 0,
+                                                                    //       productName: '',
+                                                                    //       proId: '',
+                                                                    //       category: '',
+                                                                    //       selectedVariation: '',
+                                                                    //       selectedUOM: '',
+                                                                    //       subCategory: '',
+                                                                    //       totalamount: 0,
+                                                                    //       total: 0,
+                                                                    //       tax: '',
+                                                                    //       quantity: 0,
+                                                                    //       discount: '',
+                                                                    //       imageId: '',
+                                                                    //       unit: '',
+                                                                    //       totalAmount: 0.0,
+                                                                    //       qty: 0), // You need to pass a list of Product objects here
+                                                                    //   'data': data2,
+                                                                    //   'products': products,
+                                                                    //   'selectedProducts': widget.selectedProducts,
+                                                                    //   'inputText': '',
+                                                                    //   'subText': 'hii',
+                                                                    //   'notselect': 'selectedproduct',
+                                                                    // });
+                                                                    // Navigator.push(
+                                                                    //   context,
+                                                                    //   PageRouteBuilder(
+                                                                    //     pageBuilder: (context,
+                                                                    //         animation,
+                                                                    //         secondaryAnimation) =>
+                                                                    //         NextPage(
+                                                                    //           data:data2,
+                                                                    //           product: Product(
+                                                                    //               prodId: '',
+                                                                    //               price: 0,
+                                                                    //               productName: '',
+                                                                    //               proId: '',
+                                                                    //               category: '',
+                                                                    //               selectedVariation: '',
+                                                                    //               selectedUOM: '',
+                                                                    //               subCategory: '',
+                                                                    //               totalamount: 0,
+                                                                    //               total: 0,
+                                                                    //               tax: '',
+                                                                    //               quantity: 0,
+                                                                    //               discount: '',
+                                                                    //               imageId: '',
+                                                                    //               unit: '',
+                                                                    //               totalAmount: 0.0,
+                                                                    //               qty: 0),
+                                                                    //           // or you can pass a default product or null
+                                                                    //           inputText: '',
+                                                                    //           products: products,
+                                                                    //           subText: 'hii',
+                                                                    //           selectedProducts: widget
+                                                                    //               .selectedProducts,
+                                                                    //           // pass an empty list or null
+                                                                    //           notselect: 'selectedproduct',
+                                                                    //         ),
+                                                                    //     transitionDuration: const Duration(
+                                                                    //         milliseconds: 200),
+                                                                    //     transitionsBuilder: (
+                                                                    //         context, animation,
+                                                                    //         secondaryAnimation,
+                                                                    //         child) {
+                                                                    //       return FadeTransition(
+                                                                    //         opacity: animation,
+                                                                    //         child: child,
+                                                                    //       );
+                                                                    //     },
+                                                                    //   ),
+                                                                    // );
+                                                                  }
+                                                                },
+                                                                //                                            onPressed: () {
+                                                                //                                              // List<Product> products = widget.selectedProducts;
+                                                                //                                              Product? selectedProduct;
+                                                                //                                              if (widget.selectedProducts.isNotEmpty) {
+                                                                //                                                for (var selectedProduct in widget.selectedProducts) {
+                                                                //                                                  print('----yes');
+                                                                //                                                  Map<String, dynamic> data = {
+                                                                //                                                    'deliveryLocation': data2['deliveryLocation'],
+                                                                //                                                    'ContactName': contactPersonController.text,
+                                                                //                                                    'Address': deliveryAddressController.text,
+                                                                //                                                    'ContactNumber': contactNumberController.text,
+                                                                //                                                    'Comments': commentsController.text,
+                                                                //                                                    'date': _selectedDate.toString(),
+                                                                //                                                  };
+                                                                //                                                  data2 = data;
+                                                                //                                                  print(selectedProduct);
+                                                                //                                                  //original
+                                                                //                                                  context.go('/Add_products',extra: {
+                                                                //                                                   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
+                                                                //                                                    'product': selectedProduct, // You need to pass a list of Product objects here
+                                                                //                                                    'data': data2,
+                                                                //                                                  'products': products,
+                                                                //                                                    'selectedProducts': widget.selectedProducts,
+                                                                //                                                    'inputText': '',
+                                                                //                                                    'subText': 'hii',
+                                                                //                                                    'notselect': 'selectedproduct',
+                                                                //                                                  });
+                                                                //                                                  // context.go('/Add_Product/PlaceOrder/Placed_Order_List', extra: {
+                                                                //                                                  //   'products': products,
+                                                                //                                                  //   'selectedProducts': selectedProducts,
+                                                                //                                                  //   'selectedProduct': selectedProduct,
+                                                                //                                                  //   'data': data2,
+                                                                //                                                  //   'subText': 'hii',
+                                                                //                                                  //   'inputText': '',
+                                                                //                                                  //   'notselect': 'selectedproduct',
+                                                                //                                                  // });
+                                                                //                                                              //original
+                                                                //                                                  // Navigator.push(
+                                                                //                                                  //   context,
+                                                                //                                                  //   PageRouteBuilder(
+                                                                //                                                  //     pageBuilder: (context,
+                                                                //                                                  //         animation,
+                                                                //                                                  //         secondaryAnimation) =>
+                                                                //                                                  //         NextPage(
+                                                                //                                                  //           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
+                                                                //                                                  //           data: data2,
+                                                                //                                                  //           product: selectedProduct,
+                                                                //                                                  //           inputText: '',
+                                                                //                                                  //           products: products,
+                                                                //                                                  //           subText: 'hii',
+                                                                //                                                  //           selectedProducts: widget.selectedProducts,
+                                                                //                                                  //           notselect: 'selectedproduct',),
+                                                                //                                                  //     transitionDuration:
+                                                                //                                                  //     const Duration(
+                                                                //                                                  //         milliseconds: 200),
+                                                                //                                                  //     transitionsBuilder: (
+                                                                //                                                  //         context,
+                                                                //                                                  //         animation,
+                                                                //                                                  //         secondaryAnimation,
+                                                                //                                                  //         child) {
+                                                                //                                                  //       return FadeTransition(
+                                                                //                                                  //         opacity: animation,
+                                                                //                                                  //         child: child,
+                                                                //                                                  //       );
+                                                                //                                                  //     },
+                                                                //                                                  //   ),
+                                                                //                                                  // );
+                                                                //                                                }
+                                                                //
+                                                                //                                              } else {
+                                                                //                                                print('well');
+                                                                //                                                selectedProduct =null;
+                                                                //
+                                                                // // Navigator.push(
+                                                                // //                                                   context,
+                                                                // //                                                   PageRouteBuilder(
+                                                                // //                                                     pageBuilder: (context,
+                                                                // //                                                         animation,
+                                                                // //                                                         secondaryAnimation) =>
+                                                                // //                                                         NextPage(
+                                                                // //                                                           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
+                                                                // //                                                           data: data2,
+                                                                // //                                                           product: selectedProduct!,
+                                                                // //                                                           inputText: '',
+                                                                // //                                                           products: products,
+                                                                // //                                                           subText: 'hii',
+                                                                // //                                                           selectedProducts: widget.selectedProducts,
+                                                                // //                                                           notselect: 'selectedproduct',),
+                                                                // //                                                     transitionDuration:
+                                                                // //                                                     const Duration(
+                                                                // //                                                         milliseconds: 200),
+                                                                // //                                                     transitionsBuilder: (
+                                                                // //                                                         context,
+                                                                // //                                                         animation,
+                                                                // //                                                         secondaryAnimation,
+                                                                // //                                                         child) {
+                                                                // //                                                       return FadeTransition(
+                                                                // //                                                         opacity: animation,
+                                                                // //                                                         child: child,
+                                                                // //                                                       );
+                                                                // //                                                     },
+                                                                // //                                                   ),
+                                                                // //                                                 );
+                                                                //                                              }
+                                                                //
+                                                                //
+                                                                //                                            },
+                                                                style: OutlinedButton.styleFrom(
+                                                                  backgroundColor: Colors.blue[800],
+                                                                  // Blue background color
+                                                                  //  minimumSize: MaterialStateProperty.all(Size(200, 50)),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(5), // Optional: Square corners
+                                                                  ),
+                                                                  side: BorderSide.none, // No  outline
+                                                                ),
+                                                                child: const Text(
+                                                                  '+ Add Products',
+                                                                  style: TextStyle(
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 10),
+                                                          child: Container(
+                                                            // Space above/below the border
+                                                            height: 1, // Border height
+                                                            color: const Color(0xFFB2C2D3), // Border color
                                                           ),
                                                         ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top:9,bottom: 9),
+                                                          child: Align(
+                                                            alignment: const Alignment(0.74,0.8),
+                                                            child: Container(
+                                                              padding: const EdgeInsets.only(left: 15,right: 10,top: 2,bottom: 2),
+                                                              decoration: BoxDecoration(
+                                                                border: Border.all(color: Colors.blue),
+                                                                borderRadius: BorderRadius.circular(3),
+                                                                color:  Colors.white,
+                                                              ),
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.only(bottom: 15,top: 15,left: 10,right: 10),
+                                                                child: Row(
+                                                                  mainAxisSize: MainAxisSize.min,
+                                                                  children: [
+                                                                    RichText(text:
+                                                                    TextSpan(
+                                                                      children: [
+                                                                        const TextSpan(
+                                                                          text:  'Total',
+                                                                          style: TextStyle(
+                                                                              fontSize: 14,
+                                                                              color: Colors.blue
+                                                                            // fontWeight: FontWeight.bold,
+                                                                          ),
+                                                                        ),
+                                                                        const TextSpan(
+                                                                          text: '  ₹',
+                                                                          style: TextStyle(
+                                                                            color: Colors.black,
+                                                                          ),
+                                                                        ),
+                                                                        TextSpan(
+                                                                          text:
+                                                                          data2['totalAmount'] =_total.toStringAsFixed(2),
+                                                                          style: const TextStyle(
+                                                                            color: Colors.black,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    ),
+                                                                    // Text(
+                                                                    //   'Total',
+                                                                    //   style: TextStyle(
+                                                                    //     fontSize: 16,
+                                                                    //     fontWeight: FontWeight.bold,
+                                                                    //   ),
+                                                                    // ),
+                                                                    // SizedBox(width: 16.0),
+                                                                    // Text(
+                                                                    //   data2['totalAmount'] =_total.toString(),
+                                                                    //   style: const TextStyle(
+                                                                    //     color: Colors.black,
+                                                                    //   ),
+                                                                    // ),
+                                                                    buildDataTable(),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+
+                                                        // Padding(
+                                                        //   padding:  EdgeInsets.only(top: 8, left:1100.w, bottom: 10,right: 50),
+                                                        //   child: Row(
+                                                        //     children: [
+                                                        //       const SizedBox(width: 10), // add some space between the line and the text
+                                                        //       SizedBox(
+                                                        //         width: 220,
+                                                        //         child: Container(
+                                                        //           decoration: BoxDecoration(
+                                                        //             border: Border.all(color: Colors.blue),
+                                                        //           ),
+                                                        //           child: Padding(
+                                                        //             padding: const EdgeInsets.only(
+                                                        //               top: 10,
+                                                        //               bottom: 10,
+                                                        //               left: 5,
+                                                        //               right: 5,
+                                                        //             ),
+                                                        //             child: RichText(
+                                                        //               text: TextSpan(
+                                                        //                 children: [
+                                                        //                   const TextSpan(
+                                                        //                     text: '       ', // Add a space character
+                                                        //                     style: TextStyle(
+                                                        //                       fontSize: 10, // Set the font size to control the width of the gap
+                                                        //                     ),
+                                                        //                   ),
+                                                        //                   const TextSpan(
+                                                        //                     text: 'Total',
+                                                        //                     style: TextStyle(
+                                                        //                       fontWeight: FontWeight.bold,
+                                                        //                       color: Colors.blue,
+                                                        //                     ),
+                                                        //                   ),
+                                                        //                   const TextSpan(
+                                                        //                     text: '           ', // Add a space character
+                                                        //                     style: TextStyle(
+                                                        //                       fontSize: 10, // Set the font size to control the width of the gap
+                                                        //                     ),
+                                                        //                   ),
+                                                        //                   const TextSpan(
+                                                        //                     text: '₹',
+                                                        //                     style: TextStyle(
+                                                        //                       color: Colors.black,
+                                                        //                     ),
+                                                        //                   ),
+                                                        //                   TextSpan(
+                                                        //                     text: data2['totalAmount'] = _total.toString(),
+                                                        //                     style: const TextStyle(
+                                                        //                       color: Colors.black,
+                                                        //                     ),
+                                                        //                   ),
+                                                        //                 ],
+                                                        //               ),
+                                                        //             ),
+                                                        //           ),
+                                                        //         ),
+                                                        //       ),
+                                                        //     ],
+                                                        //   ),
+                                                        // ),
                                                       ],
                                                     ),
                                                     ),
-                                                    // Text(
-                                                    //   'Total',
-                                                    //   style: TextStyle(
-                                                    //     fontSize: 16,
-                                                    //     fontWeight: FontWeight.bold,
-                                                    //   ),
-                                                    // ),
-                                                    // SizedBox(width: 16.0),
-                                                    // Text(
-                                                    //   data2['totalAmount'] =_total.toString(),
-                                                    //   style: const TextStyle(
-                                                    //     color: Colors.black,
-                                                    //   ),
-                                                    // ),
-                                                    buildDataTable(),
-                                                  ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
 
-                                        // Padding(
-                                        //   padding:  EdgeInsets.only(top: 8, left:1100.w, bottom: 10,right: 50),
-                                        //   child: Row(
-                                        //     children: [
-                                        //       const SizedBox(width: 10), // add some space between the line and the text
-                                        //       SizedBox(
-                                        //         width: 220,
-                                        //         child: Container(
-                                        //           decoration: BoxDecoration(
-                                        //             border: Border.all(color: Colors.blue),
-                                        //           ),
-                                        //           child: Padding(
-                                        //             padding: const EdgeInsets.only(
-                                        //               top: 10,
-                                        //               bottom: 10,
-                                        //               left: 5,
-                                        //               right: 5,
-                                        //             ),
-                                        //             child: RichText(
-                                        //               text: TextSpan(
-                                        //                 children: [
-                                        //                   const TextSpan(
-                                        //                     text: '       ', // Add a space character
-                                        //                     style: TextStyle(
-                                        //                       fontSize: 10, // Set the font size to control the width of the gap
-                                        //                     ),
-                                        //                   ),
-                                        //                   const TextSpan(
-                                        //                     text: 'Total',
-                                        //                     style: TextStyle(
-                                        //                       fontWeight: FontWeight.bold,
-                                        //                       color: Colors.blue,
-                                        //                     ),
-                                        //                   ),
-                                        //                   const TextSpan(
-                                        //                     text: '           ', // Add a space character
-                                        //                     style: TextStyle(
-                                        //                       fontSize: 10, // Set the font size to control the width of the gap
-                                        //                     ),
-                                        //                   ),
-                                        //                   const TextSpan(
-                                        //                     text: '₹',
-                                        //                     style: TextStyle(
-                                        //                       color: Colors.black,
-                                        //                     ),
-                                        //                   ),
-                                        //                   TextSpan(
-                                        //                     text: data2['totalAmount'] = _total.toString(),
-                                        //                     style: const TextStyle(
-                                        //                       color: Colors.black,
-                                        //                     ),
-                                        //                   ),
-                                        //                 ],
-                                        //               ),
-                                        //             ),
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //     ],
-                                        //   ),
-                                        // ),
-                                      ],
-                                    ),
-                                    ),
+                                              ],
+                                            )
+                                        ),
+                                      ),
+                                      //SizedBox(height: 20.h),
+
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ))
+                              ),
+                            ))
+                          }
+
 
 
                         ],

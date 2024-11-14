@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:html';
 import 'dart:math';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/Order%20Module/firstpage.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
@@ -25,7 +26,7 @@ class CusPayment extends StatefulWidget {
 
 }
 class _CusPaymentState extends State<CusPayment> {
-  // String amount = '20,000';
+  final ScrollController horizontalScroll = ScrollController();
   String? _selectedReason = 'Payment mode';
   String userId = window.sessionStorage['userId'] ?? '';
   final _reasonController = TextEditingController();
@@ -78,13 +79,27 @@ class _CusPaymentState extends State<CusPayment> {
       _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Customer_Order_List'),
       _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blueAccent, '/Customer_Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Customer_Return_List'),
+      Container(
+    decoration: BoxDecoration(
+    color: Colors.blue[800],
+    // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+    // color: Color.fromRGBO(224, 59, 48, 1.0),
+    borderRadius: const BorderRadius.only(
+    topLeft: Radius.circular(8), // Radius for top-left corner
+    topRight: Radius.circular(8), // No radius for top-right corner
+    bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+    bottomRight: Radius.circular(8), // No radius for bottom-right corner
+    ),
+    ),child: _buildMenuItem('Payment', Icons.payment_outlined, Colors.white, '/Customer_Payment_List')),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Customer_Return_List'),
       // _buildMenuItem('Credit Notes', Icons.credit_card_outlined, Colors.blue[900]!, '/Customer_Credit_List'),
     ];
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Payment'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Payment'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -94,25 +109,28 @@ class _CusPaymentState extends State<CusPayment> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -172,49 +190,6 @@ class _CusPaymentState extends State<CusPayment> {
       return '';
     }
   }
-  // @override
-  // void initState() {
-  //   super.initState();
-  //  // fetchProducts(widget.orderId!);
-  //   if(widget.productMap['paymentStatus'] == 'partial payment'){
-  //   //  print(widget.orderId);
-  //     fetchProducts(widget.productMap['orderId'] ?? '');
-  //     // String orderId = 'ORD_04846';
-  //     //
-  //     // fetchProducts(orderId);
-  //     GrossAmountController.text = double.parse(widget.productMap['grossAmount']).toStringAsFixed(2);
-  //     InvController.text = widget.productMap['invoiceNo'] ?? '';
-  //     PaidController.text = widget.productMap['paidAmount'] ?? '';
-  //     PayableController.text = double.parse(widget.productMap['payableAmount']).toStringAsFixed(2);
-  //   }
-  //   else if(widget.productMap['paymentStatus'] == 'cleared')
-  //   {
-  //   //  bool _isReasonEnabled = widget.productMap['paymentStatus'] == 'cleared';
-  //   //  String orderId = 'ORD_04846';
-  //     fetchProducts(widget.productMap['orderId'] ?? '');
-  //     GrossAmountController.text = double.parse(widget.productMap['grossAmount']).toStringAsFixed(2);
-  //     InvController.text = widget.productMap['invoiceNo'] ?? '';
-  //     PaidController.text = widget.productMap['paidAmount'] ?? '';
-  //     PayableController.text = double.parse(widget.productMap['payableAmount']).toStringAsFixed(2);
-  //     fetchProducts(widget.productMap['orderId'] ?? '');
-  //   }
-  //   else{
-  //   //  print(widget.orderId);
-  //     GrossAmountController.text = double.parse(widget.productMap['grossAmount']).toStringAsFixed(2);
-  //     InvController.text = widget.productMap['invoiceNo'] ?? '';
-  //     PaidController.text = widget.productMap['paidAmount'] ?? '';
-  //     PayableController.text = double.parse(widget.productMap['payableAmount']).toStringAsFixed(2);
-  //   }
-  //   if(widget.productMap['paymentStatus'] == 'partial payment') {
-  //     AmountController.text = PayableController.text;
-  //   }else if(widget.productMap['paymentStatus'] == 'cleared'){
-  //     AmountController.text = PayableController.text;
-  //
-  //   }
-  //   else {
-  //     AmountController.text = GrossAmountController.text;
-  //   }
-  // }
 
 
 
@@ -230,122 +205,6 @@ class _CusPaymentState extends State<CusPayment> {
     AmountController.dispose();
     super.dispose();
   }
-  // Future<void> checkPayment(String Amount) async {
-  //   print('hello');
-  //   print(GrossAmountController.text);
-  //   String url = "$apicall/payment_master/add_payment_master/$Amount";
-  //   Map<String, dynamic> data = {
-  //     "grossAmount": GrossAmountController.text,
-  //     "invoice": InvController.text,
-  //     "paymentMode": _selectedReason,
-  //   };
-  //   Map<String, String> headers = {
-  //     'Content-Type': 'application/json',
-  //     'Authorization': 'Bearer $token'
-  //   };
-  //   final response = await http.post(Uri.parse(url), headers: headers, body: jsonEncode(data));
-  //   final addResponseBody = jsonDecode(response.body);
-  //   // Check the response status code
-  //   if (addResponseBody.statusCode == 200)
-  //   {
-  //     print('heloo api');
-  //     showDialog(
-  //       barrierDismissible: false,
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return  AlertDialog(
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(15.0),
-  //           ),
-  //           contentPadding: EdgeInsets.zero,
-  //           content:
-  //           Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               // Close Button
-  //               Padding(
-  //                 padding: const EdgeInsets.all(16.0),
-  //                 child: Column(
-  //                   children: [
-  //                     // Warning Icon
-  //                     Icon(Icons.check_circle_rounded, color: Colors.green, size: 50),
-  //                     SizedBox(height: 16),
-  //                     // Confirmation Message
-  //                     Text(
-  //                       'Payment Received Successsfully',
-  //                       style: TextStyle(
-  //                         fontSize: 14,
-  //                         fontWeight: FontWeight.bold,
-  //                         color: Colors.black,
-  //                       ),
-  //                     ),
-  //                     SizedBox(height: 20),
-  //                     // Buttons
-  //                     Row(
-  //                       mainAxisAlignment: MainAxisAlignment.end,
-  //                       children: [
-  //
-  //                         ElevatedButton(
-  //                           onPressed: () {
-  //                             Navigator.push(
-  //                               context,
-  //                               PageRouteBuilder(
-  //                                 pageBuilder:
-  //                                     (context, animation, secondaryAnimation) =>
-  //                                     PaymentList(),
-  //                                 transitionDuration:
-  //                                 const Duration(milliseconds: 50),
-  //                                 transitionsBuilder: (context, animation,
-  //                                     secondaryAnimation, child) {
-  //                                   return FadeTransition(
-  //                                     opacity: animation,
-  //                                     child: child,
-  //                                   );
-  //                                 },
-  //                               ),
-  //                             );
-  //                             // Handle No action
-  //                             // Navigator.of(context).pop();
-  //                           },
-  //                           style: ElevatedButton.styleFrom(
-  //                             backgroundColor: Colors.blue,
-  //                             side: BorderSide(color: Colors.blue),
-  //                             shape: RoundedRectangleBorder(
-  //                               borderRadius: BorderRadius.circular(10.0),
-  //                             ),
-  //                           ),
-  //                           child: Text(
-  //                             'OK',
-  //                             style: TextStyle(
-  //                               color: Colors.white,
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         );
-  //       },
-  //     );
-  //   }
-  //   else if(addResponseBody['status'] == 'failure')
-  //     {
-  //       print('elseAPi');
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(
-  //             content: Text('Paid amount exceeds the gross amount.'),
-  //           ),
-  //       );
-  //     }
-  //   else {
-  //     print('Error: ${response.statusCode}');
-  //   }
-  // }
-
 
   void _filterAndPaginateProducts() {
     filteredData = productList.where((product) {
@@ -612,10 +471,7 @@ class _CusPaymentState extends State<CusPayment> {
         ),
         body: LayoutBuilder(
             builder: (context, constraints){
-              double maxHeight = constraints.maxHeight;
               double maxWidth = constraints.maxWidth;
-              double right = MediaQuery.of(context).size.width;
-              //double right = MediaQuery.of(context).size.width;
 
 
               return  Row(
@@ -627,7 +483,7 @@ class _CusPaymentState extends State<CusPayment> {
                       width: 200,
                       height: 984,
                       color: const Color(0xFFF7F6FA),
-                      padding: const EdgeInsets.only(left: 20, top: 30),
+                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: _buildMenuItems(context),
@@ -645,10 +501,8 @@ class _CusPaymentState extends State<CusPayment> {
                   Expanded(
                       child:
                       SingleChildScrollView(
-                        child: Stack(
-                          // mainAxisAlignment: MainAxisAlignment.start,
-                          // crossAxisAlignment: CrossAxisAlignment.start,
-                          // mainAxisSize: MainAxisSize.max,
+                        child:
+                        Stack(
                           children: [
                             Positioned(
                               top: 0,
@@ -697,443 +551,179 @@ class _CusPaymentState extends State<CusPayment> {
                                 color: Colors.black, // Border color
                               ),
                             ),
+                            if(constraints.maxWidth >= 1200)...{
+                              Padding(
+                                padding: const EdgeInsets.only(top:
+                                70,left: 20,right:20),
+                                child:
 
-                            Padding(
-                              padding: const EdgeInsets.only(left: 90, top: 100,right: 120),
-                              child: Container(
-                                height: 100,
-                                width: maxWidth,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFFFFF), // background: #FFFFFF
-                                  boxShadow: [const BoxShadow(
-                                    offset: Offset(0, 3),
-                                    blurRadius: 6,
-                                    color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                                  )],
-                                  border: Border.all(
-                                    // border: 2px
-                                    color: const Color(0xFFB2C2D3), // border: #B2C2D3
-                                  ),
-                                  borderRadius: const BorderRadius.all(Radius.circular(8)), // border-radius: 8px
-                                ),
-                                child:  Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          children: [
+                                Container(
 
-                                            const Text(
-                                              'Total Amount To Pay',
-                                              style: TextStyle(
-                                                  color: Colors.black,fontSize: 25
-                                              ),
-                                            ),
-                                            const SizedBox(height: 10,),
-                                            ValueListenableBuilder(
-                                                valueListenable: GrossAmountController,
-                                                builder: (context,value,child) {
-                                                  return Text(
-                                                    '${widget.productMap['paymentStatus'] == 'partial payment'? PayableController.text : GrossAmountController.text } INR',
-                                                    // '${AmountController.text}  INR',
-                                                    style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 20
+                                  child: Column(children:
+                                  [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 90, top: 30,right: 120),
+                                      child: Container(
+                                        height: 100,
+                                        width: maxWidth,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFFFFF), // background: #FFFFFF
+                                          boxShadow: [const BoxShadow(
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
+                                            color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                          )],
+                                          border: Border.all(
+                                            // border: 2px
+                                            color: const Color(0xFFB2C2D3), // border: #B2C2D3
+                                          ),
+                                          borderRadius: const BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+                                        ),
+                                        child:  Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+
+                                                    const Text(
+                                                      'Total Amount To Pay',
+                                                      style: TextStyle(
+                                                          color: Colors.black,fontSize: 25
+                                                      ),
                                                     ),
-                                                  );
-                                                }
-                                            ),
-                                          ],
+                                                    const SizedBox(height: 10,),
+                                                    ValueListenableBuilder(
+                                                        valueListenable: GrossAmountController,
+                                                        builder: (context,value,child) {
+                                                          return Text(
+                                                            '${widget.productMap['paymentStatus'] == 'partial payment'? PayableController.text : GrossAmountController.text } INR',
+                                                            // '${AmountController.text}  INR',
+                                                            style: const TextStyle(
+                                                                color: Colors.black,
+                                                                fontSize: 20
+                                                            ),
+                                                          );
+                                                        }
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+
+
+                                            ],
+                                          ),
                                         ),
                                       ),
-
-
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 260,left: 50,right: 50),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-
-                                          Text('${widget.productMap['invoiceNo']}',style: const TextStyle(fontSize: 20,),),
-
-                                          widget.productMap['paymentStatus'] == 'cleared'
-                                              ? Container()
-                                              : SizedBox(
-                                            width:80,
-                                            height: 30,
-                                            child:
-                                            OutlinedButton(
-                                              //   autofocus: widget.productMap['paymentStatus']  != 'cleared',
-                                              // onPressed: handleButtonPress,
-                                              //my copy
-                                                onPressed: (){
-                                                  if( _selectedReason == null || _selectedReason!.isEmpty ||  _selectedReason == 'Payment mode'){
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text('Please Select Payment Mode'),
-                                                        //  backgroundColor: Colors.red,
-                                                      ),
-                                                    );
-                                                  }
-                                                  else if (AmountController.text.isEmpty || double.tryParse(AmountController.text) == null || double.tryParse(AmountController.text)! <= 0) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text('Please Enter Valid Amount'),
-                                                      ),
-                                                    );
-                                                  }
-                                                  else{
-                                                    checkPayment(AmountController.text);
-                                                  }
-
-                                                },
-                                                style: OutlinedButton.styleFrom(
-                                                  backgroundColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(8),
-                                                  ),
-                                                  side: const BorderSide(color: Colors.blue),
-                                                  padding: EdgeInsets.zero,
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  // mainAxisSize: MainAxisSize.min,
-                                                  //crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    TextButton.icon(
-                                                      onPressed: () {
-                                                        if( _selectedReason == null || _selectedReason!.isEmpty ||  _selectedReason == 'Payment mode'){
-                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                            const SnackBar(
-                                                              content: Text('Please Select Payment Mode'),
-                                                              //  backgroundColor: Colors.red,
-                                                            ),
-                                                          );
-                                                        }
-                                                        else if (AmountController.text.isEmpty || double.tryParse(AmountController.text) == null || double.tryParse(AmountController.text)! <= 0) {
-                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                            const SnackBar(
-                                                              content: Text('Please Enter Valid Amount'),
-                                                            ),
-                                                          );
-                                                        }
-                                                        else{
-                                                          checkPayment(AmountController.text);
-                                                        }
-                                                      },
-                                                      icon: const Icon(Icons.account_balance_wallet, color: Colors.blue, size: 18),
-                                                      label: const Text(
-                                                        'Pay',
-                                                        style: TextStyle(color: Colors.blue),
-                                                      ),
-                                                    )
-
-                                                  ],
-                                                )
-
-                                            ),
-                                          ) ,
-
-                                        ],),
-
-                                    ],
-                                  ),
-
-
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 50,right: 50,top: 300),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0xff00000029),
-                                      offset: Offset(0, 3),
-                                      blurRadius: 6,
                                     ),
-                                  ],
-                                  color: const Color(0xFFFFFFFF),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 70,left: 50,right: 50),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
-                                          // const SizedBox(width: 16),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                const Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Padding(
-                                                      padding:  EdgeInsets.only(bottom: 13),
-                                                      child: Text('Payment Mode',),
-                                                    ),
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
 
-                                                  ],
-                                                ),
-                                                //  const SizedBox(height: 5,),
-                                                Padding( padding: const EdgeInsets.only(bottom: 8),
-                                                  child: SizedBox(
-                                                    height: 35,
-                                                    child: DropdownButtonFormField<String>(
-                                                      decoration: InputDecoration(
-                                                        filled: true,
-                                                        fillColor: Colors.grey.shade200,
-                                                        border: OutlineInputBorder(
-                                                          borderRadius: BorderRadius.circular(5.0),
-                                                          borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
-                                                        ),
-                                                        contentPadding: const EdgeInsets.symmetric(
-                                                            horizontal: 8, vertical: 8),
-                                                      ),
+                                                  Text('${widget.productMap['invoiceNo']}',style: const TextStyle(fontSize: 20,),),
 
-                                                      value: _selectedReason,
-                                                      onChanged: (String? value) {
-                                                        setState(() {
-                                                          _selectedReason = value!;
-                                                          _reasonController.text = value;
-                                                        });
-                                                      },
-                                                      items:<String>['Payment mode', 'UPI', 'Credit/Debit Card', 'Cash'].map<DropdownMenuItem<String>>((String value) {
-                                                        return DropdownMenuItem<String>(
-                                                          enabled: widget.productMap['paymentStatus']  != 'cleared',
-                                                          value: value,
-                                                          child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.grey,),),
-                                                        );
-                                                      }).toList(),
-                                                      isExpanded: true,
-                                                      //     hint: const Text('Reason for return'),
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 36),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                const Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Text('Gross Amount'),
-
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 5,),
-                                                Padding(
-                                                  padding: const EdgeInsets.only(top: 13),
-                                                  child: SizedBox(
-                                                    height: 40,
-                                                    child:  Text(GrossAmountController.text,style: const TextStyle(color: Colors.grey),),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                const Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Text('Paid Amount'),
-
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 5,),
-                                                Padding(
-                                                  padding: const EdgeInsets.only(top: 13),
-                                                  child: SizedBox(
-                                                    height: 40,
-                                                    child:  Text(PaidController.text,style: const TextStyle(color: Colors.grey),),
-
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                const Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Text('Remaining Amount'),
-
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 5,),
-                                                Padding(
-                                                  padding: const EdgeInsets.only(top: 13),
-                                                  child: SizedBox(
-                                                    height: 40,
-                                                    child:  Text(PayableController.text,style: const TextStyle(color: Colors.grey),),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          // Expanded(
-                                          //   child: Column(
-                                          //     crossAxisAlignment: CrossAxisAlignment.start,
-                                          //     children: [
-                                          //       const Row(
-                                          //         mainAxisSize: MainAxisSize.min,
-                                          //         children: [
-                                          //           Padding(
-                                          //             padding: const EdgeInsets.only(bottom: 13),
-                                          //             child: Text('Credit Amount',),
-                                          //           ),
-                                          //
-                                          //         ],
-                                          //       ),
-                                          //       //  const SizedBox(height: 5,),
-                                          //       Padding( padding: const EdgeInsets.only(bottom: 8),
-                                          //         child: SizedBox(
-                                          //           height: 35,
-                                          //           child: DropdownButtonFormField<String>(
-                                          //             decoration: InputDecoration(
-                                          //               filled: true,
-                                          //               fillColor: Colors.grey.shade200,
-                                          //               border: OutlineInputBorder(
-                                          //                 borderRadius: BorderRadius.circular(5.0),
-                                          //                 borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
-                                          //               ),
-                                          //               contentPadding: const EdgeInsets.symmetric(
-                                          //                   horizontal: 8, vertical: 8),
-                                          //             ),
-                                          //             value: _selectedReason,
-                                          //             onChanged: (String? value) {
-                                          //               setState(() {
-                                          //                 _selectedReason = value!;
-                                          //                 _reasonController.text = value;
-                                          //               });
-                                          //             },
-                                          //             items:<String>['Credit Amount', 'UPI', 'Credit/Debit Card', 'Cash'].map<DropdownMenuItem<String>>((String value) {
-                                          //               return DropdownMenuItem<String>(
-                                          //                 value: value,
-                                          //                 child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.grey,),),
-                                          //               );
-                                          //             }).toList(),
-                                          //             isExpanded: true,
-                                          //             //     hint: const Text('Reason for return'),
-                                          //           ),
-                                          //         ),
-                                          //       )
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          // const SizedBox(width: 16),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                const Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Padding(
-                                                      padding:  EdgeInsets.only(bottom: 13),
-                                                      child: Text('Amount to Pay'),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets.only(bottom: 8),
-                                                  child: SizedBox(
-                                                    height: 35,
+                                                  widget.productMap['paymentStatus'] == 'cleared'
+                                                      ? Container()
+                                                      : SizedBox(
+                                                    width:80,
+                                                    height: 30,
                                                     child:
-                                                    TextFormField(
-                                                      enabled: widget.productMap['paymentStatus']  != 'cleared',
-                                                      controller: AmountController,
-                                                      //controller: AmountController =widget.productMap['paymentStatus'] == 'partial payment' ? PayableController :GrossAmountController ,
-                                                      decoration: InputDecoration(
-                                                        filled: true,
-                                                        fillColor: Colors.grey.shade200,
-                                                        border: OutlineInputBorder(
-                                                          borderRadius: BorderRadius.circular(5.0),
-                                                          borderSide: BorderSide.none,
+                                                    OutlinedButton(
+                                                      //   autofocus: widget.productMap['paymentStatus']  != 'cleared',
+                                                      // onPressed: handleButtonPress,
+                                                      //my copy
+                                                        onPressed: (){
+                                                          if( _selectedReason == null || _selectedReason!.isEmpty ||  _selectedReason == 'Payment mode'){
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text('Please Select Payment Mode'),
+                                                                //  backgroundColor: Colors.red,
+                                                              ),
+                                                            );
+                                                          }
+                                                          else if (AmountController.text.isEmpty || double.tryParse(AmountController.text) == null || double.tryParse(AmountController.text)! <= 0) {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text('Please Enter Valid Amount'),
+                                                              ),
+                                                            );
+                                                          }
+                                                          else{
+                                                            checkPayment(AmountController.text);
+                                                          }
+
+                                                        },
+                                                        style: OutlinedButton.styleFrom(
+                                                          backgroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                          side: const BorderSide(color: Colors.blue),
+                                                          padding: EdgeInsets.zero,
                                                         ),
-                                                        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                                                        hintText: 'Enter Amount',
-                                                        // errorText: _errorText,
-                                                      ),
-                                                      inputFormatters: [
-                                                        FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
-                                                        FilteringTextInputFormatter.deny(RegExp(r'^\s')),
-                                                        FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
-                                                      ],
-                                                      // onChanged: (value){
-                                                      //   AmountController.text = value;
-                                                      // },
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          // mainAxisSize: MainAxisSize.min,
+                                                          //crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            TextButton.icon(
+                                                              onPressed: () {
+                                                                if( _selectedReason == null || _selectedReason!.isEmpty ||  _selectedReason == 'Payment mode'){
+                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                    const SnackBar(
+                                                                      content: Text('Please Select Payment Mode'),
+                                                                      //  backgroundColor: Colors.red,
+                                                                    ),
+                                                                  );
+                                                                }
+                                                                else if (AmountController.text.isEmpty || double.tryParse(AmountController.text) == null || double.tryParse(AmountController.text)! <= 0) {
+                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                    const SnackBar(
+                                                                      content: Text('Please Enter Valid Amount'),
+                                                                    ),
+                                                                  );
+                                                                }
+                                                                else{
+                                                                  checkPayment(AmountController.text);
+                                                                }
+                                                              },
+                                                              icon: const Icon(Icons.account_balance_wallet, color: Colors.blue, size: 18),
+                                                              label: const Text(
+                                                                'Pay',
+                                                                style: TextStyle(color: Colors.blue),
+                                                              ),
+                                                            )
+
+                                                          ],
+                                                        )
+
                                                     ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
+                                                  ) ,
+
+                                                ],),
+
+                                            ],
                                           ),
+
+
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 50, top: 470,right: 50,bottom: 10),
-                              child: Container(
-                                // decoration: BoxDecoration(
-                                //   border: Border.all(color: Colors.grey),
-                                //   borderRadius: BorderRadius.circular(8),
-                                //   boxShadow: const [
-                                //     BoxShadow(
-                                //       color: Color(0xff00000029),
-                                //       offset: Offset(0, 3),
-                                //       blurRadius: 6,
-                                //     ),
-                                //   ],
-                                //   color: const Color(0xFFFFFFFF),
-                                // ),
-                                  child: Column(
-                                    children: [
-                                      const Row(
-                                        children: [
-                                          Text('Payment History',style: TextStyle(fontWeight: FontWeight.bold),),
-                                        ],
-                                      ),
-                                      SizedBox(height: 20,),
-                                      Container(
-                                        width: maxWidth,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50,right: 50,top: 30),
+                                      child: Container(
                                         decoration: BoxDecoration(
                                           border: Border.all(color: Colors.grey),
                                           borderRadius: BorderRadius.circular(8),
@@ -1147,122 +737,991 @@ class _CusPaymentState extends State<CusPayment> {
                                           color: const Color(0xFFFFFFFF),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.only(),
-                                          child: DataTable(
-                                            showCheckboxColumn: false,
-                                            headingRowHeight: 40,
-                                            columns: [
-                                              //DataColumn(label: Container(child: Text('      '))),
-                                              DataColumn(
-                                                label: Padding(
-                                                  padding: const EdgeInsets.only(left: 10),
-                                                  child: Text(
-                                                    'Payment ID',
-                                                    style: TextStyle(
-                                                      color: Colors.indigo[900],
-                                                      fontSize: 13,
-                                                      fontWeight: FontWeight.bold,
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  // const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Padding(
+                                                              padding:  EdgeInsets.only(bottom: 13),
+                                                              child: Text('Payment Mode',),
+                                                            ),
+
+                                                          ],
+                                                        ),
+                                                        //  const SizedBox(height: 5,),
+                                                        Padding( padding: const EdgeInsets.only(bottom: 8),
+                                                          child: SizedBox(
+                                                            height: 35,
+                                                            child: DropdownButtonFormField<String>(
+                                                              decoration: InputDecoration(
+                                                                filled: true,
+                                                                fillColor: Colors.grey.shade200,
+                                                                border: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.circular(5.0),
+                                                                  borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
+                                                                ),
+                                                                contentPadding: const EdgeInsets.symmetric(
+                                                                    horizontal: 8, vertical: 8),
+                                                              ),
+
+                                                              value: _selectedReason,
+                                                              onChanged: (String? value) {
+                                                                setState(() {
+                                                                  _selectedReason = value!;
+                                                                  _reasonController.text = value;
+                                                                });
+                                                              },
+                                                              items:<String>['Payment mode', 'UPI', 'Credit/Debit Card', 'Cash'].map<DropdownMenuItem<String>>((String value) {
+                                                                return DropdownMenuItem<String>(
+                                                                  enabled: widget.productMap['paymentStatus']  != 'cleared',
+                                                                  value: value,
+                                                                  child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.grey,),),
+                                                                );
+                                                              }).toList(),
+                                                              isExpanded: true,
+                                                              //     hint: const Text('Reason for return'),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                              DataColumn(
-                                                label: Padding(
-                                                  padding: const EdgeInsets.only(left: 5),
-                                                  child: Text(
-                                                    'Payment Date',
-                                                    style: TextStyle(
-                                                      color: Colors.indigo[900],
-                                                      fontSize: 13,
-                                                      fontWeight: FontWeight.bold,
+                                                  const SizedBox(width: 36),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Gross Amount'),
+
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 13),
+                                                          child: SizedBox(
+                                                            height: 40,
+                                                            child:  Text(GrossAmountController.text,style: const TextStyle(color: Colors.grey),),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                              DataColumn(
-                                                label: Text(
-                                                  'Payment Mode',
-                                                  style: TextStyle(
-                                                    color: Colors.indigo[900],
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.bold,
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Paid Amount'),
+
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 13),
+                                                          child: SizedBox(
+                                                            height: 40,
+                                                            child:  Text(PaidController.text,style: const TextStyle(color: Colors.grey),),
+
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ),
-                                              DataColumn(
-                                                label: Text(
-                                                  'Paid Amount',
-                                                  style: TextStyle(
-                                                    color: Colors.indigo[900],
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.bold,
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Remaining Amount'),
+
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 13),
+                                                          child: SizedBox(
+                                                            height: 40,
+                                                            child:  Text(PayableController.text,style: const TextStyle(color: Colors.grey),),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
+                                                  const SizedBox(width: 16),
+                                                  // Expanded(
+                                                  //   child: Column(
+                                                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                                                  //     children: [
+                                                  //       const Row(
+                                                  //         mainAxisSize: MainAxisSize.min,
+                                                  //         children: [
+                                                  //           Padding(
+                                                  //             padding: const EdgeInsets.only(bottom: 13),
+                                                  //             child: Text('Credit Amount',),
+                                                  //           ),
+                                                  //
+                                                  //         ],
+                                                  //       ),
+                                                  //       //  const SizedBox(height: 5,),
+                                                  //       Padding( padding: const EdgeInsets.only(bottom: 8),
+                                                  //         child: SizedBox(
+                                                  //           height: 35,
+                                                  //           child: DropdownButtonFormField<String>(
+                                                  //             decoration: InputDecoration(
+                                                  //               filled: true,
+                                                  //               fillColor: Colors.grey.shade200,
+                                                  //               border: OutlineInputBorder(
+                                                  //                 borderRadius: BorderRadius.circular(5.0),
+                                                  //                 borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
+                                                  //               ),
+                                                  //               contentPadding: const EdgeInsets.symmetric(
+                                                  //                   horizontal: 8, vertical: 8),
+                                                  //             ),
+                                                  //             value: _selectedReason,
+                                                  //             onChanged: (String? value) {
+                                                  //               setState(() {
+                                                  //                 _selectedReason = value!;
+                                                  //                 _reasonController.text = value;
+                                                  //               });
+                                                  //             },
+                                                  //             items:<String>['Credit Amount', 'UPI', 'Credit/Debit Card', 'Cash'].map<DropdownMenuItem<String>>((String value) {
+                                                  //               return DropdownMenuItem<String>(
+                                                  //                 value: value,
+                                                  //                 child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.grey,),),
+                                                  //               );
+                                                  //             }).toList(),
+                                                  //             isExpanded: true,
+                                                  //             //     hint: const Text('Reason for return'),
+                                                  //           ),
+                                                  //         ),
+                                                  //       )
+                                                  //     ],
+                                                  //   ),
+                                                  // ),
+                                                  // const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Padding(
+                                                              padding:  EdgeInsets.only(bottom: 13),
+                                                              child: Text('Amount to Pay'),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(bottom: 8),
+                                                          child: SizedBox(
+                                                            height: 35,
+                                                            child:
+                                                            TextFormField(
+                                                              enabled: widget.productMap['paymentStatus']  != 'cleared',
+                                                              controller: AmountController,
+                                                              //controller: AmountController =widget.productMap['paymentStatus'] == 'partial payment' ? PayableController :GrossAmountController ,
+                                                              decoration: InputDecoration(
+                                                                filled: true,
+                                                                fillColor: Colors.grey.shade200,
+                                                                border: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.circular(5.0),
+                                                                  borderSide: BorderSide.none,
+                                                                ),
+                                                                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                                                hintText: 'Enter Amount',
+                                                                // errorText: _errorText,
+                                                              ),
+                                                              inputFormatters: [
+                                                                FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
+                                                                FilteringTextInputFormatter.deny(RegExp(r'^\s')),
+                                                                FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
+                                                              ],
+                                                              // onChanged: (value){
+                                                              //   AmountController.text = value;
+                                                              // },
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              DataColumn(
-                                                label: Text(
-                                                  'Paid By',
-                                                  style: TextStyle(
-                                                    color: Colors.indigo[900],
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.bold,
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50, top: 70,right: 50,bottom: 10),
+                                      child: Container(
+                                        // decoration: BoxDecoration(
+                                        //   border: Border.all(color: Colors.grey),
+                                        //   borderRadius: BorderRadius.circular(8),
+                                        //   boxShadow: const [
+                                        //     BoxShadow(
+                                        //       color: Color(0xff00000029),
+                                        //       offset: Offset(0, 3),
+                                        //       blurRadius: 6,
+                                        //     ),
+                                        //   ],
+                                        //   color: const Color(0xFFFFFFFF),
+                                        // ),
+                                          child: Column(
+                                            children: [
+                                              const Row(
+                                                children: [
+                                                  Text('Payment History',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                ],
+                                              ),
+                                              SizedBox(height: 20,),
+                                              Container(
+                                                width: maxWidth,
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(color: Colors.grey),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Color(0xff00000029),
+                                                      offset: Offset(0, 3),
+                                                      blurRadius: 6,
+                                                    ),
+                                                  ],
+                                                  color: const Color(0xFFFFFFFF),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(),
+                                                  child: DataTable(
+                                                    showCheckboxColumn: false,
+                                                    headingRowHeight: 40,
+                                                    columns: [
+                                                      //DataColumn(label: Container(child: Text('      '))),
+                                                      DataColumn(
+                                                        label: Padding(
+                                                          padding: const EdgeInsets.only(left: 10),
+                                                          child: Text(
+                                                            'Payment ID',
+                                                            style: TextStyle(
+                                                              color: Colors.indigo[900],
+                                                              fontSize: 13,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Padding(
+                                                          padding: const EdgeInsets.only(left: 5),
+                                                          child: Text(
+                                                            'Payment Date',
+                                                            style: TextStyle(
+                                                              color: Colors.indigo[900],
+                                                              fontSize: 13,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Payment Mode',
+                                                          style: TextStyle(
+                                                            color: Colors.indigo[900],
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Paid Amount',
+                                                          style: TextStyle(
+                                                            color: Colors.indigo[900],
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Paid By',
+                                                          style: TextStyle(
+                                                            color: Colors.indigo[900],
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                    rows: List.generate(filteredData.length, (index){
+                                                      final detail = filteredData.elementAt(index);
+                                                      return DataRow(
+                                                          color: MaterialStateProperty.resolveWith<Color>((states) {
+                                                            if (states.contains(MaterialState.hovered)) {
+                                                              return Colors.blue.shade500.withOpacity(0.8); // Dark blue with opacity
+                                                            }  else {
+                                                              return Colors.white.withOpacity(0.9);
+                                                            }
+                                                          }
+                                                          ),
+                                                          cells: [
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.transactionsId!),
+                                                              ),
+                                                            ),
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.paymentDate!),
+                                                              ),
+                                                            ),
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.paymentMode!),
+                                                              ),
+                                                            ),
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.exactPaidAmount!.toStringAsFixed(2)),
+                                                              ),
+                                                            ),
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.paidBy!),
+                                                              ),
+                                                            ),
+                                                          ]
+                                                      );
+                                                    }),
+
                                                   ),
                                                 ),
                                               ),
                                             ],
-                                            rows: List.generate(filteredData.length, (index){
-                                              final detail = filteredData.elementAt(index);
-                                              return DataRow(
-                                                  color: MaterialStateProperty.resolveWith<Color>((states) {
-                                                    if (states.contains(MaterialState.hovered)) {
-                                                      return Colors.blue.shade500.withOpacity(0.8); // Dark blue with opacity
-                                                    }  else {
-                                                      return Colors.white.withOpacity(0.9);
-                                                    }
-                                                  }
-                                                  ),
-                                                  cells: [
-                                                    DataCell(
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 5),
-                                                        child: Text(detail.transactionsId!),
-                                                      ),
-                                                    ),
-                                                    DataCell(
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 5),
-                                                        child: Text(detail.paymentDate!),
-                                                      ),
-                                                    ),
-                                                    DataCell(
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 5),
-                                                        child: Text(detail.paymentMode!),
-                                                      ),
-                                                    ),
-                                                    DataCell(
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 5),
-                                                        child: Text(detail.exactPaidAmount!.toStringAsFixed(2)),
-                                                      ),
-                                                    ),
-                                                    DataCell(
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 5),
-                                                        child: Text(detail.paidBy!),
-                                                      ),
-                                                    ),
-                                                  ]
-                                              );
-                                            }),
+                                          )
+                                      ),
+                                    ),
+                                  ],),
+                                ),
+                              ),
+                            }else...{
+                              Padding(
+                                                              padding: const EdgeInsets.only(top:
+                                                              70,left: 20,right:20),
+                                                              child:
 
+                                                              AdaptiveScrollbar(
+                              position: ScrollbarPosition.bottom,controller: horizontalScroll,
+                              child: SingleChildScrollView(
+                                controller: horizontalScroll,
+                                scrollDirection: Axis.horizontal,
+                                child: Container(
+                                  width: 1700,
+
+                                  child: Column(children:
+                                  [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 90, top: 30,right: 120),
+                                      child: Container(
+                                        height: 100,
+                                        width: 1400,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFFFFF), // background: #FFFFFF
+                                          boxShadow: [const BoxShadow(
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
+                                            color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                          )],
+                                          border: Border.all(
+                                            // border: 2px
+                                            color: const Color(0xFFB2C2D3), // border: #B2C2D3
+                                          ),
+                                          borderRadius: const BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+                                        ),
+                                        child:  Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+
+                                                    const Text(
+                                                      'Total Amount To Pay',
+                                                      style: TextStyle(
+                                                          color: Colors.black,fontSize: 25
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 10,),
+                                                    ValueListenableBuilder(
+                                                        valueListenable: GrossAmountController,
+                                                        builder: (context,value,child) {
+                                                          return Text(
+                                                            '${widget.productMap['paymentStatus'] == 'partial payment'? PayableController.text : GrossAmountController.text } INR',
+                                                            // '${AmountController.text}  INR',
+                                                            style: const TextStyle(
+                                                                color: Colors.black,
+                                                                fontSize: 20
+                                                            ),
+                                                          );
+                                                        }
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+
+
+                                            ],
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  )
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 70,left: 50,right: 50),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+
+                                                  Text('${widget.productMap['invoiceNo']}',style: const TextStyle(fontSize: 20,),),
+
+                                                  widget.productMap['paymentStatus'] == 'cleared'
+                                                      ? Container()
+                                                      : SizedBox(
+                                                    width:80,
+                                                    height: 30,
+                                                    child:
+                                                    OutlinedButton(
+                                                      //   autofocus: widget.productMap['paymentStatus']  != 'cleared',
+                                                      // onPressed: handleButtonPress,
+                                                      //my copy
+                                                        onPressed: (){
+                                                          if( _selectedReason == null || _selectedReason!.isEmpty ||  _selectedReason == 'Payment mode'){
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text('Please Select Payment Mode'),
+                                                                //  backgroundColor: Colors.red,
+                                                              ),
+                                                            );
+                                                          }
+                                                          else if (AmountController.text.isEmpty || double.tryParse(AmountController.text) == null || double.tryParse(AmountController.text)! <= 0) {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text('Please Enter Valid Amount'),
+                                                              ),
+                                                            );
+                                                          }
+                                                          else{
+                                                            checkPayment(AmountController.text);
+                                                          }
+
+                                                        },
+                                                        style: OutlinedButton.styleFrom(
+                                                          backgroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                          side: const BorderSide(color: Colors.blue),
+                                                          padding: EdgeInsets.zero,
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          // mainAxisSize: MainAxisSize.min,
+                                                          //crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            TextButton.icon(
+                                                              onPressed: () {
+                                                                if( _selectedReason == null || _selectedReason!.isEmpty ||  _selectedReason == 'Payment mode'){
+                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                    const SnackBar(
+                                                                      content: Text('Please Select Payment Mode'),
+                                                                      //  backgroundColor: Colors.red,
+                                                                    ),
+                                                                  );
+                                                                }
+                                                                else if (AmountController.text.isEmpty || double.tryParse(AmountController.text) == null || double.tryParse(AmountController.text)! <= 0) {
+                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                    const SnackBar(
+                                                                      content: Text('Please Enter Valid Amount'),
+                                                                    ),
+                                                                  );
+                                                                }
+                                                                else{
+                                                                  checkPayment(AmountController.text);
+                                                                }
+                                                              },
+                                                              icon: const Icon(Icons.account_balance_wallet, color: Colors.blue, size: 18),
+                                                              label: const Text(
+                                                                'Pay',
+                                                                style: TextStyle(color: Colors.blue),
+                                                              ),
+                                                            )
+
+                                                          ],
+                                                        )
+
+                                                    ),
+                                                  ) ,
+
+                                                ],),
+
+                                            ],
+                                          ),
+
+
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50,right: 50,top: 30),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(color: Colors.grey),
+                                          borderRadius: BorderRadius.circular(8),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(0xff00000029),
+                                              offset: Offset(0, 3),
+                                              blurRadius: 6,
+                                            ),
+                                          ],
+                                          color: const Color(0xFFFFFFFF),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  // const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Padding(
+                                                              padding:  EdgeInsets.only(bottom: 13),
+                                                              child: Text('Payment Mode',),
+                                                            ),
+
+                                                          ],
+                                                        ),
+                                                        //  const SizedBox(height: 5,),
+                                                        Padding( padding: const EdgeInsets.only(bottom: 8),
+                                                          child: SizedBox(
+                                                            height: 35,
+                                                            child: DropdownButtonFormField<String>(
+                                                              decoration: InputDecoration(
+                                                                filled: true,
+                                                                fillColor: Colors.grey.shade200,
+                                                                border: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.circular(5.0),
+                                                                  borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
+                                                                ),
+                                                                contentPadding: const EdgeInsets.symmetric(
+                                                                    horizontal: 8, vertical: 8),
+                                                              ),
+
+                                                              value: _selectedReason,
+                                                              onChanged: (String? value) {
+                                                                setState(() {
+                                                                  _selectedReason = value!;
+                                                                  _reasonController.text = value;
+                                                                });
+                                                              },
+                                                              items:<String>['Payment mode', 'UPI', 'Credit/Debit Card', 'Cash'].map<DropdownMenuItem<String>>((String value) {
+                                                                return DropdownMenuItem<String>(
+                                                                  enabled: widget.productMap['paymentStatus']  != 'cleared',
+                                                                  value: value,
+                                                                  child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.grey,),),
+                                                                );
+                                                              }).toList(),
+                                                              isExpanded: true,
+                                                              //     hint: const Text('Reason for return'),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 36),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Gross Amount'),
+
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 13),
+                                                          child: SizedBox(
+                                                            height: 40,
+                                                            child:  Text(GrossAmountController.text,style: const TextStyle(color: Colors.grey),),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Paid Amount'),
+
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 13),
+                                                          child: SizedBox(
+                                                            height: 40,
+                                                            child:  Text(PaidController.text,style: const TextStyle(color: Colors.grey),),
+
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text('Remaining Amount'),
+
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5,),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 13),
+                                                          child: SizedBox(
+                                                            height: 40,
+                                                            child:  Text(PayableController.text,style: const TextStyle(color: Colors.grey),),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  // Expanded(
+                                                  //   child: Column(
+                                                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                                                  //     children: [
+                                                  //       const Row(
+                                                  //         mainAxisSize: MainAxisSize.min,
+                                                  //         children: [
+                                                  //           Padding(
+                                                  //             padding: const EdgeInsets.only(bottom: 13),
+                                                  //             child: Text('Credit Amount',),
+                                                  //           ),
+                                                  //
+                                                  //         ],
+                                                  //       ),
+                                                  //       //  const SizedBox(height: 5,),
+                                                  //       Padding( padding: const EdgeInsets.only(bottom: 8),
+                                                  //         child: SizedBox(
+                                                  //           height: 35,
+                                                  //           child: DropdownButtonFormField<String>(
+                                                  //             decoration: InputDecoration(
+                                                  //               filled: true,
+                                                  //               fillColor: Colors.grey.shade200,
+                                                  //               border: OutlineInputBorder(
+                                                  //                 borderRadius: BorderRadius.circular(5.0),
+                                                  //                 borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
+                                                  //               ),
+                                                  //               contentPadding: const EdgeInsets.symmetric(
+                                                  //                   horizontal: 8, vertical: 8),
+                                                  //             ),
+                                                  //             value: _selectedReason,
+                                                  //             onChanged: (String? value) {
+                                                  //               setState(() {
+                                                  //                 _selectedReason = value!;
+                                                  //                 _reasonController.text = value;
+                                                  //               });
+                                                  //             },
+                                                  //             items:<String>['Credit Amount', 'UPI', 'Credit/Debit Card', 'Cash'].map<DropdownMenuItem<String>>((String value) {
+                                                  //               return DropdownMenuItem<String>(
+                                                  //                 value: value,
+                                                  //                 child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.grey,),),
+                                                  //               );
+                                                  //             }).toList(),
+                                                  //             isExpanded: true,
+                                                  //             //     hint: const Text('Reason for return'),
+                                                  //           ),
+                                                  //         ),
+                                                  //       )
+                                                  //     ],
+                                                  //   ),
+                                                  // ),
+                                                  // const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Padding(
+                                                              padding:  EdgeInsets.only(bottom: 13),
+                                                              child: Text('Amount to Pay'),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(bottom: 8),
+                                                          child: SizedBox(
+                                                            height: 35,
+                                                            child:
+                                                            TextFormField(
+                                                              enabled: widget.productMap['paymentStatus']  != 'cleared',
+                                                              controller: AmountController,
+                                                              //controller: AmountController =widget.productMap['paymentStatus'] == 'partial payment' ? PayableController :GrossAmountController ,
+                                                              decoration: InputDecoration(
+                                                                filled: true,
+                                                                fillColor: Colors.grey.shade200,
+                                                                border: OutlineInputBorder(
+                                                                  borderRadius: BorderRadius.circular(5.0),
+                                                                  borderSide: BorderSide.none,
+                                                                ),
+                                                                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                                                hintText: 'Enter Amount',
+                                                                // errorText: _errorText,
+                                                              ),
+                                                              inputFormatters: [
+                                                                FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
+                                                                FilteringTextInputFormatter.deny(RegExp(r'^\s')),
+                                                                FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
+                                                              ],
+                                                              // onChanged: (value){
+                                                              //   AmountController.text = value;
+                                                              // },
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50, top: 70,right: 50,bottom: 10),
+                                      child: Container(
+                                        // decoration: BoxDecoration(
+                                        //   border: Border.all(color: Colors.grey),
+                                        //   borderRadius: BorderRadius.circular(8),
+                                        //   boxShadow: const [
+                                        //     BoxShadow(
+                                        //       color: Color(0xff00000029),
+                                        //       offset: Offset(0, 3),
+                                        //       blurRadius: 6,
+                                        //     ),
+                                        //   ],
+                                        //   color: const Color(0xFFFFFFFF),
+                                        // ),
+                                          child: Column(
+                                            children: [
+                                              const Row(
+                                                children: [
+                                                  Text('Payment History',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                ],
+                                              ),
+                                              SizedBox(height: 20,),
+                                              Container(
+                                                width: 1700,
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(color: Colors.grey),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Color(0xff00000029),
+                                                      offset: Offset(0, 3),
+                                                      blurRadius: 6,
+                                                    ),
+                                                  ],
+                                                  color: const Color(0xFFFFFFFF),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(),
+                                                  child: DataTable(
+                                                    showCheckboxColumn: false,
+                                                    headingRowHeight: 40,
+                                                    columns: [
+                                                      //DataColumn(label: Container(child: Text('      '))),
+                                                      DataColumn(
+                                                        label: Padding(
+                                                          padding: const EdgeInsets.only(left: 10),
+                                                          child: Text(
+                                                            'Payment ID',
+                                                            style: TextStyle(
+                                                              color: Colors.indigo[900],
+                                                              fontSize: 13,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Padding(
+                                                          padding: const EdgeInsets.only(left: 5),
+                                                          child: Text(
+                                                            'Payment Date',
+                                                            style: TextStyle(
+                                                              color: Colors.indigo[900],
+                                                              fontSize: 13,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Payment Mode',
+                                                          style: TextStyle(
+                                                            color: Colors.indigo[900],
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Paid Amount',
+                                                          style: TextStyle(
+                                                            color: Colors.indigo[900],
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text(
+                                                          'Paid By',
+                                                          style: TextStyle(
+                                                            color: Colors.indigo[900],
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                    rows: List.generate(filteredData.length, (index){
+                                                      final detail = filteredData.elementAt(index);
+                                                      return DataRow(
+                                                          color: MaterialStateProperty.resolveWith<Color>((states) {
+                                                            if (states.contains(MaterialState.hovered)) {
+                                                              return Colors.blue.shade500.withOpacity(0.8); // Dark blue with opacity
+                                                            }  else {
+                                                              return Colors.white.withOpacity(0.9);
+                                                            }
+                                                          }
+                                                          ),
+                                                          cells: [
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.transactionsId!),
+                                                              ),
+                                                            ),
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.paymentDate!),
+                                                              ),
+                                                            ),
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.paymentMode!),
+                                                              ),
+                                                            ),
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.exactPaidAmount!.toStringAsFixed(2)),
+                                                              ),
+                                                            ),
+                                                            DataCell(
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 5),
+                                                                child: Text(detail.paidBy!),
+                                                              ),
+                                                            ),
+                                                          ]
+                                                      );
+                                                    }),
+
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                      ),
+                                    ),
+                                  ],),
+                                ),
                               ),
-                            ),
+                                                              ),
+                                                            ),
+                            }
+
+
+
+
+
+
 
                           ],
                         ),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:math' as math;
 import 'dart:typed_data';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart' as ord;
 import 'package:btb/widgets/productclass.dart';
@@ -51,6 +52,7 @@ class _CusReturnpageState extends State<CusReturnpage> {
   List<bool> columnSortState = [true, true, true, true, true, true];
   final String _category = '';
   bool isOrdersSelected = false;
+  final ScrollController horizontalScroll = ScrollController();
   DateTime? _selectedDate;
   late Future<void> _futureReturnMasters;
   late TextEditingController _dateController;
@@ -83,15 +85,29 @@ class _CusReturnpageState extends State<CusReturnpage> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Customer_Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
+    _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
+      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Customer_Order_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Customer_Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blueAccent, '/Customer_Return_List'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Customer_Payment_List'),
+      Container(decoration: BoxDecoration(
+        color: Colors.blue[800],
+        // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+        // color: Color.fromRGBO(224, 59, 48, 1.0),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(8), // Radius for top-left corner
+          topRight: Radius.circular(8), // No radius for top-right corner
+          bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+          bottomRight: Radius.circular(8), // No radius for bottom-right corner
+        ),
+      ),child: _buildMenuItem('Return', Icons.keyboard_return, Colors.white, '/Customer_Return_List')),
     ];
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Return'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Return'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -101,25 +117,28 @@ class _CusReturnpageState extends State<CusReturnpage> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -440,23 +459,40 @@ class _CusReturnpageState extends State<CusReturnpage> {
         ),
         body: LayoutBuilder(builder: (context, constraints) {
           double maxWidth = constraints.maxWidth;
-          double maxHeight = constraints.maxHeight;
           return Stack(
             children: [
-              Align(
-                // Added Align widget for the left side menu
-                alignment: Alignment.topLeft,
-                child: Container(
-                  height: 1400,
-                  width: 200,
-                  color: const Color(0xFFF7F6FA),
-                  padding: const EdgeInsets.only(left: 20, top: 30),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _buildMenuItems(context),
+
+              if(constraints.maxHeight <= 500)...{
+                SingleChildScrollView(
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      width: 200,
+                      color: const Color(0xFFF7F6FA),
+                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _buildMenuItems(context),
+                      ),
+                    ),
+                  ),
+                )
+
+              }
+              else...{
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    width: 200,
+                    color: const Color(0xFFF7F6FA),
+                    padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _buildMenuItems(context),
+                    ),
                   ),
                 ),
-              ),
+              },
               Padding(
                 padding: const EdgeInsets.only(left: 200, top: 0),
                 child: Container(
@@ -470,131 +506,262 @@ class _CusReturnpageState extends State<CusReturnpage> {
               ),
               Positioned(
                 top: 0,
-                left: 0,
+                left: 201,
                 right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 201),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    color: Colors.white,
-                    height: 50,
-                    child: Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text(
-                            'Return Order List',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const Spacer(),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 10, right: 80),
-                            child: OutlinedButton(
-                              onPressed: () {
-                                context.go('/Create_return_request');
-                                //   context.go('/Return/Create_return');
-                              },
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor: Colors.blue[800],
-                                // Button background color
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      5), // Rounded corners
-                                ),
-                                side: BorderSide.none, // No outline
-                              ),
-                              child: const Text(
-                                'Create',
+                bottom: 0,
+                child: Column(
+                  children: [
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        color: Colors.white,
+                        height: 50,
+                        child: Row(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(left: 20),
+                              child: Text(
+                                'Return Order List',
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  // fontWeight: FontWeight.w100,
-                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const Spacer(),
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 10, right: 80),
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    context.go('/Create_return_request');
+                                    //   context.go('/Return/Create_return');
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor: Colors.blue[800],
+                                    // Button background color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          5), // Rounded corners
+                                    ),
+                                    side: BorderSide.none, // No outline
+                                  ),
+                                  child: const Text(
+                                    'Create',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      // fontWeight: FontWeight.w100,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 40, left: 200),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  // Space above/below the border
-                  height: 0.3, // Border height
-                  color: Colors.black, // Border color
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                    left: 300, top: 120, right: maxWidth * 0.062, bottom: 15),
-                child: Container(
-                  width: maxWidth,
-                  height: 700,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    //
-                  ),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: SizedBox(
-                      width: maxWidth * 0.79,
-                      // padding: EdgeInsets.only(),
-                      // margin: EdgeInsets.only(left: 400, right: 100),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildSearchField(),
-                          // buildSearchField(),
-                          const SizedBox(height: 10),
-                          Scrollbar(
-                            controller: _scrollController,
-                            thickness: 6,
-                            thumbVisibility: true,
-                            child: SingleChildScrollView(
-                              controller: _scrollController,
-                              scrollDirection: Axis.horizontal,
-                              child: buildDataTable(),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 30),
-                            child: Container(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  PaginationControls(
-                                    currentPage: currentPage,
-                                    totalPages:
-                                    filteredData.length > itemsPerPage
-                                        ? totalPages
-                                        : 1,
-                                    //totalPages//totalPages,
-                                    onPreviousPage: _goToPreviousPage,
-                                    onNextPage: _goToNextPage,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ),
-                  ),
+                    Container(
+                      margin: const EdgeInsets.only(left: 0),
+                      height: 1,
+                      width: constraints.maxWidth,
+                      // Border height
+                      color: Colors.grey, // Border color
+                    ),
+                    if(constraints.maxWidth >= 1200)...{
+                      Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 30,
+                                            top: 50,
+                                            right: 30,
+                                            bottom: 15),
+                                        child: Container(
+                                          height: 755,
+                                          width: maxWidth * 0.8,
+                                          decoration:BoxDecoration(
+                                            //   border: Border.all(color: Colors.grey),
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(8),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                spreadRadius: 3,
+                                                blurRadius: 3,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: SizedBox(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                buildSearchField(),
+                                                const SizedBox(height: 10),
+                                                Expanded(
+                                                  child: Scrollbar(
+                                                    controller:
+                                                    _scrollController,
+                                                    thickness: 6,
+                                                    thumbVisibility: true,
+                                                    child:
+                                                    SingleChildScrollView(
+                                                      controller:
+                                                      _scrollController,
+                                                      scrollDirection:
+                                                      Axis.horizontal,
+                                                      child: buildDataTable(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 1,
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets.only(
+                                                      right: 30),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                    children: [
+                                                      PaginationControls(
+                                                        currentPage:
+                                                        currentPage,
+                                                        totalPages: filteredData
+                                                            .length >
+                                                            itemsPerPage
+                                                            ? totalPages
+                                                            : 1,
+                                                        onPreviousPage:
+                                                        _goToPreviousPage,
+                                                        onNextPage:
+                                                        _goToNextPage,
+                                                        // onLastPage: _goToLastPage,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )),
+                    }
+                    else...{
+                      Expanded(
+                          child: AdaptiveScrollbar(
+
+                            position: ScrollbarPosition.bottom,controller: horizontalScroll,
+                            child: SingleChildScrollView(
+                              controller: horizontalScroll,
+                              scrollDirection: Axis.horizontal,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 30,
+                                                top: 50,
+                                                right: 30,
+                                                bottom: 15),
+                                            child: Container(
+                                              height: 755,
+                                              width: 1100,
+                                              decoration:BoxDecoration(
+                                                //   border: Border.all(color: Colors.grey),
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(8),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                    spreadRadius: 3,
+                                                    blurRadius: 3,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: SizedBox(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                                  children: [
+                                                    buildSearchField(),
+                                                    const SizedBox(height: 10),
+                                                    Expanded(
+                                                      child: Scrollbar(
+                                                        controller:
+                                                        _scrollController,
+                                                        thickness: 6,
+                                                        thumbVisibility: true,
+                                                        child:
+                                                        SingleChildScrollView(
+                                                          controller:
+                                                          _scrollController,
+                                                          scrollDirection:
+                                                          Axis.horizontal,
+                                                          child: buildDataTable2(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 1,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                      const EdgeInsets.only(
+                                                          right: 30),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                        children: [
+                                                          PaginationControls(
+                                                            currentPage:
+                                                            currentPage,
+                                                            totalPages: filteredData
+                                                                .length >
+                                                                itemsPerPage
+                                                                ? totalPages
+                                                                : 1,
+                                                            onPreviousPage:
+                                                            _goToPreviousPage,
+                                                            onNextPage:
+                                                            _goToNextPage,
+                                                            // onLastPage: _goToLastPage,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            )),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )),
+                    }
+                  ],
                 ),
-              )
+              ),
+
             ],
           );
         }),
@@ -834,8 +1001,7 @@ class _CusReturnpageState extends State<CusReturnpage> {
       },
     );
   }
-
-  Widget buildDataTable() {
+  Widget buildDataTable2() {
     if (isLoading) {
       _loading = true;
       var width = MediaQuery.of(context).size.width;
@@ -856,7 +1022,7 @@ class _CusReturnpageState extends State<CusReturnpage> {
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            width: _mediaQuery * 0.78,
+            width:1100,
             child: DataTable(
               showCheckboxColumn: false,
               headingRowHeight: 40,
@@ -964,7 +1130,7 @@ class _CusReturnpageState extends State<CusReturnpage> {
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            width: _mediaQuery * 0.78,
+            width:1100,
             child: DataTable(
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
@@ -1020,7 +1186,299 @@ class _CusReturnpageState extends State<CusReturnpage> {
                                           columnWidths[columns
                                               .indexOf(column)] = columnWidths[
                                           columns.indexOf(column)]
-                                              .clamp(50.0, 300.0);
+                                              .clamp(161.0, 300.0);
+                                        });
+                                      },
+                                      child: const Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 10, bottom: 10),
+                                        child: Row(
+                                          children: [
+                                            VerticalDivider(
+                                              width: 5,
+                                              thickness: 4,
+                                              color: Colors.grey,
+                                            )
+                                          ],
+                                        ),
+                                      )),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    onSort: (columnIndex, ascending) {
+                      _sortOrder;
+                    },
+                  );
+                }).toList(),
+                rows: List.generate(
+                    math.min(itemsPerPage,
+                        filteredData.length - (currentPage - 1) * itemsPerPage),
+                        (index) {
+                      //   final isSelected = _isselected == ReturnMaster;
+                      //  final product = filteredData[(currentPage - 1) * itemsPerPage + index];
+
+                      final returnMaster = filteredData
+                          .skip((currentPage - 1) * itemsPerPage)
+                          .elementAt(index);
+                      final isSelected = _isselected == returnMaster;
+                      return DataRow(
+                          color: MaterialStateProperty.resolveWith<Color>((states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.blue.shade500.withOpacity(
+                                  0.8); // Add some opacity to the dark blue
+                            } else {
+                              return Colors.white.withOpacity(0.9);
+                            }
+                          }),
+                          cells: [
+                            DataCell(Text(
+                              returnMaster.status,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.deepOrange[200]
+                                    : const Color(0xFFFFB315),
+                              ),
+                            )),
+                            DataCell(Text(
+                              returnMaster.returnId!,
+                              style: const TextStyle(color: Colors.grey),
+                            )),
+                            DataCell(Text(
+                              returnMaster.returnDate!.toString(),
+                              style: const TextStyle(color: Colors.grey),
+                            )),
+                            DataCell(Text(
+                              returnMaster.reason!,
+                              style: const TextStyle(color: Colors.grey),
+                            )),
+                            DataCell(Text(
+                              returnMaster.returnCredit.toString(),
+                              style: const TextStyle(color: Colors.grey),
+                            )),
+                            DataCell(
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.picture_as_pdf_outlined,
+                                      color: Colors.red,
+                                    ),
+                                    // replace with your desired icon
+                                    onPressed: () {
+                                      // add your onPressed event code here
+                                      downloadCreditMemoPdf(returnMaster.returnId!);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                          onSelectChanged: (selected) {
+                            if (selected != null && selected) {
+                              //context.go('/return-view', extra: returnMaster);
+                            }
+                          });
+                    })
+            ),
+          ),
+          const Divider(
+            color: Colors.grey,
+            height: 1,
+          ),
+        ],
+      );
+    });
+  }
+  Widget buildDataTable() {
+    if (isLoading) {
+      _loading = true;
+      var width = MediaQuery.of(context).size.width;
+      var Height = MediaQuery.of(context).size.height;
+      // Show loading indicator while data is being fetched
+      return Padding(
+        padding: EdgeInsets.only(bottom: Height * 0.100, left: width * 0.300),
+        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+      );
+    }
+
+    if (filteredData.isEmpty) {
+      var _mediaQuery = MediaQuery.of(context).size.width;
+      return Column(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+                color: Color(0xFFF7F7F7),
+                border: Border.symmetric(
+                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+            width: _mediaQuery- 200,
+            child: DataTable(
+              showCheckboxColumn: false,
+              headingRowHeight: 40,
+              columns: [
+                DataColumn(
+                    label: Text(
+                      'Status',
+                      style: TextStyle(
+                          color: Colors.indigo[900],
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold),
+                    )),
+                DataColumn(
+                    label: Text(
+                      'Return ID',
+                      style: TextStyle(
+                          color: Colors.indigo[900],
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold),
+                    )),
+                DataColumn(
+                    label: Text(
+                      'Created Date',
+                      style: TextStyle(
+                          color: Colors.indigo[900],
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold),
+                    )),
+                DataColumn(
+                    label: Text(
+                      'Reference Number',
+                      style: TextStyle(
+                          color: Colors.indigo[900],
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold),
+                    )),
+                DataColumn(
+                    label: Text(
+                      'Credit Amount',
+                      style: TextStyle(
+                          color: Colors.indigo[900],
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold),
+                    )),
+              ],
+              rows: [],
+            ),
+          ),
+          Padding(
+            padding:
+            const EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            child: CustomDatafound(),
+          ),
+          const Divider(
+            color: Colors.grey,
+            height: 1,
+          ),
+        ],
+      );
+    }
+
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.status.compareTo(b.status);
+          } else if (columnIndex == 1) {
+            return a.returnId!.compareTo(b.returnId!);
+          } else if (columnIndex == 2) {
+            return a.returnDate!.compareTo(b.returnDate!);
+          } else if (columnIndex == 3) {
+            return a.reason!.compareTo(b.reason!);
+          } else if (columnIndex == 4) {
+            return a.returnCredit!.compareTo(b.returnCredit!);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.status.compareTo(a.status);
+          } else if (columnIndex == 1) {
+            return b.returnId!.compareTo(a.returnId!);
+          } else if (columnIndex == 2) {
+            return b.returnDate!.compareTo(a.returnDate!);
+          } else if (columnIndex == 3) {
+            return b.reason!.compareTo(a.reason!);
+          } else if (columnIndex == 4) {
+            return b.returnCredit!.compareTo(a.returnCredit!);
+          } else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
+
+    return LayoutBuilder(builder: (context, constraints) {
+      var _mediaQuery = MediaQuery.of(context).size.width;
+      return Column(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+                color: Color(0xFFF7F7F7),
+                border: Border.symmetric(
+                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+            width: _mediaQuery - 200,
+            child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columnSpacing: 35,
+                columns: columns.map((column) {
+                  return DataColumn(
+                    label: Stack(
+                      children: [
+                        Container(
+                          width: columnWidths[columns.indexOf(column)],
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                column,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.indigo[900],
+                                  fontSize: 13,
+                                ),
+                              ),
+                              if (columns.indexOf(column) < columns.length - 1)
+                                IconButton(
+                                  icon: _sortOrder[columns.indexOf(column)] ==
+                                      'asc'
+                                      ? SizedBox(width: 12,
+                                      child: Image.asset("images/sort.png",color: Colors.grey,))
+                                      : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                  onPressed: () {
+                                    setState(() {
+                                      _sortOrder[columns.indexOf(column)] =
+                                      _sortOrder[columns.indexOf(column)] ==
+                                          'asc'
+                                          ? 'desc'
+                                          : 'asc';
+                                      _sortProducts(columns.indexOf(column),
+                                          _sortOrder[columns.indexOf(column)]);
+                                    });
+                                  },
+                                ),
+                              if (columns.indexOf(column) < columns.length - 1)
+                                const Spacer(),
+                              if (columns.indexOf(column) < columns.length - 1)
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.resizeColumn,
+                                  child: GestureDetector(
+                                      onHorizontalDragUpdate: (details) {
+                                        // Update column width dynamically as user drags
+                                        setState(() {
+                                          columnWidths[
+                                          columns.indexOf(column)] +=
+                                              details.delta.dx;
+                                          columnWidths[columns
+                                              .indexOf(column)] = columnWidths[
+                                          columns.indexOf(column)]
+                                              .clamp(161.0, 300.0);
                                         });
                                       },
                                       child: const Padding(

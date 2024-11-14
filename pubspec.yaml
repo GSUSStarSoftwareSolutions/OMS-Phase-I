@@ -72,6 +72,7 @@ dependencies:
   #custom_date_range_picker: ^1.1.0
   flutter_date_range_picker: ^0.1.1
   confetti: ^0.8.0
+  adaptive_scrollbar: ^2.1.2
   #dropdown_search: ^6.0.0
   #syncfusion_flutter_datagrid: ^26.2.14
   #syncfusion_flutter_core: ^26.2.14

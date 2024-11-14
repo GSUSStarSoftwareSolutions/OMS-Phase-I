@@ -205,11 +205,13 @@ class AccountMenu extends StatelessWidget {
 
   void showConfirmationDialog(BuildContext context) {
     showDialog(
+
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return
           AlertDialog(
+
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ),

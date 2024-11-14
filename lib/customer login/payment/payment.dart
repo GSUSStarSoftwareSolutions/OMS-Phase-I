@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 import 'dart:math'as math;
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
@@ -50,10 +51,11 @@ class _CusPaymentListState extends State<CusPaymentList> {
   Map<String, dynamic> _selectedProductMap = {};
   String selectDate = '';
   int itemCount = 0;
+  final ScrollController horizontalScroll = ScrollController();
 
   List<String> _sortOrder = List.generate(6, (index) => 'asc');
   List<String> columns = ['','Order ID','Delivery Date','Credit Amount','Payment Status' ,'Total Amount'];
-  List<double> columnWidths = [50,100, 130, 139, 160, 135,];
+  List<double> columnWidths = [50,100, 130, 139, 150, 135,];
   List<bool> columnSortState = [true, true, true,true,true,true];
 
 
@@ -140,15 +142,29 @@ class _CusPaymentListState extends State<CusPaymentList> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
+    _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
       _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Customer_Order_List'),
       _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blueAccent, '/Customer_Payment_List'),
+      Container(decoration: BoxDecoration(
+        color: Colors.blue[800],
+        // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+        // color: Color.fromRGBO(224, 59, 48, 1.0),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(8), // Radius for top-left corner
+          topRight: Radius.circular(8), // No radius for top-right corner
+          bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+          bottomRight: Radius.circular(8), // No radius for bottom-right corner
+        ),
+      ),child: _buildMenuItem('Payment', Icons.payment_outlined, Colors.white, '/Customer_Payment_List')),
       _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Customer_Return_List'),
     ];
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Payment'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Payment'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -158,25 +174,28 @@ class _CusPaymentListState extends State<CusPaymentList> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -372,27 +391,42 @@ class _CusPaymentListState extends State<CusPaymentList> {
         ),
         body: LayoutBuilder(
             builder: (context,constraints) {
-              //    String? role = Provider.of<UserRoleProvider>(context).role;
               double maxWidth = constraints.maxWidth;
-              double maxHeight = constraints.maxHeight;
               return
                 Stack(
                   children: [
 
-                    Align(
-                      // Added Align widget for the left side menu
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 1400,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
+
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ) ,
+                    },
                     Padding(
                       padding: const EdgeInsets.only(left: 200,top: 0),
                       child: Container(
@@ -405,156 +439,295 @@ class _CusPaymentListState extends State<CusPaymentList> {
                     ),
                     Positioned(
                       top: 0,
-                      left: 0,
+                      left: 201,
                       right: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 201),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: Colors.white,
-                          height: 50,
-                          child: Row(
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(left: 20),
-                                child: Text(
-                                  'Payment List',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              const Spacer(),
-
-
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 10, right: 80,bottom: 10),
-
-                                  child: SizedBox(
-                                    width: 150,
-                                    child:
-                                    // _selectedProductMap['paymentStatus'] == 'cleared'? Container():
-                                    OutlinedButton(
-                                        onPressed: () {
-                                          print(_selectedProduct);
-                                          print('hi');
-                                          print(_selectedProductMap);
-                                          if(_selectedProductMap['paymentStatus']== 'partial payment' || _selectedProductMap['paymentStatus']== 'cleared' || _selectedProductMap['paymentStatus'] == '-' ||  _selectedProductMap['paymentStatus'] == 'open')
-                                          {
-                                            print(_selectedProductMap['orderId']) ;
-                                            //  String orderId = '';
-                                            //_selectedProductMap['orderId'] = orderId;
-                                            context.go('/PayCus', extra: {
-                                              'productMap': _selectedProductMap,
-                                            });
-                                          }
-                                        },
-                                        style: OutlinedButton.styleFrom(
-                                          backgroundColor: Colors.blue[800],
-                                          // Button background color
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(
-                                                5), // Rounded corners
-                                          ),
-                                          side: BorderSide.none, // No outline
-                                          padding: EdgeInsets.zero,
-                                        ),
-                                        child:  Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 15),
-                                              child: Text(
-                                                _selectedProductMap['paymentStatus'] == 'cleared' ?
-                                                'Go to History' : 'Go to Payment',
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w100,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                            IconButton(onPressed: (){}, icon: Icon(Icons.arrow_forward,color: Colors.white,size: 15,))
-                                          ],
-                                        )
+                      bottom: 0,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              color: Colors.white,
+                              height: 50,
+                              child: Row(
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 20),
+                                    child: Text(
+                                      'Payment List',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40, left: 200),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10),
-                        // Space above/below the border
-                        height: 0.3, // Border height
-                        color: Colors.black, // Border color
-                      ),
-                    ),
-                    Padding(
-                      padding:  EdgeInsets.only(
-                          left:
-                          300, top: 120, right: maxWidth * 0.062,bottom: 15),
-                      child: Container(
-                        width: maxWidth,
-                        height: 700,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: SizedBox(
-                            width: maxWidth * 0.79,
-                            // padding: EdgeInsets.only(),
-                            // margin: EdgeInsets.only(left: 400, right: 100),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                buildSearchField(),
-                                const SizedBox(height: 10),
-                                Scrollbar(
-                                  controller: _scrollController,
-                                  thickness: 6,
-                                  thumbVisibility: true,
-                                  child: SingleChildScrollView(
-                                    controller: _scrollController,
-                                    scrollDirection: Axis.horizontal,
-                                    child: buildDataTable(),
+                                  const Spacer(),
+
+
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 10, right: 80,bottom: 10),
+
+                                      child: SizedBox(
+                                        width: 150,
+                                        child:
+                                        // _selectedProductMap['paymentStatus'] == 'cleared'? Container():
+                                        OutlinedButton(
+                                            onPressed: () {
+                                              print(_selectedProduct);
+                                              print('hi');
+                                              print(_selectedProductMap);
+                                              if(_selectedProductMap['paymentStatus']== 'partial payment' || _selectedProductMap['paymentStatus']== 'cleared' || _selectedProductMap['paymentStatus'] == '-' ||  _selectedProductMap['paymentStatus'] == 'open')
+                                              {
+                                                print(_selectedProductMap['orderId']) ;
+                                                //  String orderId = '';
+                                                //_selectedProductMap['orderId'] = orderId;
+                                                context.go('/PayCus', extra: {
+                                                  'productMap': _selectedProductMap,
+                                                });
+                                              }
+                                            },
+                                            style: OutlinedButton.styleFrom(
+                                              backgroundColor: Colors.blue[800],
+                                              // Button background color
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                BorderRadius.circular(
+                                                    5), // Rounded corners
+                                              ),
+                                              side: BorderSide.none, // No outline
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                            child:  Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 15),
+                                                  child: Text(
+                                                    _selectedProductMap['paymentStatus'] == 'cleared' ?
+                                                    'Go to History' : 'Go to Payment',
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w100,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                IconButton(onPressed: (){}, icon: Icon(Icons.arrow_forward,color: Colors.white,size: 15,))
+                                              ],
+                                            )
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                SizedBox(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right:30),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                ],
+                              ),
+                            ),
+                          ),
+
+                    Container(
+                      margin: const EdgeInsets.only(left: 0),
+                      // Space above/below the border
+                      height: 1,
+                      // width: 10  00,
+                      width: constraints.maxWidth,
+                      // Border height
+                      color: Colors.grey, // Border color
+                    ),
+                          if(constraints.maxWidth >= 1300)...{
+                            Expanded(
+                                child: SingleChildScrollView(
+                                  child: Column(
                                     children: [
-                                      PaginationControls(
-                                        currentPage: currentPage,
-                                        totalPages: filteredData.length > itemsPerPage ? totalPages : 1,// totalPages,
-                                        onPreviousPage: _goToPreviousPage,
-                                        onNextPage: _goToNextPage,
+                                      Row(
+                                        children: [
+                                          Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 30,
+                                                  top: 50,
+                                                  right: 30,
+                                                  bottom: 15),
+                                              child: Container(
+                                                height: 755,
+                                                width: maxWidth * 0.8,
+                                                decoration:BoxDecoration(
+                                                  //   border: Border.all(color: Colors.grey),
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                      spreadRadius: 3,
+                                                      blurRadius: 3,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: SizedBox(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                    children: [
+                                                      buildSearchField(),
+                                                      const SizedBox(height: 10),
+                                                      Expanded(
+                                                        child: Scrollbar(
+                                                          controller:
+                                                          _scrollController,
+                                                          thickness: 6,
+                                                          thumbVisibility: true,
+                                                          child:
+                                                          SingleChildScrollView(
+                                                            controller:
+                                                            _scrollController,
+                                                            scrollDirection:
+                                                            Axis.horizontal,
+                                                            child: buildDataTable(),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 1,
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(
+                                                            right: 30),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                          children: [
+                                                            PaginationControls(
+                                                              currentPage:
+                                                              currentPage,
+                                                              totalPages: filteredData
+                                                                  .length >
+                                                                  itemsPerPage
+                                                                  ? totalPages
+                                                                  : 1,
+                                                              onPreviousPage:
+                                                              _goToPreviousPage,
+                                                              onNextPage:
+                                                              _goToNextPage,
+                                                              // onLastPage: _goToLastPage,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              )),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
+                                )),
+                          }
+                          else...{
+                            Expanded(
+                                child: AdaptiveScrollbar(
+
+                                  position: ScrollbarPosition.bottom,controller: horizontalScroll,
+                                  child: SingleChildScrollView(
+                                    controller: horizontalScroll,
+                                    scrollDirection: Axis.horizontal,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      left: 30,
+                                                      top: 50,
+                                                      right: 30,
+                                                      bottom: 15),
+                                                  child: Container(
+                                                    height: 755,
+                                                    width: 1100,
+                                                    decoration:BoxDecoration(
+                                                      //   border: Border.all(color: Colors.grey),
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                          spreadRadius: 3,
+                                                          blurRadius: 3,
+                                                          offset: const Offset(0, 3),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: SizedBox(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                        children: [
+                                                          buildSearchField(),
+                                                          const SizedBox(height: 10),
+                                                          Expanded(
+                                                            child: Scrollbar(
+                                                              controller:
+                                                              _scrollController,
+                                                              thickness: 6,
+                                                              thumbVisibility: true,
+                                                              child:
+                                                              SingleChildScrollView(
+                                                                controller:
+                                                                _scrollController,
+                                                                scrollDirection:
+                                                                Axis.horizontal,
+                                                                child: buildDataTable2(),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 1,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                            const EdgeInsets.only(
+                                                                right: 30),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                              MainAxisAlignment.end,
+                                                              children: [
+                                                                PaginationControls(
+                                                                  currentPage:
+                                                                  currentPage,
+                                                                  totalPages: filteredData
+                                                                      .length >
+                                                                      itemsPerPage
+                                                                      ? totalPages
+                                                                      : 1,
+                                                                  onPreviousPage:
+                                                                  _goToPreviousPage,
+                                                                  onNextPage:
+                                                                  _goToNextPage,
+                                                                  // onLastPage: _goToLastPage,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                          }
+                        ],
                       ),
                     ),
                   ],
@@ -771,9 +944,7 @@ class _CusPaymentListState extends State<CusPaymentList> {
       },
     );
   }
-
-
-  Widget buildDataTable() {
+  Widget buildDataTable2() {
 
     if (isLoading) {
       _loading = true;
@@ -793,7 +964,7 @@ class _CusPaymentListState extends State<CusPaymentList> {
         Column(
           children: [
             Container(
-                width: right * 0.78,
+                width:1100,
 
                 decoration:const BoxDecoration(
                     color: Color(0xFFF7F7F7),
@@ -926,7 +1097,7 @@ class _CusPaymentListState extends State<CusPaymentList> {
         Column(
           children: [
             Container(
-                width: right * 0.78,
+                width: 1100,
                 decoration:const BoxDecoration(
                     color: Color(0xFFF7F7F7),
                     border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
@@ -982,7 +1153,345 @@ class _CusPaymentListState extends State<CusPaymentList> {
                                             setState(() {
                                               columnWidths[columns.indexOf(column)] += details.delta.dx;
                                               columnWidths[columns.indexOf(column)] =
-                                                  columnWidths[columns.indexOf(column)].clamp(50.0, 300.0);
+                                                  columnWidths[columns.indexOf(column)].clamp(151.0, 300.0);
+                                            });
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top: 10,bottom: 10),
+                                            child: Row(
+                                              children: [
+                                                VerticalDivider(
+                                                  width: 5,
+                                                  thickness: 4,
+                                                  color: Colors.grey,
+
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                      ),
+                                    ),
+                                  // ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        onSort: (columnIndex, ascending){
+                          _sortOrder;
+                        },
+                      );
+                  }).toList(),
+                  rows: List.generate(
+                    math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage),
+                        (index) {
+                      final detail = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                      final isSelected = _selectedProduct == detail;
+                      return DataRow(
+                        color: MaterialStateProperty.resolveWith<Color>((states) {
+                          if (states.contains(MaterialState.hovered)) {
+                            return Colors.blue.shade500.withOpacity(0.8); // Dark blue with opacity
+                          } else if (isSelected) {
+                            return Colors.blue.shade100.withOpacity(0.8); // Green with opacity for selected row
+                          } else {
+                            return Colors.white.withOpacity(0.9);
+                          }
+                        }),
+                        cells: [
+                          DataCell(
+                            Checkbox(
+                              value: isSelected,
+                              checkColor: Colors.white,
+                              activeColor: Colors.blue[800],
+                              onChanged: (selected) {
+                                setState(() {
+                                  _selectedProduct = selected! ? detail : null;
+                                });
+                              },
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              detail.orderId!,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              detail.deliveredDate!,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              detail.creditUsed!.toString(),
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              detail.paymentStatus.toString(),
+                              style: TextStyle(
+                                color: detail.paymentStatus == "payment cleared"
+                                    ? Colors.green
+                                    : detail.paymentStatus == "partial payment"
+                                    ? Colors.orange
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              detail.grossAmount.toString(),
+                              style: TextStyle(
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ],
+                        onSelectChanged: (selected) {
+                          setState(() {
+                            if (selected != null && selected) {
+                              _selectedProduct = detail;
+
+                              _selectedProductMap = {
+                                'orderId': _selectedProduct!.orderId,
+                                'deliveredDate': _selectedProduct!.deliveredDate,
+                                'invoiceNo': _selectedProduct!.invoiceNo,//
+                                'paymentDate': _selectedProduct!.paymentDate.toString(),
+                                'paymentMode': _selectedProduct!.paymentMode.toString(),
+                                'paymentStatus': _selectedProduct!.paymentStatus.toString(),
+                                'grossAmount': _selectedProduct!.grossAmount.toString(),
+                                'payableAmount': _selectedProduct!.payableAmount.toString(),
+                                'paidAmount': _selectedProduct!.paidAmount.toString(),//
+
+                              };
+                            } else {
+                              _selectedProduct = null;
+                              _selectedProductMap ={};
+                            }
+                          });
+                        },
+                      );
+                    },
+                  ),
+                )
+            ),
+          ],
+        );
+    });
+  }
+
+  Widget buildDataTable() {
+
+    if (isLoading) {
+      _loading = true;
+      var width = MediaQuery.of(context).size.width;
+      var Height = MediaQuery.of(context).size.height;
+      // Show loading indicator while data is being fetched
+      return Padding(
+        padding: EdgeInsets.only(top: Height * 0.100,bottom: Height * 0.100,left: width * 0.300),
+        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+      );
+    }
+
+    if (filteredData.isEmpty) {
+      // String? role = Provider.of<UserRoleProvider>(context).role;
+      double right = MediaQuery.of(context).size.width;
+      return
+        Column(
+          children: [
+            Container(
+                width: right - 200,
+
+                decoration:const BoxDecoration(
+                    color: Color(0xFFF7F7F7),
+                    border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+                ),
+                child:
+
+                DataTable(
+                    showCheckboxColumn: false,
+                    headingRowHeight: 40,
+                    columns: [
+                      DataColumn(label: Container(child: Text('      '))),
+                      DataColumn(
+                        label: Container(
+                          child: Text(
+                            'Order ID',
+                            style: TextStyle(
+                              color: Colors.indigo[900],
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Container(
+                          child: Text(
+                            'Delivered Date',
+                            style: TextStyle(
+                              color: Colors.indigo[900],
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Container(
+                          child: Text(
+                            'Credit Amount',
+                            style: TextStyle(
+                              color: Colors.indigo[900],
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Container(
+                          child: Text(
+                            'Payment Status',
+                            style: TextStyle(
+                              color: Colors.indigo[900],
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Container(
+                          child: Text(
+                            'Total Amount',
+                            style: TextStyle(
+                              color: Colors.indigo[900],
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    rows: []
+
+                )
+
+
+
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 150,left: 130,bottom: 350,right: 150),
+              child: CustomDatafound(),
+            ),
+          ],
+        );
+
+    }
+
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData.sort((a, b) {
+          if (columnIndex == 1) {
+            return a.orderId!.compareTo(b.orderId!);
+          } else if (columnIndex == 2) {
+            return a.deliveredDate!.compareTo(b.deliveredDate!);
+          } else if (columnIndex == 3) {
+            return a.invoiceNo!.compareTo(b.invoiceNo!);
+          } else if (columnIndex == 4) {
+            return a.paymentStatus!.compareTo(b.paymentStatus!);
+          } else if (columnIndex == 5) {
+            return a.grossAmount!.compareTo(b.grossAmount!);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData.sort((a, b) {
+          if (columnIndex == 1) {
+            return b.orderId!.compareTo(a.orderId!); // Reverse the comparison
+          } else if (columnIndex == 2) {
+            return b.deliveredDate!.compareTo(a.deliveredDate!); // Reverse the comparison
+          } else if (columnIndex == 3) {
+            return b.invoiceNo!.compareTo(a.invoiceNo!); // Reverse the comparison
+          } else if (columnIndex == 4) {
+            return b.paymentStatus!.compareTo(a.paymentStatus!); // Reverse the comparison
+          } else if (columnIndex == 5) {
+            return b.grossAmount!.compareTo(a.grossAmount!); // Reverse the comparison
+          } else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
+
+    return LayoutBuilder(builder: (context, constraints){
+      double right = MediaQuery.of(context).size.width;
+      return
+        Column(
+          children: [
+            Container(
+                width: right - 200,
+                decoration:const BoxDecoration(
+                    color: Color(0xFFF7F7F7),
+                    border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+                ),
+                child:
+
+                DataTable(
+                  showCheckboxColumn: false,
+                  headingRowHeight: 40,
+                  columns: columns.map((column) {
+                    return
+                      DataColumn(
+                        label: Stack(
+                          children: [
+                            Container(
+                              //   padding: EdgeInsets.only(left: 5,right: 5),
+                              width: columnWidths[columns.indexOf(column)], // Dynamic width based on user interaction
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                //crossAxisAlignment: CrossAxisAlignment.end,
+                                //   mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    column,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.indigo[900],
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  if (columns.indexOf(column) > 0)
+                                    IconButton(
+                                      icon: _sortOrder[columns.indexOf(column)] == 'asc'
+                                          ? SizedBox(width: 12,
+                                          child: Image.asset("images/sort.png",color: Colors.grey,))
+                                          : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                      onPressed: () {
+                                        setState(() {
+                                          _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
+                                          _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
+                                        });
+                                      },
+                                    ),
+                                  if (columns.indexOf(column) > 0)
+                                    Spacer(),
+                                  if (columns.indexOf(column) > 0)
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.resizeColumn,
+                                      child: GestureDetector(
+                                          onHorizontalDragUpdate: (details) {
+                                            // Update column width dynamically as user drags
+                                            setState(() {
+                                              columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                              columnWidths[columns.indexOf(column)] =
+                                                  columnWidths[columns.indexOf(column)].clamp(151.0, 300.0);
                                             });
                                           },
                                           child: Padding(

@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:math'as math;
 import 'dart:html' as html;
 import 'dart:typed_data';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
@@ -32,6 +33,7 @@ class InvoiceList extends StatefulWidget {
 }
 
 class _InvoiceListState extends State<InvoiceList> {
+  final ScrollController horizontalScroll = ScrollController();
   Timer? _searchDebounceTimer;
   String _searchText = '';
   bool isOrdersSelected = false;
@@ -44,7 +46,7 @@ class _InvoiceListState extends State<InvoiceList> {
   List<Product> filteredProducts = [];
   List<String> _sortOrder = List.generate(7, (index) => 'asc');
   List<String> columns1 = ['','Invoice ID','Order ID','Order Date' ,'Delivery Status','Amount'];
-  List<String> columns = ['Invoice No','Date','Order ID' ,'Status','Amount','PDF'];
+  List<String> columns = ['Invoice No','Date','Order ID' ,'Status','Amount',''];
   List<double> columnWidths = [110, 110, 110, 135, 130,100];
   List<bool> columnSortState = [true, true, true,true,true,true,true];
   int currentPage = 1;
@@ -72,19 +74,34 @@ class _InvoiceListState extends State<InvoiceList> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Home', Icons.dashboard, Colors.blue[900]!, '/Home'),
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
       _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blueAccent, '/Invoice'),
+      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[800],
+            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+            // color: Color.fromRGBO(224, 59, 48, 1.0),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8), // Radius for top-left corner
+              topRight: Radius.circular(8), // No radius for top-right corner
+              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+            ),
+          ),
+          child: _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.white, '/Invoice')),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart, Colors.blue[900]!, '/Report_List'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
+      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Invoice'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Invoice'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -94,25 +111,28 @@ class _InvoiceListState extends State<InvoiceList> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -385,21 +405,37 @@ class _InvoiceListState extends State<InvoiceList> {
               return
                 Stack(
                   children: [
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
 
-                    Align(
-                      // Added Align widget for the left side menu
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 1400,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
 
                     Padding(
                       padding: const EdgeInsets.only(left: 200,top: 0),
@@ -413,120 +449,232 @@ class _InvoiceListState extends State<InvoiceList> {
                     ),
                     Positioned(
                       top: 0,
-                      left: 0,
+                      left: 201,
                       right: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 201),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: Colors.white,
-                          height: 50,
-                          child: Row(
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(left: 20),
-                                child: Text(
-                                  'Invoice List',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold
+                      bottom: 0,
+                      child: Column(
+                        children: [
+                          Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              color: Colors.white,
+                              height: 50,
+                              child:const  Row(
+                                children: [
+                                   Padding(
+                                    padding: EdgeInsets.only(left: 20),
+                                    child: Text(
+                                      'Invoice List',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40, left: 200),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10),
-                        // Space above/below the border
-                        height: 0.3, // Border height
-                        color: Colors.black, // Border color
-                      ),
-                    ),
-                    Padding(
-                      padding:  EdgeInsets.only(
-                          left:
-                          300, top: 120, right: maxWidth * 0.062,bottom: 15),
-                      child: Container(
-                        width: maxWidth,
-                        height: 700,
-                        // decoration: BoxDecoration(
-                        //   color: Colors.white, // or any other color that fits your design
-                        //   borderRadius: BorderRadius.all(Radius.circular(10.0)), // adds a subtle rounded corner
-                        //   border: Border.all(
-                        //     color: Color(0xFFE5E5E5), // a light grey border
-                        //     width: 1.0,
-                        //   ),
-                        //   boxShadow: [
-                        //     BoxShadow(
-                        //       color: Color(0xFFC7C5B8).withOpacity(0.2), // a soft, warm shadow
-                        //       spreadRadius: 0.5,
-                        //       blurRadius: 4, // increased blur radius for a softer shadow
-                        //       offset: Offset(0, 4), // increased offset for a more pronounced shadow
-                        //     ),
-                        //   ],
-                        // ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          // boxShadow: [
-                          //   BoxShadow(
-                          //     color: Colors.blue.withOpacity(0.1), // Soft grey shadow
-                          //     spreadRadius: 1,
-                          //     blurRadius: 3,
-                          //     offset: const Offset(0, 1),
-                          //   ),
-                          // ],
-                        ),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: SizedBox(
-                            width: maxWidth * 0.79,
-                            // padding: EdgeInsets.only(),
-                            // margin: EdgeInsets.only(left: 400, right: 100),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                buildSearchField(),
-                                // buildSearchField(),
-                                const SizedBox(height: 10),
-                                Scrollbar(
-                                  controller: _scrollController,
-                                  thickness: 6,
-                                  thumbVisibility: true,
-                                  child: SingleChildScrollView(
-                                    controller: _scrollController,
-                                    scrollDirection: Axis.horizontal,
-                                    child: buildDataTable(),
-                                  ),
-                                ),
-                                //Divider(color: Colors.grey,height: 1,)
-                                const SizedBox(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right:30),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+
+                          Container(
+                            margin: const EdgeInsets.only(left: 0),
+                            // Space above/below the border
+                            height: 1,
+                            // width: 10  00,
+                            width: constraints.maxWidth,
+                            // Border height
+                            color: Colors.grey, // Border color
+                          ),
+                          if(constraints.maxWidth >= 1250)...{
+                            Expanded(
+                                child: SingleChildScrollView(
+                                  child: Column(
                                     children: [
-                                      PaginationControls(
-                                        currentPage: currentPage,
-                                        totalPages: filteredData.length > itemsPerPage ? totalPages : 1,// totalPages,
-                                        onPreviousPage: _goToPreviousPage,
-                                        onNextPage: _goToNextPage,
+                                      Row(
+                                        children: [
+                                          Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 30,
+                                                  top: 50,
+                                                  right: 30,
+                                                  bottom: 15),
+                                              child: Container(
+                                                height: 755,
+                                                width: maxWidth * 0.8,
+                                                decoration:BoxDecoration(
+                                                  //   border: Border.all(color: Colors.grey),
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                      spreadRadius: 3,
+                                                      blurRadius: 3,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: SizedBox(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                    children: [
+                                                      buildSearchField(),
+                                                      const SizedBox(height: 10),
+                                                      Expanded(
+                                                        child: Scrollbar(
+                                                          controller:
+                                                          _scrollController,
+                                                          thickness: 6,
+                                                          thumbVisibility: true,
+                                                          child:
+                                                          SingleChildScrollView(
+                                                            controller:
+                                                            _scrollController,
+                                                            scrollDirection:
+                                                            Axis.horizontal,
+                                                            child: buildDataTable(),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 1,
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(
+                                                            right: 30),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                          children: [
+                                                            PaginationControls(
+                                                              currentPage:
+                                                              currentPage,
+                                                              totalPages: filteredData
+                                                                  .length >
+                                                                  itemsPerPage
+                                                                  ? totalPages
+                                                                  : 1,
+                                                              onPreviousPage:
+                                                              _goToPreviousPage,
+                                                              onNextPage:
+                                                              _goToNextPage,
+                                                              // onLastPage: _goToLastPage,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              )),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
+                                )),
+                          }
+                          else...{
+                            Expanded(
+                                child: AdaptiveScrollbar(
+
+                                  position: ScrollbarPosition.bottom,controller: horizontalScroll,
+                                  child: SingleChildScrollView(
+                                    controller: horizontalScroll,
+                                    scrollDirection: Axis.horizontal,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      left: 30,
+                                                      top: 50,
+                                                      right: 30,
+                                                      bottom: 15),
+                                                  child: Container(
+                                                    height: 755,
+                                                    width: 1100,
+                                                    decoration:BoxDecoration(
+                                                      //   border: Border.all(color: Colors.grey),
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                          spreadRadius: 3,
+                                                          blurRadius: 3,
+                                                          offset: const Offset(0, 3),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: SizedBox(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                        children: [
+                                                          buildSearchField(),
+                                                          const SizedBox(height: 10),
+                                                          Expanded(
+                                                            child: Scrollbar(
+                                                              controller:
+                                                              _scrollController,
+                                                              thickness: 6,
+                                                              thumbVisibility: true,
+                                                              child:
+                                                              SingleChildScrollView(
+                                                                controller:
+                                                                _scrollController,
+                                                                scrollDirection:
+                                                                Axis.horizontal,
+                                                                child: buildDataTable2(),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 1,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                            const EdgeInsets.only(
+                                                                right: 30),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                              MainAxisAlignment.end,
+                                                              children: [
+                                                                PaginationControls(
+                                                                  currentPage:
+                                                                  currentPage,
+                                                                  totalPages: filteredData
+                                                                      .length >
+                                                                      itemsPerPage
+                                                                      ? totalPages
+                                                                      : 1,
+                                                                  onPreviousPage:
+                                                                  _goToPreviousPage,
+                                                                  onNextPage:
+                                                                  _goToNextPage,
+                                                                  // onLastPage: _goToLastPage,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                          }
+                        ],
                       ),
                     ),
                   ],
@@ -744,7 +892,603 @@ class _InvoiceListState extends State<InvoiceList> {
     );
   }
 
+  Widget buildDataTable2() {
 
+    if (isLoading) {
+      _loading = true;
+      var width = MediaQuery.of(context).size.width;
+      var Height = MediaQuery.of(context).size.height;
+      // Show loading indicator while data is being fetched
+      return Padding(
+        padding: EdgeInsets.only(top: Height * 0.100,bottom: Height * 0.100,left: width * 0.300),
+        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+      );
+    }
+
+    if (filteredData.isEmpty) {
+      //  String? role = Provider.of<UserRoleProvider>(context).role;
+      double right = MediaQuery.of(context).size.width;
+      return
+        Column(
+          children: [
+            Container(
+              width: right * 0.78,
+
+              decoration:const BoxDecoration(
+                  color: Color(0xFFF7F7F7),
+                  border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+              ),
+              child:
+
+              DataTable(
+                  showCheckboxColumn: false,
+                  headingRowHeight: 40,
+                  columns: [
+                    DataColumn(label: Container(child: const Text('      '))),
+                    DataColumn(
+                      label: Container(
+                        child: Text(
+                          'Invoice No',
+                          style: TextStyle(
+                            color: Colors.indigo[900],
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Container(
+                        child: Text(
+                          'Date',
+                          style: TextStyle(
+                            color: Colors.indigo[900],
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Container(
+                        child: Text(
+                          'Order ID',
+                          style: TextStyle(
+                            color: Colors.indigo[900],
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Container(
+                        child: Text(
+                          'Location',
+                          style: TextStyle(
+                            color: Colors.indigo[900],
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Container(
+                        child: Text(
+                          'Status',
+                          style: TextStyle(
+                            color: Colors.indigo[900],
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Container(
+                        child: Text(
+                          'Amount',
+                          style: TextStyle(
+                            color: Colors.indigo[900],
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  rows: []
+
+              ),
+
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 150,left: 130,bottom: 350,right: 150),
+              child: CustomDatafound(),
+            ),
+          ],
+        );
+
+    }
+
+
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData.sort((a, b) {
+          if (columnIndex == 1) {
+            return a.InvNo!.compareTo(b.InvNo!);
+          } else if (columnIndex == 2) {
+            return a.orderDate!.compareTo(b.orderDate!);
+          } else if (columnIndex == 3) {
+            return a.orderId!.compareTo(b.orderId!);
+          } else if (columnIndex == 4) {
+            return a.deliveryLocation!.toLowerCase().compareTo(b.deliveryLocation!.toLowerCase());
+          } else if (columnIndex == 5) {
+            return a.status!.compareTo(b.status!);
+          }
+          else if (columnIndex == 6) {
+            return a.total!.compareTo(b.total!);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData.sort((a, b) {
+          if (columnIndex == 1) {
+            return b.InvNo!.compareTo(a.InvNo!); // Reverse the comparison
+          } else if (columnIndex == 2) {
+            return b.orderDate!.compareTo(a.orderDate!); // Reverse the comparison
+          } else if (columnIndex == 3) {
+            return b.orderId!.compareTo(a.orderId!); // Reverse the comparison
+          } else if (columnIndex == 4) {
+            return b.deliveryLocation!.toLowerCase().compareTo(a.deliveryLocation!.toLowerCase()); // Reverse the comparison
+          } else if (columnIndex == 5) {
+            return b.status!.compareTo(a.status!); // Reverse the comparison
+          }
+          else if (columnIndex == 6) {
+            return b.total!.compareTo(a.total!); // Reverse the comparison
+          }else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
+
+
+    return LayoutBuilder(builder: (context, constraints){
+      // double padding = constraints.maxWidth * 0.065;
+      //  String? role = Provider.of<UserRoleProvider>(context).role;
+      double right = MediaQuery.of(context).size.width;
+
+      return
+        Column(
+          children: [
+            Container(
+                width: 1100,
+
+                decoration:const BoxDecoration(
+                    color: Color(0xFFF7F7F7),
+                    border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+                ),
+                child:
+                DataTable(
+                  showCheckboxColumn: false,
+                  headingRowHeight: 40,
+                  columnSpacing: 35,
+                  columns: columns.map((column) {
+                    return
+                      DataColumn(
+                        label: Stack(
+                          children: [
+                            Container(
+                              //   padding: EdgeInsets.only(left: 5,right: 5),
+                              width: columnWidths[columns.indexOf(column)], // Dynamic width based on user interaction
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                //crossAxisAlignment: CrossAxisAlignment.end,
+                                //   mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    column,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.indigo[900],
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  if (columns.indexOf(column) < columns.length - 1)
+                                  IconButton(
+                                    icon: _sortOrder[columns.indexOf(column)] == 'asc'
+                                        ? SizedBox(width: 12,
+                                        child: Image.asset("images/sort.png",color: Colors.grey,))
+                                        : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                    onPressed: () {
+                                      setState(() {
+                                        _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
+                                        _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
+                                      });
+                                    },
+                                  ),
+
+                                  if (columns.indexOf(column) < columns.length - 1)
+                                    Spacer(),
+                                  if (columns.indexOf(column) < columns.length - 1)
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.resizeColumn,
+                                    child: GestureDetector(
+                                        onHorizontalDragUpdate: (details) {
+                                          // Update column width dynamically as user drags
+                                          setState(() {
+                                            columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                            columnWidths[columns.indexOf(column)] =
+                                                columnWidths[columns.indexOf(column)].clamp(136.0, 300.0);
+                                          });
+                                          // setState(() {
+                                          //   columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                          //   if (columnWidths[columns.indexOf(column)] < 50) {
+                                          //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
+                                          //   }
+                                          // });
+                                        },
+                                        child: const Padding(
+                                          padding: EdgeInsets.only(top: 10,bottom: 10),
+                                          child: Row(
+                                            children: [
+                                              VerticalDivider(
+                                                width: 5,
+                                                thickness: 4,
+                                                color: Colors.grey,
+
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                    ),
+                                  ),
+                                  // ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        onSort: (columnIndex, ascending){
+                          _sortOrder;
+                        },
+                      ) ;
+                  }).toList(),
+                  rows: List.generate(
+                    math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage),
+                        (index) {
+
+                      final detail = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                      print('detail');
+                      print(detail);
+                      final isSelected = _selectedProduct == detail;
+                      return DataRow(
+                        color: MaterialStateProperty.resolveWith<Color>((states) {
+                          if (states.contains(MaterialState.hovered)) {
+                            return Colors.blue.shade500.withOpacity(0.8); // Dark blue with opacity
+                          } else if (isSelected) {
+                            return Colors.blue.shade100.withOpacity(0.8); // Green with opacity for selected row
+                          } else {
+                            return Colors.white.withOpacity(0.9);
+                          }
+                        }),
+                        cells: [
+                          DataCell(
+                            Text(
+                              detail.InvNo!,
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              detail.orderDate!,
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              detail.orderId!,
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              detail.status.toString(),
+                              style: TextStyle(
+                                  color: detail.status == "In Progress" ? Colors.orange : detail.status == "Delivered" ? Colors.green : Colors.red
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              detail.total.toString(),
+                              style: const TextStyle(
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.picture_as_pdf_outlined,
+                                    color: Colors.red,
+                                  ),
+                                  // replace with your desired icon
+                                  onPressed: () {
+                                    // add your onPressed event code here
+                                    downloadPdf(detail.orderId!);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                      );
+                    },
+                  ),
+                )
+
+              // DataTable(
+              //     showCheckboxColumn: false,
+              //     headingRowHeight: 40,
+              //     columns: [
+              //       DataColumn(label: Container(child: Padding(
+              //         padding: const EdgeInsets.only(left: 10),
+              //         child: Text('Order ID',style:TextStyle(
+              //             color: Colors.indigo[900],
+              //             fontSize: 13,
+              //             fontWeight: FontWeight.bold
+              //         ),),
+              //       ))),
+              //       DataColumn(label: Container(
+              //           child: Padding(
+              //             padding: const EdgeInsets.only(left: 20),
+              //             child: Text('Delivered Date',style:TextStyle(
+              //                 color: Colors.indigo[900],
+              //                 fontSize: 13,
+              //                 fontWeight: FontWeight.bold
+              //             ),),
+              //           ))),
+              //       DataColumn(label: Container(child: Text(
+              //         'Invoice Number',style:TextStyle(
+              //           color: Colors.indigo[900],
+              //           fontSize: 13,
+              //           fontWeight: FontWeight.bold
+              //       ),))),
+              //       DataColumn(label: Container(child: Text(
+              //         'Payment Date',style:TextStyle(
+              //           color: Colors.indigo[900],
+              //           fontSize: 13,
+              //           fontWeight: FontWeight.bold
+              //       ),))),
+              //       DataColumn(label: Container(child: Text(
+              //         'Payment Mode',style:  TextStyle(
+              //
+              //           color: Colors.indigo[900],
+              //           fontSize: 13,
+              //           fontWeight: FontWeight.bold
+              //       ),))),
+              //       DataColumn(label: Container(child: Text(
+              //         'Payment Status',style:  TextStyle(
+              //
+              //           color: Colors.indigo[900],
+              //           fontSize: 13,
+              //           fontWeight: FontWeight.bold
+              //       ),))),
+              //       DataColumn(label: Container(child: Padding(
+              //         padding: const EdgeInsets.only(right: 50),
+              //         child: Text(
+              //           'Amount',style:  TextStyle(
+              //
+              //             color: Colors.indigo[900],
+              //             fontSize: 13,
+              //             fontWeight: FontWeight.bold
+              //         ),),
+              //       ))),
+              //
+              //     ],
+              //     rows:
+              //     List.generate(
+              //         math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage),(index){
+              //       final detail = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+              //       final isSelected = _selectedProduct == detail;
+              //       // final isSelected = _selectedProduct == detail;
+              //       //final product = filteredData[(currentPage - 1) * itemsPerPage + index];
+              //       return DataRow(
+              //           color: MaterialStateProperty.resolveWith<Color>((states) {
+              //             if (states.contains(MaterialState.hovered)) {
+              //               return Colors.blue.shade500.withOpacity(0.8); // Add some opacity to the dark blue
+              //             } else {
+              //               return Colors.white.withOpacity(0.9);
+              //             }
+              //           }),
+              //           cells:
+              //           [
+              //             DataCell(
+              //                 Padding(
+              //                   padding: const EdgeInsets.only(left: 5),
+              //                   child: Text(detail.deliveryId!,style:
+              //                   TextStyle(
+              //                     // fontSize: 16,
+              //                       color: Colors.grey),),
+              //                 )),
+              //             DataCell(
+              //                 Text(detail.contactPerson!, style: TextStyle(
+              //                   //fontSize: 16,
+              //                   color:Colors.grey,),)),
+              //
+              //             DataCell(
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 2),
+              //                 child: Text(detail.modifiedAt!,style: TextStyle(
+              //                   // fontSize: 16,
+              //                     color: Colors.grey)),
+              //               ),
+              //             ),
+              //
+              //             DataCell(
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 13),
+              //                 child: Text(detail.total.toString(),style: TextStyle(
+              //                   // fontSize: 16,
+              //                     color: Colors.grey)),
+              //               ),
+              //             ),
+              //             DataCell(
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 10),
+              //                 child: Text(detail.deliveryStatus,style: TextStyle(
+              //                   //fontSize: 16,
+              //                     color: detail.deliveryStatus == "In Progress" ? Colors.orange
+              //                         :
+              //                     detail.deliveryStatus == "Delivered" ? Colors.green: Colors.grey)),
+              //               ),
+              //             ),
+              //
+              //             DataCell(
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 10),
+              //                 child: Text(detail.deliveryStatus,style: TextStyle(
+              //                   //fontSize: 16,
+              //                     color: detail.deliveryStatus == "In Progress" ? Colors.orange
+              //                         :
+              //                     detail.deliveryStatus == "Delivered" ? Colors.green: Colors.grey)),
+              //               ),
+              //             ),
+              //             DataCell(
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 10),
+              //                 child: Text(detail.deliveryStatus,style: TextStyle(
+              //                   //fontSize: 16,
+              //                     color: detail.deliveryStatus == "In Progress" ? Colors.orange
+              //                         :
+              //                     detail.deliveryStatus == "Delivered" ? Colors.green: Colors.grey)),
+              //               ),
+              //             ),
+              //
+              //           ],
+              //           onSelectChanged: (selected){
+              //             if(selected != null && selected){
+              //               //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+              //
+              //               if (filteredData.length <= 9) {
+              //                 print(detail.deliveryStatus);
+              //                 // Navigator.push(
+              //                 //   context,
+              //                 //   PageRouteBuilder(
+              //                 //     pageBuilder:
+              //                 //         (context, animation, secondaryAnimation) =>
+              //                 //         DeliveryConfirm(
+              //                 //           deliverystatus: detail.deliveryStatus,
+              //                 //           deliveryId: detail.deliveryId,),
+              //                 //     transitionDuration:
+              //                 //     const Duration(milliseconds: 50),
+              //                 //     transitionsBuilder: (context, animation,
+              //                 //         secondaryAnimation, child) {
+              //                 //       return FadeTransition(
+              //                 //         opacity: animation,
+              //                 //         child: child,
+              //                 //       );
+              //                 //     },
+              //                 //   ),
+              //                 // );
+              //                 // context.go('/OrdersList', extra: {
+              //                 //   'product': detail,
+              //                 //   'item': [], // pass an empty list of maps
+              //                 //   'body': {},
+              //                 //   'itemsList': [], // pass an empty list of maps
+              //                 //   'orderDetails': productList.map((detail) => OrderDetail(
+              //                 //     orderId: detail.orderId,
+              //                 //     orderDate: detail.orderDate, items: [],
+              //                 //     // Add other fields as needed
+              //                 //   )).toList(),
+              //                 // });
+              //               } else {
+              //                 // Navigator.push(
+              //                 //   context,
+              //                 //   PageRouteBuilder(
+              //                 //     pageBuilder:
+              //                 //         (context, animation, secondaryAnimation) => DeliveryConfirm(
+              //                 //       deliverystatus: detail.deliveryStatus,
+              //                 //       deliveryId: detail.deliveryId,),
+              //                 //     transitionDuration:
+              //                 //     const Duration(milliseconds: 50),
+              //                 //     transitionsBuilder: (context, animation,
+              //                 //         secondaryAnimation, child) {
+              //                 //       return FadeTransition(
+              //                 //         opacity: animation,
+              //                 //         child: child,
+              //                 //       );
+              //                 //     },
+              //                 //   ),
+              //                 // );
+              //
+              //
+              //               };
+              //               // context.go('/OrdersList', extra: {
+              //               //   'product': detail,
+              //               //   'item': [], // pass an empty list of maps
+              //               //   'body': {},
+              //               //   'itemsList': [], // pass an empty list of maps
+              //               //   'orderDetails':filteredData.map((detail) => OrderDetail(
+              //               //     orderId: detail.orderId,
+              //               //     orderDate: detail.orderDate, items: [],
+              //               //     // Add other fields as needed
+              //               //   )).toList(),
+              //               // });
+              //             }
+              //           }
+              //       );
+              //     })
+              //   // List.generate(
+              //   //   5, // number of rows
+              //   //       (index) {
+              //   //     return DataRow(
+              //   //       cells: [
+              //   //         DataCell(Text('ORD_000 ${index + 1}')),
+              //   //         DataCell(Padding(
+              //   //           padding: const EdgeInsets.only(left: 25),
+              //   //           child: Text('26/08/2024'),
+              //   //         )),
+              //   //         DataCell(Padding(
+              //   //           padding: const EdgeInsets.only(left: 15),
+              //   //           child: Text('INV_000${index + 1}'),
+              //   //         )),
+              //   //         DataCell(Padding(
+              //   //           padding: const EdgeInsets.only(left: 5),
+              //   //           child: Text('26/08/2024'),
+              //   //         )),
+              //   //         DataCell(Padding(
+              //   //           padding: const EdgeInsets.only(left: 25),
+              //   //           child: Text('UPI'),
+              //   //         )),
+              //   //         DataCell(Padding(
+              //   //           padding: const EdgeInsets.only(left: 15),
+              //   //           child: Text('Success'),
+              //   //         )),
+              //   //         DataCell(Padding(
+              //   //           padding: const EdgeInsets.only(left: 5),
+              //   //           child: Text('10000'),
+              //   //         )),
+              //   //       ],
+              //   //     );
+              //   //   },
+              //   // ),
+              //
+              // ),
+            ),
+          ],
+        );
+    });
+  }
   Widget buildDataTable() {
 
     if (isLoading) {
@@ -919,7 +1663,7 @@ class _InvoiceListState extends State<InvoiceList> {
         Column(
           children: [
             Container(
-              width: right * 0.78,
+                width: right - 200,
 
               decoration:const BoxDecoration(
                   color: Color(0xFFF7F7F7),
@@ -929,6 +1673,7 @@ class _InvoiceListState extends State<InvoiceList> {
               DataTable(
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
+                columnSpacing: 35,
                 columns: columns.map((column) {
                   return
                  DataColumn(
@@ -951,31 +1696,23 @@ class _InvoiceListState extends State<InvoiceList> {
                                     fontSize: 13,
                                   ),
                                 ),
-                              //  if (columns.indexOf(column) > 0)
-                                  MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      child: IconButton(
-                                        icon: _sortOrder[columns.indexOf(column)] == 'asc'
-                                            ? SizedBox(width: 12,
-                                            child: Image.asset("images/sort.png",color: Colors.grey,))
-                                            : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
-                                        onPressed: () {
-                                          setState(() {
-                                            _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
-                                            _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
-                                          });
-                                        },
-                                      ),
+                                if (columns.indexOf(column) < columns.length - 1)
+                                   IconButton(
+                                      icon: _sortOrder[columns.indexOf(column)] == 'asc'
+                                          ? SizedBox(width: 12,
+                                          child: Image.asset("images/sort.png",color: Colors.grey,))
+                                          : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                      onPressed: () {
+                                        setState(() {
+                                          _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
+                                          _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
+                                        });
+                                      },
                                     ),
-                                  ),
-                                //SizedBox(width: 50,),
-                                //Padding(
-                                //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-                                //  child:
-                              //  if (columns.indexOf(column) > 0)
-                                  const Spacer(),
-                               // if (columns.indexOf(column) > 0)
+
+                                if (columns.indexOf(column) < columns.length - 1)
+                                  Spacer(),
+                                if (columns.indexOf(column) < columns.length - 1)
                                   MouseRegion(
                                     cursor: SystemMouseCursors.resizeColumn,
                                     child: GestureDetector(
@@ -984,14 +1721,8 @@ class _InvoiceListState extends State<InvoiceList> {
                                           setState(() {
                                             columnWidths[columns.indexOf(column)] += details.delta.dx;
                                             columnWidths[columns.indexOf(column)] =
-                                                columnWidths[columns.indexOf(column)].clamp(50.0, 300.0);
+                                                columnWidths[columns.indexOf(column)].clamp(136.0, 300.0);
                                           });
-                                          // setState(() {
-                                          //   columnWidths[columns.indexOf(column)] += details.delta.dx;
-                                          //   if (columnWidths[columns.indexOf(column)] < 50) {
-                                          //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-                                          //   }
-                                          // });
                                         },
                                         child: const Padding(
                                           padding: EdgeInsets.only(top: 10,bottom: 10),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:html';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/Order%20Module/firstpage.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/image%20loading.dart';
@@ -12,10 +13,21 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import '../widgets/confirmdialog.dart';
 
-
-
-void main(){
-  runApp(const ProductForm1(product: null, prodId: '', priceText: '', productText: '', selectedvalue2: '', discountText: '', selectedValue: '', selectedValue1: '', selectedValue3: '', imagePath: null, displayData: {}, orderDetails: [],));
+void main() {
+  runApp(const ProductForm1(
+    product: null,
+    prodId: '',
+    priceText: '',
+    productText: '',
+    selectedvalue2: '',
+    discountText: '',
+    selectedValue: '',
+    selectedValue1: '',
+    selectedValue3: '',
+    imagePath: null,
+    displayData: {},
+    orderDetails: [],
+  ));
 }
 
 class ProductForm1 extends StatefulWidget {
@@ -48,8 +60,8 @@ class ProductForm1 extends StatefulWidget {
   final String? selectedValue;
   final String? selectedValue1;
   final String? selectedValue3;
-
   final Uint8List? imagePath;
+
   @override
   State<ProductForm1> createState() => _ProductForm1State();
 }
@@ -62,7 +74,6 @@ class _ProductForm1State extends State<ProductForm1> {
   String storeImage = '';
   String? imageId = '';
   List<bool> _isSelected = [];
- // List<OrderDetail> filteredOrderDetails = [];
   var result;
   List<ord.Product> selectedProductList = [];
   String token = window.sessionStorage["token"] ?? " ";
@@ -84,6 +95,7 @@ class _ProductForm1State extends State<ProductForm1> {
   String? errorMessage;
   final prodId1Controller = TextEditingController();
   final productNameController = TextEditingController();
+  final ScrollController horizontalScroll = ScrollController();
   final categoryController = TextEditingController();
   final subCategoryController = TextEditingController();
   final prodIdController = TextEditingController();
@@ -104,6 +116,7 @@ class _ProductForm1State extends State<ProductForm1> {
     'Return': false,
     'Reports': false,
   };
+
   bool areRequiredFieldsFilled() {
     return productNameController.text.isNotEmpty &&
         categoryController.text.isNotEmpty &&
@@ -113,27 +126,10 @@ class _ProductForm1State extends State<ProductForm1> {
         discountController.text.isNotEmpty;
   }
 
-  // Future<void> _newData() async {
-  //   print('Token: $token');
-  //   if (searchText.isNotEmpty) {
-  //     await fetchData(searchText, 'category');
-  //   }
-  //   else if(searchText.isEmpty) {
-  //     await fetchProducts(prodIdController.text);
-  //   }
-  //   else
-  //   {
-  //     setState(() {
-  //       productList = [];
-  //     });
-  //   }
-  // }
-
   Future<void> fetchData(String productName, String category) async {
     try {
       final response = await http.get(
-        Uri.parse(
-            '$apicall/productmaster/search_by_productname/$productName'),
+        Uri.parse('$apicall/productmaster/search_by_productname/$productName'),
         headers: {
           "Content-Type": "application/json",
           'Authorization': 'Bearer $token'
@@ -219,35 +215,44 @@ class _ProductForm1State extends State<ProductForm1> {
     }
   }
 
-
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Home', Icons.dashboard, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
+      _buildMenuItem(
+          'Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
       Container(
           decoration: BoxDecoration(
-            color: Colors.white ,
+            color: Colors.blue[800],
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(8), // Radius for top-left corner
-              topRight: Radius.circular(0), // No radius for top-right corner
+              topRight: Radius.circular(8), // No radius for top-right corner
               bottomLeft: Radius.circular(8), // Radius for bottom-left corner
-              bottomRight: Radius.circular(0), // No radius for bottom-right corner
+              bottomRight:
+                  Radius.circular(8), // No radius for bottom-right corner
             ),
           ),
-          child: _buildMenuItem('Products', Icons.image_outlined, Colors.black, '/Product_List')),
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Invoice'),
-      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart, Colors.blue[900]!, '/Report_List'),
+          child: _buildMenuItem(
+              'Products', Icons.image_outlined, Colors.black, '/Product_List')),
+      _buildMenuItem(
+          'Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined,
+          Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!,
+          '/Delivery_List'),
+      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!,
+          '/Payment_List'),
+      _buildMenuItem(
+          'Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
+      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!,
+          '/Report_List'),
     ];
   }
 
-  Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
-    iconColor = _isHovered[title] == true ? Colors.black87 : Colors.white;
-    title == 'Products'? _isHovered[title] = false :  _isHovered[title] = false;
-    title == 'Products'? iconColor = Colors.black : Colors.white;
+  Widget _buildMenuItem(
+      String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Products' ? _isHovered[title] = false : _isHovered[title] = false;
+    title == 'Products' ? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -257,14 +262,14 @@ class _ProductForm1State extends State<ProductForm1> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,),
+          margin: const EdgeInsets.only(bottom: 5, right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 5,top: 5),
+            padding: const EdgeInsets.only(left: 5, top: 5),
             child: Row(
               children: [
                 Icon(icon, color: iconColor),
@@ -293,7 +298,6 @@ class _ProductForm1State extends State<ProductForm1> {
     super.dispose();
   }
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -315,8 +319,6 @@ class _ProductForm1State extends State<ProductForm1> {
       }
     }
   }
-
-
 
   @override
   void initState() {
@@ -348,7 +350,7 @@ class _ProductForm1State extends State<ProductForm1> {
       priceController.text = widget.priceText!;
       discountController.text = widget.discountText!;
 
-   productNameController.text = widget.productText!;
+      productNameController.text = widget.productText!;
       unitController.text = widget.selectedvalue2!;
       taxController.text = widget.selectedValue3!;
       categoryController.text = widget.selectedValue!;
@@ -370,23 +372,6 @@ class _ProductForm1State extends State<ProductForm1> {
     return regex.hasMatch(str);
   }
 
-
-
-  // void _onSearchChanged() {
-  //   // This will be called whenever the search text changes
-  //   setState(() {
-  //     // You can filter your list here based on the search text
-  //     // For example:
-  //     widget.orderDetails = widget.orderDetails!.where((orderDetail) {
-  //       return orderDetail.orderId!.contains(_searchController.text) ||
-  //           orderDetail.orderDate!.contains(_searchController.text) ||
-  //           orderDetail.orderCategory!.contains(_searchController.text);
-  //     }).toList();
-  //   });
-  // }// last edited
-
-
-
   Future<void> deleteProductById(String productId) async {
     try {
       final Uri apiUri = Uri.parse(
@@ -400,89 +385,66 @@ class _ProductForm1State extends State<ProductForm1> {
           barrierDismissible: false,
           context: context,
           builder: (BuildContext context) {
-            return
-              AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                contentPadding: EdgeInsets.zero,
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Close Button
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          // Warning Icon
-                          Icon(Icons.check_circle_rounded, color: Colors.green, size: 50),
-                          SizedBox(height: 16),
-                          // Confirmation Message
-                          Text(
-                            'Product Deleted Successfuly',
-                            style: TextStyle(
-                              fontSize: 18,
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Close Button
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        const Icon(Icons.check_circle_rounded,
+                            color: Colors.green, size: 50),
+                        const SizedBox(height: 16),
+                        // Confirmation Message
+                        const Text(
+                          'Product Deleted Successfuly',
+                          style: TextStyle(
+                            fontSize: 18,
                             //  fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                            color: Colors.black,
                           ),
-                          SizedBox(height: 20),
-                          // Buttons
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Handle No action
-                                  context.go('/Product_List');
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  side: BorderSide(color: Colors.blue),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: Text(
-                                  'OK',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                  ),
+                        ),
+                        const SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle No action
+                                context.go('/Product_List');
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                side: const BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                              child: const Text(
+                                'OK',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
+                  ),
+                ],
+              ),
+            );
           },
         );
-        // showDialog(
-        //   context: context,
-        //   builder: (context) {
-        //     return AlertDialog(
-        //       icon: Icon(
-        //           Icons.check_circle_rounded, color: Colors.green, size: 25),
-        //       content: Padding(
-        //         padding: EdgeInsets.only(left: 35),
-        //         child: Text('Product deleted successfully'),
-        //       ),
-        //       actions: <Widget>[
-        //         TextButton(
-        //           child: Text('OK'),
-        //           onPressed: () {
-        //            context.go('/Products');
-        //           },
-        //         ),
-        //       ],
-        //     );
-        //   },
-        // );
-
       } else {
         print('Failed to delete product: ${response.statusCode}');
       }
@@ -496,8 +458,7 @@ class _ProductForm1State extends State<ProductForm1> {
     try {
       // Make an HTTP request to fetch data from the API
       final response = await http.get(
-        Uri.parse(
-            '$apicall/productmaster/search_by_productname/$productName'),
+        Uri.parse('$apicall/productmaster/search_by_productname/$productName'),
         headers: {
           "Content-Type": "application/json",
           'Authorization': 'Bearer $token'
@@ -570,8 +531,9 @@ class _ProductForm1State extends State<ProductForm1> {
         if (jsonData != null) {
           if (jsonData is List) {
             final products =
-            jsonData.map((item) => ord.Product.fromJson(item)).toList();
-            final product = products.firstWhere((element) => element.prodId == prodId);
+                jsonData.map((item) => ord.Product.fromJson(item)).toList();
+            final product =
+                products.firstWhere((element) => element.prodId == prodId);
             setState(() {
               productNameController.text = product.productName;
               categoryController.text = product.category;
@@ -585,14 +547,14 @@ class _ProductForm1State extends State<ProductForm1> {
               print(imageIdContoller.text);
               loadImage(imageIdContoller.text);
               //await loadImage(imageIdContoller.text);
-
             });
           } else if (jsonData is Map) {
             if (jsonData.containsKey('body')) {
               final products = jsonData['body']
                   .map((item) => ord.Product.fromJson(item))
                   .toList();
-              final product = products.firstWhere((element) => element.prodId == prodId);
+              final product =
+                  products.firstWhere((element) => element.prodId == prodId);
               setState(() {
                 productNameController.text = product.productName;
                 categoryController.text = product.category;
@@ -604,8 +566,6 @@ class _ProductForm1State extends State<ProductForm1> {
                 imageIdContoller.text = product.imageId;
                 print('image size');
                 print(imageIdContoller.text);
-
-
               });
             } else {
               print('No product found');
@@ -630,8 +590,7 @@ class _ProductForm1State extends State<ProductForm1> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.white,
-        appBar:
-        AppBar(
+        appBar: AppBar(
           backgroundColor: const Color(0xFFFFFFFF),
           title: Image.asset("images/Final-Ikyam-Logo.png"),
           // Set background color to white
@@ -651,648 +610,1883 @@ class _ProductForm1State extends State<ProductForm1> {
                 ),
               ),
             ),
-            const SizedBox(width: 10,),
+            const SizedBox(
+              width: 10,
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 10),
-              child:
-              AccountMenu(),
+              child: AccountMenu(),
             ),
           ],
         ),
-        body: LayoutBuilder(
-            builder: (context, constraints) {
-              double maxHeight = constraints.maxHeight;
-              double maxWidth = constraints.maxWidth;
-              /// For web view
-              return Stack(
-                children: [
-                  Align(
-                    // Added Align widget for the left side menu
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                      height: 1400,
-                      width: 200,
-                      color: const Color(0xFF0974A1),
-                      padding: const EdgeInsets.only(left: 20, top: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildMenuItems(context),
+        body: LayoutBuilder(builder: (context, constraints) {
+          double maxHeight = constraints.maxHeight;
+          double maxWidth = constraints.maxWidth;
+
+          return Stack(
+            children: [
+              if (constraints.maxWidth >= 1336) ...{
+                Container(
+                  width: maxWidth,
+                  height: maxHeight, //height
+                  child: Stack(
+                    children: [
+                      Align(
+                        // Added Align widget for the left side menu
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          height: 1400,
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 20, top: 30),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-
-                  Container(
-                    margin: const EdgeInsets.only(
-                      top: 60,
-                      left: 200,
-                    ),
-                    width:259,
-                    height: 980,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SizedBox(
-                          height: 40,
-                          width: 80,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 5, right: 3, bottom: 5),
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                hintText: 'Search product',
-                                contentPadding: EdgeInsets.all(8),
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(
-                                  Icons.search_outlined,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            onChanged: (value){
-                                setState(() {
-                                  searchText = value.toLowerCase();
-                                });
-                            },
-              // final List<OrderDetail> filteredOrderDetails = searchText.isNotEmpty
-              // ? widget.orderDetails!.where((orderDetail) =>
-              // orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
-              // ).toList()
-              //     : widget.orderDetails!;
-              //
-              // ...
-              //
-              // itemCount: filteredOrderDetails.length,
-              //
-              // itemBuilder: (context, index) {
-              // final OrderDetail orderDetail = filteredOrderDetails[index];
-              // ...
-              // }
-                            //  onChanged: _onSearchChanged(),
-                              // onChanged: (value) {
-                              // //  token = window.sessionStorage["token"] ?? " ";
-                              //   setState(() {
-                              //     searchText = value; // Update searchText
-                              //   });
-                              //   //_newData();
-                              //   // fetchImage(); // Fetch data
-                              // },
-                            ),
-                          ),
+                      Container(
+                        margin: const EdgeInsets.only(
+                          top: 60,
+                          left: 201,
                         ),
-                        const SizedBox(
-                          height: 5,
+                        width: 259,
+                        //height: 980,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
                         ),
-                        Container(
-                          height: maxHeight * 0.83,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                            child: ListView.separated(
-                              itemCount:
-                              searchText.isNotEmpty
-                                  ? widget.orderDetails!.where((orderDetail) =>
-                                  orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
-                              ).length: widget.orderDetails!.length,
-                              // searchText.isNotEmpty
-                              //     ? widget.orderDetails!.length : widget.orderDetails!.where((orderDetail) =>
-                              //     orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
-                              // ).length,
-                              itemBuilder: (context, index) {
-                               // final OrderDetail orderDetail = widget.orderDetails![index];
-                                //original
-                                final OrderDetail orderDetail = (searchText.isNotEmpty ? widget.orderDetails!.where((orderDetail) =>
-                                    orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
-                                ).toList()[index] :widget.orderDetails![index]);
-                             //   final OrderDetail orderDetail = orderDetails[index];
-                                // final OrderDetail orderDetail = searchText.isNotEmpty ?
-                                // widget.orderDetails!.where((orderDetail) => orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
-                                // ).length :widget.orderDetails![index];
-                                bool isSelected = orderDetail.orderId == prodIdController.text;
-                                // widget.orderDetails!.sort((a, b) {
-                                //   if (a.orderId ==
-                                //       prodIdController.text) {
-                                //     return -1; // selected product name comes first
-                                //   } else if (b.orderId ==
-                                //       prodIdController.text) {
-                                //     return 1; // selected product name comes first
-                                //   } else {
-                                //     final aIsNumber = a.orderId[0]
-                                //         .contains(RegExp(r'[0-90]'));
-                                //     final bIsNumber = b.orderId[0]
-                                //         .contains(RegExp(r'[0-90]'));
-                                //
-                                //     if (aIsNumber && !bIsNumber) {
-                                //       return 1;
-                                //     } else if (!aIsNumber && bIsNumber) {
-                                //       return -1;
-                                //     } else {
-                                //       return a.orderId
-                                //           .compareTo(b.orderId);
-                                //     }
-                                //   }
-                                // });
-                                // widget.orderDetails!.sort((a, b) {
-                                //   if (a.orderId == prodIdController.text) {
-                                //     return -1; // selected product name comes first
-                                //   } else if (b.orderId == prodIdController.text) {
-                                //     return 1; // selected product name comes first
-                                //   } else {
-                                //     final aIsNumber = a.orderId[0].contains(RegExp(r'[0-90]'));
-                                //     final bIsNumber = b.orderId[0].contains(RegExp(r'[0-90]'));
-                                //
-                                //     if (aIsNumber && !bIsNumber) {
-                                //       return 1;
-                                //     } else if (!aIsNumber && bIsNumber) {
-                                //       return -1;
-                                //     } else {
-                                //       return a.orderId.compareTo(b.orderId);
-                                //     }
-                                //   }
-                                // });
-                                return
-                                  GestureDetector(
-                                    onTap: () async {
-                                      setState(() {
-                                       // _isLoading = true;
-                                        for (int i = 0; i < _isSelected.length; i++) {
-                                          _isSelected[i] = i == index;
-                                        }
-                                        prodIdController.text = orderDetail.orderId!;
-                                      });
-                                      await  Future.delayed(Duration(milliseconds: 2));
-                                    await fetchProducts(orderDetail.orderId!);
-
-
-
-
-                                      //context.go('/dasbaord/productpage/ontap');
-//                                     setState(() {
-//                                       prodIdController.text = orderDetail.orderId!;
-//                                      // productNameController.text = orderDetail.orderDate!;
-//
-//                                       print(prodIdController.text);
-//                                        //You need to set the other controllers here, but you don't have these properties in OrderDetail
-//                                        // categoryController.text = orderDetail.category;
-//                                        // subCategoryController.text = orderDetail.subCategory;
-//                                        // taxController.text = orderDetail.tax;
-//                                        // unitController.text = orderDetail.unit;
-//                                        // priceController.text = orderDetail.price.toString();
-//                                        // discountController.text = orderDetail.discount;
-//                                        // imageIdContoller.text = orderDetail.imageId;
-//                                       print('---iamde');
-//                                       // widget.dia
-//                                       _displayData['imageId'] = imageIdContoller.text;
-// // widget.displayData['imageId'] =
-// //     imageIdContoller.text;
-//                                       // widget.displayData['imageId'] =_displayData['imageId'];
-//                                       print(imageIdContoller.text);
-//                                       // fetchImage(orderDetail.imageId); // You don't have imageId in OrderDetail
-//                                     });
-                                    },
-                                    child: Container(
-                                      decoration: isSelected
-                                          ? BoxDecoration(
-                                          color: Colors.lightBlue[100]) // selected color
-                                          : null,
-                                      child:
-                                      ListTile(
-                                        title: Text(
-                                          '${orderDetail.orderDate}',
-                                          style: const TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                        subtitle: Text('${orderDetail.orderCategory}'), // You don't have category in OrderDetail
-                                        tileColor: isSelected ? Colors.lightBlue[100] : null,
-                                      ),
-                                    ),
-                                  );
-                              },
-                              separatorBuilder: (BuildContext context, int index) {
-                                return const Divider();
-                              },
-                            )
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 200),
-                    child: Container(// Space above/below the border
-                      width: 0.8, // Border height
-                      color: Colors.grey, // Border color
-                    ),
-                  ),
-
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 201),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        color: Colors.white,
-                        height: 60,
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            IconButton(
-                              icon: const Icon(
-                                  Icons.arrow_back), // Back button icon
-                              onPressed: () {
-                                context.go('/Product_List');
-                                // Navigator.of(context).push(PageRouteBuilder(
-                                //   pageBuilder: (context, animation,
-                                //       secondaryAnimation) =>
-                                //       const ProductPage(product: null),
-                                // ));
-                              },
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 20),
-                              child: Text(
-                                'Product List',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            const Spacer(),
-                            Align(
-                              alignment: Alignment.topRight,
+                            SizedBox(
+                              height: 33,
+                              width: 80,
                               child: Padding(
                                 padding: const EdgeInsets.only(
-                                    top: 15, right: 30),
-                                child: OutlinedButton(
-                                  onPressed: ()  {
-                                    showDialog(
-                                      barrierDismissible: false,
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return
-                                          AlertDialog(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(15.0),
-                                            ),
-                                            contentPadding: EdgeInsets.zero,
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                // Close Button
-                                                Align(
-                                                  alignment: Alignment.topRight,
-                                                  child: IconButton(
-                                                    icon: Icon(Icons.close, color: Colors.red),
-                                                    onPressed: () {
-                                                      Navigator.of(context).pop();
-                                                    },
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets.all(16.0),
-                                                  child: Column(
-                                                    children: [
-                                                      // Warning Icon
-                                                      Icon(Icons.warning, color: Colors.orange, size: 50),
-                                                      SizedBox(height: 16),
-                                                      // Confirmation Message
-                                                      Text(
-                                                        'Are You Sure',
-                                                        style: TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight: FontWeight.bold,
-                                                          color: Colors.black,
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: 20),
-                                                      // Buttons
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                        children: [
-                                                          ElevatedButton(
-                                                            onPressed: () {
-                                                              // Handle Yes action
-                                                              deleteProductById('${prodIdController.text}');
-                                                              // context.go('/');
-                                                              // Navigator.of(context).pop();
-                                                            },
-                                                            style: ElevatedButton.styleFrom(
-                                                              backgroundColor: Colors.white,
-                                                              side: BorderSide(color: Colors.blue),
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(10.0),
-                                                              ),
-                                                            ),
-                                                            child: Text(
-                                                              'Yes',
-                                                              style: TextStyle(
-                                                                color: Colors.blue,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          ElevatedButton(
-                                                            onPressed: () {
-                                                              // Handle No action
-                                                              Navigator.of(context).pop();
-                                                            },
-                                                            style: ElevatedButton.styleFrom(
-                                                              backgroundColor: Colors.white,
-                                                              side: BorderSide(color: Colors.red),
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(10.0),
-                                                              ),
-                                                            ),
-                                                            child: Text(
-                                                              'No',
-                                                              style: TextStyle(
-                                                                color: Colors.red,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                      },
-                                    );
-
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    backgroundColor:
-                                    Colors.red[900],
-                                    // Button background color
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(
-                                          5), // Rounded corners
-                                    ),
-                                    side: BorderSide.none, // No outline
-                                  ),
-                                  child: const Text(
-                                    'Delete',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w100,
-                                      color: Colors.white,
+                                    left: 5, right: 3, bottom: 5),
+                                child: TextFormField(
+                                  decoration: const InputDecoration(
+                                    hintText: 'Search product',
+                                    contentPadding: EdgeInsets.all(8),
+                                    border: OutlineInputBorder(),
+                                    prefixIcon: Icon(
+                                      Icons.search_outlined,
+                                      color: Colors.blue,
                                     ),
                                   ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 30,top: 3),
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  print('---- image path-----');
-                                  print(storeImageBytes1);
-                                  print(priceController.text);
-                                  print(discountController.text);
-                                  print(subCategoryController.text);
-                                  print(categoryController.text);
-                                  print(unitController.text);
-                                  print(taxController.text);
-                                  print(productNameController.text);
-                                  print('hii');
-                                 // widget.displayData['imageId'] = imageIdContoller.text;
-                                  print(widget.displayData['imageId'] ?? "");
-                                  _displayData['imageId'] ?? "";
-                                  print('checkk what is this');
-                                  print(_displayData['imageId'] ?? "");
-                                  widget.displayData['imageId'] ?? "";
-                                  print(imageIdContoller.text);
-                                  final inputText = categoryController.text;
-                                  final subText = subCategoryController.text;
-                                  final unitText = unitController.text;
-                                  final taxText = taxController.text;
-                                  final prodText = prodIdController.text;
-
-                                  if (storeImageBytes1 != null &&
-                                      productNameController.text.isNotEmpty &&
-                                      priceController.text.isNotEmpty &&
-                                      discountController.text.isNotEmpty) {
-                                    _textInput = productNameController.text;
-                                    _priceInput = priceController.text;
-                                    discountInput = discountController.text;
-                                    print('list details these are all');
-                                    print(widget.orderDetails);
-                                    context.go('/Edit_Product', extra: {
-                                      'prodId': prodText,
-                                      'textInput': _textInput ?? '',
-                                      'priceInput': _priceInput ?? '',
-                                      'discountInput': discountInput ?? '',
-                                      'inputText': inputText,
-                                      'subText': subText,
-                                      'unitText': unitText,
-                                      'taxText': taxText,
-                                      'imagePath': storeImageBytes1,
-                                      'imageId': _displayData['imageId']?? imageIdContoller.text?? '',
-                                      'productData': {}, // or pass the actual product data
+                                  onChanged: (value) {
+                                    setState(() {
+                                      searchText = value.toLowerCase();
                                     });
-
-                                    // context.go('/dashboard/productpage/:Edit/Edit', extra: {
-                                    //   'prodId': prodText ?? '',
-                                    //   'textInput': _textInput ?? '',
-                                    //   'priceInput': _priceInput ?? '',
-                                    //   'discountInput': discountInput ?? '',
-                                    //   'inputText': inputText ?? '',
-                                    //   'subText': subText ?? '',
-                                    //   'unitText': unitText ?? '',
-                                    //   'taxText': taxText ?? '',
-                                    //   'imagePath': storeImageBytes1,
-                                    //   'imageId': _displayData['imageId']?? imageIdContoller.text?? '',
-                                    //   'productData': {}, // or pass the actual product data
-                                    // });
-
-                                  } else {
-                                    // Handle case when imagePath is null or other required fields are empty
-                                    print(
-                                        'Error: Image path is null or other required fields are empty.');
-                                  }
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor: Colors
-                                      .blue[800], // Button background color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        5), // Rounded corners
-                                  ),
-                                  side: BorderSide.none, // No outline
-                                ),
-                                child: Text(
-                                  isEditing ? 'Edit' : 'Edit',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    //fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                                  },
+                                  // final List<OrderDetail> filteredOrderDetails = searchText.isNotEmpty
+                                  // ? widget.orderDetails!.where((orderDetail) =>
+                                  // orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
+                                  // ).toList()
+                                  //     : widget.orderDetails!;
+                                  //
+                                  // ...
+                                  //
+                                  // itemCount: filteredOrderDetails.length,
+                                  //
+                                  // itemBuilder: (context, index) {
+                                  // final OrderDetail orderDetail = filteredOrderDetails[index];
+                                  // ...
+                                  // }
+                                  //  onChanged: _onSearchChanged(),
+                                  // onChanged: (value) {
+                                  // //  token = window.sessionStorage["token"] ?? " ";
+                                  //   setState(() {
+                                  //     searchText = value; // Update searchText
+                                  //   });
+                                  //   //_newData();
+                                  //   // fetchImage(); // Fetch data
+                                  // },
                                 ),
                               ),
                             ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Container(
+                                height: maxHeight * 0.83,
+                                //500,//maxHeight * 0.83,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ListView.separated(
+                                  itemCount: searchText.isNotEmpty
+                                      ? widget.orderDetails!
+                                      .where((orderDetail) => orderDetail
+                                      .orderDate
+                                      .toLowerCase()
+                                      .contains(
+                                      searchText.toLowerCase()))
+                                      .length
+                                      : widget.orderDetails!.length,
+                                  // searchText.isNotEmpty
+                                  //     ? widget.orderDetails!.length : widget.orderDetails!.where((orderDetail) =>
+                                  //     orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
+                                  // ).length,
+                                  itemBuilder: (context, index) {
+                                    // final OrderDetail orderDetail = widget.orderDetails![index];
+                                    //original
+                                    final OrderDetail orderDetail = (searchText
+                                        .isNotEmpty
+                                        ? widget.orderDetails!
+                                        .where((orderDetail) => orderDetail
+                                        .orderDate
+                                        .toLowerCase()
+                                        .contains(
+                                        searchText.toLowerCase()))
+                                        .toList()[index]
+                                        : widget.orderDetails![index]);
+                                    //   final OrderDetail orderDetail = orderDetails[index];
+                                    // final OrderDetail orderDetail = searchText.isNotEmpty ?
+                                    // widget.orderDetails!.where((orderDetail) => orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
+                                    // ).length :widget.orderDetails![index];
+                                    bool isSelected = orderDetail.orderId ==
+                                        prodIdController.text;
+                                    // widget.orderDetails!.sort((a, b) {
+                                    //   if (a.orderId ==
+                                    //       prodIdController.text) {
+                                    //     return -1; // selected product name comes first
+                                    //   } else if (b.orderId ==
+                                    //       prodIdController.text) {
+                                    //     return 1; // selected product name comes first
+                                    //   } else {
+                                    //     final aIsNumber = a.orderId[0]
+                                    //         .contains(RegExp(r'[0-90]'));
+                                    //     final bIsNumber = b.orderId[0]
+                                    //         .contains(RegExp(r'[0-90]'));
+                                    //
+                                    //     if (aIsNumber && !bIsNumber) {
+                                    //       return 1;
+                                    //     } else if (!aIsNumber && bIsNumber) {
+                                    //       return -1;
+                                    //     } else {
+                                    //       return a.orderId
+                                    //           .compareTo(b.orderId);
+                                    //     }
+                                    //   }
+                                    // });
+                                    // widget.orderDetails!.sort((a, b) {
+                                    //   if (a.orderId == prodIdController.text) {
+                                    //     return -1; // selected product name comes first
+                                    //   } else if (b.orderId == prodIdController.text) {
+                                    //     return 1; // selected product name comes first
+                                    //   } else {
+                                    //     final aIsNumber = a.orderId[0].contains(RegExp(r'[0-90]'));
+                                    //     final bIsNumber = b.orderId[0].contains(RegExp(r'[0-90]'));
+                                    //
+                                    //     if (aIsNumber && !bIsNumber) {
+                                    //       return 1;
+                                    //     } else if (!aIsNumber && bIsNumber) {
+                                    //       return -1;
+                                    //     } else {
+                                    //       return a.orderId.compareTo(b.orderId);
+                                    //     }
+                                    //   }
+                                    // });
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        setState(() {
+                                          // _isLoading = true;
+                                          for (int i = 0;
+                                          i < _isSelected.length;
+                                          i++) {
+                                            _isSelected[i] = i == index;
+                                          }
+                                          prodIdController.text =
+                                          orderDetail.orderId!;
+                                        });
+                                        await Future.delayed(
+                                            const Duration(milliseconds: 2));
+                                        await fetchProducts(
+                                            orderDetail.orderId!);
+
+                                        //context.go('/dasbaord/productpage/ontap');
+                                        //                                     setState(() {
+                                        //                                       prodIdController.text = orderDetail.orderId!;
+                                        //                                      // productNameController.text = orderDetail.orderDate!;
+                                        //
+                                        //                                       print(prodIdController.text);
+                                        //                                        //You need to set the other controllers here, but you don't have these properties in OrderDetail
+                                        //                                        // categoryController.text = orderDetail.category;
+                                        //                                        // subCategoryController.text = orderDetail.subCategory;
+                                        //                                        // taxController.text = orderDetail.tax;
+                                        //                                        // unitController.text = orderDetail.unit;
+                                        //                                        // priceController.text = orderDetail.price.toString();
+                                        //                                        // discountController.text = orderDetail.discount;
+                                        //                                        // imageIdContoller.text = orderDetail.imageId;
+                                        //                                       print('---iamde');
+                                        //                                       // widget.dia
+                                        //                                       _displayData['imageId'] = imageIdContoller.text;
+                                        // // widget.displayData['imageId'] =
+                                        // //     imageIdContoller.text;
+                                        //                                       // widget.displayData['imageId'] =_displayData['imageId'];
+                                        //                                       print(imageIdContoller.text);
+                                        //                                       // fetchImage(orderDetail.imageId); // You don't have imageId in OrderDetail
+                                        //                                     });
+                                      },
+                                      child: Container(
+                                        decoration: isSelected
+                                            ? BoxDecoration(
+                                            color: Colors.lightBlue[
+                                            100]) // selected color
+                                            : null,
+                                        child: ListTile(
+                                          title: Text(
+                                            '${orderDetail.orderDate}',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          subtitle: Text(
+                                              '${orderDetail.orderCategory}'),
+                                          // You don't have category in OrderDetail
+                                          tileColor: isSelected
+                                              ? Colors.lightBlue[100]
+                                              : null,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  separatorBuilder:
+                                      (BuildContext context, int index) {
+                                    return const Divider();
+                                  },
+                                )),
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 43, left: 200),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 10), // Space above/below the border
-                      height: 1, // Border height
-                      color: Colors.grey, // Border color
-                    ),
-                  ),
-                  Padding(
-                    padding:  const EdgeInsets.only(top: 0, left: 450),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 10), // Space above/below the border
-                      height: constraints.maxHeight,
-                      // width: 1500,
-                      width: 2,// Border height
-                      color: Colors.grey[300], // Border color
-                    ),
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      FutureBuilder(
-                        future: Future.delayed(Duration(seconds: 2)), // 2-second buffer
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            // Display the custom loading icon while waiting
-                            return Padding(
-                              padding: EdgeInsets.only(top: maxHeight * 0.35),
-                              child: Container(
-                                margin: EdgeInsets.only(left: maxWidth * 0.35),
-                                width: maxWidth * 0.2,
-                                height: 300,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Center(child: ImageLoadingIcon()), // Custom icon here
-                              ),
-                            );
-                          } else {
-                            return storeImageBytes1 != null
-                                ? Padding(
-                              padding: EdgeInsets.only(top: maxHeight * 0.35),
-                              child: Container(
-                                margin: EdgeInsets.only(left: maxWidth * 0.35),
-                                width: maxWidth * 0.2,
-                                height: 300,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  color: Colors.white70,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.blue.withOpacity(0.1),
-                                      spreadRadius: 1,
-                                      blurRadius: 3,
-                                      offset: const Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: Image.memory(storeImageBytes1!),
-                              ),
-                            )
-                                : Padding(
-                              padding: EdgeInsets.only(top: maxHeight * 0.35),
-                              child: Container(
-                                margin: EdgeInsets.only(left: maxWidth * 0.35),
-                                width: maxWidth * 0.2,
-                                height: 300,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Center(child: Text('No Image Found.')),
-                              ),
-                            );
-                          }
-                        },
+                      Padding(
+                        padding: const EdgeInsets.only(left: 201),
+                        child: Container(
+                          // Space above/below the border
+                          width: 0.8, // Border height
+                          color: Colors.grey, // Border color
+                        ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildFirstWidget(context), // Use the ProductForm widget here
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 202),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            color: Colors.white,
+                            height: 60,
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                      Icons.arrow_back), // Back button icon
+                                  onPressed: () {
+                                    context.go('/Product_List');
+                                    // Navigator.of(context).push(PageRouteBuilder(
+                                    //   pageBuilder: (context, animation,
+                                    //       secondaryAnimation) =>
+                                    //       const ProductPage(product: null),
+                                    // ));
+                                  },
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 20),
+                                  child: Text(
+                                    'Product List',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Align(
+                                  alignment: Alignment.topRight,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 15, right: 30),
+                                    child: OutlinedButton(
+                                      onPressed: () {
+                                        showDialog(
+                                          barrierDismissible: false,
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                BorderRadius.circular(15.0),
+                                              ),
+                                              contentPadding: EdgeInsets.zero,
+                                              content: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  // Close Button
+                                                  Align(
+                                                    alignment:
+                                                    Alignment.topRight,
+                                                    child: IconButton(
+                                                      icon: const Icon(Icons.close,
+                                                          color: Colors.red),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    const EdgeInsets.all(
+                                                        16.0),
+                                                    child: Column(
+                                                      children: [
+                                                        // Warning Icon
+                                                        const Icon(Icons.warning,
+                                                            color:
+                                                            Colors.orange,
+                                                            size: 50),
+                                                        const SizedBox(height: 16),
+                                                        // Confirmation Message
+                                                        const Text(
+                                                          'Are You Sure',
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                            FontWeight.bold,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 20),
+                                                        // Buttons
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                          children: [
+                                                            ElevatedButton(
+                                                              onPressed: () {
+                                                                // Handle Yes action
+                                                                deleteProductById(
+                                                                    '${prodIdController.text}');
+                                                                // context.go('/');
+                                                                // Navigator.of(context).pop();
+                                                              },
+                                                              style:
+                                                              ElevatedButton
+                                                                  .styleFrom(
+                                                                backgroundColor:
+                                                                Colors
+                                                                    .white,
+                                                                side: const BorderSide(
+                                                                    color: Colors
+                                                                        .blue),
+                                                                shape:
+                                                                RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                      10.0),
+                                                                ),
+                                                              ),
+                                                              child: const Text(
+                                                                'Yes',
+                                                                style:
+                                                                TextStyle(
+                                                                  color: Colors
+                                                                      .blue,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            ElevatedButton(
+                                                              onPressed: () {
+                                                                // Handle No action
+                                                                Navigator.of(
+                                                                    context)
+                                                                    .pop();
+                                                              },
+                                                              style:
+                                                              ElevatedButton
+                                                                  .styleFrom(
+                                                                backgroundColor:
+                                                                Colors
+                                                                    .white,
+                                                                side: const BorderSide(
+                                                                    color: Colors
+                                                                        .red),
+                                                                shape:
+                                                                RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                      10.0),
+                                                                ),
+                                                              ),
+                                                              child: const Text(
+                                                                'No',
+                                                                style:
+                                                                TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        backgroundColor: Colors.red[900],
+                                        // Button background color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              5), // Rounded corners
+                                        ),
+                                        side: BorderSide.none, // No outline
+                                      ),
+                                      child: const Text(
+                                        'Delete',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w100,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                  const EdgeInsets.only(right: 30, top: 3),
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      print('---- image path-----');
+                                      print(storeImageBytes1);
+                                      print(priceController.text);
+                                      print(discountController.text);
+                                      print(subCategoryController.text);
+                                      print(categoryController.text);
+                                      print(unitController.text);
+                                      print(taxController.text);
+                                      print(productNameController.text);
+                                      print('hii');
+                                      // widget.displayData['imageId'] = imageIdContoller.text;
+                                      print(
+                                          widget.displayData['imageId'] ?? "");
+                                      _displayData['imageId'] ?? "";
+                                      print('checkk what is this');
+                                      print(_displayData['imageId'] ?? "");
+                                      widget.displayData['imageId'] ?? "";
+                                      print(imageIdContoller.text);
+                                      final inputText = categoryController.text;
+                                      final subText =
+                                          subCategoryController.text;
+                                      final unitText = unitController.text;
+                                      final taxText = taxController.text;
+                                      final prodText = prodIdController.text;
+
+                                      if (storeImageBytes1 != null &&
+                                          productNameController
+                                              .text.isNotEmpty &&
+                                          priceController.text.isNotEmpty &&
+                                          discountController.text.isNotEmpty) {
+                                        _textInput = productNameController.text;
+                                        _priceInput = priceController.text;
+                                        discountInput = discountController.text;
+                                        print('list details these are all');
+                                        print(widget.orderDetails);
+                                        context.go('/Edit_Product', extra: {
+                                          'prodId': prodText,
+                                          'textInput': _textInput ?? '',
+                                          'priceInput': _priceInput ?? '',
+                                          'discountInput': discountInput ?? '',
+                                          'inputText': inputText,
+                                          'subText': subText,
+                                          'unitText': unitText,
+                                          'taxText': taxText,
+                                          'imagePath': storeImageBytes1,
+                                          'imageId': _displayData['imageId'] ??
+                                              imageIdContoller.text ??
+                                              '',
+                                          'productData': {},
+                                          // or pass the actual product data
+                                        });
+
+                                        // context.go('/dashboard/productpage/:Edit/Edit', extra: {
+                                        //   'prodId': prodText ?? '',
+                                        //   'textInput': _textInput ?? '',
+                                        //   'priceInput': _priceInput ?? '',
+                                        //   'discountInput': discountInput ?? '',
+                                        //   'inputText': inputText ?? '',
+                                        //   'subText': subText ?? '',
+                                        //   'unitText': unitText ?? '',
+                                        //   'taxText': taxText ?? '',
+                                        //   'imagePath': storeImageBytes1,
+                                        //   'imageId': _displayData['imageId']?? imageIdContoller.text?? '',
+                                        //   'productData': {}, // or pass the actual product data
+                                        // });
+                                      } else {
+                                        // Handle case when imagePath is null or other required fields are empty
+                                        print(
+                                            'Error: Image path is null or other required fields are empty.');
+                                      }
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor: Colors.blue[800],
+                                      // Button background color
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            5), // Rounded corners
+                                      ),
+                                      side: BorderSide.none, // No outline
+                                    ),
+                                    child: Text(
+                                      isEditing ? 'Edit' : 'Edit',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        //fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 43, left: 201),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 10), // Space above/below the border
+                          height: 1, // Border height
+                          color: Colors.grey, // Border color
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 0, left: 450),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          // Space above/below the border
+                          height: constraints.maxHeight,
+                          // width: 1500,
+                          width: 2,
+                          // Border height
+                          color: Colors.grey[300], // Border color
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 480, top: 100, bottom: 40, right: 20),
+                        child: SingleChildScrollView(
+                          child: Container(
+                            width: maxWidth * 0.82,
+                            height: maxHeight * 0.83,
+                            color: Colors.white,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                FutureBuilder(
+                                  future: Future.delayed(const Duration(seconds: 2)),
+                                  // 2-second buffer
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      // Display the custom loading icon while waiting
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                            top: maxHeight * 0.12),
+                                        child: Container(
+                                          margin: EdgeInsets.only(
+                                              left: maxWidth * 0.12),
+                                          width: maxWidth * 0.2,
+                                          height: 300,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius:
+                                            BorderRadius.circular(4),
+                                          ),
+                                          child: Center(
+                                              child:
+                                              ImageLoadingIcon()), // Custom icon here
+                                        ),
+                                      );
+                                    } else {
+                                      return storeImageBytes1 != null
+                                          ? Padding(
+                                        padding: EdgeInsets.only(
+                                            top: maxHeight * 0.12),
+                                        child: Container(
+                                          margin: EdgeInsets.only(
+                                              left: maxWidth * 0.12),
+                                          width: maxWidth * 0.2,
+                                          height: 300,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.grey),
+                                            color: Colors.white70,
+                                            borderRadius:
+                                            BorderRadius.circular(8),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.blue
+                                                    .withOpacity(0.1),
+                                                spreadRadius: 1,
+                                                blurRadius: 3,
+                                                offset:
+                                                const Offset(0, 1),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Image.memory(
+                                              storeImageBytes1!),
+                                        ),
+                                      )
+                                          : Padding(
+                                        padding: EdgeInsets.only(
+                                            top: maxHeight * 0.12),
+                                        child: Container(
+                                          margin: EdgeInsets.only(
+                                              left: maxWidth * 0.12),
+                                          width: maxWidth * 0.2,
+                                          height: 300,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius:
+                                            BorderRadius.circular(4),
+                                          ),
+                                          child: const Center(
+                                              child: Text(
+                                                  'No Image Found.')),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _buildFirstWidget2(
+                                      context), // Use the ProductForm widget here
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              } else ...{
+                Container(
+                  width: 1500,
+                  child: Stack(
+                    children: [
+                      Align(
+                        // Added Align widget for the left side menu
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          height: 1400,
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 20, top: 30),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(left: 200),
+                        child: AdaptiveScrollbar(
+                            position: ScrollbarPosition.bottom,
+                            controller: horizontalScroll,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              controller: horizontalScroll,
+                              child: Container(
+                                width: 1300,
+                                height: 984,
+                                child: Container(
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        // Space above/below the border
+                                        width: 0.8, // Border height
+                                        color: Colors.grey, // Border color
+                                      ),
+                                      Positioned(
+                                        top: 0,
+                                        left: 1,
+                                        right: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          color: Colors.white,
+                                          height: 60,
+                                          child: Row(
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_back),
+                                                // Back button icon
+                                                onPressed: () {
+                                                  context.go('/Product_List');
+                                                  // Navigator.of(context).push(PageRouteBuilder(
+                                                  //   pageBuilder: (context, animation,
+                                                  //       secondaryAnimation) =>
+                                                  //       const ProductPage(product: null),
+                                                  // ));
+                                                },
+                                              ),
+                                              const Padding(
+                                                padding:
+                                                EdgeInsets.only(left: 20),
+                                                child: Text(
+                                                  'Product List',
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              Align(
+                                                alignment: Alignment.topRight,
+                                                child: Padding(
+                                                  padding:
+                                                  const EdgeInsets.only(
+                                                      top: 15, right: 30),
+                                                  child: OutlinedButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        barrierDismissible:
+                                                        false,
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                        context) {
+                                                          return AlertDialog(
+                                                            shape:
+                                                            RoundedRectangleBorder(
+                                                              borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                  15.0),
+                                                            ),
+                                                            contentPadding:
+                                                            EdgeInsets.zero,
+                                                            content: Column(
+                                                              mainAxisSize:
+                                                              MainAxisSize
+                                                                  .min,
+                                                              children: [
+                                                                // Close Button
+                                                                Align(
+                                                                  alignment:
+                                                                  Alignment
+                                                                      .topRight,
+                                                                  child:
+                                                                  IconButton(
+                                                                    icon: const Icon(
+                                                                        Icons
+                                                                            .close,
+                                                                        color: Colors
+                                                                            .red),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                          context)
+                                                                          .pop();
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                                Padding(
+                                                                  padding:
+                                                                  const EdgeInsets
+                                                                      .all(
+                                                                      16.0),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      // Warning Icon
+                                                                      const Icon(
+                                                                          Icons
+                                                                              .warning,
+                                                                          color: Colors
+                                                                              .orange,
+                                                                          size:
+                                                                          50),
+                                                                      const SizedBox(
+                                                                          height:
+                                                                          16),
+                                                                      // Confirmation Message
+                                                                      const Text(
+                                                                        'Are You Sure',
+                                                                        style:
+                                                                        TextStyle(
+                                                                          fontSize:
+                                                                          18,
+                                                                          fontWeight:
+                                                                          FontWeight.bold,
+                                                                          color:
+                                                                          Colors.black,
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                          height:
+                                                                          20),
+                                                                      // Buttons
+                                                                      Row(
+                                                                        mainAxisAlignment:
+                                                                        MainAxisAlignment.spaceEvenly,
+                                                                        children: [
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              // Handle Yes action
+                                                                              deleteProductById('${prodIdController.text}');
+                                                                              // context.go('/');
+                                                                              // Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                            ElevatedButton.styleFrom(
+                                                                              backgroundColor: Colors.white,
+                                                                              side: const BorderSide(color: Colors.blue),
+                                                                              shape: RoundedRectangleBorder(
+                                                                                borderRadius: BorderRadius.circular(10.0),
+                                                                              ),
+                                                                            ),
+                                                                            child:
+                                                                            const Text(
+                                                                              'Yes',
+                                                                              style: TextStyle(
+                                                                                color: Colors.blue,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          ElevatedButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              // Handle No action
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            style:
+                                                                            ElevatedButton.styleFrom(
+                                                                              backgroundColor: Colors.white,
+                                                                              side: const BorderSide(color: Colors.red),
+                                                                              shape: RoundedRectangleBorder(
+                                                                                borderRadius: BorderRadius.circular(10.0),
+                                                                              ),
+                                                                            ),
+                                                                            child:
+                                                                            const Text(
+                                                                              'No',
+                                                                              style: TextStyle(
+                                                                                color: Colors.red,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    style: OutlinedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                      Colors.red[900],
+                                                      // Button background color
+                                                      shape:
+                                                      RoundedRectangleBorder(
+                                                        borderRadius:
+                                                        BorderRadius.circular(
+                                                            5), // Rounded corners
+                                                      ),
+                                                      side: BorderSide
+                                                          .none, // No outline
+                                                    ),
+                                                    child: const Text(
+                                                      'Delete',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                        FontWeight.w100,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 30, top: 3),
+                                                child: OutlinedButton(
+                                                  onPressed: () {
+                                                    print(
+                                                        '---- image path-----');
+                                                    print(storeImageBytes1);
+                                                    print(priceController.text);
+                                                    print(discountController
+                                                        .text);
+                                                    print(subCategoryController
+                                                        .text);
+                                                    print(categoryController
+                                                        .text);
+                                                    print(unitController.text);
+                                                    print(taxController.text);
+                                                    print(productNameController
+                                                        .text);
+                                                    print('hii');
+                                                    // widget.displayData['imageId'] = imageIdContoller.text;
+                                                    print(widget.displayData[
+                                                    'imageId'] ??
+                                                        "");
+                                                    _displayData['imageId'] ??
+                                                        "";
+                                                    print(
+                                                        'checkk what is this');
+                                                    print(_displayData[
+                                                    'imageId'] ??
+                                                        "");
+                                                    widget.displayData[
+                                                    'imageId'] ??
+                                                        "";
+                                                    print(
+                                                        imageIdContoller.text);
+                                                    final inputText =
+                                                        categoryController.text;
+                                                    final subText =
+                                                        subCategoryController
+                                                            .text;
+                                                    final unitText =
+                                                        unitController.text;
+                                                    final taxText =
+                                                        taxController.text;
+                                                    final prodText =
+                                                        prodIdController.text;
+
+                                                    if (storeImageBytes1 !=
+                                                        null &&
+                                                        productNameController
+                                                            .text.isNotEmpty &&
+                                                        priceController
+                                                            .text.isNotEmpty &&
+                                                        discountController
+                                                            .text.isNotEmpty) {
+                                                      _textInput =
+                                                          productNameController
+                                                              .text;
+                                                      _priceInput =
+                                                          priceController.text;
+                                                      discountInput =
+                                                          discountController
+                                                              .text;
+                                                      print(
+                                                          'list details these are all');
+                                                      print(
+                                                          widget.orderDetails);
+                                                      context.go(
+                                                          '/Edit_Product',
+                                                          extra: {
+                                                            'prodId': prodText,
+                                                            'textInput':
+                                                            _textInput ??
+                                                                '',
+                                                            'priceInput':
+                                                            _priceInput ??
+                                                                '',
+                                                            'discountInput':
+                                                            discountInput ??
+                                                                '',
+                                                            'inputText':
+                                                            inputText,
+                                                            'subText': subText,
+                                                            'unitText':
+                                                            unitText,
+                                                            'taxText': taxText,
+                                                            'imagePath':
+                                                            storeImageBytes1,
+                                                            'imageId': _displayData[
+                                                            'imageId'] ??
+                                                                imageIdContoller
+                                                                    .text ??
+                                                                '',
+                                                            'productData': {},
+                                                            // or pass the actual product data
+                                                          });
+
+                                                      // context.go('/dashboard/productpage/:Edit/Edit', extra: {
+                                                      //   'prodId': prodText ?? '',
+                                                      //   'textInput': _textInput ?? '',
+                                                      //   'priceInput': _priceInput ?? '',
+                                                      //   'discountInput': discountInput ?? '',
+                                                      //   'inputText': inputText ?? '',
+                                                      //   'subText': subText ?? '',
+                                                      //   'unitText': unitText ?? '',
+                                                      //   'taxText': taxText ?? '',
+                                                      //   'imagePath': storeImageBytes1,
+                                                      //   'imageId': _displayData['imageId']?? imageIdContoller.text?? '',
+                                                      //   'productData': {}, // or pass the actual product data
+                                                      // });
+                                                    } else {
+                                                      // Handle case when imagePath is null or other required fields are empty
+                                                      print(
+                                                          'Error: Image path is null or other required fields are empty.');
+                                                    }
+                                                  },
+                                                  style:
+                                                  OutlinedButton.styleFrom(
+                                                    backgroundColor:
+                                                    Colors.blue[800],
+                                                    // Button background color
+                                                    shape:
+                                                    RoundedRectangleBorder(
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                          5), // Rounded corners
+                                                    ),
+                                                    side: BorderSide
+                                                        .none, // No outline
+                                                  ),
+                                                  child: Text(
+                                                    isEditing ? 'Edit' : 'Edit',
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      //fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 43, left: 1),
+                                        child: Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          // Space above/below the border
+                                          height: 1,
+                                          // Border height
+                                          color: Colors.grey, // Border color
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                          top: 60,
+                                          left: 1,
+                                        ),
+                                        width: 259,
+                                        //   height: 980,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                          BorderRadius.circular(4),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                          children: [
+                                            SizedBox(
+                                              height: 35,
+                                              width: 80,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 5,
+                                                    right: 3,
+                                                    bottom: 5),
+                                                child: TextFormField(
+                                                  decoration:
+                                                  const InputDecoration(
+                                                    hintText: 'Search product',
+                                                    contentPadding:
+                                                    EdgeInsets.all(8),
+                                                    border:
+                                                    OutlineInputBorder(),
+                                                    prefixIcon: Icon(
+                                                      Icons.search_outlined,
+                                                      color: Colors.blue,
+                                                    ),
+                                                  ),
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      searchText =
+                                                          value.toLowerCase();
+                                                    });
+                                                  },
+                                                  // final List<OrderDetail> filteredOrderDetails = searchText.isNotEmpty
+                                                  // ? widget.orderDetails!.where((orderDetail) =>
+                                                  // orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
+                                                  // ).toList()
+                                                  //     : widget.orderDetails!;
+                                                  //
+                                                  // ...
+                                                  //
+                                                  // itemCount: filteredOrderDetails.length,
+                                                  //
+                                                  // itemBuilder: (context, index) {
+                                                  // final OrderDetail orderDetail = filteredOrderDetails[index];
+                                                  // ...
+                                                  // }
+                                                  //  onChanged: _onSearchChanged(),
+                                                  // onChanged: (value) {
+                                                  // //  token = window.sessionStorage["token"] ?? " ";
+                                                  //   setState(() {
+                                                  //     searchText = value; // Update searchText
+                                                  //   });
+                                                  //   //_newData();
+                                                  //   // fetchImage(); // Fetch data
+                                                  // },
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Container(
+                                                height: 390,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                  BorderRadius.circular(10),
+                                                ),
+                                                child: ListView.separated(
+                                                  itemCount: searchText.isNotEmpty
+                                                      ? widget.orderDetails!
+                                                      .where((orderDetail) =>
+                                                      orderDetail
+                                                          .orderDate
+                                                          .toLowerCase()
+                                                          .contains(
+                                                          searchText
+                                                              .toLowerCase()))
+                                                      .length
+                                                      : widget
+                                                      .orderDetails!.length,
+                                                  // searchText.isNotEmpty
+                                                  //     ? widget.orderDetails!.length : widget.orderDetails!.where((orderDetail) =>
+                                                  //     orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
+                                                  // ).length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    // final OrderDetail orderDetail = widget.orderDetails![index];
+                                                    //original
+                                                    final OrderDetail orderDetail = (searchText
+                                                        .isNotEmpty
+                                                        ? widget.orderDetails!
+                                                        .where((orderDetail) =>
+                                                        orderDetail
+                                                            .orderDate
+                                                            .toLowerCase()
+                                                            .contains(
+                                                            searchText
+                                                                .toLowerCase()))
+                                                        .toList()[index]
+                                                        : widget.orderDetails![
+                                                    index]);
+                                                    //   final OrderDetail orderDetail = orderDetails[index];
+                                                    // final OrderDetail orderDetail = searchText.isNotEmpty ?
+                                                    // widget.orderDetails!.where((orderDetail) => orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
+                                                    // ).length :widget.orderDetails![index];
+                                                    bool isSelected =
+                                                        orderDetail.orderId ==
+                                                            prodIdController
+                                                                .text;
+                                                    // widget.orderDetails!.sort((a, b) {
+                                                    //   if (a.orderId ==
+                                                    //       prodIdController.text) {
+                                                    //     return -1; // selected product name comes first
+                                                    //   } else if (b.orderId ==
+                                                    //       prodIdController.text) {
+                                                    //     return 1; // selected product name comes first
+                                                    //   } else {
+                                                    //     final aIsNumber = a.orderId[0]
+                                                    //         .contains(RegExp(r'[0-90]'));
+                                                    //     final bIsNumber = b.orderId[0]
+                                                    //         .contains(RegExp(r'[0-90]'));
+                                                    //
+                                                    //     if (aIsNumber && !bIsNumber) {
+                                                    //       return 1;
+                                                    //     } else if (!aIsNumber && bIsNumber) {
+                                                    //       return -1;
+                                                    //     } else {
+                                                    //       return a.orderId
+                                                    //           .compareTo(b.orderId);
+                                                    //     }
+                                                    //   }
+                                                    // });
+                                                    // widget.orderDetails!.sort((a, b) {
+                                                    //   if (a.orderId == prodIdController.text) {
+                                                    //     return -1; // selected product name comes first
+                                                    //   } else if (b.orderId == prodIdController.text) {
+                                                    //     return 1; // selected product name comes first
+                                                    //   } else {
+                                                    //     final aIsNumber = a.orderId[0].contains(RegExp(r'[0-90]'));
+                                                    //     final bIsNumber = b.orderId[0].contains(RegExp(r'[0-90]'));
+                                                    //
+                                                    //     if (aIsNumber && !bIsNumber) {
+                                                    //       return 1;
+                                                    //     } else if (!aIsNumber && bIsNumber) {
+                                                    //       return -1;
+                                                    //     } else {
+                                                    //       return a.orderId.compareTo(b.orderId);
+                                                    //     }
+                                                    //   }
+                                                    // });
+                                                    return GestureDetector(
+                                                      onTap: () async {
+                                                        setState(() {
+                                                          // _isLoading = true;
+                                                          for (int i = 0;
+                                                          i <
+                                                              _isSelected
+                                                                  .length;
+                                                          i++) {
+                                                            _isSelected[i] =
+                                                                i == index;
+                                                          }
+                                                          prodIdController
+                                                              .text =
+                                                          orderDetail
+                                                              .orderId!;
+                                                        });
+                                                        await Future.delayed(
+                                                            const Duration(
+                                                                milliseconds:
+                                                                2));
+                                                        await fetchProducts(
+                                                            orderDetail
+                                                                .orderId!);
+
+                                                        //context.go('/dasbaord/productpage/ontap');
+                                                        //                                     setState(() {
+                                                        //                                       prodIdController.text = orderDetail.orderId!;
+                                                        //                                      // productNameController.text = orderDetail.orderDate!;
+                                                        //
+                                                        //                                       print(prodIdController.text);
+                                                        //                                        //You need to set the other controllers here, but you don't have these properties in OrderDetail
+                                                        //                                        // categoryController.text = orderDetail.category;
+                                                        //                                        // subCategoryController.text = orderDetail.subCategory;
+                                                        //                                        // taxController.text = orderDetail.tax;
+                                                        //                                        // unitController.text = orderDetail.unit;
+                                                        //                                        // priceController.text = orderDetail.price.toString();
+                                                        //                                        // discountController.text = orderDetail.discount;
+                                                        //                                        // imageIdContoller.text = orderDetail.imageId;
+                                                        //                                       print('---iamde');
+                                                        //                                       // widget.dia
+                                                        //                                       _displayData['imageId'] = imageIdContoller.text;
+                                                        // // widget.displayData['imageId'] =
+                                                        // //     imageIdContoller.text;
+                                                        //                                       // widget.displayData['imageId'] =_displayData['imageId'];
+                                                        //                                       print(imageIdContoller.text);
+                                                        //                                       // fetchImage(orderDetail.imageId); // You don't have imageId in OrderDetail
+                                                        //                                     });
+                                                      },
+                                                      child: Container(
+                                                        decoration: isSelected
+                                                            ? BoxDecoration(
+                                                            color: Colors
+                                                                .lightBlue[
+                                                            100]) // selected color
+                                                            : null,
+                                                        child: ListTile(
+                                                          title: Text(
+                                                            '${orderDetail.orderDate}',
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                          ),
+                                                          subtitle: Text(
+                                                              '${orderDetail.orderCategory}'),
+                                                          // You don't have category in OrderDetail
+                                                          tileColor: isSelected
+                                                              ? Colors
+                                                              .lightBlue[100]
+                                                              : null,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  separatorBuilder:
+                                                      (BuildContext context,
+                                                      int index) {
+                                                    return const Divider();
+                                                  },
+                                                )),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 250),
+                                        child: Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          // Space above/below the border
+                                          height: constraints.maxHeight,
+                                          // width: 1500,
+                                          width: 2,
+                                          // Border height
+                                          color:
+                                          Colors.grey[300], // Border color
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 55,
+                                            bottom: 30,
+                                            right: 5,
+                                            left: 270),
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.vertical,
+                                          child: Container(
+                                            color: Colors.white,
+                                            width: 1000,
+                                            height: 800,
+                                            child: Row(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                              children: [
+                                                FutureBuilder(
+                                                  future: Future.delayed(
+                                                      const Duration(seconds: 2)),
+                                                  // 2-second buffer
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot
+                                                        .connectionState ==
+                                                        ConnectionState
+                                                            .waiting) {
+                                                      // Display the custom loading icon while waiting
+                                                      return Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(
+                                                            top: 80),
+                                                        child: Container(
+                                                          margin:
+                                                          const EdgeInsets.only(
+                                                              left: 50),
+                                                          width: 300,
+                                                          height: 300,
+                                                          decoration:
+                                                          BoxDecoration(
+                                                            color: Colors
+                                                                .grey[300],
+                                                            borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                4),
+                                                          ),
+                                                          child: Center(
+                                                              child:
+                                                              ImageLoadingIcon()), // Custom icon here
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      return storeImageBytes1 !=
+                                                          null
+                                                          ? Padding(
+                                                        padding: const EdgeInsets
+                                                            .only(
+                                                            top: 80),
+                                                        child: Container(
+                                                          margin: const EdgeInsets
+                                                              .only(
+                                                              left:
+                                                              50),
+                                                          width: 300,
+                                                          height: 300,
+                                                          decoration:
+                                                          BoxDecoration(
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .grey),
+                                                            color: Colors
+                                                                .white70,
+                                                            borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                8),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .blue
+                                                                    .withOpacity(
+                                                                    0.1),
+                                                                spreadRadius:
+                                                                1,
+                                                                blurRadius:
+                                                                3,
+                                                                offset:
+                                                                const Offset(
+                                                                    0,
+                                                                    1),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Image.memory(
+                                                              storeImageBytes1!),
+                                                        ),
+                                                      )
+                                                          : Padding(
+                                                        padding: const EdgeInsets
+                                                            .only(
+                                                            top: 80),
+                                                        child: Container(
+                                                          margin: const EdgeInsets
+                                                              .only(
+                                                              left:
+                                                              50),
+                                                          width: 300,
+                                                          height: 300,
+                                                          decoration:
+                                                          BoxDecoration(
+                                                            color: Colors
+                                                                .grey[
+                                                            300],
+                                                            borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                4),
+                                                          ),
+                                                          child: const Center(
+                                                              child: Text(
+                                                                  'No Image Found.')),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                                const SizedBox(width: 5),
+                                                Expanded(
+                                                  child: _buildFirstWidget(
+                                                      context), // Use the ProductForm widget here
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )),
                       ),
                     ],
                   ),
-                  // Row(
-                  //   //  mainAxisSize: MainAxisSize.min,
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   mainAxisAlignment: MainAxisAlignment.start,
-                  //   // mainAxisAlignment: MainAxisAlignment.start,
-                  //   children: [
-                  //     storeImageBytes1 != null
-                  //         ? Padding(
-                  //           padding:  EdgeInsets.only(top: maxHeight * 0.35),
-                  //           child: Container(
-                  //                                   margin:  EdgeInsets.only(
-                  //
-                  //           left: maxWidth * 0.35,
-                  //                                   ),
-                  //                                   //image container controller
-                  //                                   width: maxWidth * 0.2,
-                  //                                   height: 300,
-                  //                                   decoration: BoxDecoration(
-                  //           border: Border.all(color: Colors.grey),
-                  //           color: Colors.white70,
-                  //           borderRadius: BorderRadius.circular(8),
-                  //           boxShadow: [
-                  //             BoxShadow(
-                  //               color: Colors.blue.withOpacity(0.1), // Soft grey shadow
-                  //               spreadRadius: 1,
-                  //               blurRadius: 3,
-                  //               offset: const Offset(0, 1),
-                  //             ),
-                  //           ],
-                  //                                   ),
-                  //                                   child: Image.memory(storeImageBytes1!),
-                  //                                 ),
-                  //         )
-                  //         : Padding(
-                  //       padding:  EdgeInsets.only(top: maxHeight * 0.35),
-                  //           child: Container(
-                  //                                   margin:  EdgeInsets.only(
-                  //           left: maxWidth * 0.45,
-                  //                                   ),
-                  //                                   //image container controller
-                  //                                   width: maxWidth * 0.2,
-                  //                                   height: 300,
-                  //                                   decoration: BoxDecoration(
-                  //           color: Colors.grey[300],
-                  //           borderRadius: BorderRadius.circular(4),
-                  //                                   ),
-                  //                                   child: const Text('No Image Found.'),
-                  //                                 ),
-                  //         ),
-                  //     const SizedBox(width: 16),
-                  //     Expanded(
-                  //       child: _buildFirstWidget(
-                  //           context), // Use the ProductForm widget here
-                  //     ),
-                  //   ],
-                  // ),
+                )
+              }
 
-                ],
-              );
-            }
-        ),
+
+
+
+
+
+            ],
+          );
+
+
+
+
+          /// For web view
+        }),
       ),
     );
   }
+
+
+  Widget _buildFirstWidget2(context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      double maxHeight = constraints.maxHeight;
+      double maxWidth = constraints.maxWidth;
+      // For larger screens (like web view)
+      return Padding(
+        padding: const EdgeInsets.only(
+          left: 50,
+          top: 30,
+          right: 80,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text(
+                    'Product  Name',
+                    style: TextStyle(
+                      color: Colors.blue[900],
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(2),
+                      border: Border.all(color: Colors.blue[100]!),
+                    ),
+                    child: TextFormField(
+                      controller: productNameController,
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        enabled: isEditing,
+                        contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 10),
+                        border: InputBorder.none,
+                        filled: true,
+                        // hintText: 'Enter product Name',
+                        errorText: errorMessage,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp("[a-zA-Z0-9 ]")),
+                        // Allow only letters, numbers, and single space
+                        FilteringTextInputFormatter.deny(RegExp(r'^\s')),
+                        // Disallow starting with a space
+                        FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
+                        // Disallow multiple spaces
+                      ],
+                      validator: (value) {
+                        if (value != null && value.trim().isEmpty) {
+                          return 'Please enter a product name';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Category',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: categoryController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter Category',
+                              contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Sub Category',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: subCategoryController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter Sub Category',
+                              contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Tax',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: taxController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter tax',
+                              contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Unit',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: unitController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter Unit',
+                              contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Price ',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: priceController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(
+                                  10), // limits to 10 digits
+                            ],
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter Price',
+                              contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                            onChanged: (value) {
+                              if (value.isNotEmpty && !isNumeric(value)) {
+                                setState(() {
+                                  errorMessage = 'Please enter numbers only';
+                                });
+                              } else {
+                                setState(() {
+                                  errorMessage = null;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Discount',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: discountController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(
+                                  10), // limits to 10 digits
+                            ],
+                            decoration: InputDecoration(
+                              filled: true,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              // fillColor: isEditing
+                              //     ? Colors.white
+                              //     : Colors.grey[100],
+                              fillColor: Colors.white,
+                              hintText: 'Enter Discount',
+                              contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                            onChanged: (value) {
+                              if (value.isNotEmpty && !isNumeric(value)) {
+                                setState(() {
+                                  errorMessage = 'Please enter numbers only';
+                                });
+                              } else {
+                                setState(() {
+                                  errorMessage = null;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+
+
 
   final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -1318,8 +2512,7 @@ class _ProductForm1State extends State<ProductForm1> {
       "discount": discountController.text,
     };
 
-    final productUrl =
-        '$apicall/productmaster/update_productmaster';
+    final productUrl = '$apicall/productmaster/update_productmaster';
 
     final productResponse = await http.put(
       Uri.parse(productUrl),
@@ -1352,7 +2545,14 @@ class _ProductForm1State extends State<ProductForm1> {
           price: int.parse(priceController.text),
           discount: discountController.text,
           imageId: imageIdContoller.text,
-          prodId: '', selectedUOM: '', selectedVariation: '', quantity: 0,total: 0,totalamount: 0, totalAmount: 0.0, qty: 0,
+          prodId: '',
+          selectedUOM: '',
+          selectedVariation: '',
+          quantity: 0,
+          total: 0,
+          totalamount: 0,
+          totalAmount: 0.0,
+          qty: 0,
         );
 
         // Add the selected product to the list
@@ -1369,396 +2569,373 @@ class _ProductForm1State extends State<ProductForm1> {
 
   @override
   Widget _buildFirstWidget(BuildContext context) {
-    return
-        LayoutBuilder(
-            builder: (context, constraints) {
-              double maxHeight = constraints.maxHeight;
-              double maxWidth = constraints.maxWidth;
-              // For larger screens (like web view)
-              return Padding(
-                padding:  EdgeInsets.only(
-                  left: 50,
-                  top: maxHeight * 0.27,
-                  right: 125,
+    return LayoutBuilder(builder: (context, constraints) {
+      double maxHeight = constraints.maxHeight;
+      double maxWidth = constraints.maxWidth;
+      // For larger screens (like web view)
+      return Padding(
+        padding: const EdgeInsets.only(
+          left: 50,
+          top: 10,
+          right: 125,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text(
+                    'Product  Name',
+                    style: TextStyle(
+                      color: Colors.blue[900],
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Text(
-                            'Product  Name',
-                            style: TextStyle(
-                              color: Colors.blue[900],
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(2),
-                              border: Border.all(color: Colors.blue[100]!),
-                            ),
-                            child: TextFormField(
-                              controller: productNameController,
-                              decoration: InputDecoration(
-                                fillColor: Colors.white,
-                                enabled: isEditing,
-                                contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 10),
-                                border: InputBorder.none,
-                                filled: true,
-                                // hintText: 'Enter product Name',
-                                errorText: errorMessage,
-                              ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp("[a-zA-Z0-9 ]")),
-                                // Allow only letters, numbers, and single space
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'^\s')),
-                                // Disallow starting with a space
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'\s\s')),
-                                // Disallow multiple spaces
-                              ],
-                              validator: (value) {
-                                if (value != null && value.trim().isEmpty) {
-                                  return 'Please enter a product name';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
+                const SizedBox(height: 2),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(2),
+                      border: Border.all(color: Colors.blue[100]!),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Text(
-                                  'Category',
-                                  style: TextStyle(
-                                    color: Colors.blue[900],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(2),
-                                    border:
-                                    Border.all(color: Colors.blue[100]!),
-                                  ),
-                                  child: TextFormField(
-                                    controller: categoryController,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      enabled: isEditing,
-                                      border: InputBorder.none,
-                                      hintText: 'Enter Category',
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Text(
-                                  'Sub Category',
-                                  style: TextStyle(
-                                    color: Colors.blue[900],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(2),
-                                    border:
-                                    Border.all(color: Colors.blue[100]!),
-                                  ),
-                                  child: TextFormField(
-                                    controller: subCategoryController,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      enabled: isEditing,
-                                      border: InputBorder.none,
-                                      hintText: 'Enter Sub Category',
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                    child: TextFormField(
+                      controller: productNameController,
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        enabled: isEditing,
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 10),
+                        border: InputBorder.none,
+                        filled: true,
+                        // hintText: 'Enter product Name',
+                        errorText: errorMessage,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp("[a-zA-Z0-9 ]")),
+                        // Allow only letters, numbers, and single space
+                        FilteringTextInputFormatter.deny(RegExp(r'^\s')),
+                        // Disallow starting with a space
+                        FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
+                        // Disallow multiple spaces
                       ],
+                      validator: (value) {
+                        if (value != null && value.trim().isEmpty) {
+                          return 'Please enter a product name';
+                        }
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Text(
-                                  'Tax',
-                                  style: TextStyle(
-                                    color: Colors.blue[900],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(2),
-                                    border:
-                                    Border.all(color: Colors.blue[100]!),
-                                  ),
-                                  child: TextFormField(
-                                    controller: taxController,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      enabled: isEditing,
-                                      border: InputBorder.none,
-                                      hintText: 'Enter tax',
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Text(
-                                  'Unit',
-                                  style: TextStyle(
-                                    color: Colors.blue[900],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(2),
-                                    border:
-                                    Border.all(color: Colors.blue[100]!),
-                                  ),
-                                  child: TextFormField(
-                                    controller: unitController,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      enabled: isEditing,
-                                      border: InputBorder.none,
-                                      hintText: 'Enter Unit',
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Text(
-                                  'Price ',
-                                  style: TextStyle(
-                                    color: Colors.blue[900],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(2),
-                                    border:
-                                    Border.all(color: Colors.blue[100]!),
-                                  ),
-                                  child: TextFormField(
-                                    controller: priceController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      LengthLimitingTextInputFormatter(
-                                          10), // limits to 10 digits
-                                    ],
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      enabled: isEditing,
-                                      border: InputBorder.none,
-                                      hintText: 'Enter Price',
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                    ),
-                                    onChanged: (value) {
-                                      if (value.isNotEmpty &&
-                                          !isNumeric(value)) {
-                                        setState(() {
-                                          errorMessage =
-                                          'Please enter numbers only';
-                                        });
-                                      } else {
-                                        setState(() {
-                                          errorMessage = null;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Text(
-                                  'Discount',
-                                  style: TextStyle(
-                                    color: Colors.blue[900],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(2),
-                                    border:
-                                    Border.all(color: Colors.blue[100]!),
-                                  ),
-                                  child: TextFormField(
-                                    controller: discountController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      LengthLimitingTextInputFormatter(
-                                          10), // limits to 10 digits
-                                    ],
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      enabled: isEditing,
-                                      border: InputBorder.none,
-                                      // fillColor: isEditing
-                                      //     ? Colors.white
-                                      //     : Colors.grey[100],
-                                      fillColor: Colors.white,
-                                      hintText: 'Enter Discount',
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                    ),
-                                    onChanged: (value) {
-                                      if (value.isNotEmpty &&
-                                          !isNumeric(value)) {
-                                        setState(() {
-                                          errorMessage =
-                                          'Please enter numbers only';
-                                        });
-                                      } else {
-                                        setState(() {
-                                          errorMessage = null;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-              );
-            }
-        );
-
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Category',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: categoryController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter Category',
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Sub Category',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: subCategoryController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter Sub Category',
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Tax',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: taxController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter tax',
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Unit',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: unitController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter Unit',
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Price ',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: priceController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(
+                                  10), // limits to 10 digits
+                            ],
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              hintText: 'Enter Price',
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                            onChanged: (value) {
+                              if (value.isNotEmpty && !isNumeric(value)) {
+                                setState(() {
+                                  errorMessage = 'Please enter numbers only';
+                                });
+                              } else {
+                                setState(() {
+                                  errorMessage = null;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          'Discount',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: Colors.blue[100]!),
+                          ),
+                          child: TextFormField(
+                            controller: discountController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(
+                                  10), // limits to 10 digits
+                            ],
+                            decoration: InputDecoration(
+                              filled: true,
+                              enabled: isEditing,
+                              border: InputBorder.none,
+                              // fillColor: isEditing
+                              //     ? Colors.white
+                              //     : Colors.grey[100],
+                              fillColor: Colors.white,
+                              hintText: 'Enter Discount',
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                            onChanged: (value) {
+                              if (value.isNotEmpty && !isNumeric(value)) {
+                                setState(() {
+                                  errorMessage = 'Please enter numbers only';
+                                });
+                              } else {
+                                setState(() {
+                                  errorMessage = null;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
   }
-
 
   bool isNumeric(String value) {
     return double.tryParse(value) != null;
@@ -1774,8 +2951,4 @@ class _ProductForm1State extends State<ProductForm1> {
       print('Error loading image: $e');
     }
   }
-
-
-
 }
-

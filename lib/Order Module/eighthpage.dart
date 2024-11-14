@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 import 'dart:typed_data';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/pdf/delivery%20note%20pdf.dart';
 import 'package:btb/widgets/confirmdialog.dart';
@@ -59,6 +60,7 @@ class _EighthPageState extends State<EighthPage> {
   final TextEditingController PaidAmount = TextEditingController();
   late TextEditingController PaymentModeController = TextEditingController();
   late TextEditingController PaymentDate = TextEditingController();
+  final ScrollController horizontalScroll = ScrollController();
   final TextEditingController totalController = TextEditingController();
   final TextEditingController productNameController = TextEditingController();
   final TextEditingController categoryController = TextEditingController();
@@ -567,19 +569,31 @@ class _EighthPageState extends State<EighthPage> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Home', Icons.dashboard, Colors.blue[900]!, '/Home'),
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
       _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blueAccent, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Invoice'),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[800]  ,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8), // Radius for top-left corner
+              topRight: Radius.circular(8), // No radius for top-right corner
+              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+            ),
+          ),child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.white, '/Order_List')),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
       _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart, Colors.blue[900]!, '/Report_List'),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
+      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Orders'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Orders'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -589,25 +603,28 @@ class _EighthPageState extends State<EighthPage> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -748,760 +765,1538 @@ class _EighthPageState extends State<EighthPage> {
             builder: (context, constraints){
               double maxHeight = constraints.maxHeight;
               double maxWidth = constraints.maxWidth;
-              return Row(
-                children: [
-                  Align(
-                    // Added Align widget for the left side menu
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                      height: 984,
-                      width: 200,
-                      color: const Color(0xFFF7F6FA),
-                      padding: const EdgeInsets.only(left: 20, top: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildMenuItems(context),
+
+              if(constraints.maxWidth >= 1366){
+                return Row(
+                  children: [
+                    Align(
+                      // Added Align widget for the left side menu
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        height: 984,
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 1), // Space above/below the border
-                    height: 984,
-                    // width: 1500,
-                    width:0.5,// Border height
-                    color: Colors.black, // Border color
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(
-                      //  top: 56,
-                      left: 1,
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 1), // Space above/below the border
+                      height: 984,
+                      // width: 1500,
+                      width:0.5,// Border height
+                      color: Colors.black, // Border color
                     ),
-                    width: 298,
-                    height: 933,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFFFF),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 5),
-                                child: IconButton(
-                                  icon:
-                                  const Icon(Icons.arrow_back), // Back button icon
-                                  onPressed: () {
-                                    context.go('/Order_List');
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //       builder: (context) =>
-                                    //       const Orderspage()),
-                                    // );
+                    Container(
+                      margin: const EdgeInsets.only(
+                        //  top: 56,
+                        left: 1,
+                      ),
+                      width: 298,
+                      height: 933,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFFFF),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 5),
+                                  child: IconButton(
+                                    icon:
+                                    const Icon(Icons.arrow_back), // Back button icon
+                                    onPressed: () {
+                                      context.go('/Order_List');
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) =>
+                                      //       const Orderspage()),
+                                      // );
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 15,top: 10),
+                                  child: Text(
+                                    'Order List',
+                                    style: TextStyle(
+                                      fontSize: 19,
+                                      //  fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // Divider(),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 0, left: 0),
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 5), // Space above/below the border
+                                height: 0.5,
+                                // width: 1500,
+                                width: constraints.maxWidth,// Border height
+                                color: Colors.black, // Border color
+                              ),
+                            ),
+                            SizedBox(
+                              height: 50,
+                              width: 60,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 15, right: 15, bottom: 5,top: 10 ),
+                                child: TextFormField(
+                                  controller: _orderIdController, // Assign the controller to the TextFormField
+                                  decoration: const InputDecoration(
+                                    // labelText: 'Order ID',
+                                    hintText: 'Search Order',
+                                    contentPadding: EdgeInsets.all(8),
+                                    border: OutlineInputBorder(),
+                                    prefixIcon: Icon(Icons.search_outlined),
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _searchText = value.toLowerCase();
+                                    });
                                   },
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(left: 15,top: 10),
-                                child: Text(
-                                  'Order List',
-                                  style: TextStyle(
-                                    fontSize: 19,
-                                    //  fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Divider(),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 0, left: 0),
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 5), // Space above/below the border
-                              height: 0.5,
-                              // width: 1500,
-                              width: constraints.maxWidth,// Border height
-                              color: Colors.black, // Border color
                             ),
-                          ),
-                          SizedBox(
-                            height: 50,
-                            width: 60,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 15, right: 15, bottom: 5,top: 10 ),
-                              child: TextFormField(
-                                controller: _orderIdController, // Assign the controller to the TextFormField
-                                decoration: const InputDecoration(
-                                  // labelText: 'Order ID',
-                                  hintText: 'Search Order',
-                                  contentPadding: EdgeInsets.all(8),
-                                  border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.search_outlined),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _searchText = value.toLowerCase();
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          //const SizedBox(height: 2),
-                          Expanded(child: SingleChildScrollView(child: Column(children: [
-                            _loading
-                                ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
-                                : _errorMessage.isNotEmpty
-                                ? Center(child: Text(_errorMessage))
-                                : widget.orderDetails!.isEmpty
-                                ? const Center(child: Text('No product found'))
-                                : ListView.separated(
-                              shrinkWrap: true,
-                              itemCount: _searchText.isNotEmpty
-                                  ? widget.orderDetails!.where((orderDetail) =>
-                              orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                                  orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                              ).length
-                                  : widget.orderDetails!.length,
-                              itemBuilder: (context, index) {
-                                final filteredOrderDetails = _searchText.isNotEmpty
+                            //const SizedBox(height: 2),
+                            Expanded(child: SingleChildScrollView(child: Column(children: [
+                              _loading
+                                  ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
+                                  : _errorMessage.isNotEmpty
+                                  ? Center(child: Text(_errorMessage))
+                                  : widget.orderDetails!.isEmpty
+                                  ? const Center(child: Text('No product found'))
+                                  : ListView.separated(
+                                shrinkWrap: true,
+                                itemCount: _searchText.isNotEmpty
                                     ? widget.orderDetails!.where((orderDetail) =>
                                 orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
                                     orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                                ).toList()
-                                    : widget.orderDetails!;
+                                ).length
+                                    : widget.orderDetails!.length,
+                                itemBuilder: (context, index) {
+                                  final filteredOrderDetails = _searchText.isNotEmpty
+                                      ? widget.orderDetails!.where((orderDetail) =>
+                                  orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                      orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                  ).toList()
+                                      : widget.orderDetails!;
 
-                                final orderDetail = filteredOrderDetails[index];
+                                  final orderDetail = filteredOrderDetails[index];
 
-                                final isSelectedIndex = _searchText.isNotEmpty
-                                    ? filteredOrderDetails.indexOf(orderDetail)
-                                    : index;
+                                  final isSelectedIndex = _searchText.isNotEmpty
+                                      ? filteredOrderDetails.indexOf(orderDetail)
+                                      : index;
 
-                                return GestureDetector(
-                                  onTap: () async {
-                                    _timer = Timer(Duration(seconds: 1), () {
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      _timer = Timer(Duration(seconds: 1), () {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                      });
                                       setState(() {
                                         _isLoading = false;
+                                        for (int i = 0; i < _isSelected.length; i++) {
+                                          _isSelected[i] = i == isSelectedIndex;
+                                        }
+                                        orderIdController.text = orderDetail.orderId;
                                       });
-                                    });
-                                    setState(() {
-                                      _isLoading = false;
-                                      for (int i = 0; i < _isSelected.length; i++) {
-                                        _isSelected[i] = i == isSelectedIndex;
-                                      }
-                                      orderIdController.text = orderDetail.orderId;
-                                    });
-                                    await _fetchOrderDetails1(orderDetail.orderId);
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    decoration: BoxDecoration(
-                                      color: _isSelected[isSelectedIndex] ? Colors.lightBlue[100] : Colors.white,
+                                      await _fetchOrderDetails1(orderDetail.orderId);
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      decoration: BoxDecoration(
+                                        color: _isSelected[isSelectedIndex] ? Colors.lightBlue[100] : Colors.white,
+                                      ),
+                                      child: ListTile(
+                                        title: Text('Order ID: ${orderDetail?.orderId}'),
+                                        subtitle: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Order Date: ${orderDetail?.orderDate}'),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                    child: ListTile(
-                                      title: Text('Order ID: ${orderDetail?.orderId}'),
-                                      subtitle: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                  );
+                                },
+                                separatorBuilder: (context, index) {
+                                  return const Divider();
+                                },
+                              )
+                              // _loading
+                              //     ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
+                              //     : _errorMessage.isNotEmpty
+                              //     ? Center(child: Text(_errorMessage))
+                              //     : widget.orderDetails!.isEmpty
+                              //     ? const Center(child: Text('No product found'))
+                              //     : ListView.separated(
+                              //   shrinkWrap: true,
+                              //   itemCount: _searchText.isNotEmpty
+                              //       ? widget.orderDetails!.where((orderDetail) =>
+                              //   orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                              //       orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                              //   ).length
+                              //       : widget.orderDetails!.length,
+                              //   itemBuilder: (context, index) {
+                              //     final isSelected = _isSelected[index];
+                              //     final orderDetail = _searchText.isNotEmpty
+                              //         ? widget.orderDetails!.where((orderDetail) =>
+                              //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                              //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                              //     ).toList().isEmpty ? null : widget.orderDetails!.where((orderDetail) =>
+                              //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                              //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                              //     ).elementAt(index)
+                              //         : widget.orderDetails![index];
+                              //
+                              //
+                              //     return GestureDetector(
+                              //       onTap: ()  {
+                              //
+                              //         _timer = Timer(Duration(seconds: 1), () {
+                              //           setState(() {
+                              //             _isLoading = false;
+                              //           });
+                              //         });
+                              //         setState(() {
+                              //           _isLoading = false;
+                              //           for (int i = 0; i < _isSelected.length; i++) {
+                              //             _isSelected[i] = i == index;
+                              //           }
+                              //           orderIdController.text = orderDetail.orderId;
+                              //         });
+                              //       },
+                              //       child: AnimatedContainer(
+                              //         duration: const Duration(milliseconds: 200),
+                              //         decoration: BoxDecoration(
+                              //           color: isSelected ? Colors.lightBlue[100] : Colors.white,
+                              //         ),
+                              //         child: ListTile(
+                              //           title: Text('Order ID: ${orderDetail?.orderId}'),
+                              //           subtitle: Column(
+                              //             crossAxisAlignment: CrossAxisAlignment.start,
+                              //             children: [
+                              //               Text('Order Date: ${orderDetail?.orderDate}'),
+                              //             ],
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     );
+                              //   },
+                              //   separatorBuilder: (context, index) {
+                              //     return const Divider();
+                              //   },
+                              // )
+                            ],),))
+
+                          ],
+                        ),
+                      ),
+
+                    ),
+                    Expanded(child: SingleChildScrollView(child: Stack(children: [
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 0,
+                            left: 0,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            color: Colors.white,
+                            height: 50,
+                            child: Row(
+                              children: [
+
+                                // Padding(
+                                //   padding: const EdgeInsets.only(left: 80),
+                                //   child: IconButton(
+                                //     icon: Icon(Icons.arrow_circle_left_rounded,color: Colors.blue,),
+                                //     tooltip: 'Go Back', onPressed: () {  },
+                                //   ),
+                                // ),
+                                // Text('Go back')
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      Container(
+                        width: 0.8, // Set the width to 1 for a vertical line
+                        height: 984, // Set the height to your liking
+                        decoration: BoxDecoration(
+                          border: Border(left: BorderSide(width: 1, color: Colors.black54)),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 40, left: 0),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 10), // Space above/below the border
+                          height: 0.5,
+                          // width: 1500,
+                          width: constraints.maxWidth,// Border height
+                          color: Colors.black, // Border color
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(left: 80, top: 100,right: 60),
+                        child: Container(
+                          height: 100,
+                          width: maxWidth,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child:  Padding(
+                            padding: EdgeInsets.only(top: 30),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.check_box,
+                                        color: Colors.green,
+                                      ),
+                                      Text(
+                                        'Order',
+                                        style: TextStyle(
+                                            color: Colors.black,fontWeight: FontWeight.bold
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.check_box,
+                                        color: Colors.green,
+                                      ),
+                                      Text(
+                                        'Invoice',
+                                        style: TextStyle(
+                                            color: Colors.black,fontWeight: FontWeight.bold
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.check_box,
+                                        color: deliveryStatusController.text == 'Not Started'
+                                            ? Colors.grey
+                                            :deliveryStatusController.text == 'Delivered'
+                                            ? Colors.green
+                                            : Colors.grey, // default color
+                                      ),
+                                      Text(
+                                        deliveryStatusController.text == 'In Progress' ? '    Delivery\n(In Progress)' : 'Delivered',
+                                        style: TextStyle(
+                                          color: deliveryStatusController.text == 'Not Started'
+                                              ? Colors.grey
+                                              : deliveryStatusController.text == 'In Progress'
+                                              ? Colors.grey
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.check_box,
+                                        color:  paymentStatusController.text == 'partial payment' || paymentStatusController.text=='cleared'? Colors.green: Colors.grey,
+                                      ),
+                                      Text(
+                                        'Payments',
+                                        style: TextStyle(
+                                          color: paymentStatusController.text == 'partial payment' || paymentStatusController.text=='cleared'? Colors.black: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 80, top: 270,right: 60),
+                        child: Container(
+                          height: 115,
+                          width: constraints.maxWidth * 0.7,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 2,bottom: 3),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 30),
+                                      child: Text('Order',style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Spacer(),
+                                    Text('Available for Download'),
+                                    SizedBox(width: 5,),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child: IconButton(
+                                        onPressed: (){
+                                          downloadPdf();
+                                        },
+                                        color: Colors.green, icon: Icon(Icons.download_for_offline),),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                height: 1, // 1 pixel height
+                                width: double.infinity, // match parent width
+                                color: Colors.grey, // adjust the color to your liking
+                              ),
+                              const SizedBox(height: 20,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child:Column(
+                                      children: [
+                                        Text('ORDER ID'),
+                                        Text('${orderIdController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Date'),
+                                        Text('${CreatedDateController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Contact No'),
+                                        Text('${ContactNoController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Location'),
+                                        Text('${deliveryLocationController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 80, top: 780,right: 60),
+                        child: Container(
+                          height: 115,
+                          width: constraints.maxWidth * 0.7,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 2,bottom: 3),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 30),
+                                      child: Text('Payment',style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Spacer(),
+                                    Text('Available for Download'),
+                                    SizedBox(width: 5,),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child:
+                                      IconButton(
+                                        onPressed:(){
+                                          print(PaymentIdController.text);
+                                          paymentStatusController.text == 'cleared' || paymentStatusController.text == 'partial payment'
+                                              ? downloadPaymentReceipt(orderIdController.text)
+                                              : null;
+                                        },
+                                        color: paymentStatusController.text == '-'
+                                            ? Colors.grey
+                                            :  paymentStatusController.text == 'cleared' || paymentStatusController.text == 'partial payment'
+                                            ? Colors.green
+                                            : Colors.grey,
+                                        icon: Icon(Icons.download_for_offline),
+                                        // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Container(
+                                height: 1, // 1 pixel height
+                                width: double.infinity, // match parent width
+                                color: Colors.grey, // adjust the color to your liking
+                              ),
+                              const SizedBox(height: 20,),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child:Column(
+                                      children: [
+                                        Text('Payment ID'),
+                                        Text('${PaymentIdController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Date'),
+                                        Text('${PaymentDate.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Payment Mode'),
+                                        Text('${PaymentModeController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Status'),
+                                        Text('${paymentStatusController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+
+                        padding: const EdgeInsets.only(left: 80, top: 440,right: 60),
+                        child: Container(
+                          height: 115,
+                          width: constraints.maxWidth * 0.7,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 2,bottom: 3),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 30),
+                                      child: Text('Invoice',style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Spacer(),
+                                    Text('Available for Download'),
+                                    SizedBox(width: 5,),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child:IconButton(
+                                        onPressed: (){
+                                          downloadInvoicePdf();
+                                        },
+                                        color: Colors.green, icon: Icon(Icons.download_for_offline),),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Container(
+                                height: 1, // 1 pixel height
+                                width: double.infinity, // match parent width
+                                color: Colors.grey, // adjust the color to your liking
+                              ),
+                              const SizedBox(height: 20,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child:Column(
+                                      children: [
+                                        Text('INV_NO'),
+                                        Text('${InvNoController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Date'),
+                                        Text('${CreatedDateController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Location'),
+                                        Text('${deliveryLocationController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Gross Amount'),
+                                        Text('${totalAmountController.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 80, top: 610,right: 60),
+                        child: Container(
+                          height: 115,
+                          width: constraints.maxWidth * 0.7,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding:const EdgeInsets.only(top: 2,bottom: 3),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 30),
+                                      child: Text('Delivery',style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Spacer(),
+                                    Text('Available for Download'),
+                                    SizedBox(width: 5,),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child: IconButton(
+                                        onPressed:(){
+                                          deliveryStatusController.text == 'Delivered'
+                                              ? downloadDeliverypdf()
+                                              : null;
+                                        },
+                                        color: deliveryStatusController.text == 'Not Started'
+                                            ? Colors.grey
+                                            :  deliveryStatusController.text == 'Delivered'
+                                            ? Colors.green
+                                            : Colors.grey,
+                                        icon: Icon(Icons.download_for_offline),
+                                        // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Container(
+                                height: 1, // 1 pixel height
+                                width: double.infinity, // match parent width
+                                color: Colors.grey, // adjust the color to your liking
+                              ),
+                              const SizedBox(height: 20,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child:Column(
+                                      children: [
+                                        Text('Delivery ID'),
+                                        Text('${DeliveryId.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Delivery Date'),
+                                        Text('${Deliverydate.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Delivery Location'),
+                                        Text('${DeliveryAddress.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Delivery Status'),
+                                        Text('${DeliveryStatus.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],),))
+                  ],
+                );
+              }else{
+                return Stack(
+                  children: [
+                    Align(
+                      // Added Align widget for the left side menu
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        height: 984,
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(left: 200),
+                      child: AdaptiveScrollbar(
+                          position: ScrollbarPosition.bottom,
+                        controller: horizontalScroll,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          controller: horizontalScroll,
+                          child: Container(
+                            width: 1250,
+                            height: 984,
+                            child: Row(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 1), // Space above/below the border
+                                  height: 984,
+                                  // width: 1500,
+                                  width:0.5,// Border height
+                                  color: Colors.black, // Border color
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                    //  top: 56,
+                                    left: 1,
+                                  ),
+                                  width: 298,
+                                  height: 933,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFFFFF),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Form(
+                                    key: _formKey,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 5),
+                                              child: IconButton(
+                                                icon:
+                                                const Icon(Icons.arrow_back), // Back button icon
+                                                onPressed: () {
+                                                  context.go('/Order_List');
+                                                  // Navigator.push(
+                                                  //   context,
+                                                  //   MaterialPageRoute(
+                                                  //       builder: (context) =>
+                                                  //       const Orderspage()),
+                                                  // );
+                                                },
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: 15,top: 10),
+                                              child: Text(
+                                                'Order List',
+                                                style: TextStyle(
+                                                  fontSize: 19,
+                                                  //  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        // Divider(),
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 0, left: 0),
+                                          child: Container(
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 5), // Space above/below the border
+                                            height: 0.5,
+                                            // width: 1500,
+                                            width: constraints.maxWidth,// Border height
+                                            color: Colors.black, // Border color
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 50,
+                                          width: 60,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 15, right: 15, bottom: 5,top: 10 ),
+                                            child: TextFormField(
+                                              controller: _orderIdController, // Assign the controller to the TextFormField
+                                              decoration: const InputDecoration(
+                                                // labelText: 'Order ID',
+                                                hintText: 'Search Order',
+                                                contentPadding: EdgeInsets.all(8),
+                                                border: OutlineInputBorder(),
+                                                prefixIcon: Icon(Icons.search_outlined),
+                                              ),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _searchText = value.toLowerCase();
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        //const SizedBox(height: 2),
+                                        Expanded(child: SingleChildScrollView(child: Column(children: [
+                                          _loading
+                                              ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
+                                              : _errorMessage.isNotEmpty
+                                              ? Center(child: Text(_errorMessage))
+                                              : widget.orderDetails!.isEmpty
+                                              ? const Center(child: Text('No product found'))
+                                              : ListView.separated(
+                                            shrinkWrap: true,
+                                            itemCount: _searchText.isNotEmpty
+                                                ? widget.orderDetails!.where((orderDetail) =>
+                                            orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                                orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                            ).length
+                                                : widget.orderDetails!.length,
+                                            itemBuilder: (context, index) {
+                                              final filteredOrderDetails = _searchText.isNotEmpty
+                                                  ? widget.orderDetails!.where((orderDetail) =>
+                                              orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                                  orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                              ).toList()
+                                                  : widget.orderDetails!;
+
+                                              final orderDetail = filteredOrderDetails[index];
+
+                                              final isSelectedIndex = _searchText.isNotEmpty
+                                                  ? filteredOrderDetails.indexOf(orderDetail)
+                                                  : index;
+
+                                              return GestureDetector(
+                                                onTap: () async {
+                                                  _timer = Timer(Duration(seconds: 1), () {
+                                                    setState(() {
+                                                      _isLoading = false;
+                                                    });
+                                                  });
+                                                  setState(() {
+                                                    _isLoading = false;
+                                                    for (int i = 0; i < _isSelected.length; i++) {
+                                                      _isSelected[i] = i == isSelectedIndex;
+                                                    }
+                                                    orderIdController.text = orderDetail.orderId;
+                                                  });
+                                                  await _fetchOrderDetails1(orderDetail.orderId);
+                                                },
+                                                child: AnimatedContainer(
+                                                  duration: const Duration(milliseconds: 200),
+                                                  decoration: BoxDecoration(
+                                                    color: _isSelected[isSelectedIndex] ? Colors.lightBlue[100] : Colors.white,
+                                                  ),
+                                                  child: ListTile(
+                                                    title: Text('Order ID: ${orderDetail?.orderId}'),
+                                                    subtitle: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text('Order Date: ${orderDetail?.orderDate}'),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            separatorBuilder: (context, index) {
+                                              return const Divider();
+                                            },
+                                          )
+                                          // _loading
+                                          //     ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
+                                          //     : _errorMessage.isNotEmpty
+                                          //     ? Center(child: Text(_errorMessage))
+                                          //     : widget.orderDetails!.isEmpty
+                                          //     ? const Center(child: Text('No product found'))
+                                          //     : ListView.separated(
+                                          //   shrinkWrap: true,
+                                          //   itemCount: _searchText.isNotEmpty
+                                          //       ? widget.orderDetails!.where((orderDetail) =>
+                                          //   orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                          //       orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                          //   ).length
+                                          //       : widget.orderDetails!.length,
+                                          //   itemBuilder: (context, index) {
+                                          //     final isSelected = _isSelected[index];
+                                          //     final orderDetail = _searchText.isNotEmpty
+                                          //         ? widget.orderDetails!.where((orderDetail) =>
+                                          //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                          //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                          //     ).toList().isEmpty ? null : widget.orderDetails!.where((orderDetail) =>
+                                          //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                          //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                          //     ).elementAt(index)
+                                          //         : widget.orderDetails![index];
+                                          //
+                                          //
+                                          //     return GestureDetector(
+                                          //       onTap: ()  {
+                                          //
+                                          //         _timer = Timer(Duration(seconds: 1), () {
+                                          //           setState(() {
+                                          //             _isLoading = false;
+                                          //           });
+                                          //         });
+                                          //         setState(() {
+                                          //           _isLoading = false;
+                                          //           for (int i = 0; i < _isSelected.length; i++) {
+                                          //             _isSelected[i] = i == index;
+                                          //           }
+                                          //           orderIdController.text = orderDetail.orderId;
+                                          //         });
+                                          //       },
+                                          //       child: AnimatedContainer(
+                                          //         duration: const Duration(milliseconds: 200),
+                                          //         decoration: BoxDecoration(
+                                          //           color: isSelected ? Colors.lightBlue[100] : Colors.white,
+                                          //         ),
+                                          //         child: ListTile(
+                                          //           title: Text('Order ID: ${orderDetail?.orderId}'),
+                                          //           subtitle: Column(
+                                          //             crossAxisAlignment: CrossAxisAlignment.start,
+                                          //             children: [
+                                          //               Text('Order Date: ${orderDetail?.orderDate}'),
+                                          //             ],
+                                          //           ),
+                                          //         ),
+                                          //       ),
+                                          //     );
+                                          //   },
+                                          //   separatorBuilder: (context, index) {
+                                          //     return const Divider();
+                                          //   },
+                                          // )
+                                        ],),))
+
+                                      ],
+                                    ),
+                                  ),
+
+                                ),
+                                Expanded(child: SingleChildScrollView(child: Stack(children: [
+                                  Positioned(
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 0,
+                                        left: 0,
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        color: Colors.white,
+                                        height: 50,
+                                        child: Row(
+                                          children: [
+
+                                            // Padding(
+                                            //   padding: const EdgeInsets.only(left: 80),
+                                            //   child: IconButton(
+                                            //     icon: Icon(Icons.arrow_circle_left_rounded,color: Colors.blue,),
+                                            //     tooltip: 'Go Back', onPressed: () {  },
+                                            //   ),
+                                            // ),
+                                            // Text('Go back')
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  Container(
+                                    width: 0.8, // Set the width to 1 for a vertical line
+                                    height: 984, // Set the height to your liking
+                                    decoration: BoxDecoration(
+                                      border: Border(left: BorderSide(width: 1, color: Colors.black54)),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 40, left: 0),
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10), // Space above/below the border
+                                      height: 0.5,
+                                      // width: 1500,
+                                      width: 1500,// Border height
+                                      color: Colors.black, // Border color
+                                    ),
+                                  ),
+
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 80, top: 100,right: 60),
+                                    child: Container(
+                                      height: 100,
+                                      width: maxWidth,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child:  Padding(
+                                        padding: EdgeInsets.only(top: 30),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Expanded(
+                                              flex: 1,
+                                              child: Column(
+                                                children: [
+                                                  Icon(
+                                                    Icons.check_box,
+                                                    color: Colors.green,
+                                                  ),
+                                                  Text(
+                                                    'Order',
+                                                    style: TextStyle(
+                                                        color: Colors.black,fontWeight: FontWeight.bold
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Column(
+                                                children: [
+                                                  Icon(
+                                                    Icons.check_box,
+                                                    color: Colors.green,
+                                                  ),
+                                                  Text(
+                                                    'Invoice',
+                                                    style: TextStyle(
+                                                        color: Colors.black,fontWeight: FontWeight.bold
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Column(
+                                                children: [
+                                                  Icon(
+                                                    Icons.check_box,
+                                                    color: deliveryStatusController.text == 'Not Started'
+                                                        ? Colors.grey
+                                                        :deliveryStatusController.text == 'Delivered'
+                                                        ? Colors.green
+                                                        : Colors.grey, // default color
+                                                  ),
+                                                  Text(
+                                                    deliveryStatusController.text == 'In Progress' ? '    Delivery\n(In Progress)' : 'Delivered',
+                                                    style: TextStyle(
+                                                      color: deliveryStatusController.text == 'Not Started'
+                                                          ? Colors.grey
+                                                          : deliveryStatusController.text == 'In Progress'
+                                                          ? Colors.grey
+                                                          : Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Column(
+                                                children: [
+                                                  Icon(
+                                                    Icons.check_box,
+                                                    color:  paymentStatusController.text == 'partial payment' || paymentStatusController.text=='cleared'? Colors.green: Colors.grey,
+                                                  ),
+                                                  Text(
+                                                    'Payments',
+                                                    style: TextStyle(
+                                                      color: paymentStatusController.text == 'partial payment' || paymentStatusController.text=='cleared'? Colors.black: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 80, top: 270,right: 60),
+                                    child: Container(
+                                      height: 115,
+                                      width: maxWidth,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
                                         children: [
-                                          Text('Order Date: ${orderDetail?.orderDate}'),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 2,bottom: 3),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(left: 30),
+                                                  child: Text('Order',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                ),
+                                                Spacer(),
+                                                Text('Available for Download'),
+                                                SizedBox(width: 5,),
+                                                Padding(
+                                                  padding: EdgeInsets.only(right: 10),
+                                                  child: IconButton(
+                                                    onPressed: (){
+                                                      downloadPdf();
+                                                    },
+                                                    color: Colors.green, icon: Icon(Icons.download_for_offline),),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            height: 1, // 1 pixel height
+                                            width: double.infinity, // match parent width
+                                            color: Colors.grey, // adjust the color to your liking
+                                          ),
+                                          const SizedBox(height: 20,),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child:Column(
+                                                  children: [
+                                                    Text('ORDER ID'),
+                                                    Text('${orderIdController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Date'),
+                                                    Text('${CreatedDateController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Contact No'),
+                                                    Text('${ContactNoController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Location'),
+                                                    Text('${deliveryLocationController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ],
                                       ),
                                     ),
                                   ),
-                                );
-                              },
-                              separatorBuilder: (context, index) {
-                                return const Divider();
-                              },
-                            )
-                            // _loading
-                            //     ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
-                            //     : _errorMessage.isNotEmpty
-                            //     ? Center(child: Text(_errorMessage))
-                            //     : widget.orderDetails!.isEmpty
-                            //     ? const Center(child: Text('No product found'))
-                            //     : ListView.separated(
-                            //   shrinkWrap: true,
-                            //   itemCount: _searchText.isNotEmpty
-                            //       ? widget.orderDetails!.where((orderDetail) =>
-                            //   orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                            //       orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                            //   ).length
-                            //       : widget.orderDetails!.length,
-                            //   itemBuilder: (context, index) {
-                            //     final isSelected = _isSelected[index];
-                            //     final orderDetail = _searchText.isNotEmpty
-                            //         ? widget.orderDetails!.where((orderDetail) =>
-                            //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                            //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                            //     ).toList().isEmpty ? null : widget.orderDetails!.where((orderDetail) =>
-                            //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                            //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                            //     ).elementAt(index)
-                            //         : widget.orderDetails![index];
-                            //
-                            //
-                            //     return GestureDetector(
-                            //       onTap: ()  {
-                            //
-                            //         _timer = Timer(Duration(seconds: 1), () {
-                            //           setState(() {
-                            //             _isLoading = false;
-                            //           });
-                            //         });
-                            //         setState(() {
-                            //           _isLoading = false;
-                            //           for (int i = 0; i < _isSelected.length; i++) {
-                            //             _isSelected[i] = i == index;
-                            //           }
-                            //           orderIdController.text = orderDetail.orderId;
-                            //         });
-                            //       },
-                            //       child: AnimatedContainer(
-                            //         duration: const Duration(milliseconds: 200),
-                            //         decoration: BoxDecoration(
-                            //           color: isSelected ? Colors.lightBlue[100] : Colors.white,
-                            //         ),
-                            //         child: ListTile(
-                            //           title: Text('Order ID: ${orderDetail?.orderId}'),
-                            //           subtitle: Column(
-                            //             crossAxisAlignment: CrossAxisAlignment.start,
-                            //             children: [
-                            //               Text('Order Date: ${orderDetail?.orderDate}'),
-                            //             ],
-                            //           ),
-                            //         ),
-                            //       ),
-                            //     );
-                            //   },
-                            //   separatorBuilder: (context, index) {
-                            //     return const Divider();
-                            //   },
-                            // )
-                          ],),))
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 80, top: 780,right: 60),
+                                    child: Container(
+                                      height: 115,
+                                      width: maxWidth,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 2,bottom: 3),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(left: 30),
+                                                  child: Text('Payment',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                ),
+                                                Spacer(),
+                                                Text('Available for Download'),
+                                                SizedBox(width: 5,),
+                                                Padding(
+                                                  padding: EdgeInsets.only(right: 10),
+                                                  child:
+                                                  IconButton(
+                                                    onPressed:(){
+                                                      print(PaymentIdController.text);
+                                                      paymentStatusController.text == 'cleared' || paymentStatusController.text == 'partial payment'
+                                                          ? downloadPaymentReceipt(orderIdController.text)
+                                                          : null;
+                                                    },
+                                                    color: paymentStatusController.text == '-'
+                                                        ? Colors.grey
+                                                        :  paymentStatusController.text == 'cleared' || paymentStatusController.text == 'partial payment'
+                                                        ? Colors.green
+                                                        : Colors.grey,
+                                                    icon: Icon(Icons.download_for_offline),
+                                                    // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
 
-                        ],
-                      ),
-                    ),
+                                          Container(
+                                            height: 1, // 1 pixel height
+                                            width: double.infinity, // match parent width
+                                            color: Colors.grey, // adjust the color to your liking
+                                          ),
+                                          const SizedBox(height: 20,),
 
-                  ),
-                  Expanded(child: SingleChildScrollView(child: Stack(children: [
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          top: 0,
-                          left: 0,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: Colors.white,
-                          height: 50,
-                          child: Row(
-                            children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child:Column(
+                                                  children: [
+                                                    Text('Payment ID'),
+                                                    Text('${PaymentIdController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Date'),
+                                                    Text('${PaymentDate.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Payment Mode'),
+                                                    Text('${PaymentModeController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Status'),
+                                                    Text('${paymentStatusController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
 
-                              // Padding(
-                              //   padding: const EdgeInsets.only(left: 80),
-                              //   child: IconButton(
-                              //     icon: Icon(Icons.arrow_circle_left_rounded,color: Colors.blue,),
-                              //     tooltip: 'Go Back', onPressed: () {  },
-                              //   ),
-                              // ),
-                              // Text('Go back')
-                            ],
+                                    padding: const EdgeInsets.only(left: 80, top: 440,right: 60),
+                                    child: Container(
+                                      height: 115,
+                                      width:maxWidth,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 2,bottom: 3),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(left: 30),
+                                                  child: Text('Invoice',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                ),
+                                                Spacer(),
+                                                Text('Available for Download'),
+                                                SizedBox(width: 5,),
+                                                Padding(
+                                                  padding: EdgeInsets.only(right: 10),
+                                                  child:IconButton(
+                                                    onPressed: (){
+                                                      downloadInvoicePdf();
+                                                    },
+                                                    color: Colors.green, icon: Icon(Icons.download_for_offline),),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          Container(
+                                            height: 1, // 1 pixel height
+                                            width: double.infinity, // match parent width
+                                            color: Colors.grey, // adjust the color to your liking
+                                          ),
+                                          const SizedBox(height: 20,),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child:Column(
+                                                  children: [
+                                                    Text('INV_NO'),
+                                                    Text('${InvNoController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Date'),
+                                                    Text('${CreatedDateController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Location'),
+                                                    Text('${deliveryLocationController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Gross Amount'),
+                                                    Text('${totalAmountController.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 80, top: 610,right: 60),
+                                    child: Container(
+                                      height: 115,
+                                      width: maxWidth,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding:const EdgeInsets.only(top: 2,bottom: 3),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(left: 30),
+                                                  child: Text('Delivery',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                ),
+                                                Spacer(),
+                                                Text('Available for Download'),
+                                                SizedBox(width: 5,),
+                                                Padding(
+                                                  padding: EdgeInsets.only(right: 10),
+                                                  child: IconButton(
+                                                    onPressed:(){
+                                                      deliveryStatusController.text == 'Delivered'
+                                                          ? downloadDeliverypdf()
+                                                          : null;
+                                                    },
+                                                    color: deliveryStatusController.text == 'Not Started'
+                                                        ? Colors.grey
+                                                        :  deliveryStatusController.text == 'Delivered'
+                                                        ? Colors.green
+                                                        : Colors.grey,
+                                                    icon: Icon(Icons.download_for_offline),
+                                                    // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          Container(
+                                            height: 1, // 1 pixel height
+                                            width: double.infinity, // match parent width
+                                            color: Colors.grey, // adjust the color to your liking
+                                          ),
+                                          const SizedBox(height: 20,),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child:Column(
+                                                  children: [
+                                                    Text('Delivery ID'),
+                                                    Text('${DeliveryId.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Delivery Date'),
+                                                    Text('${Deliverydate.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Delivery Location'),
+                                                    Text('${DeliveryAddress.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Delivery Status'),
+                                                    Text('${DeliveryStatus.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],),))
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
+                  ],
+                );
+              }
 
-                    Container(
-                      width: 0.8, // Set the width to 1 for a vertical line
-                      height: 984, // Set the height to your liking
-                      decoration: BoxDecoration(
-                        border: Border(left: BorderSide(width: 1, color: Colors.black54)),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40, left: 0),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10), // Space above/below the border
-                        height: 0.5,
-                        // width: 1500,
-                        width: constraints.maxWidth,// Border height
-                        color: Colors.black, // Border color
-                      ),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(left: 80, top: 100,right: 60),
-                      child: Container(
-                        height: 100,
-                        width: maxWidth,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child:  Padding(
-                          padding: EdgeInsets.only(top: 30),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.check_box,
-                                      color: Colors.green,
-                                    ),
-                                    Text(
-                                      'Order',
-                                      style: TextStyle(
-                                          color: Colors.black,fontWeight: FontWeight.bold
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.check_box,
-                                      color: Colors.green,
-                                    ),
-                                    Text(
-                                      'Invoice',
-                                      style: TextStyle(
-                                          color: Colors.black,fontWeight: FontWeight.bold
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.check_box,
-                                      color: deliveryStatusController.text == 'Not Started'
-                                          ? Colors.grey
-                                          :deliveryStatusController.text == 'Delivered'
-                                          ? Colors.green
-                                          : Colors.grey, // default color
-                                    ),
-                                    Text(
-                                      deliveryStatusController.text == 'In Progress' ? '    Delivery\n(In Progress)' : 'Delivered',
-                                      style: TextStyle(
-                                        color: deliveryStatusController.text == 'Not Started'
-                                            ? Colors.grey
-                                            : deliveryStatusController.text == 'In Progress'
-                                            ? Colors.grey
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.check_box,
-                                      color:  paymentStatusController.text == 'partial payment' || paymentStatusController.text=='cleared'? Colors.green: Colors.grey,
-                                    ),
-                                    Text(
-                                      'Payments',
-                                      style: TextStyle(
-                                        color: paymentStatusController.text == 'partial payment' || paymentStatusController.text=='cleared'? Colors.black: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 80, top: 270,right: 60),
-                      child: Container(
-                        height: 115,
-                        width: constraints.maxWidth * 0.7,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 2,bottom: 3),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 30),
-                                    child: Text('Order',style: TextStyle(fontWeight: FontWeight.bold),),
-                                  ),
-                                  Spacer(),
-                                  Text('Available for Download'),
-                                  SizedBox(width: 5,),
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 10),
-                                    child: IconButton(
-                                      onPressed: (){
-                                        downloadPdf();
-                                      },
-                                      color: Colors.green, icon: Icon(Icons.download_for_offline),),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              height: 1, // 1 pixel height
-                              width: double.infinity, // match parent width
-                              color: Colors.grey, // adjust the color to your liking
-                            ),
-                            const SizedBox(height: 20,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child:Column(
-                                    children: [
-                                      Text('ORDER ID'),
-                                      Text('${orderIdController.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Date'),
-                                      Text('${CreatedDateController.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Contact No'),
-                                      Text('${ContactNoController.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Location'),
-                                      Text('${deliveryLocationController.text}'),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 80, top: 780,right: 60),
-                      child: Container(
-                        height: 115,
-                        width: constraints.maxWidth * 0.7,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 2,bottom: 3),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 30),
-                                    child: Text('Payment',style: TextStyle(fontWeight: FontWeight.bold),),
-                                  ),
-                                  Spacer(),
-                                  Text('Available for Download'),
-                                  SizedBox(width: 5,),
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 10),
-                                    child:
-                                    IconButton(
-                                      onPressed:(){
-                                        print(PaymentIdController.text);
-                                        paymentStatusController.text == 'cleared' || paymentStatusController.text == 'partial payment'
-                                            ? downloadPaymentReceipt(orderIdController.text)
-                                            : null;
-                                      },
-                                      color: paymentStatusController.text == '-'
-                                          ? Colors.grey
-                                          :  paymentStatusController.text == 'cleared' || paymentStatusController.text == 'partial payment'
-                                          ? Colors.green
-                                          : Colors.grey,
-                                      icon: Icon(Icons.download_for_offline),
-                                      // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            Container(
-                              height: 1, // 1 pixel height
-                              width: double.infinity, // match parent width
-                              color: Colors.grey, // adjust the color to your liking
-                            ),
-                            const SizedBox(height: 20,),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child:Column(
-                                    children: [
-                                      Text('Payment ID'),
-                                      Text('${PaymentIdController.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Date'),
-                                      Text('${PaymentDate.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Payment Mode'),
-                                      Text('${PaymentModeController.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Status'),
-                                      Text('${paymentStatusController.text}'),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-
-                      padding: const EdgeInsets.only(left: 80, top: 440,right: 60),
-                      child: Container(
-                        height: 115,
-                        width: constraints.maxWidth * 0.7,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 2,bottom: 3),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 30),
-                                    child: Text('Invoice',style: TextStyle(fontWeight: FontWeight.bold),),
-                                  ),
-                                  Spacer(),
-                                  Text('Available for Download'),
-                                  SizedBox(width: 5,),
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 10),
-                                    child:IconButton(
-                                      onPressed: (){
-                                        downloadInvoicePdf();
-                                      },
-                                      color: Colors.green, icon: Icon(Icons.download_for_offline),),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            Container(
-                              height: 1, // 1 pixel height
-                              width: double.infinity, // match parent width
-                              color: Colors.grey, // adjust the color to your liking
-                            ),
-                            const SizedBox(height: 20,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child:Column(
-                                    children: [
-                                      Text('INV_NO'),
-                                      Text('${InvNoController.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Date'),
-                                      Text('${CreatedDateController.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Location'),
-                                      Text('${deliveryLocationController.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Gross Amount'),
-                                      Text('${totalAmountController.text}'),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 80, top: 610,right: 60),
-                      child: Container(
-                        height: 115,
-                        width: constraints.maxWidth * 0.7,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding:const EdgeInsets.only(top: 2,bottom: 3),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 30),
-                                    child: Text('Delivery',style: TextStyle(fontWeight: FontWeight.bold),),
-                                  ),
-                                  Spacer(),
-                                  Text('Available for Download'),
-                                  SizedBox(width: 5,),
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 10),
-                                    child: IconButton(
-                                      onPressed:(){
-                                        deliveryStatusController.text == 'Delivered'
-                                            ? downloadDeliverypdf()
-                                            : null;
-                                      },
-                                      color: deliveryStatusController.text == 'Not Started'
-                                          ? Colors.grey
-                                          :  deliveryStatusController.text == 'Delivered'
-                                          ? Colors.green
-                                          : Colors.grey,
-                                      icon: Icon(Icons.download_for_offline),
-                                      // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            Container(
-                              height: 1, // 1 pixel height
-                              width: double.infinity, // match parent width
-                              color: Colors.grey, // adjust the color to your liking
-                            ),
-                            const SizedBox(height: 20,),
-                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child:Column(
-                                    children: [
-                                      Text('Delivery ID'),
-                                      Text('${DeliveryId.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Delivery Date'),
-                                      Text('${Deliverydate.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Delivery Location'),
-                                      Text('${DeliveryAddress.text}'),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Text('Delivery Status'),
-                                      Text('${DeliveryStatus.text}'),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],),))
-                ],
-              );
             }
         )
     );

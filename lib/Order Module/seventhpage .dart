@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/Order%20Module/firstpage.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
@@ -55,6 +56,7 @@ class _SeventhPageState extends State<SeventhPage> {
   final TextEditingController EmailIdController = TextEditingController();
   bool? _isChecked1 = true;
   bool _isLoading = false;
+  final ScrollController horizontalScroll = ScrollController();
   bool _isFirstLoad = true;
   bool? _isChecked2 = true;
   List<detail> filteredData = [];
@@ -695,1081 +697,2184 @@ class _SeventhPageState extends State<SeventhPage> {
             builder: (context, constraints){
               double maxHeight = constraints.maxHeight;
               double maxWidth = constraints.maxWidth;
-              return  Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    // Added Align widget for the left side menu
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                      height: 984,
-                      width: 200,
-                      color: const Color(0xFFF7F6FA),
-                      padding: const EdgeInsets.only(left: 20, top: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildMenuItems(context),
+
+              if(constraints.maxWidth >=1366){
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      // Added Align widget for the left side menu
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        height: 984,
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 20, top: 30),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 0,top: 0),
-                    child: Container(
-                      width: 1.8, // Set the width to 1 for a vertical line
-                      height: 984, // Set the height to your liking
+                    Padding(
+                      padding: const EdgeInsets.only(left: 0,top: 0),
+                      child: Container(
+                        width: 1.8, // Set the width to 1 for a vertical line
+                        height: 984, // Set the height to your liking
+                        decoration: BoxDecoration(
+                          border: Border(left: BorderSide(width: 1, color: Colors.grey)),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                        // top: 60,
+                        left: 1,
+                      ),
+                      width: 298,
+                      height: 928
+                      ,
                       decoration: BoxDecoration(
-                        border: Border(left: BorderSide(width: 1, color: Colors.grey)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
                       ),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(
-                     // top: 60,
-                      left: 1,
-                    ),
-                    width: 298,
-                    height: 928
-                    ,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 5),
-                                child: IconButton(
-                                  icon:
-                                  const Icon(Icons.arrow_back), // Back button icon
-                                  onPressed: () {
-                                    context.go('/Order_List');
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //       builder: (context) =>
-                                    //       const Orderspage()),
-                                    // );
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 5),
+                                  child: IconButton(
+                                    icon:
+                                    const Icon(Icons.arrow_back), // Back button icon
+                                    onPressed: () {
+                                      context.go('/Order_List');
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) =>
+                                      //       const Orderspage()),
+                                      // );
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 15,top: 10),
+                                  child: Text(
+                                    'Order List',
+                                    style: TextStyle(
+                                      fontSize: 19,
+                                      //  fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 0, left: 0),
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 5), // Space above/below the border
+                                height: 0.5,
+                                // width: 1500,
+                                width: constraints.maxWidth,// Border height
+                                color: Colors.black, // Border color
+                              ),
+                            ),
+                            SizedBox(
+                              height: 50,
+                              width: 60,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 15, right: 15, bottom: 5,top: 5),
+                                child: TextFormField(
+                                  //  controller: _orderIdController, // Assign the controller to the TextFormField
+                                  decoration: const InputDecoration(
+                                    // labelText: 'Order ID',
+                                    hintText: 'Search Order',
+                                    contentPadding: EdgeInsets.all(8),
+                                    border: OutlineInputBorder(),
+                                    prefixIcon: Icon(Icons.search_outlined),
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _searchText = value.toLowerCase();
+                                    });
                                   },
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(left: 15,top: 10),
-                                child: Text(
-                                  'Order List',
-                                  style: TextStyle(
-                                    fontSize: 19,
-                                    //  fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 0, left: 0),
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 5), // Space above/below the border
-                              height: 0.5,
-                              // width: 1500,
-                              width: constraints.maxWidth,// Border height
-                              color: Colors.black, // Border color
                             ),
-                          ),
-                          SizedBox(
-                            height: 50,
-                            width: 60,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 15, right: 15, bottom: 5,top: 5),
-                              child: TextFormField(
-                                //  controller: _orderIdController, // Assign the controller to the TextFormField
-                                decoration: const InputDecoration(
-                                  // labelText: 'Order ID',
-                                  hintText: 'Search Order',
-                                  contentPadding: EdgeInsets.all(8),
-                                  border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.search_outlined),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _searchText = value.toLowerCase();
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                         Expanded(child: SingleChildScrollView(child: Column(
-                           children: [
-                             _loading
-                                 ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
-                                 : _errorMessage.isNotEmpty
-                                 ? Center(child: Text(_errorMessage))
-                                 : widget.orderDetails!.isEmpty
-                                 ? const Center(child: Text('No product found'))
-                                 : ListView.separated(
-                               shrinkWrap: true,
-                               itemCount: _searchText.isNotEmpty
-                                   ? widget.orderDetails!.where((orderDetail) =>
-                               orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                                   orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                               ).length
-                                   : widget.orderDetails!.length,
-                               itemBuilder: (context, index) {
-                                 final isSelected = _isSelected[index];
-                                 final orderDetail = _searchText.isNotEmpty
-                                     ? widget.orderDetails!.where((orderDetail) =>
-                                 orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                                     orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                                 ).elementAt(index)
-                                     : widget.orderDetails![index];
+                            const SizedBox(height: 5),
+                            Expanded(child: SingleChildScrollView(child: Column(
+                              children: [
+                                _loading
+                                    ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
+                                    : _errorMessage.isNotEmpty
+                                    ? Center(child: Text(_errorMessage))
+                                    : widget.orderDetails!.isEmpty
+                                    ? const Center(child: Text('No product found'))
+                                    : ListView.separated(
+                                  shrinkWrap: true,
+                                  itemCount: _searchText.isNotEmpty
+                                      ? widget.orderDetails!.where((orderDetail) =>
+                                  orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                      orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                  ).length
+                                      : widget.orderDetails!.length,
+                                  itemBuilder: (context, index) {
+                                    final isSelected = _isSelected[index];
+                                    final orderDetail = _searchText.isNotEmpty
+                                        ? widget.orderDetails!.where((orderDetail) =>
+                                    orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                        orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                    ).elementAt(index)
+                                        : widget.orderDetails![index];
 
-                                 return GestureDetector(
-                                   onTap: () async {
-                                     _timer = Timer(Duration(seconds: 1), () {
-                                       setState(() {
-                                         _isLoading = false;
-                                       });
-                                     });
-                                     setState(() {
-                                       for (int i = 0; i < _isSelected.length; i++) {
-                                         _isSelected[i] = i == index;
-                                       }
-                                       orderIdController.text = orderDetail.orderId;
-                                     });
-                                     await _fetchOrderDetails(orderDetail.orderId);
-                                     //in this place write api to fetch datas?? _showProductDetails(orderDetail);
-                                   },
-                                   child: AnimatedContainer(
-                                     duration: const Duration(milliseconds: 200),
-                                     decoration: BoxDecoration(
-                                       color: isSelected ? Colors.lightBlue[100] : Colors.white,
-                                     ),
-                                     child: ListTile(
-                                       title: Text('Order ID: ${orderDetail.orderId}'),
-                                       subtitle: Column(
-                                         crossAxisAlignment: CrossAxisAlignment.start,
-                                         children: [
-                                           Text('Order Date: ${orderDetail.orderDate}'),
-                                         ],
-                                       ),
-                                     ),
-                                   ),
-                                 );
-                               },
-                               separatorBuilder: (context, index) {
-                                 return const Divider();
-                               },
-                             )
-                           ],
-                         ),))
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        _timer = Timer(Duration(seconds: 1), () {
+                                          setState(() {
+                                            _isLoading = false;
+                                          });
+                                        });
+                                        setState(() {
+                                          for (int i = 0; i < _isSelected.length; i++) {
+                                            _isSelected[i] = i == index;
+                                          }
+                                          orderIdController.text = orderDetail.orderId;
+                                        });
+                                        await _fetchOrderDetails(orderDetail.orderId);
+                                        //in this place write api to fetch datas?? _showProductDetails(orderDetail);
+                                      },
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? Colors.lightBlue[100] : Colors.white,
+                                        ),
+                                        child: ListTile(
+                                          title: Text('Order ID: ${orderDetail.orderId}'),
+                                          subtitle: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text('Order Date: ${orderDetail.orderDate}'),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  separatorBuilder: (context, index) {
+                                    return const Divider();
+                                  },
+                                )
+                              ],
+                            ),))
 
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(child: SingleChildScrollView(child: Stack(
-                    children: [
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 0,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            color: Colors.white,
-                            height: 50,
-                            child: Row(
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 30),
-                                  child: Text('Order ID :',style: TextStyle(fontSize: 19),),
-                                ),
-                                const SizedBox(width:8),
-                                Text((orderIdController.text),style: const TextStyle(fontSize: 19),),
-                                //  Text(orderIdController.text),
-                                const SizedBox(width: 10,),
-                                const Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 100),
-                                  child: OutlinedButton(
-                                    onPressed: () {
-                                      context.go('/Documents',extra: {
-                                        'orderId': orderIdController.text,
-                                        'orderDetails': filteredData.map((detailInstance) => OrderDetail(
-                                          orderId: detailInstance.orderId,
-                                          orderDate: detailInstance.orderDate, items: [],
-                                          // Add other fields as needed
-                                        )).toList(),
-                                      });
+                    Expanded(child: SingleChildScrollView(child: Stack(
+                      children: [
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 0,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              color: Colors.white,
+                              height: 50,
+                              child: Row(
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 30),
+                                    child: Text('Order ID :',style: TextStyle(fontSize: 19),),
+                                  ),
+                                  const SizedBox(width:8),
+                                  Text((orderIdController.text),style: const TextStyle(fontSize: 19),),
+                                  //  Text(orderIdController.text),
+                                  const SizedBox(width: 10,),
+                                  const Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 100),
+                                    child: OutlinedButton(
+                                      onPressed: () {
+                                        context.go('/Documents',extra: {
+                                          'orderId': orderIdController.text,
+                                          'orderDetails': filteredData.map((detailInstance) => OrderDetail(
+                                            orderId: detailInstance.orderId,
+                                            orderDate: detailInstance.orderDate, items: [],
+                                            // Add other fields as needed
+                                          )).toList(),
+                                        });
 
-                                    },
-                                    style: OutlinedButton.styleFrom(
-                                      backgroundColor:
-                                      Colors.blue[800], // Button background color
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(5), // Rounded corners
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        backgroundColor:
+                                        Colors.blue[800], // Button background color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(5), // Rounded corners
+                                        ),
+                                        side: BorderSide.none, // No outline
                                       ),
-                                      side: BorderSide.none, // No outline
+                                      child: const Text(
+                                        'Documents',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
-                                    child: const Text(
-                                      'Documents',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 0, left: 0),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 1), // Space above/below the border
+                            height: 984,
+                            // width: 1500,
+                            width:0.5,// Border height
+                            color: Colors.black, // Border color
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 49, left: 0),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 1), // Space above/below the border
+                            height: 0.5,
+                            // width: 1500,
+                            width: constraints.maxWidth,// Border height
+                            color: Colors.black, // Border color
+                          ),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.only(left: 50, top: 100,right: 50),
+                          child: Container(
+                            height: 100,
+                            width: maxWidth,
+                            decoration:  BoxDecoration(
+                              color: Color(0xFFFFFFFF), // background: #FFFFFF
+                              boxShadow: [BoxShadow(
+                                offset: Offset(0, 3),
+                                blurRadius: 6,
+                                color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                              )],
+                              border: Border.all(
+                                // border: 2px
+                                color: Color(0xFFB2C2D3), // border: #B2C2D3
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+                            ),
+                            child:  Padding(
+                              padding: EdgeInsets.only(top: 30),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Icon(
+                                          Icons.check_box,
+                                          color: Colors.green,
+                                        ),
+                                        Text(
+                                          'Order Placed',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Icon(
+                                          Icons.check_box,
+                                          color: Colors.grey,
+                                        ),
+                                        Text(
+                                          'Invoice',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Icon(
+                                          Icons.check_box,
+                                          color: deliveryStatusController.text == 'Not Started'
+                                              ? Colors.grey
+                                              : deliveryStatusController.text == 'Delivered'
+                                              ? Colors.green
+                                              : Colors.grey, // default color
+                                        ),
+                                        Text(
+                                          'Delivery',
+                                          style: TextStyle(
+                                            color: deliveryStatusController.text.toLowerCase() == 'Not Started'
+                                                ? Colors.grey
+                                                : deliveryStatusController.text.toLowerCase() == 'In Progress'
+                                                ? Colors.grey
+                                                : Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Icon(
+                                          Icons.check_box,
+                                          color: Colors.grey,
+                                        ),
+                                        Text(
+                                          'Payments',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 50,right: 50,top: 250),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color(0xFFFFFFFF), // background: #FFFFFF
+                              boxShadow: [BoxShadow(
+                                offset: Offset(0, 3),
+                                blurRadius: 6,
+                                color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                              )],
+                              border: Border.all(
+                                // border: 2px
+                                color: Color(0xFFB2C2D3), // border: #B2C2D3
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+                            ),
+                            child: Table(
+                              border: TableBorder.all(color: const Color(0xFFB2C2D3)),
+
+                              columnWidths: const {
+                                0: FlexColumnWidth(2),
+                                1: FlexColumnWidth(1.4),
+                              },
+                              children: [
+                                row1,
+                                row2,
+                                row3,
+                              ],
+                            ),
+                          ),
+                        ),
+                        _isLoading
+                            ? Padding(
+                          padding: EdgeInsets.only(top: 400),
+                          child: SpinKitWave(
+                            color: Colors.blue,
+                            size: 30.0,
+                          ),
+                        )
+                            : Container(),
+                        Padding(
+                          padding:  const EdgeInsets.only(left: 50, top: 650,right: 50),
+                          child: Container(
+                            // height: 150,
+                            width: maxWidth,
+                            //   padding: const EdgeInsets.all(0.0),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFFFFFFF), // background: #FFFFFF
+                              boxShadow: [BoxShadow(
+                                offset: Offset(0, 3),
+                                blurRadius: 6,
+                                color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                              )],
+                              border: Border.all(
+                                // border: 2px
+                                color: Color(0xFFB2C2D3), // border: #B2C2D3
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 30, top: 10),
+                                  child: Text(
+                                    'Add Products',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: maxWidth,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      top: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
+                                      bottom: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                    child: Table(
+                                      columnWidths: const {
+                                        0: FlexColumnWidth(1),
+                                        1: FlexColumnWidth(2.7),
+                                        2: FlexColumnWidth(2),
+                                        3: FlexColumnWidth(1.8),
+                                        4: FlexColumnWidth(2),
+                                        5: FlexColumnWidth(1),
+                                        6: FlexColumnWidth(2),
+                                        7: FlexColumnWidth(2),
+                                        8: FlexColumnWidth(2),
+                                        9: FlexColumnWidth(2),
+                                      },
+                                      children: const [
+                                        TableRow(
+                                          children: [
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'SN',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Product Name',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Category',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Sub Category',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Price',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'QTY',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Amount',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Disc.',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'TAX',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Total Amount',
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                // Container(
+                                //   width: maxWidth,
+                                //   decoration: BoxDecoration(
+                                //     border: Border.all(
+                                //       color: Colors.grey,),
+                                //   ),
+                                //   child:  Padding(
+                                //     padding: EdgeInsets.only(
+                                //       top: 5,
+                                //       bottom: 5,
+                                //     ),
+                                //     child: SizedBox(
+                                //       // height: 34,
+                                //       child: Row(
+                                //         children: [
+                                //           Expanded(
+                                //             flex:1,
+                                //             child: Padding(
+                                //               padding: EdgeInsets.only(left: 25,),
+                                //               child: Text(
+                                //                 "SN",
+                                //                 style: TextStyle(
+                                //                   fontWeight: FontWeight.bold,
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           Expanded(
+                                //             flex: 1,
+                                //             child: Padding(
+                                //               padding: EdgeInsets.only(left: 10,right: 10),
+                                //               child: Text(
+                                //                 'Product Name',
+                                //                 style: TextStyle(
+                                //                   fontWeight: FontWeight.bold,
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           Expanded(
+                                //             flex: 1,
+                                //             child: Padding(padding: EdgeInsets.only(left: 50,right: 15),
+                                //               child: Text(
+                                //                 "Category",
+                                //                 style: TextStyle(
+                                //                   fontWeight: FontWeight.bold,
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           Expanded(
+                                //             flex: 1,
+                                //             child: Padding(
+                                //               padding: EdgeInsets.only(left: 45,right: 10),
+                                //               child: Text(
+                                //                 "Sub Category",
+                                //                 style: TextStyle(
+                                //                   fontWeight: FontWeight.bold,
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           Expanded(
+                                //             flex: 1,
+                                //             child: Padding(
+                                //               padding: EdgeInsets.only(left: 90,right: 10),
+                                //               child: Text(
+                                //                 "Price",
+                                //                 style: TextStyle(
+                                //                   fontWeight: FontWeight.bold,
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //
+                                //           const Expanded(
+                                //             flex: 1,
+                                //             child: Padding(
+                                //               padding: EdgeInsets.only(left: 65,right: 10),
+                                //               child: Text(
+                                //                 "QTY",
+                                //                 style: TextStyle(
+                                //                   fontWeight: FontWeight.bold,
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           Expanded(
+                                //             flex: 1,
+                                //             child: Padding(
+                                //               padding: EdgeInsets.only(right: 10),
+                                //               child: Text(
+                                //                 "Total Amount",
+                                //                 style: TextStyle(
+                                //                   fontWeight: FontWeight.bold,
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //         ],
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: selectedItems.length,
+                                  itemBuilder: (context, index) {
+                                    var item = selectedItems[index];
+                                    // int index = selectedItems.indexOf(item) + 1;
+                                    return Table(
+                                      border: TableBorder(
+                                        bottom: BorderSide(width:1 ,color: Colors.grey),
+                                        //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
+                                        verticalInside: BorderSide(width: 1,color: Colors.grey),
+                                      ),
+                                      // border: TableBorder.all(
+                                      //     color: const Color(0xFFB2C2D3)),
+                                      columnWidths: const {
+                                        0: FlexColumnWidth(1),
+                                        1: FlexColumnWidth(2.7),
+                                        2: FlexColumnWidth(2),
+                                        3: FlexColumnWidth(1.8),
+                                        4: FlexColumnWidth(2),
+                                        5: FlexColumnWidth(1),
+                                        6: FlexColumnWidth(2),
+                                        7: FlexColumnWidth(2),
+                                        8: FlexColumnWidth(2),
+                                        9: FlexColumnWidth(2),
+                                      },
+                                      // Add this line
+                                      children: [
+                                        TableRow(
+                                          children: [
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                    ' ${index + 1}',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10),
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade200,
+                                                    borderRadius: BorderRadius
+                                                        .circular(4.0),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item['productName'],
+                                                      textAlign: TextAlign
+                                                          .center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10),
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade200,
+                                                    borderRadius: BorderRadius
+                                                        .circular(4.0),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item['category'],
+                                                      textAlign: TextAlign
+                                                          .center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10),
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade200,
+                                                    borderRadius: BorderRadius
+                                                        .circular(4.0),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item['subCategory'],
+                                                      textAlign: TextAlign
+                                                          .center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10),
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade200,
+                                                    borderRadius: BorderRadius
+                                                        .circular(4.0),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item['price'].toString(),
+                                                      textAlign: TextAlign
+                                                          .center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10),
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade200,
+                                                    borderRadius: BorderRadius
+                                                        .circular(4.0),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item['qty'].toString(),
+                                                      textAlign: TextAlign
+                                                          .center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10
+                                                ),
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade200,
+                                                    borderRadius: BorderRadius
+                                                        .circular(4.0),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item['actualAmount']
+                                                          .toString(),
+                                                      textAlign: TextAlign
+                                                          .center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10
+                                                ),
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade200,
+                                                    borderRadius: BorderRadius
+                                                        .circular(4.0),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item['discount']
+                                                          .toString(),
+                                                      textAlign: TextAlign
+                                                          .center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10
+                                                ),
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade200,
+                                                    borderRadius: BorderRadius
+                                                        .circular(4.0),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item['tax']
+                                                          .toString(),
+                                                      textAlign: TextAlign
+                                                          .center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10
+                                                ),
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade200,
+                                                    borderRadius: BorderRadius
+                                                        .circular(4.0),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item['totalAmount']
+                                                          .toString(),
+                                                      textAlign: TextAlign
+                                                          .center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 9,bottom: 9),
+                                  child: Align(
+                                    alignment: const Alignment(0.9,0.8),
+                                    child: Container(
+                                      height: 40,
+                                      padding: const EdgeInsets.only(left: 15,right: 10,top: 10,bottom: 2),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.blue),
+                                        borderRadius: BorderRadius.circular(2.0),
                                         color: Colors.white,
                                       ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(bottom: 2),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            RichText(text:
+                                            TextSpan(
+                                              children: [
+                                                const TextSpan(
+                                                  text:  'Total',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.blue
+                                                    // fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const TextSpan(
+                                                  text: '  ₹',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                  totalController.text,
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
+                                // const Divider(color: Colors.grey,),
+                                // Padding(
+                                //   padding: EdgeInsets.only(top: 20,left: maxWidth * 0.2 ,right: maxWidth * 0.2),
+                                //   child: Row(
+                                //     children: [
+                                //       Expanded(
+                                //         child: Container(
+                                //   width: maxWidth * 0.25,
+                                //           decoration: BoxDecoration(
+                                //             border: Border.all(color: Colors.blue),
+                                //           ),
+                                //           child: Padding(
+                                //             padding: const EdgeInsets.only(
+                                //               top: 10,
+                                //               bottom: 10,
+                                //               left: 5,
+                                //               right: 5,
+                                //             ),
+                                //             child: RichText(
+                                //               text: TextSpan(
+                                //                 children: [
+                                //                   const TextSpan(
+                                //                     text: 'Total',
+                                //                     style: TextStyle(
+                                //                       fontWeight: FontWeight.bold,
+                                //                       color: Colors.blue,
+                                //                     ),
+                                //                   ),
+                                //                   const TextSpan(
+                                //                     text: '  ₹',
+                                //                     style: TextStyle(
+                                //                       color: Colors.black,
+                                //                     ),
+                                //                   ),
+                                //                   TextSpan(
+                                //                     text: totalController.text,
+                                //                     style: const TextStyle(
+                                //                       color: Colors.black,
+                                //                     ),
+                                //                   ),
+                                //                 ],
+                                //               ),
+                                //             ),
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
+
+
                               ],
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 0, left: 0),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 1), // Space above/below the border
-                          height: 984,
-                          // width: 1500,
-                          width:0.5,// Border height
-                          color: Colors.black, // Border color
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 49, left: 0),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 1), // Space above/below the border
-                          height: 0.5,
-                          // width: 1500,
-                          width: constraints.maxWidth,// Border height
-                          color: Colors.black, // Border color
-                        ),
-                      ),
+                      ],
+                    ),))
 
-                      Padding(
-                        padding: const EdgeInsets.only(left: 50, top: 100,right: 50),
-                        child: Container(
-                          height: 100,
-                          width: maxWidth,
-                          decoration:  BoxDecoration(
-                            color: Color(0xFFFFFFFF), // background: #FFFFFF
-                            boxShadow: [BoxShadow(
-                              offset: Offset(0, 3),
-                              blurRadius: 6,
-                              color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                            )],
-                            border: Border.all(
-                              // border: 2px
-                              color: Color(0xFFB2C2D3), // border: #B2C2D3
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
-                          ),
-                          child:  Padding(
-                            padding: EdgeInsets.only(top: 30),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  ],
+                );
+              }else{
+                return  Stack(
+                  //crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        height: 984,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 20, top: 30),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(left: 200),
+                      child: AdaptiveScrollbar(
+                        position: ScrollbarPosition.bottom,
+                        controller: horizontalScroll,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          controller: horizontalScroll,
+                          child: Container(
+                            width: 1250,
+                            height: 984,
+                            child:
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.check_box,
-                                        color: Colors.green,
-                                      ),
-                                      Text(
-                                        'Order Placed',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.check_box,
-                                        color: Colors.grey,
-                                      ),
-                                      Text(
-                                        'Invoice',
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.check_box,
-                                        color: deliveryStatusController.text == 'Not Started'
-                                            ? Colors.grey
-                                            : deliveryStatusController.text == 'Delivered'
-                                            ? Colors.green
-                                            : Colors.grey, // default color
-                                      ),
-                                      Text(
-                                        'Delivery',
-                                        style: TextStyle(
-                                          color: deliveryStatusController.text.toLowerCase() == 'Not Started'
-                                              ? Colors.grey
-                                              : deliveryStatusController.text.toLowerCase() == 'In Progress'
-                                              ? Colors.grey
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.check_box,
-                                        color: Colors.grey,
-                                      ),
-                                      Text(
-                                        'Payments',
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 50,right: 50,top: 250),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Color(0xFFFFFFFF), // background: #FFFFFF
-                            boxShadow: [BoxShadow(
-                              offset: Offset(0, 3),
-                              blurRadius: 6,
-                              color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                            )],
-                            border: Border.all(
-                              // border: 2px
-                              color: Color(0xFFB2C2D3), // border: #B2C2D3
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
-                          ),
-                          child: Table(
-                            border: TableBorder.all(color: const Color(0xFFB2C2D3)),
-
-                            columnWidths: const {
-                              0: FlexColumnWidth(2),
-                              1: FlexColumnWidth(1.4),
-                            },
-                            children: [
-                              row1,
-                              row2,
-                              row3,
-                            ],
-                          ),
-                        ),
-                      ),
-                      _isLoading
-                          ? Padding(
-                        padding: EdgeInsets.only(top: 400),
-                        child: SpinKitWave(
-                          color: Colors.blue,
-                          size: 30.0,
-                        ),
-                      )
-                          : Container(),
-                      Padding(
-                        padding:  const EdgeInsets.only(left: 50, top: 650,right: 50),
-                        child: Container(
-                          // height: 150,
-                          width: maxWidth,
-                          //   padding: const EdgeInsets.all(0.0),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFFFFFFF), // background: #FFFFFF
-                            boxShadow: [BoxShadow(
-                              offset: Offset(0, 3),
-                              blurRadius: 6,
-                              color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                            )],
-                            border: Border.all(
-                              // border: 2px
-                              color: Color(0xFFB2C2D3), // border: #B2C2D3
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 30, top: 10),
-                                child: Text(
-                                  'Add Products',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: maxWidth,
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    top: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
-                                    bottom: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 5, bottom: 5),
-                                  child: Table(
-                                    columnWidths: const {
-                                      0: FlexColumnWidth(1),
-                                      1: FlexColumnWidth(2.7),
-                                      2: FlexColumnWidth(2),
-                                      3: FlexColumnWidth(1.8),
-                                      4: FlexColumnWidth(2),
-                                      5: FlexColumnWidth(1),
-                                      6: FlexColumnWidth(2),
-                                      7: FlexColumnWidth(2),
-                                      8: FlexColumnWidth(2),
-                                      9: FlexColumnWidth(2),
-                                    },
-                                    children: const [
-                                      TableRow(
-                                        children: [
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'SN',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'Product Name',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'Category',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'Sub Category',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'Price',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'QTY',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'Amount',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'Disc.',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'TAX',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  'Total Amount',
-                                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // Container(
-                              //   width: maxWidth,
-                              //   decoration: BoxDecoration(
-                              //     border: Border.all(
-                              //       color: Colors.grey,),
-                              //   ),
-                              //   child:  Padding(
-                              //     padding: EdgeInsets.only(
-                              //       top: 5,
-                              //       bottom: 5,
-                              //     ),
-                              //     child: SizedBox(
-                              //       // height: 34,
-                              //       child: Row(
-                              //         children: [
-                              //           Expanded(
-                              //             flex:1,
-                              //             child: Padding(
-                              //               padding: EdgeInsets.only(left: 25,),
-                              //               child: Text(
-                              //                 "SN",
-                              //                 style: TextStyle(
-                              //                   fontWeight: FontWeight.bold,
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           Expanded(
-                              //             flex: 1,
-                              //             child: Padding(
-                              //               padding: EdgeInsets.only(left: 10,right: 10),
-                              //               child: Text(
-                              //                 'Product Name',
-                              //                 style: TextStyle(
-                              //                   fontWeight: FontWeight.bold,
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           Expanded(
-                              //             flex: 1,
-                              //             child: Padding(padding: EdgeInsets.only(left: 50,right: 15),
-                              //               child: Text(
-                              //                 "Category",
-                              //                 style: TextStyle(
-                              //                   fontWeight: FontWeight.bold,
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           Expanded(
-                              //             flex: 1,
-                              //             child: Padding(
-                              //               padding: EdgeInsets.only(left: 45,right: 10),
-                              //               child: Text(
-                              //                 "Sub Category",
-                              //                 style: TextStyle(
-                              //                   fontWeight: FontWeight.bold,
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           Expanded(
-                              //             flex: 1,
-                              //             child: Padding(
-                              //               padding: EdgeInsets.only(left: 90,right: 10),
-                              //               child: Text(
-                              //                 "Price",
-                              //                 style: TextStyle(
-                              //                   fontWeight: FontWeight.bold,
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //           ),
-                              //
-                              //           const Expanded(
-                              //             flex: 1,
-                              //             child: Padding(
-                              //               padding: EdgeInsets.only(left: 65,right: 10),
-                              //               child: Text(
-                              //                 "QTY",
-                              //                 style: TextStyle(
-                              //                   fontWeight: FontWeight.bold,
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           Expanded(
-                              //             flex: 1,
-                              //             child: Padding(
-                              //               padding: EdgeInsets.only(right: 10),
-                              //               child: Text(
-                              //                 "Total Amount",
-                              //                 style: TextStyle(
-                              //                   fontWeight: FontWeight.bold,
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: selectedItems.length,
-                                itemBuilder: (context, index) {
-                                  var item = selectedItems[index];
-                                  // int index = selectedItems.indexOf(item) + 1;
-                                  return Table(
-                                    border: TableBorder(
-                                      bottom: BorderSide(width:1 ,color: Colors.grey),
-                                      //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
-                                      verticalInside: BorderSide(width: 1,color: Colors.grey),
-                                    ),
-                                    // border: TableBorder.all(
-                                    //     color: const Color(0xFFB2C2D3)),
-                                    columnWidths: const {
-                                      0: FlexColumnWidth(1),
-                                      1: FlexColumnWidth(2.7),
-                                      2: FlexColumnWidth(2),
-                                      3: FlexColumnWidth(1.8),
-                                      4: FlexColumnWidth(2),
-                                      5: FlexColumnWidth(1),
-                                      6: FlexColumnWidth(2),
-                                      7: FlexColumnWidth(2),
-                                      8: FlexColumnWidth(2),
-                                      9: FlexColumnWidth(2),
-                                    },
-                                    // Add this line
-                                    children: [
-                                      TableRow(
-                                        children: [
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10),
-                                              child: Center(
-                                                child: Text(
-                                                  ' ${index + 1}',
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10),
-                                              child: Container(
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius
-                                                      .circular(4.0),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item['productName'],
-                                                    textAlign: TextAlign
-                                                        .center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10),
-                                              child: Container(
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius
-                                                      .circular(4.0),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item['category'],
-                                                    textAlign: TextAlign
-                                                        .center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10),
-                                              child: Container(
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius
-                                                      .circular(4.0),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item['subCategory'],
-                                                    textAlign: TextAlign
-                                                        .center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10),
-                                              child: Container(
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius
-                                                      .circular(4.0),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item['price'].toString(),
-                                                    textAlign: TextAlign
-                                                        .center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10),
-                                              child: Container(
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius
-                                                      .circular(4.0),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item['qty'].toString(),
-                                                    textAlign: TextAlign
-                                                        .center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10
-                                              ),
-                                              child: Container(
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius
-                                                      .circular(4.0),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item['actualAmount']
-                                                        .toString(),
-                                                    textAlign: TextAlign
-                                                        .center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10
-                                              ),
-                                              child: Container(
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius
-                                                      .circular(4.0),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item['discount']
-                                                        .toString(),
-                                                    textAlign: TextAlign
-                                                        .center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10
-                                              ),
-                                              child: Container(
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius
-                                                      .circular(4.0),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item['tax']
-                                                        .toString(),
-                                                    textAlign: TextAlign
-                                                        .center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10
-                                              ),
-                                              child: Container(
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius
-                                                      .circular(4.0),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item['totalAmount']
-                                                        .toString(),
-                                                    textAlign: TextAlign
-                                                        .center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 9,bottom: 9),
-                                child: Align(
-                                  alignment: const Alignment(0.9,0.8),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 0,top: 0),
                                   child: Container(
-                                    height: 40,
-                                    padding: const EdgeInsets.only(left: 15,right: 10,top: 10,bottom: 2),
+                                    width: 1.8, // Set the width to 1 for a vertical line
+                                    height: 984, // Set the height to your liking
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.blue),
-                                      borderRadius: BorderRadius.circular(2.0),
-                                      color: Colors.white,
+                                      border: Border(left: BorderSide(width: 1, color: Colors.grey)),
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(bottom: 2),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          RichText(text:
-                                          TextSpan(
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                    // top: 60,
+                                    left: 1,
+                                  ),
+                                  width: 298,
+                                  height: 928
+                                  ,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Form(
+                                    key: _formKey,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 5),
+                                              child: IconButton(
+                                                icon:
+                                                const Icon(Icons.arrow_back), // Back button icon
+                                                onPressed: () {
+                                                  context.go('/Order_List');
+                                                  // Navigator.push(
+                                                  //   context,
+                                                  //   MaterialPageRoute(
+                                                  //       builder: (context) =>
+                                                  //       const Orderspage()),
+                                                  // );
+                                                },
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: 15,top: 10),
+                                              child: Text(
+                                                'Order List',
+                                                style: TextStyle(
+                                                  fontSize: 19,
+                                                  //  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 0, left: 0),
+                                          child: Container(
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 5), // Space above/below the border
+                                            height: 0.5,
+                                            // width: 1500,
+                                            width: constraints.maxWidth,// Border height
+                                            color: Colors.black, // Border color
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 50,
+                                          width: 60,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 15, right: 15, bottom: 5,top: 5),
+                                            child: TextFormField(
+                                              //  controller: _orderIdController, // Assign the controller to the TextFormField
+                                              decoration: const InputDecoration(
+                                                // labelText: 'Order ID',
+                                                hintText: 'Search Order',
+                                                contentPadding: EdgeInsets.all(8),
+                                                border: OutlineInputBorder(),
+                                                prefixIcon: Icon(Icons.search_outlined),
+                                              ),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _searchText = value.toLowerCase();
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Expanded(child: SingleChildScrollView(child: Column(
+                                          children: [
+                                            _loading
+                                                ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
+                                                : _errorMessage.isNotEmpty
+                                                ? Center(child: Text(_errorMessage))
+                                                : widget.orderDetails!.isEmpty
+                                                ? const Center(child: Text('No product found'))
+                                                : ListView.separated(
+                                              shrinkWrap: true,
+                                              itemCount: _searchText.isNotEmpty
+                                                  ? widget.orderDetails!.where((orderDetail) =>
+                                              orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                                  orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                              ).length
+                                                  : widget.orderDetails!.length,
+                                              itemBuilder: (context, index) {
+                                                final isSelected = _isSelected[index];
+                                                final orderDetail = _searchText.isNotEmpty
+                                                    ? widget.orderDetails!.where((orderDetail) =>
+                                                orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
+                                                    orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
+                                                ).elementAt(index)
+                                                    : widget.orderDetails![index];
+
+                                                return GestureDetector(
+                                                  onTap: () async {
+                                                    _timer = Timer(Duration(seconds: 1), () {
+                                                      setState(() {
+                                                        _isLoading = false;
+                                                      });
+                                                    });
+                                                    setState(() {
+                                                      for (int i = 0; i < _isSelected.length; i++) {
+                                                        _isSelected[i] = i == index;
+                                                      }
+                                                      orderIdController.text = orderDetail.orderId;
+                                                    });
+                                                    await _fetchOrderDetails(orderDetail.orderId);
+                                                    //in this place write api to fetch datas?? _showProductDetails(orderDetail);
+                                                  },
+                                                  child: AnimatedContainer(
+                                                    duration: const Duration(milliseconds: 200),
+                                                    decoration: BoxDecoration(
+                                                      color: isSelected ? Colors.lightBlue[100] : Colors.white,
+                                                    ),
+                                                    child: ListTile(
+                                                      title: Text('Order ID: ${orderDetail.orderId}'),
+                                                      subtitle: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text('Order Date: ${orderDetail.orderDate}'),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              separatorBuilder: (context, index) {
+                                                return const Divider();
+                                              },
+                                            )
+                                          ],
+                                        ),))
+
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Expanded(child: SingleChildScrollView(child: Stack(
+                                  children: [
+                                    Positioned(
+                                      top: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 0,
+                                        ),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                                          color: Colors.white,
+                                          height: 50,
+                                          child: Row(
                                             children: [
-                                              const TextSpan(
-                                                text:  'Total',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.blue
-                                                  // fontWeight: FontWeight.bold,
-                                                ),
+                                              const Padding(
+                                                padding: EdgeInsets.only(left: 30),
+                                                child: Text('Order ID :',style: TextStyle(fontSize: 19),),
                                               ),
-                                              const TextSpan(
-                                                text: '  ₹',
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text:
-                                                totalController.text,
-                                                style: const TextStyle(
-                                                  color: Colors.black,
+                                              const SizedBox(width:8),
+                                              Text((orderIdController.text),style: const TextStyle(fontSize: 19),),
+                                              //  Text(orderIdController.text),
+                                              const SizedBox(width: 10,),
+                                              const Spacer(),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 100),
+                                                child: OutlinedButton(
+                                                  onPressed: () {
+                                                    context.go('/Documents',extra: {
+                                                      'orderId': orderIdController.text,
+                                                      'orderDetails': filteredData.map((detailInstance) => OrderDetail(
+                                                        orderId: detailInstance.orderId,
+                                                        orderDate: detailInstance.orderDate, items: [],
+                                                        // Add other fields as needed
+                                                      )).toList(),
+                                                    });
+
+                                                  },
+                                                  style: OutlinedButton.styleFrom(
+                                                    backgroundColor:
+                                                    Colors.blue[800], // Button background color
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                      BorderRadius.circular(5), // Rounded corners
+                                                    ),
+                                                    side: BorderSide.none, // No outline
+                                                  ),
+                                                  child: const Text(
+                                                    'Documents',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          )
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ),
-                              // const Divider(color: Colors.grey,),
-                              // Padding(
-                              //   padding: EdgeInsets.only(top: 20,left: maxWidth * 0.2 ,right: maxWidth * 0.2),
-                              //   child: Row(
-                              //     children: [
-                              //       Expanded(
-                              //         child: Container(
-                              //   width: maxWidth * 0.25,
-                              //           decoration: BoxDecoration(
-                              //             border: Border.all(color: Colors.blue),
-                              //           ),
-                              //           child: Padding(
-                              //             padding: const EdgeInsets.only(
-                              //               top: 10,
-                              //               bottom: 10,
-                              //               left: 5,
-                              //               right: 5,
-                              //             ),
-                              //             child: RichText(
-                              //               text: TextSpan(
-                              //                 children: [
-                              //                   const TextSpan(
-                              //                     text: 'Total',
-                              //                     style: TextStyle(
-                              //                       fontWeight: FontWeight.bold,
-                              //                       color: Colors.blue,
-                              //                     ),
-                              //                   ),
-                              //                   const TextSpan(
-                              //                     text: '  ₹',
-                              //                     style: TextStyle(
-                              //                       color: Colors.black,
-                              //                     ),
-                              //                   ),
-                              //                   TextSpan(
-                              //                     text: totalController.text,
-                              //                     style: const TextStyle(
-                              //                       color: Colors.black,
-                              //                     ),
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //       ),
-                              //     ],
-                              //   ),
-                              // ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 0, left: 0),
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 1), // Space above/below the border
+                                        height: 984,
+                                        // width: 1500,
+                                        width:0.5,// Border height
+                                        color: Colors.black, // Border color
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 49, left: 0),
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 1), // Space above/below the border
+                                        height: 0.5,
+                                        // width: 1500,
+                                        width: 1500,// Border height
+                                        color: Colors.black, // Border color
+                                      ),
+                                    ),
+
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50, top: 100,right: 50),
+                                      child: Container(
+                                        height: 100,
+                                        width: maxWidth,
+                                        decoration:  BoxDecoration(
+                                          color: Color(0xFFFFFFFF), // background: #FFFFFF
+                                          boxShadow: [BoxShadow(
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
+                                            color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                          )],
+                                          border: Border.all(
+                                            // border: 2px
+                                            color: Color(0xFFB2C2D3), // border: #B2C2D3
+                                          ),
+                                          borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+                                        ),
+                                        child:  Padding(
+                                          padding: EdgeInsets.only(top: 30),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.check_box,
+                                                      color: Colors.green,
+                                                    ),
+                                                    Text(
+                                                      'Order Placed',
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.check_box,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    Text(
+                                                      'Invoice',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.check_box,
+                                                      color: deliveryStatusController.text == 'Not Started'
+                                                          ? Colors.grey
+                                                          : deliveryStatusController.text == 'Delivered'
+                                                          ? Colors.green
+                                                          : Colors.grey, // default color
+                                                    ),
+                                                    Text(
+                                                      'Delivery',
+                                                      style: TextStyle(
+                                                        color: deliveryStatusController.text.toLowerCase() == 'Not Started'
+                                                            ? Colors.grey
+                                                            : deliveryStatusController.text.toLowerCase() == 'In Progress'
+                                                            ? Colors.grey
+                                                            : Colors.black,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.check_box,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    Text(
+                                                      'Payments',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 50,right: 50,top: 250),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFFFFFFFF), // background: #FFFFFF
+                                          boxShadow: [BoxShadow(
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
+                                            color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                          )],
+                                          border: Border.all(
+                                            // border: 2px
+                                            color: Color(0xFFB2C2D3), // border: #B2C2D3
+                                          ),
+                                          borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+                                        ),
+                                        child: Table(
+                                          border: TableBorder.all(color: const Color(0xFFB2C2D3)),
+
+                                          columnWidths: const {
+                                            0: FlexColumnWidth(2),
+                                            1: FlexColumnWidth(1.4),
+                                          },
+                                          children: [
+                                            row1,
+                                            row2,
+                                            row3,
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    _isLoading
+                                        ? Padding(
+                                      padding: EdgeInsets.only(top: 400),
+                                      child: SpinKitWave(
+                                        color: Colors.blue,
+                                        size: 30.0,
+                                      ),
+                                    )
+                                        : Container(),
+                                    Padding(
+                                      padding:  const EdgeInsets.only(left: 50, top: 650,right: 50),
+                                      child: Container(
+                                        // height: 150,
+                                        width: maxWidth,
+                                        //   padding: const EdgeInsets.all(0.0),
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFFFFFFFF), // background: #FFFFFF
+                                          boxShadow: [BoxShadow(
+                                            offset: Offset(0, 3),
+                                            blurRadius: 6,
+                                            color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                          )],
+                                          border: Border.all(
+                                            // border: 2px
+                                            color: Color(0xFFB2C2D3), // border: #B2C2D3
+                                          ),
+                                          borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 30, top: 10),
+                                              child: Text(
+                                                'Add Products',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              width: maxWidth,
+                                              decoration: BoxDecoration(
+                                                border: Border(
+                                                  top: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
+                                                  bottom: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
+                                                ),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                                child: Table(
+                                                  columnWidths: const {
+                                                    0: FlexColumnWidth(1),
+                                                    1: FlexColumnWidth(2.7),
+                                                    2: FlexColumnWidth(2),
+                                                    3: FlexColumnWidth(1.8),
+                                                    4: FlexColumnWidth(2),
+                                                    5: FlexColumnWidth(1),
+                                                    6: FlexColumnWidth(2),
+                                                    7: FlexColumnWidth(2),
+                                                    8: FlexColumnWidth(2),
+                                                    9: FlexColumnWidth(2),
+                                                  },
+                                                  children: const [
+                                                    TableRow(
+                                                      children: [
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'SN',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Product Name',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Category',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Sub Category',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Price',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'QTY',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Amount',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Disc.',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'TAX',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Total Amount',
+                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            // Container(
+                                            //   width: maxWidth,
+                                            //   decoration: BoxDecoration(
+                                            //     border: Border.all(
+                                            //       color: Colors.grey,),
+                                            //   ),
+                                            //   child:  Padding(
+                                            //     padding: EdgeInsets.only(
+                                            //       top: 5,
+                                            //       bottom: 5,
+                                            //     ),
+                                            //     child: SizedBox(
+                                            //       // height: 34,
+                                            //       child: Row(
+                                            //         children: [
+                                            //           Expanded(
+                                            //             flex:1,
+                                            //             child: Padding(
+                                            //               padding: EdgeInsets.only(left: 25,),
+                                            //               child: Text(
+                                            //                 "SN",
+                                            //                 style: TextStyle(
+                                            //                   fontWeight: FontWeight.bold,
+                                            //                 ),
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //           Expanded(
+                                            //             flex: 1,
+                                            //             child: Padding(
+                                            //               padding: EdgeInsets.only(left: 10,right: 10),
+                                            //               child: Text(
+                                            //                 'Product Name',
+                                            //                 style: TextStyle(
+                                            //                   fontWeight: FontWeight.bold,
+                                            //                 ),
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //           Expanded(
+                                            //             flex: 1,
+                                            //             child: Padding(padding: EdgeInsets.only(left: 50,right: 15),
+                                            //               child: Text(
+                                            //                 "Category",
+                                            //                 style: TextStyle(
+                                            //                   fontWeight: FontWeight.bold,
+                                            //                 ),
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //           Expanded(
+                                            //             flex: 1,
+                                            //             child: Padding(
+                                            //               padding: EdgeInsets.only(left: 45,right: 10),
+                                            //               child: Text(
+                                            //                 "Sub Category",
+                                            //                 style: TextStyle(
+                                            //                   fontWeight: FontWeight.bold,
+                                            //                 ),
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //           Expanded(
+                                            //             flex: 1,
+                                            //             child: Padding(
+                                            //               padding: EdgeInsets.only(left: 90,right: 10),
+                                            //               child: Text(
+                                            //                 "Price",
+                                            //                 style: TextStyle(
+                                            //                   fontWeight: FontWeight.bold,
+                                            //                 ),
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //
+                                            //           const Expanded(
+                                            //             flex: 1,
+                                            //             child: Padding(
+                                            //               padding: EdgeInsets.only(left: 65,right: 10),
+                                            //               child: Text(
+                                            //                 "QTY",
+                                            //                 style: TextStyle(
+                                            //                   fontWeight: FontWeight.bold,
+                                            //                 ),
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //           Expanded(
+                                            //             flex: 1,
+                                            //             child: Padding(
+                                            //               padding: EdgeInsets.only(right: 10),
+                                            //               child: Text(
+                                            //                 "Total Amount",
+                                            //                 style: TextStyle(
+                                            //                   fontWeight: FontWeight.bold,
+                                            //                 ),
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //         ],
+                                            //       ),
+                                            //     ),
+                                            //   ),
+                                            // ),
+                                            ListView.builder(
+                                              shrinkWrap: true,
+                                              physics: const NeverScrollableScrollPhysics(),
+                                              itemCount: selectedItems.length,
+                                              itemBuilder: (context, index) {
+                                                var item = selectedItems[index];
+                                                // int index = selectedItems.indexOf(item) + 1;
+                                                return Table(
+                                                  border: TableBorder(
+                                                    bottom: BorderSide(width:1 ,color: Colors.grey),
+                                                    //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
+                                                    verticalInside: BorderSide(width: 1,color: Colors.grey),
+                                                  ),
+                                                  // border: TableBorder.all(
+                                                  //     color: const Color(0xFFB2C2D3)),
+                                                  columnWidths: const {
+                                                    0: FlexColumnWidth(1),
+                                                    1: FlexColumnWidth(2.7),
+                                                    2: FlexColumnWidth(2),
+                                                    3: FlexColumnWidth(1.8),
+                                                    4: FlexColumnWidth(2),
+                                                    5: FlexColumnWidth(1),
+                                                    6: FlexColumnWidth(2),
+                                                    7: FlexColumnWidth(2),
+                                                    8: FlexColumnWidth(2),
+                                                    9: FlexColumnWidth(2),
+                                                  },
+                                                  // Add this line
+                                                  children: [
+                                                    TableRow(
+                                                      children: [
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10),
+                                                            child: Center(
+                                                              child: Text(
+                                                                ' ${index + 1}',
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item['productName'],
+                                                                  textAlign: TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item['category'],
+                                                                  textAlign: TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item['subCategory'],
+                                                                  textAlign: TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item['price'].toString(),
+                                                                  textAlign: TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10),
+                                                            child: Container(
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item['qty'].toString(),
+                                                                  textAlign: TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10
+                                                            ),
+                                                            child: Container(
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item['actualAmount']
+                                                                      .toString(),
+                                                                  textAlign: TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10
+                                                            ),
+                                                            child: Container(
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item['discount']
+                                                                      .toString(),
+                                                                  textAlign: TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10
+                                                            ),
+                                                            child: Container(
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item['tax']
+                                                                      .toString(),
+                                                                  textAlign: TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TableCell(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                top: 10,
+                                                                bottom: 10
+                                                            ),
+                                                            child: Container(
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey.shade200,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(4.0),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item['totalAmount']
+                                                                      .toString(),
+                                                                  textAlign: TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 9,bottom: 9),
+                                              child: Align(
+                                                alignment: const Alignment(0.9,0.8),
+                                                child: Container(
+                                                  height: 40,
+                                                  padding: const EdgeInsets.only(left: 15,right: 10,top: 10,bottom: 2),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(color: Colors.blue),
+                                                    borderRadius: BorderRadius.circular(2.0),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(bottom: 2),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        RichText(text:
+                                                        TextSpan(
+                                                          children: [
+                                                            const TextSpan(
+                                                              text:  'Total',
+                                                              style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors.blue
+                                                                // fontWeight: FontWeight.bold,
+                                                              ),
+                                                            ),
+                                                            const TextSpan(
+                                                              text: '  ₹',
+                                                              style: TextStyle(
+                                                                color: Colors.black,
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                              text:
+                                                              totalController.text,
+                                                              style: const TextStyle(
+                                                                color: Colors.black,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // const Divider(color: Colors.grey,),
+                                            // Padding(
+                                            //   padding: EdgeInsets.only(top: 20,left: maxWidth * 0.2 ,right: maxWidth * 0.2),
+                                            //   child: Row(
+                                            //     children: [
+                                            //       Expanded(
+                                            //         child: Container(
+                                            //   width: maxWidth * 0.25,
+                                            //           decoration: BoxDecoration(
+                                            //             border: Border.all(color: Colors.blue),
+                                            //           ),
+                                            //           child: Padding(
+                                            //             padding: const EdgeInsets.only(
+                                            //               top: 10,
+                                            //               bottom: 10,
+                                            //               left: 5,
+                                            //               right: 5,
+                                            //             ),
+                                            //             child: RichText(
+                                            //               text: TextSpan(
+                                            //                 children: [
+                                            //                   const TextSpan(
+                                            //                     text: 'Total',
+                                            //                     style: TextStyle(
+                                            //                       fontWeight: FontWeight.bold,
+                                            //                       color: Colors.blue,
+                                            //                     ),
+                                            //                   ),
+                                            //                   const TextSpan(
+                                            //                     text: '  ₹',
+                                            //                     style: TextStyle(
+                                            //                       color: Colors.black,
+                                            //                     ),
+                                            //                   ),
+                                            //                   TextSpan(
+                                            //                     text: totalController.text,
+                                            //                     style: const TextStyle(
+                                            //                       color: Colors.black,
+                                            //                     ),
+                                            //                   ),
+                                            //                 ],
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //     ],
+                                            //   ),
+                                            // ),
 
 
-                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),))
+
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ],
-                  ),))
+                    )
 
-                ],
-              );
+
+                  ],
+                );
+
+              }
+
             }
         )
 
