@@ -1819,11 +1819,11 @@ class UserResponse {
   bool active;
   final String role;
   final String email;
-  final String? token;
+
   final String companyName;
   final String mobileNumber;
   final String location;
-  final DateTime? tokenCreationDate;
+
 
   UserResponse({
     required this.userId,
@@ -1832,11 +1832,11 @@ class UserResponse {
     required this.active,
     required this.role,
     required this.email,
-    this.token,
+
     required this.companyName,
     required this.mobileNumber,
     required this.location,
-    this.tokenCreationDate,
+
   });
 
   // Factory method to create an instance from JSON
@@ -1848,13 +1848,9 @@ class UserResponse {
       active: json['active'] ?? '',
       role: json['role'] ?? '',
       email: json['email'] ?? '',
-      token: json['token'] ?? '',
       companyName: json['companyName'] ?? '',
       mobileNumber: json['mobileNumber'] ?? '',
       location: json['location'] ?? '',
-      tokenCreationDate: json['tokenCreationDate'] != null
-          ? DateTime.parse(json['tokenCreationDate'])
-          : null,
     );
   }
 
@@ -1867,11 +1863,9 @@ class UserResponse {
       'active': active,
       'role': role,
       'email': email,
-      'token': token,
       'companyName': companyName,
       'mobileNumber': mobileNumber,
       'location': location,
-      'tokenCreationDate': tokenCreationDate?.toIso8601String(),
     };
   }
 

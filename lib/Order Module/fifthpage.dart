@@ -238,38 +238,6 @@ class _FifthPageState extends State<FifthPage> {
     });
   }
 
-  // void _calculateTotal() {
-  //   _total = 0.0;
-  //   for (var product in widget.selectedProducts) {
-  //     product.total = product.totalAmount * product.quantity;
-  //     _total += product.total; // Add the total of each product to _total
-  //   }
-  //   setState(() {
-  //
-  //   });
-  // }
-
-
-  // void _calculateTotal() {
-  //   double total = 0.0;
-  //   for (var product in widget.selectedProducts) {
-  //     total += _calculateTotalAmount(product);
-  //   }
-  //   setState(() {
-  //     _total = total;
-  //   });
-  // }
-  //
-  // void calculateTotal1;
-  // Void(List<Product> products) {
-  //   double total = 0;
-  //   for (Product product in products) {
-  //     total += _calculateTotalAmount(product);
-  //   }
-  //   print('Total Amount: $total');
-  //   // You can also return the total amount if needed
-  //    return total;
-  // }
 
 
 

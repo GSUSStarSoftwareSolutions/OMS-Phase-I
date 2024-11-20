@@ -4,6 +4,7 @@ import 'package:btb/Product%20Module/Edit.dart';
 import 'package:btb/Product Module/Product Screen.dart';
 import 'package:btb/admin/admin%20edit.dart';
 import 'package:btb/admin/admin%20list.dart';
+import 'package:btb/admin/create%20login.dart';
 import 'package:btb/customer%20login/credit/credit%20list.dart';
 import 'package:btb/customer%20login/delivery/delivery.dart';
 import 'package:btb/customer%20login/invoice/invoice%20list.dart';
@@ -157,6 +158,24 @@ class MyApp extends StatelessWidget {
           return CustomTransitionPage(
             key: state.pageKey,
             child: Createusr(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/Create_Account',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: CreateLogin(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(

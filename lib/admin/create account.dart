@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 import 'dart:html';
+
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/main.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,6 +23,7 @@ class _createscrState extends State<createscr> {
   final userName = TextEditingController();
   final Email = TextEditingController();
   final Password = TextEditingController();
+  final ConfirmPassword = TextEditingController();
   bool _obscureText = true;
   bool _obscureText1 = true;
 
@@ -36,85 +38,82 @@ class _createscrState extends State<createscr> {
     });
   }
 
-  Future<String?> checkLogin(String username, String password) async {
-    Map tempJson = {"userName": username, "password": password};
+  Future<String?> checkLogin(String Email, String password) async {
     String url =
-        '$apicall/user_master/login-authenticate';
-    final response = await http.post(Uri.parse(url),
+       '$apicall/user_master/add_password/$Email/$password';
+      //   'https://mjl9lz64l7.execute-api.ap-south-1.amazonaws.com/stage1/api/user_master/add_password/$Email/$password';
+    final response = await http.put(Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
-        },
-        body: json.encode(tempJson));
+        });
     if (response.statusCode == 200) {
-      Map tempData = json.decode(response.body);
-      if (tempData.containsKey("error")) {
-        // Handle empty input fields with appropriate messages
-        if (userName.text.isEmpty && Password.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please enter username & password")),
+
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            contentPadding: EdgeInsets.zero,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.warning,
+                          color: Colors.orange, size: 50),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Password set Successfully',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.end,
+                        children: [
+
+                          ElevatedButton(
+                            onPressed: () {
+                              context.go('/');
+                            },
+                            style:
+                            ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              side: const BorderSide(
+                                  color: Colors.blue),
+                              shape:
+                              RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(
+                                    10.0),
+                              ),
+                            ),
+                            child: const Text(
+                              'Go to Login',
+                              style: TextStyle(
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           );
-        } else if (userName.text.isNotEmpty && Password.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please enter password")),
-          );
-        } else if (userName.text.isEmpty && Password.text.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please enter username")),
-          );
-        } else if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Something went wrong")));
-        }
-      } else {
-        window.sessionStorage["userId"] = tempData['userId'];
-        // Check the role and handle accordingly
-        String role = tempData['role'];
-        if (role == 'Employee') {
-          // Handle Employee role
-          window.sessionStorage["token"] = tempData['token'];
-          context.go('/Home'); // Navigate to Employee-specific home
-        } else if (role == 'Customer') {
-          // Handle Admin role
-          window.sessionStorage["userId"] = tempData['userId'];
-          window.sessionStorage["token"] = tempData['token'];
-          //  String userId = tempData['userId'];
-          //  Provider.of<UserRoleProvider>(context, listen: false).setRole(role);
-          context.go('/Customer_Order_List');
-          // Navigate to Admin-specific home
-        } else if (role == 'Admin') {
-          // Handle Admin role
-          window.sessionStorage["token"] = tempData['token'];
-          context.go('/User_List');
-          // Navigate to Admin-specific home
-        }
-        // else if (role == 'User') {
-        //   // Handle Admin role
-        //   window.sessionStorage["token"] = tempData['token'];
-        //   Navigator.push(
-        //     context,
-        //     PageRouteBuilder(
-        //       pageBuilder: (context, animation, secondaryAnimation) =>
-        //           AdminList(),
-        //       transitionDuration: const Duration(milliseconds: 200),
-        //       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        //         return FadeTransition(
-        //           opacity: animation,
-        //           child: child,
-        //         );
-        //       },
-        //     ),
-        //   );
-        // //  context.go('/AdminHome');
-        //   // Navigate to Admin-specific home
-        // }
-        else {
-          // Handle other roles, if needed
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Unknown role")),
-          );
-        }
-        return null;
-      }
+        },
+      );
+
     } else {
       // Handle non-200 responses
       ScaffoldMessenger.of(context).showSnackBar(
@@ -127,258 +126,221 @@ class _createscrState extends State<createscr> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Container(
-          constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
-          // 80% of screen width
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: constraints.maxHeight * 0.18),
-              // 10% of screen height
-              Align(
-                alignment: Alignment(0.05, 0.0),
-                child: Text(
-                  'Create an Account',
-                  style: TextStyle(
-                      fontSize: constraints.maxWidth * 0.023,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue),
+        return Scaffold(
+          body: Container(
+            constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
+            // 80% of screen width
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: constraints.maxHeight * 0.18),
+                // 10% of screen height
+                Align(
+                  alignment: Alignment(0.05, 0.0),
+                  child: Text(
+                    'Create an Account',
+                    style: TextStyle(
+                        fontSize: constraints.maxWidth * 0.023,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
                 ),
-              ),
-              SizedBox(height: constraints.maxHeight * 0.03),
-              // 5% of screen height
-              Align(
-                alignment:  Alignment(0.9, 0.4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: constraints.maxHeight * 0.04),
-                    const Align(
-                        alignment: Alignment(-0.24, 0.0),
-                        child: Text(
-                          'Email Address',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment:  Alignment(0.1, 0.0),
-                      child: SizedBox(
-                        height: 40,
-                        width: constraints.maxWidth * 0.39,
-                        child: TextFormField(
-                          controller: Email,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Enter your email address',
-                            hintStyle: TextStyle(fontSize: 13),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
+                SizedBox(height: constraints.maxHeight * 0.03),
+                Align(
+                  alignment:  Alignment(0.9, 0.4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: constraints.maxHeight * 0.04),
+                      const Align(
+                          alignment: Alignment(-0.33, 0.0),
+                          child: Text(
+                            'Email Address',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment:  Alignment(0.1, 0.0),
+                        child: SizedBox(
+                          height: 40,
+                          width: constraints.maxWidth * 0.39,
+                          child: TextFormField(
+                            controller: Email,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter your email address',
+                              hintStyle: TextStyle(fontSize: 13),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
                             ),
                           ),
-                          onFieldSubmitted: (value) async {
-                            print('username');
-                            String? role =
-                            await checkLogin(userName.text, Password.text);
-                            if (role != null) {
-                              if(role == 'Employee'){
-                                context.go('/Home');
-                              }else if(role == 'Customer'){
-                                context.go('/Customer_Order_List');
-                              }else if(role == 'Admin'){
-                                context.go('/User_List');
-                              }else if(userName.text.isNotEmpty && Password.text.isEmpty){
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+                      const Align(
+                          alignment: Alignment(-0.32, 0.0),
+                          child: Text(
+                            'New Password',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment:  Alignment(0.1, 0.0),
+                        child: SizedBox(
+                          height: 40,
+                          width: constraints.maxWidth * 0.39,
+                          child: TextFormField(
+                            controller: Password,
+                            obscureText: _obscureText1,
+                            decoration:  InputDecoration(
+                              border:const  OutlineInputBorder(),
+                              hintText: 'Enter your new password',
+                              hintStyle: TextStyle(fontSize: 13),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureText1
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  size: 20,
+                                ),
+                                onPressed:
+                                _togglePasswordVisibility1, // Toggle password visibility
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Align(
+                          alignment: Alignment(-0.29, 0.0),
+                          child: Text(
+                            'Confirm Password',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: const Alignment(0.1, 0.0),
+                        child: SizedBox(
+                          height: 40,
+                          width: constraints.maxWidth * 0.39,
+                          child: TextFormField(
+                            controller: ConfirmPassword,
+                            obscureText: _obscureText,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter your confirm password',
+                              hintStyle: TextStyle(fontSize: 13),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureText
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  size: 20,
+                                ),
+                                onPressed:
+                                _togglePasswordVisibility, // Toggle password visibility
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Align(
+                        alignment: const Alignment(0.1, 0.2),
+                        child: SizedBox(
+                          width: constraints.maxWidth * 0.25,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              if(Password.text.isEmpty && ConfirmPassword.text.isEmpty){
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content:
-                                      Text("Please enter password")),
+                                  const SnackBar(content: Text("Password & Confirm Password can't be empty")),
+                                );
+                              }else if(Password.text.isEmpty && ConfirmPassword.text.isNotEmpty){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please Enter Password")),
+                                );
+                              }else if(Password.text.isNotEmpty && ConfirmPassword.text.isEmpty){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please Enter Confirm Password")),
+                                );
+                              }else if(Password.text != ConfirmPassword.text){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Password doesn't match")),
                                 );
                               }
-
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-                    const Align(
-                        alignment: Alignment(-0.24, 0.0),
-                        child: Text(
-                          'New Password',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment:  Alignment(0.1, 0.0),
-                      child: SizedBox(
-                        height: 40,
-                        width: constraints.maxWidth * 0.39,
-                        child: TextFormField(
-                          controller: userName,
-                          obscureText: _obscureText1,
-                          decoration:  InputDecoration(
-                            border:const  OutlineInputBorder(),
-                            hintText: 'Enter your new password',
-                            hintStyle: TextStyle(fontSize: 13),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureText1
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                size: 20,
-                              ),
-                              onPressed:
-                              _togglePasswordVisibility1, // Toggle password visibility
-                            ),
-                          ),
-                          onFieldSubmitted: (value) async {
-                            print('username');
-                            String? role =
-                            await checkLogin(userName.text, Password.text);
-                            if (role != null) {
-                              if(role == 'Employee'){
-                                context.go('/Home');
-                              }else if(role == 'Customer'){
-                                context.go('/Customer_Order_List');
-                              }else if(role == 'Admin'){
-                                context.go('/User_List');
-                              }else if(userName.text.isNotEmpty && Password.text.isEmpty){
+                              else if(Email.text.isEmpty && Password.text == ConfirmPassword.text){
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content:
-                                      Text("Please enter password")),
+                                  const SnackBar(content: Text("Please Enter Email Address")),
                                 );
                               }
-
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Align(
-                        alignment: Alignment(-0.21, 0.0),
-                        child: Text(
-                          'Confirm Password',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: const Alignment(0.1, 0.0),
-                      child: SizedBox(
-                        height: 40,
-                        width: constraints.maxWidth * 0.39,
-                        child: TextFormField(
-                          controller: Password,
-                          obscureText: _obscureText,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Enter your confirm password',
-                            hintStyle: TextStyle(fontSize: 13),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureText
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                size: 20,
-                              ),
-                              onPressed:
-                              _togglePasswordVisibility, // Toggle password visibility
-                            ),
-                          ),
-                          onFieldSubmitted: (value) async {
-                            print('username');
-                            String? role =
-                            await checkLogin(userName.text, Password.text);
-                            if (role != null) {
-                              if(role == 'Employee'){
-                                context.go('/Home');
-                              }else if(role == 'Customer'){
-                                context.go('/Customer_Order_List');
-                              }else if(role == 'Admin'){
-                                context.go('/User_List');
-                              }else if(userName.text.isEmpty && Password.text.isNotEmpty){
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content:
-                                      Text("Please enter username")),
-                                );
+                              else{
+                                await checkLogin(Email.text, Password.text);
                               }
+                              // bool isValid = await checkLogin(userName.text, Password.text);
+                              // if (isValid) {
+                              //   context.go('/Home');
+                              //   ScaffoldMessenger.of(context).showSnackBar(
+                              //     const SnackBar(content: Text("Something went wrong")),
+                              //   );
+                              // }
 
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Align(
-                      alignment: const Alignment(0.1, 0.2),
-                      child: SizedBox(
-                        width: constraints.maxWidth * 0.25,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            // bool isValid = await checkLogin(userName.text, Password.text);
-                            // if (isValid) {
-                            //   context.go('/Home');
-                            //   ScaffoldMessenger.of(context).showSnackBar(
-                            //     const SnackBar(content: Text("Something went wrong")),
-                            //   );
-                            // }
-                            await checkLogin(userName.text, Password.text);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue[800],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[800],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                             ),
+                            child: const Align(
+                                alignment: Alignment(0.0, 0.0),
+                                child: Text(
+                                  'Create Account',
+                                  style: TextStyle(color: Colors.white),
+                                )),
                           ),
-                          child: const Align(
-                              alignment: Alignment(0.0, 0.0),
-                              child: Text(
-                                'Create Account',
-                                style: TextStyle(color: Colors.white),
-                              )),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    Align(
-                      alignment: const Alignment(0.1, 0.0),
-                      child: RichText(
-                        textAlign: TextAlign.center,
-                        text: const TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Already have an account ? ',
-                              style: TextStyle(
-                                color: Colors.black,
+                      const SizedBox(height: 30),
+                      Align(
+                        alignment: const Alignment(0.1, 0.0),
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: const TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Already have an account ? ',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            TextSpan(
-                              text: 'Log in',
-                              style: TextStyle(
-                                color: Colors.blue,
+                              TextSpan(
+                                text: 'Log in',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -418,3 +380,5 @@ class ImageContainer1 extends StatelessWidget {
     );
   }
 }
+
+

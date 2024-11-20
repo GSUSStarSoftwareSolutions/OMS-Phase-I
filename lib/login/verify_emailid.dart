@@ -346,7 +346,7 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                         width: constraints.maxWidth * 0.2,
                         child: ElevatedButton(
                           onPressed: (){
-                            if(emailController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(emailController.text)){
+                            if(emailController.text.isEmpty){
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(
                                     'Enter Valid E-mail Address')),

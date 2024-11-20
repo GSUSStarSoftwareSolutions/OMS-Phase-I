@@ -583,19 +583,30 @@ Future<Uint8List> OrderBillPdf(OrderDetail orderDetails) async {
                         children: [
                           pw.TableRow(
                             children: [
-                          //    for(var item in items)
+                              //    for(var item in items)
                               buildCell('+10'),
                               buildCell(item['productName']),
                               buildCell(item['category']),
                               buildCell(item['qty'].toString()),
-                            //  buildCell((item['totalamoun2'] = item['price'] - double.parse(item['discountamount'].toString())).toString()),
+                              //  buildCell((item['totalamoun2'] = item['price'] - double.parse(item['discountamount'].toString())).toString()),
                               buildCell((item['totalamoun2'] = item['price'] - double.parse(item['discountamount'].toString())).toString()),
+                              // buildCell(
+                              //     (_total = double.parse((item['qty']
+                              //         * double.parse(item['totalamoun2'].toString() + double.parse(item['taxamount']).toString()
+                              //         )).toString())).toString()
+                              // ),
                               buildCell(
-                                  (_total = double.parse((item['qty']
-                                      * double.parse(item['totalamoun2'].toString()
-                                      )).toString())).toString()
-                              ),
-                            //  buildCell(double.parse(total.toString()) as String),
+                                  (_total = (double.parse(item['qty'].toString()) *
+                                      (double.parse(item['totalamoun2'].toString()) +
+                                          double.parse(item['taxamount'].toString())))
+                                  ).toStringAsFixed(2)) // Ensure the result is a properly formatted string with 2 decimal places
+
+
+
+//  buildCell(double.parse(total.toString()) as String),
+
+
+                          //  buildCell(double.parse(total.toString()) as String),
                             ],
                           ),
                         ],

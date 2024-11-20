@@ -542,10 +542,10 @@ class _EighthPageState extends State<EighthPage> {
           if (product['productName'] == item['productName']) {
             item['tax'] = product['tax'];
             item['discount'] = product['discount'];
-             item['discountamount'] = (double.parse(item['totalAmount'].toString()) * double.parse(item['discount'].replaceAll('%', ''))) / 100;
-             item['taxamount'] = ((double.parse(item['totalAmount'].toString()) -
-                 double.parse(item['discountamount'].toString())) *
-                 double.parse(item['tax'].replaceAll('%', '').toString())) / 100;
+            item['discountamount'] = (double.parse(item['price'].toString()) * double.parse(item['discount'].replaceAll('%', ''))) / 100;
+            item['taxamount'] = ((double.parse(item['price'].toString()) -
+                double.parse(item['discountamount'].toString())) *
+                double.parse(item['tax'].replaceAll('%', '').toString())) / 100;
           }
         }
       }
@@ -565,6 +565,7 @@ class _EighthPageState extends State<EighthPage> {
       print('Error generating PDF: $e');
     }
   }
+
 
 
   List<Widget> _buildMenuItems(BuildContext context) {

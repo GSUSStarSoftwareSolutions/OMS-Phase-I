@@ -551,25 +551,28 @@ class _LoginContainer2State extends State<LoginContainer2> {
                           ),
                         ),
                         const SizedBox(height: 140),
-                        Align(
-                          alignment: const Alignment(0.1, 0.0),
-                          child: RichText(
-                            textAlign: TextAlign.center,
-                            text: const TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Need help? ',
-                                  style: TextStyle(
-                                    color: Colors.black,
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 30),
+                          child: Align(
+                            alignment: const Alignment(0.1, 0.0),
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: const TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Need help? ',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
                                   ),
-                                ),
-                                TextSpan(
-                                  text: 'Contact Support',
-                                  style: TextStyle(
-                                    color: Colors.blue,
+                                  TextSpan(
+                                    text: 'Contact Support',
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -593,7 +596,7 @@ class ImageContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context,constraints){
-        if(constraints.maxHeight >=600){
+        if(constraints.maxHeight >=630){
           return Container(
             width: double.infinity, // Take full width
             color: Colors.grey[100],
