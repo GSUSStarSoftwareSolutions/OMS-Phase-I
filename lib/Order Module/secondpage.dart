@@ -164,6 +164,10 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisSize: MainAxisSize.max, // Adjust height to content
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: const Center(child: Text("Select Shipping Address",style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),),
+                    ),
                     // Close Icon
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0, right: 8.0),
@@ -199,13 +203,34 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                                   child: Column(
                                     children: [
                                       const SizedBox(height: 10),
-                                      Text(
-                                        shippingAddress1,
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black87,
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+
+                                          decoration:BoxDecoration(
+                                            //   border: Border.all(color: Colors.grey),
+                                            color: Colors.greenAccent,
+                                            borderRadius: BorderRadius.circular(8),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                spreadRadius: 3,
+                                                blurRadius: 3,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              shippingAddress1,
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -231,13 +256,34 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                                 child: Column(
                                   children: [
                                     const SizedBox(height: 10),
-                                    Text(
-                                      shippingAddress2,
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black87,
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        decoration:BoxDecoration(
+                                          //   border: Border.all(color: Colors.grey),
+                                          color: Colors.yellow,
+                                          borderRadius: BorderRadius.circular(8),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                              spreadRadius: 3,
+                                              blurRadius: 3,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+
+                                        child: Center(
+                                          child: Text(
+                                            shippingAddress2,
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -480,109 +526,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                   print('paaa');
                   _showAddressDialog(context);
 
-                  // AlertDialog(
-                  //   shape: RoundedRectangleBorder(
-                  //     borderRadius: BorderRadius.circular(15.0),
-                  //   ),
-                  //   contentPadding: EdgeInsets.zero,
-                  //   content: Column(
-                  //     mainAxisSize: MainAxisSize.min,
-                  //     children: [
-                  //       // Close Button
-                  //       Align(
-                  //         alignment: Alignment.topRight,
-                  //         child: IconButton(
-                  //           icon: Icon(Icons.close, color: Colors.red),
-                  //           onPressed: () {
-                  //             Navigator.of(context).pop();
-                  //           },
-                  //         ),
-                  //       ),
-                  //       Padding(
-                  //         padding: const EdgeInsets.all(16.0),
-                  //         child: Column(
-                  //           children: [
-                  //             // Warning Icon
-                  //             Icon(Icons.warning, color: Colors.orange, size: 50),
-                  //             SizedBox(height: 16),
-                  //             // Confirmation Message
-                  //             Text(
-                  //               'Are You Sure',
-                  //               style: TextStyle(
-                  //                 fontSize: 18,
-                  //                 fontWeight: FontWeight.bold,
-                  //                 color: Colors.black,
-                  //               ),
-                  //             ),
-                  //             SizedBox(height: 20),
-                  //             // Buttons
-                  //             Row(
-                  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //               children: [
-                  //                 ElevatedButton(
-                  //                   onPressed: () {
-                  //                     // Handle Yes action
-                  //                     context.go('/');
-                  //                     // Navigator.push(
-                  //                     //   context,
-                  //                     //   PageRouteBuilder(
-                  //                     //     pageBuilder: (context, animation,
-                  //                     //         secondaryAnimation) =>
-                  //                     //         LoginScr(),
-                  //                     //     transitionDuration:
-                  //                     //     const Duration(milliseconds: 5),
-                  //                     //     transitionsBuilder: (context, animation,
-                  //                     //         secondaryAnimation, child) {
-                  //                     //       return FadeTransition(
-                  //                     //         opacity: animation,
-                  //                     //         child: child,
-                  //                     //       );
-                  //                     //     },
-                  //                     //   ),
-                  //                     // );
-                  //                     // Navigator.of(context).pop();
-                  //                   },
-                  //                   style: ElevatedButton.styleFrom(
-                  //                     backgroundColor: Colors.white,
-                  //                     side: BorderSide(color: Colors.blue),
-                  //                     shape: RoundedRectangleBorder(
-                  //                       borderRadius: BorderRadius.circular(10.0),
-                  //                     ),
-                  //                   ),
-                  //                   child: Text(
-                  //                     'Yes',
-                  //                     style: TextStyle(
-                  //                       color: Colors.blue,
-                  //                     ),
-                  //                   ),
-                  //                 ),
-                  //                 ElevatedButton(
-                  //                   onPressed: () {
-                  //                     // Handle No action
-                  //                     Navigator.of(context).pop();
-                  //                   },
-                  //                   style: ElevatedButton.styleFrom(
-                  //                     backgroundColor: Colors.white,
-                  //                     side: BorderSide(color: Colors.red),
-                  //                     shape: RoundedRectangleBorder(
-                  //                       borderRadius: BorderRadius.circular(10.0),
-                  //                     ),
-                  //                   ),
-                  //                   child: Text(
-                  //                     'No',
-                  //                     style: TextStyle(
-                  //                       color: Colors.red,
-                  //                     ),
-                  //                   ),
-                  //                 ),
-                  //               ],
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // );
+
                 },
                 style: OutlinedButton.styleFrom(
                   backgroundColor : Colors.blue[800],
@@ -1352,11 +1296,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                                                 {
                                                   String validateFields() {
                                                     if ( controller.text.isEmpty) {
-                                                      return 'Please Enter Customer Id.';
-                                                    }
-                                                    if(controller.text.length != 10)
-                                                    {
-                                                      return 'Please Enter Valid Customer Id.';
+                                                      return 'Please Enter Customer Name.';
                                                     }
                                                     if (ContactPersonController.text.isEmpty || ContactPersonController.text.length <= 2) {
                                                       return 'Please enter a contact person name';
@@ -1696,11 +1636,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                                                           {
                                                             String validateFields() {
                                                               if ( controller.text.isEmpty) {
-                                                                return 'Please Enter Customer Id.';
-                                                              }
-                                                              if(controller.text.length != 10)
-                                                              {
-                                                                return 'Please Enter Valid Customer Id.';
+                                                                return 'Please Enter Customer Name.';
                                                               }
                                                               if (ContactPersonController.text.isEmpty || ContactPersonController.text.length <= 2) {
                                                                 return 'Please enter a contact person name';

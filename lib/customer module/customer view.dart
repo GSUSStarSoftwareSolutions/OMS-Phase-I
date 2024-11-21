@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:math'as math;
 import 'dart:typed_data';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
@@ -47,6 +48,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   DateTime? _selectedDate;
   late TextEditingController _dateController;
   Map<String, dynamic> PaymentMap = {};
+  final ScrollController horizontalScroll = ScrollController();
   int startIndex = 0;
   List<Product> filteredProducts = [];
   int currentPage = 1;
@@ -91,7 +93,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       isLoading = true;
     });
 
-   //
+    //
     try {
       final response = await http.get(
         Uri.parse(
@@ -159,7 +161,19 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.dashboard, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blueAccent, '/Customer'),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[800],
+            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+            // color: Color.fromRGBO(224, 59, 48, 1.0),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8), // Radius for top-left corner
+              topRight: Radius.circular(8), // No radius for top-right corner
+              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+            ),
+          ),
+          child: _buildMenuItem('Customer', Icons.account_circle, Colors.blueAccent, '/Customer')),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Order_List'),
       _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Invoice'),
@@ -171,6 +185,9 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Customer'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Customer'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -180,25 +197,28 @@ class _CustomerDetailsState extends State<CustomerDetails> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 10),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -209,7 +229,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
 
 
   Future<List<dynamic>>fetchProducts1(String orderId) async {
-   // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzI2NTUwOTkzLCJpYXQiOjE3MjY1NDM3OTN9.rld2WZLY1ike7K1ykjgT11WV5hxJ6WLzYxtkvCmJZeDteUqK3m1Run-GGxlDdNlDus6oLCCLCtC1lbKZl1k38Q';
+    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzI2NTUwOTkzLCJpYXQiOjE3MjY1NDM3OTN9.rld2WZLY1ike7K1ykjgT11WV5hxJ6WLzYxtkvCmJZeDteUqK3m1Run-GGxlDdNlDus6oLCCLCtC1lbKZl1k38Q';
 
     try {
       final response = await http.get(
@@ -235,7 +255,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
     }
   }
   Future<void> downloadPdf(String orderId1) async {
-     String orderId = orderId1;
+    String orderId = orderId1;
     try {
       final orderDetails = await fetchProducts1(orderId);
 
@@ -263,8 +283,8 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   void _filterAndPaginateProducts() {
     filteredData = productList.where((product) {
       final matchesSearchText= product.deliveryId!.toLowerCase().contains(_searchText.toLowerCase());
-        print('-----');
-        //print(product.paymentDate);
+      print('-----');
+      //print(product.paymentDate);
       String orderYear = '';
       bool matchesDateRange = true;
       DateTime? paymentDate;
@@ -426,20 +446,41 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               return
                 Stack(
                   children: [
-                    Align(
-                      // Added Align widget for the left side menu
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 1400,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          // Added Align widget for the left side menu
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            height: 1400,
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    }
+                    else...{
+                      Align(
+                        // Added Align widget for the left side menu
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          height: 1400,
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
+                        ),
+                      ),
+                    },
+
                     Padding(
                       padding: const EdgeInsets.only(left: 200,top: 0),
                       child: Container(
@@ -451,116 +492,351 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                       ),
                     ),
                     Positioned(
+                      left: 201,
                       top: 0,
-                      left: 0,
                       right: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 201),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: Colors.white,
-                          height: 50,
-                          child: Row(
-                            children: [
-                              IconButton(onPressed: (){
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, animation,
-                                        secondaryAnimation) =>
-                                        const CusList(),
-                                    transitionDuration:
-                                    const Duration(milliseconds: 200),
-                                    transitionsBuilder: (context, animation,
-                                        secondaryAnimation, child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
+                      bottom: 0,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              color: Colors.white,
+                              height: 50,
+                              child: Row(
+                                children: [
+                                  Padding(padding:EdgeInsets.only(left: 5),
+                                  child:IconButton(icon: Icon(Icons.arrow_back,),
+         onPressed: () {
+                                    context.go('/Customer');
+         },
+                                  )
                                   ),
-                                );
-                              }, icon: const Icon(Icons.arrow_back)),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 20),
-                                child: Text(
-                                  'Customer',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold
+                                  SizedBox(width: 20,),
+                                  Text(
+                                    'Customer',
+                                    style: TextStyle(
+                                        fontSize: 20, fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
+
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40, left: 200),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10),
-                        // Space above/below the border
-                        height: 0.3, // Border height
-                        color: Colors.black, // Border color
-                      ),
-                    ),
-                    Padding(
-                      padding:  EdgeInsets.only(
-                          left:
-                          300, top: 120, right: maxWidth * 0.062,bottom: 15),
-                      child: Container(
-                        width: maxWidth,
-                        height: 700,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: SizedBox(
-                            width: maxWidth * 0.79,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                buildSearchField(),
-                                // buildSearchField(),
-                                const SizedBox(height: 10),
-                                Scrollbar(
-                                  controller: _scrollController,
-                                  thickness: 6,
-                                  thumbVisibility: true,
-                                  child: SingleChildScrollView(
-                                    controller: _scrollController,
-                                    scrollDirection: Axis.horizontal,
-                                    child: buildDataTable(),
-                                  ),
-                                ),
-                                //Divider(color: Colors.grey,height: 1,)
-                                const SizedBox(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right:30),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                          Container(
+                            margin: const EdgeInsets.only(left: 0),
+                            // Space above/below the border
+                            height: 1,
+                            // width: 10  00,
+                            width: constraints.maxWidth,
+                            // Border height
+                            color: Colors.grey, // Border color
+                          ),
+                          if(constraints.maxWidth >= 1350)...{
+                            Expanded(
+                                child: SingleChildScrollView(
+                                  child: Column(
                                     children: [
-                                      PaginationControls(
-                                        currentPage: currentPage,
-                                        totalPages: filteredData.length > itemsPerPage ? totalPages : 1,// totalPages,
-                                        onPreviousPage: _goToPreviousPage,
-                                        onNextPage: _goToNextPage,
+                                      Row(
+                                        children: [
+                                          Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 30,
+                                                  top: 50,
+                                                  right: 30,
+                                                  bottom: 15),
+                                              child: Container(
+                                                height: 755,
+                                                width: maxWidth * 0.8,
+                                                decoration:BoxDecoration(
+                                                  //   border: Border.all(color: Colors.grey),
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                      spreadRadius: 3,
+                                                      blurRadius: 3,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: SizedBox(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                    children: [
+                                                      buildSearchField(),
+                                                      const SizedBox(height: 10),
+                                                      Expanded(
+                                                        child: Scrollbar(
+                                                          controller:
+                                                          _scrollController,
+                                                          thickness: 6,
+                                                          thumbVisibility: true,
+                                                          child:
+                                                          SingleChildScrollView(
+                                                            controller:
+                                                            _scrollController,
+                                                            scrollDirection:
+                                                            Axis.horizontal,
+                                                            child: buildDataTable(),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 1,
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(
+                                                            right: 30),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                          children: [
+                                                            PaginationControls(
+                                                              currentPage:
+                                                              currentPage,
+                                                              totalPages: filteredData
+                                                                  .length >
+                                                                  itemsPerPage
+                                                                  ? totalPages
+                                                                  : 1,
+                                                              onPreviousPage:
+                                                              _goToPreviousPage,
+                                                              onNextPage:
+                                                              _goToNextPage,
+                                                              // onLastPage: _goToLastPage,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              )),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
+                                )),
+                          }
+                          else...{
+                            Expanded(
+                                child: AdaptiveScrollbar(
+
+                                  position: ScrollbarPosition.bottom,controller: horizontalScroll,
+                                  child: SingleChildScrollView(
+                                    controller: horizontalScroll,
+                                    scrollDirection: Axis.horizontal,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      left: 30,
+                                                      top: 50,
+                                                      right: 30,
+                                                      bottom: 15),
+                                                  child: Container(
+                                                    height: 755,
+                                                    width: 1100,
+                                                    decoration:BoxDecoration(
+                                                      //   border: Border.all(color: Colors.grey),
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                          spreadRadius: 3,
+                                                          blurRadius: 3,
+                                                          offset: const Offset(0, 3),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: SizedBox(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                        children: [
+                                                          buildSearchField(),
+                                                          const SizedBox(height: 10),
+                                                          Expanded(
+                                                            child: Scrollbar(
+                                                              controller:
+                                                              _scrollController,
+                                                              thickness: 6,
+                                                              thumbVisibility: true,
+                                                              child:
+                                                              SingleChildScrollView(
+                                                                controller:
+                                                                _scrollController,
+                                                                scrollDirection:
+                                                                Axis.horizontal,
+                                                                child: buildDataTable2(),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 1,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                            const EdgeInsets.only(
+                                                                right: 30),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                              MainAxisAlignment.end,
+                                                              children: [
+                                                                PaginationControls(
+                                                                  currentPage:
+                                                                  currentPage,
+                                                                  totalPages: filteredData
+                                                                      .length >
+                                                                      itemsPerPage
+                                                                      ? totalPages
+                                                                      : 1,
+                                                                  onPreviousPage:
+                                                                  _goToPreviousPage,
+                                                                  onNextPage:
+                                                                  _goToNextPage,
+                                                                  // onLastPage: _goToLastPage,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                          }
+
+                        ],
                       ),
                     ),
+                    // Positioned(
+                    //   top: 0,
+                    //   left: 0,
+                    //   right: 0,
+                    //   child: Padding(
+                    //     padding: const EdgeInsets.only(left: 201),
+                    //     child: Container(
+                    //       padding: const EdgeInsets.symmetric(horizontal: 16),
+                    //       color: Colors.white,
+                    //       height: 50,
+                    //       child: Row(
+                    //         children: [
+                    //           IconButton(onPressed: (){
+                    //             Navigator.push(
+                    //               context,
+                    //               PageRouteBuilder(
+                    //                 pageBuilder: (context, animation,
+                    //                     secondaryAnimation) =>
+                    //                     const CusList(),
+                    //                 transitionDuration:
+                    //                 const Duration(milliseconds: 200),
+                    //                 transitionsBuilder: (context, animation,
+                    //                     secondaryAnimation, child) {
+                    //                   return FadeTransition(
+                    //                     opacity: animation,
+                    //                     child: child,
+                    //                   );
+                    //                 },
+                    //               ),
+                    //             );
+                    //           }, icon: const Icon(Icons.arrow_back)),
+                    //           const Padding(
+                    //             padding: EdgeInsets.only(left: 20),
+                    //             child: Text(
+                    //               'Customer',
+                    //               style: TextStyle(
+                    //                   fontSize: 20,
+                    //                   fontWeight: FontWeight.bold
+                    //               ),
+                    //               textAlign: TextAlign.center,
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 40, left: 200),
+                    //   child: Container(
+                    //     margin: const EdgeInsets.symmetric(
+                    //         vertical: 10),
+                    //     // Space above/below the border
+                    //     height: 0.3, // Border height
+                    //     color: Colors.black, // Border color
+                    //   ),
+                    // ),
+                    // Padding(
+                    //   padding:  EdgeInsets.only(
+                    //       left:
+                    //       300, top: 120, right: maxWidth * 0.062,bottom: 15),
+                    //   child: Container(
+                    //     width: maxWidth,
+                    //     height: 700,
+                    //     decoration: BoxDecoration(
+                    //       border: Border.all(color: Colors.grey),
+                    //       color: Colors.white,
+                    //       borderRadius: BorderRadius.circular(8),
+                    //     ),
+                    //     child: SingleChildScrollView(
+                    //       scrollDirection: Axis.vertical,
+                    //       child: SizedBox(
+                    //         width: maxWidth * 0.79,
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: [
+                    //             buildSearchField(),
+                    //             // buildSearchField(),
+                    //             const SizedBox(height: 10),
+                    //             Scrollbar(
+                    //               controller: _scrollController,
+                    //               thickness: 6,
+                    //               thumbVisibility: true,
+                    //               child: SingleChildScrollView(
+                    //                 controller: _scrollController,
+                    //                 scrollDirection: Axis.horizontal,
+                    //                 child: buildDataTable(),
+                    //               ),
+                    //             ),
+                    //             //Divider(color: Colors.grey,height: 1,)
+                    //             const SizedBox(),
+                    //             Padding(
+                    //               padding: const EdgeInsets.only(right:30),
+                    //               child: Row(
+                    //                 mainAxisAlignment: MainAxisAlignment.end,
+                    //                 children: [
+                    //                   PaginationControls(
+                    //                     currentPage: currentPage,
+                    //                     totalPages: filteredData.length > itemsPerPage ? totalPages : 1,// totalPages,
+                    //                     onPreviousPage: _goToPreviousPage,
+                    //                     onNextPage: _goToNextPage,
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             )
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 );
             }
@@ -624,12 +900,12 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                                   setState(() {
                                     dropdownValue1 = newValue;
                                     status = newValue ?? '';
-                                     _filterAndPaginateProducts();
+                                    _filterAndPaginateProducts();
                                   });
                                 },
                                 items: <String>[
                                   'Status',
-                                 'partial payment',
+                                  'partial payment',
                                   'cleared',
                                 ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
@@ -649,7 +925,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                     //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(left: 300),
@@ -660,7 +936,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                                   width: 209,
                                   height: 45,
                                   child: DateRangeField(
-                                  //  initialValue:null ,
+                                    //  initialValue:null ,
                                     decoration: InputDecoration(
                                       hintText: "Select a date",
                                       hintStyle: const TextStyle(fontSize: 13),
@@ -681,12 +957,12 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                                     selectedDateRange: selectedDateRange,
                                     pickerBuilder: datePickerBuilder,
                                     onDateRangeSelected: (DateRange? value){
-                                        setState(() {
-                                          selectedDateRange =value;
-                                         // _dateController.text = value.toString();
-                                          //print(_dateController.text);
-                                          _filterAndPaginateProducts();
-                                        });
+                                      setState(() {
+                                        selectedDateRange =value;
+                                        // _dateController.text = value.toString();
+                                        //print(_dateController.text);
+                                        _filterAndPaginateProducts();
+                                      });
                                     },
                                   ),
                                 )
@@ -703,31 +979,31 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                         child: SizedBox(
                           height: 30,
                           child: OutlinedButton(
-                            onPressed: () {
-                             downloadPdf(widget.orderId!);
-                              //context.go('/Create_New_Product');
-                            },
-                            style: OutlinedButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              backgroundColor: Colors.blue[800],
-                              // Button background color
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(5), // Rounded corners
-                              ),
-                              side: BorderSide.none, // No outline
-                            ),
-                            child:Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                IconButton(onPressed: (){}, icon: const Icon(Icons.download_for_offline,color: Colors.white,size: 15,)
+                              onPressed: () {
+                                downloadPdf(widget.orderId!);
+                                //context.go('/Create_New_Product');
+                              },
+                              style: OutlinedButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                backgroundColor: Colors.blue[800],
+                                // Button background color
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(5), // Rounded corners
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.only(right: 20),
-                                  child: Text('Export',style: TextStyle(color: Colors.white),),
-                                )
-                              ],
-                            )
+                                side: BorderSide.none, // No outline
+                              ),
+                              child:Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(onPressed: (){}, icon: const Icon(Icons.download_for_offline,color: Colors.white,size: 15,)
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 20),
+                                    child: Text('Export',style: TextStyle(color: Colors.white),),
+                                  )
+                                ],
+                              )
                           ),
                         ),
                       ),
@@ -776,8 +1052,8 @@ class _CustomerDetailsState extends State<CustomerDetails> {
         minimumDateRangeLength: 3,
         initialDateRange: null,
         disabledDates: [DateTime(2023, 11, 20)],
-           initialDisplayedDate: null,
-       // initialDisplayedDate: selectedDateRange?.start ?? DateTime(2023, 11, 20),
+        initialDisplayedDate: null,
+        // initialDisplayedDate: selectedDateRange?.start ?? DateTime(2023, 11, 20),
         onDateRangeChanged: onDateRangeChanged,
         height: 350,
         theme: const CalendarTheme(
@@ -815,7 +1091,208 @@ class _CustomerDetailsState extends State<CustomerDetails> {
         Column(
           children: [
             Container(
-              width: right * 0.78,
+              width: right * 0.82,
+
+              decoration:const BoxDecoration(
+                  color: Color(0xFFF7F7F7),
+                  border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+              ),
+              child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columns: [
+                  DataColumn(label: Container(
+                      child: Text('Invoice ID',style:TextStyle(
+                          color: Colors.indigo[900],
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold
+                      ),))),
+                  DataColumn(label: Container(child: Text('Payment ID',style:TextStyle(
+                      color: Colors.indigo[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold
+                  ),))),
+                  DataColumn(label: Container(child: Text(
+                    'Date',style:TextStyle(
+                      color: Colors.indigo[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold
+                  ),))),
+                  DataColumn(label: Container(child: Text(
+                    'Amount',style:TextStyle(
+                      color: Colors.indigo[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold
+                  ),))),
+                  DataColumn(label: Container(child: Text(
+                    'Paid Amount',style:TextStyle(
+                      color: Colors.indigo[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold
+                  ),))),
+                  DataColumn(label: Container(child: Text(
+                    'Status',style:TextStyle(
+                      color: Colors.indigo[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold
+                  ),))),
+
+                ],
+                rows: [],
+
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 150,left: 130,bottom: 350,right: 150),
+              child: CustomDatafound(),
+            ),
+          ],
+
+        );
+
+    }
+    return LayoutBuilder(builder: (context, constraints){
+      // double padding = constraints.maxWidth * 0.065;
+      //double right = MediaQuery.of(context).size.width;
+      double right = MediaQuery.of(context).size.width * 0.92;
+
+
+      return
+        Column(
+          children: [
+            Container(
+              width: right - 100,
+
+              decoration:const BoxDecoration(
+                  color: Color(0xFFF7F7F7),
+                  border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+              ),
+              child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columns: [
+                  DataColumn(label: Container(child: Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text('Invoice Number',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),),
+                  ))),
+                  DataColumn(label: Container(child: Text(
+                    'Payment ID',style:TextStyle(
+                      color: Colors.indigo[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold
+                  ),))),
+                  DataColumn(label: Container(child: Text(
+                    'Date',style:TextStyle(
+                      color: Colors.indigo[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold
+                  ),))),
+                  DataColumn(label: Container(child: Text(
+                    'Amount',style:TextStyle(
+                      color: Colors.indigo[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold
+                  ),))),
+                  // DataColumn(label: Container(child: Text(
+                  //   'Paid Amount',style:  TextStyle(
+                  //
+                  //     color: Colors.indigo[900],
+                  //     fontSize: 13,
+                  //     fontWeight: FontWeight.bold
+                  // ),))),
+                  DataColumn(label: Container(child: Text(
+                    'Status',style:  TextStyle(
+
+                      color: Colors.indigo[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold
+                  ),))),
+                ],
+                rows:
+                List.generate(
+                    math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage),(index){
+                  final detail = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                  final isSelected = _selectedProduct == detail;
+                  // final isSelected = _selectedProduct == detail;
+                  //final product = filteredData[(currentPage - 1) * itemsPerPage + index];
+                  return DataRow(
+                    color: MaterialStateProperty.resolveWith<Color>((states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return Colors.blue.shade500.withOpacity(0.8); // Add some opacity to the dark blue
+                      } else {
+                        return Colors.white.withOpacity(0.9);
+                      }
+                    }),
+                    cells:
+                    [
+
+                      DataCell(
+                          Text(detail.invoiceNo!,style:
+                          const TextStyle(
+                            // fontSize: 16,
+                              color: Colors.grey),)),
+                      DataCell(
+                        Padding(
+                          padding: const EdgeInsets.only(left: 2),
+                          child: Text(detail.paymentId!,style: const TextStyle(
+                            // fo ntSize: 16,
+                              color: Colors.grey)),
+                        ),
+                      ),
+                      DataCell(
+                        Text(detail.paymentDate!.toString(),style: const TextStyle(
+                          //fontSize: 16,
+                            color: Colors.grey)),
+                      ),
+                      DataCell(
+                        Padding(
+                          padding: const EdgeInsets.only(left: 13),
+                          child: Text(detail.total.toString(),style: const TextStyle(
+                            // fontSize: 16,
+                              color: Colors.grey)),
+                        ),
+                      ),
+                      DataCell(
+                        Padding(
+                          padding: const EdgeInsets.only(left: 5),
+                          child: Text(detail.paymentStatus.toString(),style: const TextStyle(
+                            //fontSize: 16,
+                              color: Colors.grey)),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ],
+        );
+    });
+  }
+
+  Widget buildDataTable2() {
+    if (isLoading) {
+      _loading = true;
+      var width = MediaQuery.of(context).size.width;
+      var Height = MediaQuery.of(context).size.height;
+      // Show loading indicator while data is being fetched
+      return Padding(
+        padding: EdgeInsets.only(top: Height * 0.100,bottom: Height * 0.100,left: width * 0.300),
+        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+      );
+    }
+
+    if (filteredData.isEmpty) {
+      double right = MediaQuery.of(context).size.width;
+      return
+        Column(
+          children: [
+            Container(
+              width: 1100,
 
               decoration:const BoxDecoration(
                   color: Color(0xFFF7F7F7),
@@ -884,7 +1361,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
         Column(
           children: [
             Container(
-              width: right * 0.78,
+              width:1100,
 
               decoration:const BoxDecoration(
                   color: Color(0xFFF7F7F7),
@@ -998,4 +1475,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   }
 
 
+
 }
+
+

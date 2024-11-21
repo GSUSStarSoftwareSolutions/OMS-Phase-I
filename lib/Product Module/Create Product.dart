@@ -759,7 +759,7 @@ class _SecondPageState extends State<SecondPage> {
                         height: 1400,
                         width: 200,
                         color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: _buildMenuItems(context),
@@ -1664,7 +1664,7 @@ class _SecondPageState extends State<SecondPage> {
                         height: 1400,
                         width: 200,
                         color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: _buildMenuItems(context),

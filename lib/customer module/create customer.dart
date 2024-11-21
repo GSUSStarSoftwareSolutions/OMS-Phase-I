@@ -75,7 +75,19 @@ class _CreateCustomerState extends State<CreateCustomer> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.dashboard, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blueAccent, '/Customer'),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[800],
+            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+            // color: Color.fromRGBO(224, 59, 48, 1.0),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8), // Radius for top-left corner
+              topRight: Radius.circular(8), // No radius for top-right corner
+              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+            ),
+          ),
+          child: _buildMenuItem('Customer', Icons.account_circle, Colors.blueAccent, '/Customer')),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Order_List'),
       _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Invoice'),
@@ -87,6 +99,9 @@ class _CreateCustomerState extends State<CreateCustomer> {
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Customer'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Customer'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -96,25 +111,28 @@ class _CreateCustomerState extends State<CreateCustomer> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 10),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -184,21 +202,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
               actions: <Widget>[
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                        const CusList(),
-                        transitionDuration: const Duration(milliseconds: 200),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
+                    context.go('/Customer');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
@@ -216,7 +220,28 @@ class _CreateCustomerState extends State<CreateCustomer> {
             );
           },
         );
-      } else {
+      }
+      else if(addResponseBody['status'] == 'failed' && addResponseBody['code'] == '508'){
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Customer name already exists'),
+          ),
+        );
+      }
+      else if(addResponseBody['status'] == 'failed' && addResponseBody['code'] == '509'){
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+          const SnackBar(
+            content: Text(
+                'This email id already exists'),
+          ),
+        );
+      }
+        else {
         // Handle other cases
         print('Unexpected response: $addResponseBody');
       }
@@ -272,7 +297,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
                 height: 1400,
                 width: 200,
                 color: const Color(0xFFF7F6FA),
-                padding: const EdgeInsets.only(left: 20, top: 30),
+                padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: _buildMenuItems(context),
@@ -303,11 +328,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
                       IconButton(
                         icon: const Icon(Icons.arrow_back), // Back button icon
                         onPressed: () {
-                          Navigator.of(context).push(PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                            const CusList(),
-                          ));
+                          context.go('/Customer');
                         },
                       ),
                       const Padding(

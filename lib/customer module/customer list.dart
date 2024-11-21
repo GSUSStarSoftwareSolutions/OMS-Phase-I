@@ -63,7 +63,7 @@ class _CusListState extends State<CusList> {
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
   List<String> _sortOrder = List.generate(6, (index) => 'asc');
-  List<String> columns = ['Customer ID','Customer Name','Contact','Location' ,'Credit Amount'];
+  List<String> columns = ['Customer ID','Customer Name','Contact','Email Address' ,'Credit Amount'];
   List<double> columnWidths = [130, 145, 139, 160, 135,];
   List<bool> columnSortState = [true, true, true,true,true];
 
@@ -257,7 +257,19 @@ class _CusListState extends State<CusList> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.dashboard, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blueAccent, '/Customer'),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[800],
+            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+            // color: Color.fromRGBO(224, 59, 48, 1.0),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8), // Radius for top-left corner
+              topRight: Radius.circular(8), // No radius for top-right corner
+              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+            ),
+          ),
+          child: _buildMenuItem('Customer', Icons.account_circle, Colors.white, '/Customer')),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Order_List'),
       _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Invoice'),
@@ -269,6 +281,9 @@ class _CusListState extends State<CusList> {
   }
 
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Customer'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Customer'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -278,25 +293,28 @@ class _CusListState extends State<CusList> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 10),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -628,7 +646,7 @@ class _CusListState extends State<CusList> {
                             height: 1400,
                             width: 200,
                             color: const Color(0xFFF7F6FA),
-                            padding: const EdgeInsets.only(left: 20, top: 30),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: _buildMenuItems(context),
@@ -646,7 +664,7 @@ class _CusListState extends State<CusList> {
                           height: 1400,
                           width: 200,
                           color: const Color(0xFFF7F6FA),
-                          padding: const EdgeInsets.only(left: 20, top: 30),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: _buildMenuItems(context),
@@ -700,18 +718,8 @@ class _CusListState extends State<CusList> {
                                           top: 10, right: 80),
                                       child: OutlinedButton(
                                         onPressed: () {
-                                          // context.go('/Create_New_Order');
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation, secondaryAnimation) =>
-                                              const CreateCustomer(),
-                                              transitionDuration: const Duration(milliseconds: 50),
-                                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                                return FadeTransition(opacity: animation, child: child);
-                                              },
-                                            ),
-                                          );
+                                           context.go('/Create_Cus');
+
                                           //context.go('/Home/Orders/Create_Order');
                                         },
                                         style: OutlinedButton.styleFrom(
@@ -1214,7 +1222,7 @@ class _CusListState extends State<CusList> {
           } else if (columnIndex == 2) {
             return a.contact!.compareTo(b.contact!);
           } else if (columnIndex == 3) {
-            return a.location!.toLowerCase().compareTo(b.location!.toLowerCase());
+            return a.email!.toLowerCase().compareTo(b.email!.toLowerCase());
           } else if (columnIndex == 4) {
             return a.creditAmount!.compareTo(b.creditAmount!);
           } else {
@@ -1230,7 +1238,7 @@ class _CusListState extends State<CusList> {
           } else if (columnIndex == 2) {
             return b.contact!.compareTo(a.contact!); // Reverse the comparison
           } else if (columnIndex == 3) {
-            return b.location!.toLowerCase().compareTo(a.location!.toLowerCase()); // Reverse the comparison
+            return b.email!.toLowerCase().compareTo(a.email!.toLowerCase()); // Reverse the comparison
           } else if (columnIndex == 4) {
             return b.creditAmount!.compareTo(a.creditAmount!); // Reverse the comparison
           } else {
@@ -1377,7 +1385,7 @@ class _CusListState extends State<CusList> {
                         DataCell(
                           Container(
                             width: columnWidths[3],
-                            child: Text(detail.location.toString(),style: const TextStyle(
+                            child: Text(detail.email.toString(),style: const TextStyle(
                               // fontSize: 16,
                                 color: Colors.grey)),
                           ),
@@ -1393,15 +1401,13 @@ class _CusListState extends State<CusList> {
                         if(selected != null && selected){
                           //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
                           if (filteredData.length <= 9) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
-                            );
+                           context.go('/Cus_Details',extra:{
+                             'orderId': detail.cusId
+                           });
                           } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
-                            );
+                            context.go('/Cus_Details',extra:{
+                              'orderId': detail.cusId
+                            });
 
                           };
                         }
@@ -1462,7 +1468,7 @@ class _CusListState extends State<CusList> {
                         fontWeight: FontWeight.bold
                     ),)),
                     DataColumn(label: Text(
-                      'Location',style:TextStyle(
+                      'Email Address',style:TextStyle(
                         color: Colors.indigo[900],
                         fontSize: 13,
                         fontWeight: FontWeight.bold
@@ -1500,7 +1506,7 @@ class _CusListState extends State<CusList> {
           } else if (columnIndex == 2) {
             return a.contact!.compareTo(b.contact!);
           } else if (columnIndex == 3) {
-            return a.location!.toLowerCase().compareTo(b.location!.toLowerCase());
+            return a.email!.toLowerCase().compareTo(b.email!.toLowerCase());
           } else if (columnIndex == 4) {
             return a.creditAmount!.compareTo(b.creditAmount!);
           } else {
@@ -1516,7 +1522,7 @@ class _CusListState extends State<CusList> {
           } else if (columnIndex == 2) {
             return b.contact!.compareTo(a.contact!); // Reverse the comparison
           } else if (columnIndex == 3) {
-            return b.location!.toLowerCase().compareTo(a.location!.toLowerCase()); // Reverse the comparison
+            return b.email!.toLowerCase().compareTo(a.email!.toLowerCase()); // Reverse the comparison
           } else if (columnIndex == 4) {
             return b.creditAmount!.compareTo(a.creditAmount!); // Reverse the comparison
           } else {
@@ -1663,7 +1669,7 @@ class _CusListState extends State<CusList> {
                         DataCell(
                           Container(
                             width: columnWidths[3],
-                            child: Text(detail.location.toString(),style: const TextStyle(
+                            child: Text(detail.email.toString(),style: const TextStyle(
                               // fontSize: 16,
                                 color: Colors.grey)),
                           ),
@@ -1679,15 +1685,13 @@ class _CusListState extends State<CusList> {
                         if(selected != null && selected){
                           //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
                           if (filteredData.length <= 9) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
-                            );
+                            context.go('/Cus_Details',extra:{
+                              'orderId': detail.cusId
+                            });
                           } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
-                            );
+                            context.go('/Cus_Details',extra:{
+                              'orderId': detail.cusId
+                            });
 
                           };
                         }
@@ -1759,6 +1763,7 @@ class CusDetail {
   String? cusName;
   String? contact;
   String? location;
+  String? email;
   double? creditAmount;
 
 
@@ -1767,6 +1772,7 @@ class CusDetail {
     this.cusName,
     this.contact,
     this.location,
+    this.email,
     this.creditAmount
   });
 
@@ -1774,6 +1780,7 @@ class CusDetail {
     return CusDetail(
       cusId: json['customerId'] ?? '',
       cusName: json['customerName'] ?? '',
+      email: json['email'] ?? '',
       contact: json['contactNo'] ?? '',
       location: json['deliveryLocation'] ?? '',
       creditAmount: json['returnCredit'] ?? 0.0,
@@ -1796,6 +1803,7 @@ class CusDetail {
     return jsonEncode({
       "cusId": cusId,
       "cusName": cusName,
+      "email": email,
       "Contact": contact,
       "Location": location,
       "CreditAmount": creditAmount,

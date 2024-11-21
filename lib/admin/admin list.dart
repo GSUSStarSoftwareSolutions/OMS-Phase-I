@@ -802,7 +802,7 @@ class _AdminListState extends State<AdminList> {
                           child: DropdownButtonFormField2<String>(
                             decoration: InputDecoration(
                               contentPadding:
-                                  EdgeInsets.only(bottom: 20, left: 10),
+                                  EdgeInsets.only(bottom: 20, left: 2),
                               // adjusted padding
                               border: InputBorder.none,
                               filled: true,

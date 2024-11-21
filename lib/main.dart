@@ -16,6 +16,8 @@ import 'package:btb/customer%20login/order/order%20list.dart';
 import 'package:btb/customer%20login/order/view%20screen.dart';
 import 'package:btb/customer%20login/payment/pay%20cus.dart';
 import 'package:btb/customer%20login/return/return%20list.dart';
+import 'package:btb/customer%20module/create%20customer.dart';
+import 'package:btb/customer%20module/customer%20view.dart';
 import 'package:btb/delivery%20module/delivery%20list.dart';
 import 'package:btb/payment%20module/pay%20screen.dart';
 import 'package:btb/payment%20module/payment.dart';
@@ -1618,6 +1620,26 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
+
+      GoRoute(
+        path: '/Cus_Details',
+        pageBuilder: (context, state) {
+          final data = state.extra as Map<String, dynamic>?;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: CustomerDetails(orderId: data!['orderId'],),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
       GoRoute(
         path: '/Search_For_Products_',
         pageBuilder: (context, state) {
@@ -1784,6 +1806,24 @@ class MyApp extends StatelessWidget {
           return CustomTransitionPage(
             key: state.pageKey,
             child: OrdersSecond(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/Create_Cus',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: CreateCustomer(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
