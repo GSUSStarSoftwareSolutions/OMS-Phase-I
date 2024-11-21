@@ -408,67 +408,53 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                                 alignment: Alignment.topRight,
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 10, right: 80),
-                                  child: MouseRegion(
-                                    onEnter: (_) {
-                                      setState(() {
-                                        _isHovered1 = true;
-                                        _controller.forward(); // Start shake animation when hovered
-                                      });
-                                    },
-                                    onExit: (_) {
-                                      setState(() {
-                                        _isHovered1 = false;
-                                        _controller.stop(); // Stop shake animation when not hovered
-                                      });
-                                    },
-                                    child: AnimatedBuilder(
-                                        animation: _controller,
-                                        builder: (context, child) {
-                                          return Transform.translate(offset: Offset(_isHovered1? _shakeAnimation.value : 0,0),
-                                            child: AnimatedContainer(
-                                              duration: const Duration(milliseconds: 300),
-                                              curve: Curves.easeInOut,
-                                              decoration: BoxDecoration(
-                                                color: _isHovered1
-                                                    ? Colors.blue[800]
-                                                    : Colors.blue[800], // Background color change on hover
-                                                borderRadius: BorderRadius.circular(5),
-                                                boxShadow: _isHovered1
-                                                    ? [
-                                                  BoxShadow(
-                                                      color: Colors.black45,
-                                                      blurRadius: 6,
-                                                      spreadRadius: 2)
-                                                ]
-                                                    : [],
-                                              ),
-                                              child: OutlinedButton(
-                                                onPressed: () {
-                                                  context.go('/Create_New_Product');
-                                                },
-                                                style: OutlinedButton.styleFrom(
-                                                  backgroundColor: Colors
-                                                      .blue[800], // Button background color
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(
-                                                        5), // Rounded corners
-                                                  ),
-                                                  side: BorderSide.none, // No outline
+                                  child: AnimatedBuilder(
+                                      animation: _controller,
+                                      builder: (context, child) {
+                                        return Transform.translate(offset: Offset(_isHovered1? _shakeAnimation.value : 0,0),
+                                          child: AnimatedContainer(
+                                            duration: const Duration(milliseconds: 300),
+                                            curve: Curves.easeInOut,
+                                            decoration: BoxDecoration(
+                                              color: _isHovered1
+                                                  ? Colors.blue[800]
+                                                  : Colors.blue[800], // Background color change on hover
+                                              borderRadius: BorderRadius.circular(5),
+                                              boxShadow: _isHovered1
+                                                  ? [
+                                                BoxShadow(
+                                                    color: Colors.black45,
+                                                    blurRadius: 6,
+                                                    spreadRadius: 2)
+                                              ]
+                                                  : [],
+                                            ),
+                                            child: OutlinedButton(
+                                              onPressed: () {
+                                                context.go('/Create_New_Product');
+                                              },
+                                              style: OutlinedButton.styleFrom(
+                                                backgroundColor: Colors
+                                                    .blue[800], // Button background color
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(
+                                                      5), // Rounded corners
                                                 ),
-                                                child: const Text(
-                                                  'Create',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    // fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
+                                                side: BorderSide.none, // No outline
+                                              ),
+                                              child: const Text(
+                                                'Create',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  // fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
                                                 ),
                                               ),
                                             ),
-                                          );
-                                        }
+                                          ),
+                                        );
+                                      }
 
-                                    ),
                                   ),
                                 ),
                               ),

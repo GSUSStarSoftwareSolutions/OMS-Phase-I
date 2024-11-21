@@ -81,8 +81,8 @@ class _AdminListState extends State<AdminList> {
     120,
     90,
     139,
-    149,
-    90,
+    145,
+    110,
     30,
   ];
 
@@ -237,14 +237,7 @@ class _AdminListState extends State<AdminList> {
     });
   }
 
-  // void _updateSearch1(String searchText1) {
-  //   setState(() {
-  //     _searchText1 = searchText1;
-  //     currentPage = 1; // Reset to first page when searching
-  //     _filterAndPaginateProducts();
-  //     // _clearSearch();
-  //   });
-  // }
+
 
   void _goToPreviousPage() {
     if (currentPage > 1) {
@@ -1604,7 +1597,7 @@ class _AdminListState extends State<AdminList> {
                         Padding(
                           padding: const EdgeInsets.only(top: 12, bottom: 7),
                           child: Container(
-                            width: 100,
+                            width: 98,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),
                             ),
@@ -1651,7 +1644,7 @@ class _AdminListState extends State<AdminList> {
                                       Colors.white, // Dropdown background color
                                 ),
                                 maxHeight: 200,
-                                width: 100,
+                                width: 98,
                                 offset: const Offset(0, -10),
                                 padding: EdgeInsets.zero,
                               ),

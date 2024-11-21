@@ -3,12 +3,15 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:math'as math;
 import 'dart:typed_data';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/customer%20module/create%20customer.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
 import 'package:btb/widgets/productclass.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import '../Order Module/firstpage.dart';
@@ -55,6 +58,7 @@ class _CusListState extends State<CusList> {
   List<CusDetail>filteredData = [];
   String status = '';
   String selectDate = '';
+  final ScrollController horizontalScroll = ScrollController();
 
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
@@ -151,7 +155,7 @@ class _CusListState extends State<CusList> {
           return OrderDetail.fromJson(jsonObject);
         } else {
         }
-            } else {
+      } else {
       }
     } catch (e) {
     }
@@ -229,7 +233,7 @@ class _CusListState extends State<CusList> {
         }
         else {
         }
-            } else {
+      } else {
       }
     } catch (e) {
     }
@@ -303,31 +307,31 @@ class _CusListState extends State<CusList> {
   Future downloaddelPdf(String orderId) async {
     final String orderId1 = orderId;
 
-      final productMasterData = await _fetchAlldelProductMaster();
-      final orderDetails = await _fetchdelOrderDetails(orderId1);
-      for (var product in productMasterData) {
-        for (var item in orderDetails!.items) {
-          if (product['productName'] == item['productName']) {
-            item['tax'] = product['tax'];
-            item['discount'] = product['discount'];
-            item['discountamount'] = (double.parse(item['totalAmount'].toString()) * double.parse(item['discount'].replaceAll('%', ''))) / 100;
-            item['taxamount'] = ((double.parse(item['totalAmount'].toString()) -
-                double.parse(item['discountamount'].toString())) *
-                double.parse(item['tax'].replaceAll('%', '').toString())) / 100;
-          }
+    final productMasterData = await _fetchAlldelProductMaster();
+    final orderDetails = await _fetchdelOrderDetails(orderId1);
+    for (var product in productMasterData) {
+      for (var item in orderDetails!.items) {
+        if (product['productName'] == item['productName']) {
+          item['tax'] = product['tax'];
+          item['discount'] = product['discount'];
+          item['discountamount'] = (double.parse(item['totalAmount'].toString()) * double.parse(item['discount'].replaceAll('%', ''))) / 100;
+          item['taxamount'] = ((double.parse(item['totalAmount'].toString()) -
+              double.parse(item['discountamount'].toString())) *
+              double.parse(item['tax'].replaceAll('%', '').toString())) / 100;
         }
       }
+    }
 
-      if (orderDetails != null) {
-        final Uint8List pdfBytes = await Deliverypdf(orderDetails);
-        final blob = html.Blob([pdfBytes]);
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        final anchor = html.AnchorElement(href: url)
-          ..setAttribute('download', 'Delivery_Note.pdf')
-          ..click();
-        html.Url.revokeObjectUrl(url);
-      } else {
-      }
+    if (orderDetails != null) {
+      final Uint8List pdfBytes = await Deliverypdf(orderDetails);
+      final blob = html.Blob([pdfBytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute('download', 'Delivery_Note.pdf')
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    } else {
+    }
 
   }
   Future<List<dynamic>> _fetchAlldelProductMaster() async {
@@ -352,24 +356,24 @@ class _CusListState extends State<CusList> {
     }
   }
   Future<OrderDetail?> _fetchdelOrderDetails(String orderId) async {
-      final url = '$apicall/order_master/search_by_orderid/$orderId';
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        final jsonData = jsonDecode(responseBody);
-        if (jsonData is List<dynamic>) {
-          final jsonObject = jsonData.first;
-          return OrderDetail.fromJson(jsonObject);
-        } else {
-        }
-            } else {
+    final url = '$apicall/order_master/search_by_orderid/$orderId';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      final responseBody = response.body;
+      final jsonData = jsonDecode(responseBody);
+      if (jsonData is List<dynamic>) {
+        final jsonObject = jsonData.first;
+        return OrderDetail.fromJson(jsonObject);
+      } else {
       }
+    } else {
+    }
 
     return null;
   }
@@ -446,7 +450,7 @@ class _CusListState extends State<CusList> {
           return OrderDetail.fromJson(jsonObject);
         } else {
         }
-            } else {
+      } else {
       }
     } catch (e) {
     }
@@ -487,7 +491,7 @@ class _CusListState extends State<CusList> {
             setState(() {
               totalPages = (products.length / itemsPerPage).ceil();
               productList = products;
-               _filterAndPaginateProducts();
+              _filterAndPaginateProducts();
             });
           }
         }
@@ -615,24 +619,48 @@ class _CusListState extends State<CusList> {
               return
                 Stack(
                   children: [
-                    Align(
-                      // Added Align widget for the left side menu
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 1400,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child:  Align(
+                          // Added Align widget for the left side menu
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            height: 1400,
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 20, top: 30),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
 
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    }
+                    else...{
+                      Align(
+                        // Added Align widget for the left side menu
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          height: 1400,
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 20, top: 30),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+
+                          ),
+                        ),
+                      ),
+                    },
+
                     Padding(
-                      padding: const EdgeInsets.only(left: 200,top: 0),
+                      padding: const EdgeInsets.only(left: 190),
                       child: Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 10),
                         width: 1, // Set the width to 1 for a vertical line
                         height: 1400, // Set the height to your liking
                         decoration: const BoxDecoration(
@@ -641,167 +669,347 @@ class _CusListState extends State<CusList> {
                       ),
                     ),
                     Positioned(
+                      left: 201,
                       top: 0,
-                      left: 0,
                       right: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 201),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: Colors.white,
-                          height: 50,
-                          child: Row(
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(left: 20),
-                                child: Text(
-                                  'Customer List',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              const Spacer(),
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 10, right: 80),
-                                  child: OutlinedButton(
-                                    onPressed: () {
-                                      // context.go('/Create_New_Order');
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation, secondaryAnimation) =>
-                                          const CreateCustomer(),
-                                          transitionDuration: const Duration(milliseconds: 50),
-                                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                            return FadeTransition(opacity: animation, child: child);
-                                          },
-                                        ),
-                                      );
-                                      //context.go('/Home/Orders/Create_Order');
-                                    },
-                                    style: OutlinedButton.styleFrom(
-                                      backgroundColor:
-                                      Colors.blue[800],
-                                      // Button background color
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(
-                                            5), // Rounded corners
-                                      ),
-                                      side: BorderSide.none, // No outline
-                                    ),
-                                    child: const Text(
-                                      'Create',
+                      bottom: 0,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              color: Colors.white,
+                              height: 50,
+                              child: Row(
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 20),
+                                    child: Text(
+                                      'Customer List',
                                       style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w100,
-                                        color: Colors.white,
+                                          fontSize: 20, fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 10, right: 80),
+                                      child: OutlinedButton(
+                                        onPressed: () {
+                                          // context.go('/Create_New_Order');
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation, secondaryAnimation) =>
+                                              const CreateCustomer(),
+                                              transitionDuration: const Duration(milliseconds: 50),
+                                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                                return FadeTransition(opacity: animation, child: child);
+                                              },
+                                            ),
+                                          );
+                                          //context.go('/Home/Orders/Create_Order');
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor:
+                                          Colors.blue[800],
+                                          // Button background color
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                            BorderRadius.circular(
+                                                5), // Rounded corners
+                                          ),
+                                          side: BorderSide.none, // No outline
+                                        ),
+                                        child: const Text(
+                                          'Create',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w100,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                  // Align(
+                                  //   alignment: Alignment.topRight,
+                                  //   child: Padding(
+                                  //     padding: const EdgeInsets.only(top: 10, right: 80),
+                                  //     child: MouseRegion(
+                                  //       onEnter: (_) {
+                                  //         setState(() {
+                                  //           _isHovered1 = true;
+                                  //           _controller.forward(); // Start shake animation when hovered
+                                  //         });
+                                  //       },
+                                  //       onExit: (_) {
+                                  //         setState(() {
+                                  //           _isHovered1 = false;
+                                  //           _controller.stop(); // Stop shake animation when not hovered
+                                  //         });
+                                  //       },
+                                  //       child: AnimatedBuilder(
+                                  //           animation: _controller,
+                                  //           builder: (context, child) {
+                                  //             return Transform.translate(offset: Offset(_isHovered1? _shakeAnimation.value : 0,0),
+                                  //               child: AnimatedContainer(
+                                  //                 duration: const Duration(milliseconds: 300),
+                                  //                 curve: Curves.easeInOut,
+                                  //                 decoration: BoxDecoration(
+                                  //                   color: _isHovered1
+                                  //                       ? Colors.blue[800]
+                                  //                       : Colors.blue[800], // Background color change on hover
+                                  //                   borderRadius: BorderRadius.circular(5),
+                                  //                   boxShadow: _isHovered1
+                                  //                       ? [
+                                  //                     const BoxShadow(
+                                  //                         color: Colors.black45,
+                                  //                         blurRadius: 6,
+                                  //                         spreadRadius: 2)
+                                  //                   ]
+                                  //                       : [],
+                                  //                 ),
+                                  //                 child: OutlinedButton(
+                                  //                   onPressed: () {
+                                  //                     context.go('/Create_New_Order');
+                                  //                     //context.go('/Home/Orders/Create_Order');
+                                  //                   },
+                                  //                   style: OutlinedButton.styleFrom(
+                                  //                     backgroundColor: Colors.blue[800],
+                                  //                     shape: RoundedRectangleBorder(
+                                  //                       borderRadius: BorderRadius.circular(
+                                  //                           5), // Rounded corners
+                                  //                     ),
+                                  //                     side: BorderSide.none, // No outline
+                                  //                   ),
+                                  //                   child: const Text(
+                                  //                     'Create',
+                                  //                     style: TextStyle(
+                                  //                       fontSize: 14,
+                                  //                       fontWeight: FontWeight.w100,
+                                  //                       color: Colors.white,
+                                  //                     ),
+                                  //                   ),
+                                  //                 ),
+                                  //               ),
+                                  //             );
+                                  //           }
+                                  //
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40, left: 200),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10),
-                        // Space above/below the border
-                        height: 0.3, // Border height
-                        color: Colors.black, // Border color
-                      ),
-                    ),
-                    Padding(
-                      padding:  EdgeInsets.only(
-                          left:
-                          300, top: 120, right: maxWidth * 0.062,bottom: 15),
-                      child: Container(
-                        width: maxWidth,
-                        height: 700,
-                        // decoration: BoxDecoration(
-                        //   color: Colors.white, // or any other color that fits your design
-                        //   borderRadius: BorderRadius.all(Radius.circular(10.0)), // adds a subtle rounded corner
-                        //   border: Border.all(
-                        //     color: Color(0xFFE5E5E5), // a light grey border
-                        //     width: 1.0,
-                        //   ),
-                        //   boxShadow: [
-                        //     BoxShadow(
-                        //       color: Color(0xFFC7C5B8).withOpacity(0.2), // a soft, warm shadow
-                        //       spreadRadius: 0.5,
-                        //       blurRadius: 4, // increased blur radius for a softer shadow
-                        //       offset: Offset(0, 4), // increased offset for a more pronounced shadow
-                        //     ),
-                        //   ],
-                        // ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          // boxShadow: [
-                          //   BoxShadow(
-                          //     color: Colors.blue.withOpacity(0.1), // Soft grey shadow
-                          //     spreadRadius: 1,
-                          //     blurRadius: 3,
-                          //     offset: const Offset(0, 1),
-                          //   ),
-                          // ],
-                        ),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: SizedBox(
-                            width: maxWidth * 0.79,
-                            // padding: EdgeInsets.only(),
-                            // margin: EdgeInsets.only(left: 400, right: 100),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                buildSearchField(),
-                                // buildSearchField(),
-                                const SizedBox(height: 10),
-                                Scrollbar(
-                                  controller: _scrollController,
-                                  thickness: 6,
-                                  thumbVisibility: true,
-                                  child: SingleChildScrollView(
-                                    controller: _scrollController,
-                                    scrollDirection: Axis.horizontal,
-                                    child: buildDataTable(),
-                                  ),
-                                ),
-                                //Divider(color: Colors.grey,height: 1,)
-                                const SizedBox(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right:30),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                          Container(
+                            margin: const EdgeInsets.only(left: 0),
+                            // Space above/below the border
+                            height: 1,
+                            // width: 10  00,
+                            width: constraints.maxWidth,
+                            // Border height
+                            color: Colors.grey, // Border color
+                          ),
+                          if(constraints.maxWidth >= 1350)...{
+                            Expanded(
+                                child: SingleChildScrollView(
+                                  child: Column(
                                     children: [
-                                      PaginationControls(
-                                        currentPage: currentPage,
-                                        totalPages: filteredData.length > itemsPerPage ? totalPages : 1,// totalPages,
-                                        onPreviousPage: _goToPreviousPage,
-                                        onNextPage: _goToNextPage,
+                                      Row(
+                                        children: [
+                                          Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 30,
+                                                  top: 50,
+                                                  right: 30,
+                                                  bottom: 15),
+                                              child: Container(
+                                                height: 755,
+                                                width: maxWidth * 0.8,
+                                                decoration:BoxDecoration(
+                                                  //   border: Border.all(color: Colors.grey),
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                      spreadRadius: 3,
+                                                      blurRadius: 3,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: SizedBox(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                    children: [
+                                                      buildSearchField(),
+                                                      const SizedBox(height: 10),
+                                                      Expanded(
+                                                        child: Scrollbar(
+                                                          controller:
+                                                          _scrollController,
+                                                          thickness: 6,
+                                                          thumbVisibility: true,
+                                                          child:
+                                                          SingleChildScrollView(
+                                                            controller:
+                                                            _scrollController,
+                                                            scrollDirection:
+                                                            Axis.horizontal,
+                                                            child: buildDataTable(),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 1,
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(
+                                                            right: 30),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                          children: [
+                                                            PaginationControls(
+                                                              currentPage:
+                                                              currentPage,
+                                                              totalPages: filteredData
+                                                                  .length >
+                                                                  itemsPerPage
+                                                                  ? totalPages
+                                                                  : 1,
+                                                              onPreviousPage:
+                                                              _goToPreviousPage,
+                                                              onNextPage:
+                                                              _goToNextPage,
+                                                              // onLastPage: _goToLastPage,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              )),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
+                                )),
+                          }
+                          else...{
+                            Expanded(
+                                child: AdaptiveScrollbar(
+
+                                  position: ScrollbarPosition.bottom,controller: horizontalScroll,
+                                  child: SingleChildScrollView(
+                                    controller: horizontalScroll,
+                                    scrollDirection: Axis.horizontal,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      left: 30,
+                                                      top: 50,
+                                                      right: 30,
+                                                      bottom: 15),
+                                                  child: Container(
+                                                    height: 755,
+                                                    width: 1100,
+                                                    decoration:BoxDecoration(
+                                                      //   border: Border.all(color: Colors.grey),
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                          spreadRadius: 3,
+                                                          blurRadius: 3,
+                                                          offset: const Offset(0, 3),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: SizedBox(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                        children: [
+                                                          buildSearchField(),
+                                                          const SizedBox(height: 10),
+                                                          Expanded(
+                                                            child: Scrollbar(
+                                                              controller:
+                                                              _scrollController,
+                                                              thickness: 6,
+                                                              thumbVisibility: true,
+                                                              child:
+                                                              SingleChildScrollView(
+                                                                controller:
+                                                                _scrollController,
+                                                                scrollDirection:
+                                                                Axis.horizontal,
+                                                                child: buildDataTable2(),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 1,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                            const EdgeInsets.only(
+                                                                right: 30),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                              MainAxisAlignment.end,
+                                                              children: [
+                                                                PaginationControls(
+                                                                  currentPage:
+                                                                  currentPage,
+                                                                  totalPages: filteredData
+                                                                      .length >
+                                                                      itemsPerPage
+                                                                      ? totalPages
+                                                                      : 1,
+                                                                  onPreviousPage:
+                                                                  _goToPreviousPage,
+                                                                  onNextPage:
+                                                                  _goToNextPage,
+                                                                  // onLastPage: _goToLastPage,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                          }
+
+                        ],
                       ),
                     ),
+
                   ],
                 );
             }
@@ -922,6 +1130,291 @@ class _CusListState extends State<CusList> {
     );
   }
 
+  Widget buildDataTable2() {
+
+    if (isLoading) {
+      _loading = true;
+      var width = MediaQuery.of(context).size.width;
+      var Height = MediaQuery.of(context).size.height;
+      // Show loading indicator while data is being fetched
+      return Padding(
+        padding: EdgeInsets.only(top: Height * 0.100,bottom: Height * 0.100,left: width * 0.300),
+        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+      );
+    }
+
+    if (filteredData.isEmpty) {
+      double right = MediaQuery.of(context).size.width;
+      return
+        Column(
+          children: [
+            Container(
+              width: 1100,
+
+              decoration:const BoxDecoration(
+                  color: Color(0xFFF7F7F7),
+                  border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+              ),
+              child: DataTable(
+                  showCheckboxColumn: false,
+                  headingRowHeight: 40,
+                  columns: [
+                    DataColumn(label: Text('Customer ID',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),)),
+                    DataColumn(label: Text('Customer Name',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),)),
+                    DataColumn(label: Text(
+                      'Contact',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),)),
+                    DataColumn(label: Text(
+                      'Location',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),)),
+                    DataColumn(label: Text(
+                      'Credit Amount',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),)),
+
+                  ],
+                  rows: const []
+
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 150,left: 130,bottom: 350,right: 150),
+              child: CustomDatafound(),
+            ),
+          ],
+
+        );
+
+    }
+
+
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.cusId!.compareTo(b.cusId!);
+          } else if (columnIndex == 1) {
+            return a.cusName!.compareTo(b.cusName!);
+          } else if (columnIndex == 2) {
+            return a.contact!.compareTo(b.contact!);
+          } else if (columnIndex == 3) {
+            return a.location!.toLowerCase().compareTo(b.location!.toLowerCase());
+          } else if (columnIndex == 4) {
+            return a.creditAmount!.compareTo(b.creditAmount!);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.cusId!.compareTo(a.cusId!); // Reverse the comparison
+          } else if (columnIndex == 1) {
+            return b.cusName!.compareTo(a.cusName!); // Reverse the comparison
+          } else if (columnIndex == 2) {
+            return b.contact!.compareTo(a.contact!); // Reverse the comparison
+          } else if (columnIndex == 3) {
+            return b.location!.toLowerCase().compareTo(a.location!.toLowerCase()); // Reverse the comparison
+          } else if (columnIndex == 4) {
+            return b.creditAmount!.compareTo(a.creditAmount!); // Reverse the comparison
+          } else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
+
+    return LayoutBuilder(builder: (context, constraints){
+      // double padding = constraints.maxWidth * 0.065;
+      double right = MediaQuery.of(context).size.width * 0.92;
+
+
+      return
+        Column(
+          children: [
+            Container(
+              width: 1100,
+
+              decoration:const BoxDecoration(
+                  color: Color(0xFFF7F7F7),
+                  border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+              ),
+              child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columns: columns.map((column) {
+                  return
+                    DataColumn(
+                      label: Stack(
+                        children: [
+                          Container(
+                            //   padding: EdgeInsets.only(left: 5,right: 5),
+                            width: columnWidths[columns.indexOf(column)], // Dynamic width based on user interaction
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              //crossAxisAlignment: CrossAxisAlignment.end,
+                              //   mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  column,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.indigo[900],
+                                    fontSize: 13,
+                                  ),
+                                ),
+
+                                IconButton(
+                                  icon: _sortOrder[columns.indexOf(column)] == 'asc'
+                                      ? SizedBox(width: 12,
+                                      child: Image.asset("images/sort.png",color: Colors.grey,))
+                                      : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                  onPressed: () {
+                                    setState(() {
+                                      _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
+                                      _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
+                                    });
+                                  },
+                                ),
+                                //SizedBox(width: 50,),
+                                //Padding(
+                                //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
+                                //  child:
+
+                                Spacer(),
+
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.resizeColumn,
+                                  child: GestureDetector(
+                                      onHorizontalDragUpdate: (details) {
+                                        // Update column width dynamically as user drags
+                                        setState(() {
+                                          columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                          columnWidths[columns.indexOf(column)] =
+                                              columnWidths[columns.indexOf(column)].clamp(50.0, 300.0);
+                                        });
+                                        // setState(() {
+                                        //   columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                        //   if (columnWidths[columns.indexOf(column)] < 50) {
+                                        //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
+                                        //   }
+                                        // });
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 10,bottom: 10),
+                                        child: Row(
+                                          children: [
+                                            VerticalDivider(
+                                              width: 5,
+                                              thickness: 4,
+                                              color: Colors.grey,
+
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                  ),
+                                ),
+                                // ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      onSort: (columnIndex, ascending){
+                        _sortOrder;
+                      },
+                    );
+                }).toList(),
+                rows:
+                List.generate(
+                    math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage),(index){
+                  final detail = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                  return DataRow(
+                      color: MaterialStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue.shade500.withOpacity(0.8); // Add some opacity to the dark blue
+                        } else {
+                          return Colors.white.withOpacity(0.9);
+                        }
+                      }),
+                      cells:
+                      [
+
+                        DataCell(
+                            Text(detail.cusId!,style:
+                            const TextStyle(
+                              // fontSize: 16,
+                                color: Colors.grey),)),
+                        DataCell(
+                          Text(detail.cusName!,style: const TextStyle(
+                            // fontSize: 16,
+                              color: Colors.grey)),
+                        ),
+                        DataCell(
+                          Text(detail.contact!,style: const TextStyle(
+                            //fontSize: 16,
+                              color: Colors.grey)),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[3],
+                            child: Text(detail.location.toString(),style: const TextStyle(
+                              // fontSize: 16,
+                                color: Colors.grey)),
+                          ),
+                        ),
+                        DataCell(
+                          Text(detail.creditAmount!.toStringAsFixed(2),style: const TextStyle(
+                            //fontSize: 16,
+                              color: Colors.grey)),
+                        ),
+
+                      ],
+                      onSelectChanged: (selected){
+                        if(selected != null && selected){
+                          //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+                          if (filteredData.length <= 9) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
+                            );
+
+                          };
+                        }
+                      }
+
+                  );
+                }),
+              ),
+            ),
+          ],
+        );
+    });
+  }
 
   Widget buildDataTable() {
 
@@ -982,7 +1475,7 @@ class _CusListState extends State<CusList> {
                     ),)),
 
                   ],
-                rows: const []
+                  rows: const []
 
               ),
             ),
@@ -1036,22 +1529,22 @@ class _CusListState extends State<CusList> {
 
     return LayoutBuilder(builder: (context, constraints){
       // double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width;
+      double right = MediaQuery.of(context).size.width * 0.92;
 
 
       return
         Column(
           children: [
             Container(
-              width: right * 0.78,
+              width: right - 100,
 
               decoration:const BoxDecoration(
                   color: Color(0xFFF7F7F7),
                   border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
               ),
               child: DataTable(
-                  showCheckboxColumn: false,
-                  headingRowHeight: 40,
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
                 columns: columns.map((column) {
                   return
                     DataColumn(
@@ -1075,57 +1568,57 @@ class _CusListState extends State<CusList> {
                                   ),
                                 ),
 
-                                  IconButton(
-                                    icon: _sortOrder[columns.indexOf(column)] == 'asc'
-                                        ? SizedBox(width: 12,
-                                        child: Image.asset("images/sort.png",color: Colors.grey,))
-                                        : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
-                                    onPressed: () {
-                                      setState(() {
-                                        _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
-                                        _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
-                                      });
-                                    },
-                                  ),
+                                IconButton(
+                                  icon: _sortOrder[columns.indexOf(column)] == 'asc'
+                                      ? SizedBox(width: 12,
+                                      child: Image.asset("images/sort.png",color: Colors.grey,))
+                                      : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                  onPressed: () {
+                                    setState(() {
+                                      _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
+                                      _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
+                                    });
+                                  },
+                                ),
                                 //SizedBox(width: 50,),
                                 //Padding(
                                 //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
                                 //  child:
 
-                                  Spacer(),
+                                Spacer(),
 
-                                  MouseRegion(
-                                    cursor: SystemMouseCursors.resizeColumn,
-                                    child: GestureDetector(
-                                        onHorizontalDragUpdate: (details) {
-                                          // Update column width dynamically as user drags
-                                          setState(() {
-                                            columnWidths[columns.indexOf(column)] += details.delta.dx;
-                                            columnWidths[columns.indexOf(column)] =
-                                                columnWidths[columns.indexOf(column)].clamp(50.0, 300.0);
-                                          });
-                                          // setState(() {
-                                          //   columnWidths[columns.indexOf(column)] += details.delta.dx;
-                                          //   if (columnWidths[columns.indexOf(column)] < 50) {
-                                          //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-                                          //   }
-                                          // });
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(top: 10,bottom: 10),
-                                          child: Row(
-                                            children: [
-                                              VerticalDivider(
-                                                width: 5,
-                                                thickness: 4,
-                                                color: Colors.grey,
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.resizeColumn,
+                                  child: GestureDetector(
+                                      onHorizontalDragUpdate: (details) {
+                                        // Update column width dynamically as user drags
+                                        setState(() {
+                                          columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                          columnWidths[columns.indexOf(column)] =
+                                              columnWidths[columns.indexOf(column)].clamp(50.0, 300.0);
+                                        });
+                                        // setState(() {
+                                        //   columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                        //   if (columnWidths[columns.indexOf(column)] < 50) {
+                                        //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
+                                        //   }
+                                        // });
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 10,bottom: 10),
+                                        child: Row(
+                                          children: [
+                                            VerticalDivider(
+                                              width: 5,
+                                              thickness: 4,
+                                              color: Colors.grey,
 
-                                              )
-                                            ],
-                                          ),
-                                        )
-                                    ),
+                                            )
+                                          ],
+                                        ),
+                                      )
                                   ),
+                                ),
                                 // ),
                               ],
                             ),
@@ -1137,11 +1630,11 @@ class _CusListState extends State<CusList> {
                       },
                     );
                 }).toList(),
-                  rows:
-                  List.generate(
-                      math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage),(index){
-                    final detail = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                    return DataRow(
+                rows:
+                List.generate(
+                    math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage),(index){
+                  final detail = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                  return DataRow(
                       color: MaterialStateProperty.resolveWith<Color>((states) {
                         if (states.contains(MaterialState.hovered)) {
                           return Colors.blue.shade500.withOpacity(0.8); // Add some opacity to the dark blue
@@ -1182,26 +1675,26 @@ class _CusListState extends State<CusList> {
                         ),
 
                       ],
-                        onSelectChanged: (selected){
-                          if(selected != null && selected){
-                            //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                            if (filteredData.length <= 9) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
-                              );
-                            } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
-                              );
+                      onSelectChanged: (selected){
+                        if(selected != null && selected){
+                          //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+                          if (filteredData.length <= 9) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => CustomerDetails(orderId: detail.cusId,)),
+                            );
 
-                            };
-                          }
+                          };
                         }
+                      }
 
-                    );
-                  }),
+                  );
+                }),
               ),
             ),
           ],
@@ -1312,3 +1805,5 @@ class CusDetail {
 
 
 }
+
+

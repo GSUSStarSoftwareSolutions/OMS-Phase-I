@@ -409,14 +409,7 @@ class _ReportspageState extends State<Reportspage> {
           if (product['productName'] == item['productName']) {
             item['tax'] = product['tax'];
             item['discount'] = product['discount'];
-            item['discountamount'] =
-                (double.parse(item['totalAmount'].toString()) *
-                        double.parse(item['discount'].replaceAll('%', ''))) /
-                    100;
-            item['taxamount'] = ((double.parse(item['totalAmount'].toString()) -
-                        double.parse(item['discountamount'].toString())) *
-                    double.parse(item['tax'].replaceAll('%', '').toString())) /
-                100;
+            item['discountamount'] =    (double.parse(item['price'].toString()) *            double.parse(item['discount'].replaceAll('%', ''))) /        100;item['taxamount'] = ((double.parse(item['price'].toString()) -            double.parse(item['discountamount'].toString())) *        double.parse(item['tax'].replaceAll('%', '').toString())) /    100;
           }
         }
       }

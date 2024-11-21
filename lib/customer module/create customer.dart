@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:html';
 import 'dart:io' as io;
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
   String token = window.sessionStorage["token"] ?? " ";
   String? imagePath;
   io.File? selectedImage;
+  final ScrollController horizontalScroll = ScrollController();
   bool isOrdersSelected = false;
   String? errorMessage;
   bool purchaseOrderError = false;
@@ -47,6 +49,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
   var result;
   final TextEditingController cusNameController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController shippingAdd1 = TextEditingController();
+  final TextEditingController shippingAdd2 = TextEditingController();
   final TextEditingController EmailController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController unitController = TextEditingController();
@@ -129,7 +133,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
       "billingAddress": addressController.text,
       "deliveryLocation": addressController.text,
       "email": EmailController.text,
-      "shippingAddress": "string",
+      "shippingAddress1": shippingAdd1.text,
+      "shippingAddress2": shippingAdd2.text,
       "returnCredit": 0
     };
     Map<String, String> headers = {
@@ -183,7 +188,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
                       context,
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
-                            const CusList(),
+                        const CusList(),
                         transitionDuration: const Duration(milliseconds: 200),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
@@ -301,7 +306,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
                           Navigator.of(context).push(PageRouteBuilder(
                             pageBuilder:
                                 (context, animation, secondaryAnimation) =>
-                                    const CusList(),
+                            const CusList(),
                           ));
                         },
                       ),
@@ -330,230 +335,575 @@ class _CreateCustomerState extends State<CreateCustomer> {
                 color: Colors.grey, // Border color
               ),
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: Card(
-                    margin: EdgeInsets.only(
-                        left: maxWidth * 0.4,
-                        top: maxHeight * 0.15,
-                        right: maxWidth * 0.3),
-                    color: Colors.white,
-                    elevation: 0.0,
-                    child: Form(
-                      key: _validate,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            const Icon(
-                              Icons.account_circle,
-                              size: 100,
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            // Customer Name
-                            TextFormField(
-                              controller: cusNameController,
-                              decoration: const InputDecoration(
-                                labelText: 'Customer Name *',
-                                labelStyle: TextStyle(
-                                    fontSize: 16, color: Colors.black87),
-                                border: OutlineInputBorder(),
-                                hintText: 'Enter Customer Name',
-                                hintStyle: TextStyle(color: Colors.grey),
-                              ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp("[a-zA-Z ]")),
-                                // Allow only letters, numbers, and single space
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'^\s')),
-                                // Disallow starting with a space
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'\s\s')),
-                                // Disallow multiple spaces
-                              ],
-                              validator: (value) {
-                                if (cusNameController.text != null &&
-                                    cusNameController.text.trim().isEmpty) {
-                                  return 'Please enter a customer name';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // Email
-                            TextFormField(
-                              controller: EmailController,
-                              decoration: const InputDecoration(
-                                labelText: 'Email *',
-                                labelStyle: TextStyle(
-                                    fontSize: 16, color: Colors.black87),
-                                border: OutlineInputBorder(),
-                                hintText: 'Enter Email',
-                                hintStyle: TextStyle(color: Colors.grey),
-                              ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp("[a-zA-Z,0-9,@.]")),
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'^\s')),
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'\s\s')),
-                              ],
-                              validator: (value) {
-                                if (value != null && value.trim().isEmpty) {
-                                  return 'Please enter an email';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
+            if(constraints.maxWidth >= 1350)...{
+              Row(
+                children: [
 
-                            // Contact Number
-                            TextFormField(
-                              controller: ContactnoController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(10),
-                              ],
-                              decoration: const InputDecoration(
-                                labelText: 'Contact Number *',
-                                labelStyle: TextStyle(
-                                    fontSize: 16, color: Colors.black87),
-                                border: OutlineInputBorder(),
-                                hintText: 'Enter Contact Number',
-                                hintStyle: TextStyle(color: Colors.grey),
-                              ),
-                              validator: (value) {
-                                if (value != null && value.trim().isEmpty) {
-                                  return 'Please enter a contact number';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 350,right: 120,top: 80),
+                      child: Container(
+                        color: Colors.white,
+                        width: 800,
+                        height: 800,
+                        child: SingleChildScrollView(
 
-                            // Address
-                            TextFormField(
-                              controller: addressController,
-                              maxLines: 3,
-                              decoration: const InputDecoration(
-                                labelText: ' Billing Address *',
-                                labelStyle: TextStyle(
-                                    fontSize: 16, color: Colors.black87),
-                                border: OutlineInputBorder(),
-                                hintText: 'Enter Address',
-                                hintStyle: TextStyle(color: Colors.grey),
+                          child: Container(
+                            width: 1200,
+                            margin: EdgeInsets.only(
+                                left: maxWidth * 0.19,
+                                top: 10,
+                                bottom: maxHeight * 0.02,
+                                right: maxWidth * 0.19),
+                            color: Colors.white,
+                            // elevation: 0.0,
+                            child: Form(
+                              key: _validate,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+
+                                  TextFormField(
+                                    controller: cusNameController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Customer Name *',
+                                      labelStyle: TextStyle(
+                                          fontSize: 16, color: Colors.black87),
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Enter Customer Name',
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                    ),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp("[a-zA-Z ]")),
+                                      // Allow only letters, numbers, and single space
+                                      FilteringTextInputFormatter.deny(
+                                          RegExp(r'^\s')),
+                                      // Disallow starting with a space
+                                      FilteringTextInputFormatter.deny(
+                                          RegExp(r'\s\s')),
+                                      // Disallow multiple spaces
+                                    ],
+                                    validator: (value) {
+                                      if (cusNameController.text != null &&
+                                          cusNameController.text.trim().isEmpty) {
+                                        return 'Please enter a customer name';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  // Email
+                                  TextFormField(
+                                    controller: EmailController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Email *',
+                                      labelStyle: TextStyle(
+                                          fontSize: 16, color: Colors.black87),
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Enter Email',
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                    ),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp("[a-zA-Z,0-9,@.]")),
+                                      FilteringTextInputFormatter.deny(
+                                          RegExp(r'^\s')),
+                                      FilteringTextInputFormatter.deny(
+                                          RegExp(r'\s\s')),
+                                    ],
+                                    validator: (value) {
+                                      if (value != null && value.trim().isEmpty) {
+                                        return 'Please enter an email';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Contact Number
+                                  TextFormField(
+                                    controller: ContactnoController,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      LengthLimitingTextInputFormatter(10),
+                                    ],
+                                    decoration: const InputDecoration(
+                                      labelText: 'Contact Number *',
+                                      labelStyle: TextStyle(
+                                          fontSize: 16, color: Colors.black87),
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Enter Contact Number',
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                    ),
+                                    validator: (value) {
+                                      if (value != null && value.trim().isEmpty) {
+                                        return 'Please enter a contact number';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  // Address
+                                  TextFormField(
+                                    controller: addressController,
+                                    maxLines: 3,
+                                    decoration: const InputDecoration(
+                                      labelText: ' Billing Address *',
+                                      labelStyle: TextStyle(
+                                          fontSize: 16, color: Colors.black87),
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Enter Address',
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                    ),
+                                    validator: (value) {
+                                      if (value != null && value.trim().isEmpty) {
+                                        return 'Please enter an address';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: shippingAdd1,
+                                          maxLines: 3,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Shipping Address 1 *',
+                                            labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
+                                            border: OutlineInputBorder(),
+                                            hintText: 'Enter Address',
+                                            hintStyle: TextStyle(color: Colors.grey),
+                                          ),
+                                          validator: (value) {
+                                            if (value != null && value.trim().isEmpty) {
+                                              return 'Please enter an address';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: shippingAdd2,
+                                          maxLines: 3,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Shipping Address 2 *',
+                                            labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
+                                            border: OutlineInputBorder(),
+                                            hintText: 'Enter Address',
+                                            hintStyle: TextStyle(color: Colors.grey),
+                                          ),
+                                          validator: (value) {
+                                            if (value != null && value.trim().isEmpty) {
+                                              return 'Please enter an address';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Buttons
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      OutlinedButton(
+                                        onPressed: () {
+                                          ContactnoController.clear();
+                                          cusNameController.clear();
+                                          addressController.clear();
+                                          EmailController.clear();
+                                          shippingAdd1.clear();
+                                          shippingAdd2.clear();
+                                          // Clear form
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: Colors.grey[300],
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(5),
+                                          ),
+                                          side: BorderSide.none,
+                                        ),
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.indigo[900],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      OutlinedButton(
+                                        onPressed: () async {
+                                          if (cusNameController.text.isEmpty ||
+                                              cusNameController.text.length <= 2) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'Please fill  Customer name'),
+                                              ),
+                                            );
+                                          } else if (EmailController.text.isEmpty ||
+                                              !RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$')
+                                                  .hasMatch(EmailController.text)) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'Please fill Email Address Format @gmail.com'),
+                                              ),
+                                            );
+                                          } else if (ContactnoController
+                                              .text.isEmpty ||
+                                              ContactnoController.text.length != 10) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'Please enter a valid phone number.'),
+                                              ),
+                                            );
+                                          } else if (addressController.text.isEmpty) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content:
+                                                Text('Please fill  address '),
+                                              ),
+                                            );
+                                          } else {
+                                            cusSave();
+                                          } // Save form
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: Colors.blue[800],
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(5),
+                                          ),
+                                          side: BorderSide.none,
+                                        ),
+                                        child: const Text(
+                                          'Save',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                              validator: (value) {
-                                if (value != null && value.trim().isEmpty) {
-                                  return 'Please enter an address';
-                                }
-                                return null;
-                              },
                             ),
-                            const SizedBox(height: 16),
-                            const SizedBox(height: 40),
-                            // Buttons
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                OutlinedButton(
-                                  onPressed: () {
-                                    ContactnoController.clear();
-                                    cusNameController.clear();
-                                    addressController.clear();
-                                    EmailController.clear();
-                                    // Clear form
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    backgroundColor: Colors.grey[300],
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    side: BorderSide.none,
-                                  ),
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.indigo[900],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                OutlinedButton(
-                                  onPressed: () async {
-                                    if (cusNameController.text.isEmpty ||
-                                        cusNameController.text.length <= 2) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please fill  Customer name'),
-                                        ),
-                                      );
-                                    } else if (EmailController.text.isEmpty ||
-                                        !RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$')
-                                            .hasMatch(EmailController.text)) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please fill Email Address Format @gmail.com'),
-                                        ),
-                                      );
-                                    } else if (ContactnoController
-                                            .text.isEmpty ||
-                                        ContactnoController.text.length != 10) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please enter a valid phone number.'),
-                                        ),
-                                      );
-                                    } else if (addressController.text.isEmpty) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text('Please fill  address '),
-                                        ),
-                                      );
-                                    } else {
-                                      cusSave();
-                                    } // Save form
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    backgroundColor: Colors.blue[800],
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    side: BorderSide.none,
-                                  ),
-                                  child: const Text(
-                                    'Save',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            )
+                ],
+              ),
+            }else...{
+              Padding(
+                  padding: const EdgeInsets.only(left: 450,right: 30,top: 100,bottom: 30),
+                  child:
+                  Container(
+                    color: Colors.white,
+                    width: 900,
+                    height: 800,
+                    child:
+                    AdaptiveScrollbar(
+                      controller: horizontalScroll,
+                      position: ScrollbarPosition.bottom,
+                      child: SingleChildScrollView(
+                        controller: horizontalScroll,
+                        scrollDirection: Axis.horizontal,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width:600,
+                                    height: 800,
+                                    // margin: EdgeInsets.only(
+                                    //     left: 350,
+                                    //     top: 120,
+                                    //     bottom: 80,
+                                    //     right: 30
+                                    // ),
+                                    color: Colors.white,
+                                    // elevation: 0.0,
+                                    child: Form(
+                                      key: _validate,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(
+                                            height: 40,),
+                                          SizedBox(
+                                            width: 600,
+                                            child: TextFormField(
+                                              controller: cusNameController,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Customer Name *',
+                                                labelStyle: TextStyle(
+                                                    fontSize: 16, color: Colors.black87),
+                                                border: OutlineInputBorder(),
+                                                hintText: 'Enter Customer Name',
+                                                hintStyle: TextStyle(color: Colors.grey),
+                                              ),
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.allow(
+                                                    RegExp("[a-zA-Z ]")),
+                                                // Allow only letters, numbers, and single space
+                                                FilteringTextInputFormatter.deny(
+                                                    RegExp(r'^\s')),
+                                                // Disallow starting with a space
+                                                FilteringTextInputFormatter.deny(
+                                                    RegExp(r'\s\s')),
+                                                // Disallow multiple spaces
+                                              ],
+                                              validator: (value) {
+                                                if (cusNameController.text != null &&
+                                                    cusNameController.text.trim().isEmpty) {
+                                                  return 'Please enter a customer name';
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          // Email
+                                          TextFormField(
+                                            controller: EmailController,
+                                            decoration: const InputDecoration(
+                                              labelText: 'Email *',
+                                              labelStyle: TextStyle(
+                                                  fontSize: 16, color: Colors.black87),
+                                              border: OutlineInputBorder(),
+                                              hintText: 'Enter Email',
+                                              hintStyle: TextStyle(color: Colors.grey),
+                                            ),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp("[a-zA-Z,0-9,@.]")),
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(r'^\s')),
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(r'\s\s')),
+                                            ],
+                                            validator: (value) {
+                                              if (value != null && value.trim().isEmpty) {
+                                                return 'Please enter an email';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                          const SizedBox(height: 16),
+
+                                          // Contact Number
+                                          TextFormField(
+                                            controller: ContactnoController,
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.digitsOnly,
+                                              LengthLimitingTextInputFormatter(10),
+                                            ],
+                                            decoration: const InputDecoration(
+                                              labelText: 'Contact Number *',
+                                              labelStyle: TextStyle(
+                                                  fontSize: 16, color: Colors.black87),
+                                              border: OutlineInputBorder(),
+                                              hintText: 'Enter Contact Number',
+                                              hintStyle: TextStyle(color: Colors.grey),
+                                            ),
+                                            validator: (value) {
+                                              if (value != null && value.trim().isEmpty) {
+                                                return 'Please enter a contact number';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                          const SizedBox(height: 16),
+                                          // Address
+                                          TextFormField(
+                                            controller: addressController,
+                                            maxLines: 3,
+                                            decoration: const InputDecoration(
+                                              labelText: ' Billing Address *',
+                                              labelStyle: TextStyle(
+                                                  fontSize: 16, color: Colors.black87),
+                                              border: OutlineInputBorder(),
+                                              hintText: 'Enter Address',
+                                              hintStyle: TextStyle(color: Colors.grey),
+                                            ),
+                                            validator: (value) {
+                                              if (value != null && value.trim().isEmpty) {
+                                                return 'Please enter an address';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: shippingAdd1,
+                                                  maxLines: 3,
+                                                  decoration: const InputDecoration(
+                                                    labelText: 'Shipping Address 1 *',
+                                                    labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
+                                                    border: OutlineInputBorder(),
+                                                    hintText: 'Enter Address',
+                                                    hintStyle: TextStyle(color: Colors.grey),
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value != null && value.trim().isEmpty) {
+                                                      return 'Please enter an address';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: shippingAdd2,
+                                                  maxLines: 3,
+                                                  decoration: const InputDecoration(
+                                                    labelText: 'Shipping Address 2 *',
+                                                    labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
+                                                    border: OutlineInputBorder(),
+                                                    hintText: 'Enter Address',
+                                                    hintStyle: TextStyle(color: Colors.grey),
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value != null && value.trim().isEmpty) {
+                                                      return 'Please enter an address';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 16),
+
+                                          // Buttons
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              OutlinedButton(
+                                                onPressed: () {
+                                                  ContactnoController.clear();
+                                                  cusNameController.clear();
+                                                  addressController.clear();
+                                                  EmailController.clear();
+                                                  // Clear form
+                                                },
+                                                style: OutlinedButton.styleFrom(
+                                                  backgroundColor: Colors.grey[300],
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
+                                                  side: BorderSide.none,
+                                                ),
+                                                child: Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.indigo[900],
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              OutlinedButton(
+                                                onPressed: () async {
+                                                  if (cusNameController.text.isEmpty ||
+                                                      cusNameController.text.length <= 2) {
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Please fill  Customer name'),
+                                                      ),
+                                                    );
+                                                  } else if (EmailController.text.isEmpty ||
+                                                      !RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$')
+                                                          .hasMatch(EmailController.text)) {
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Please fill Email Address Format @gmail.com'),
+                                                      ),
+                                                    );
+                                                  } else if (ContactnoController
+                                                      .text.isEmpty ||
+                                                      ContactnoController.text.length != 10) {
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Please enter a valid phone number.'),
+                                                      ),
+                                                    );
+                                                  } else if (addressController.text.isEmpty) {
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content:
+                                                        Text('Please fill  address '),
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    cusSave();
+                                                  } // Save form
+                                                },
+                                                style: OutlinedButton.styleFrom(
+                                                  backgroundColor: Colors.blue[800],
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
+                                                  side: BorderSide.none,
+                                                ),
+                                                child: const Text(
+                                                  'Save',
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  )
+              )
+
+
+            }
+
           ]);
         })); // Use the ProductForm widget here
   }
@@ -570,12 +920,14 @@ customerFieldDecoration(
     hintText: hintText,
     hintStyle: const TextStyle(fontSize: 11),
     border:
-        const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+    const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
     counterText: '',
     contentPadding: const EdgeInsets.fromLTRB(12, 00, 0, 0),
     enabledBorder: const OutlineInputBorder(
         borderSide: BorderSide(color: Color(0xff9FB3C8))),
     focusedBorder:
-        const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+    const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
   );
 }
+
+

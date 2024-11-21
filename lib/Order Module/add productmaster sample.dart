@@ -731,7 +731,6 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
       }
       print('from the api response');
       print(orderId);
-
       context.go('/View_Order',extra: {
         'selectedProducts': updatedOrder,
         'orderId': orderId,
