@@ -14,29 +14,39 @@ import 'package:http/http.dart' as http;
 import '../widgets/confirmdialog.dart';
 
 void main() {
-  runApp(
-      MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: CreateReturn(storeImage: '', imageSizeString: const [], orderDetailsMap: const {}, storeImages: const [], orderDetails: const [], imageSizeStrings: const [],),)
-  );
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: CreateReturn(
+      storeImage: '',
+      imageSizeString: const [],
+      orderDetailsMap: const {},
+      storeImages: const [],
+      orderDetails: const [],
+      imageSizeStrings: const [],
+    ),
+  ));
 }
-
-
 
 class CreateReturn extends StatefulWidget {
   final String storeImage;
-   final List<String>? imageSizeString;
+  final List<String>? imageSizeString;
   final List<dynamic> orderDetails;
   List<String> storeImages;
   final Map<String, dynamic> orderDetailsMap;
   List<String> imageSizeStrings;
   final _formKey = GlobalKey<FormState>();
 
-
   //final Map<Product, TextEditingController> _controller = {};
 
-  CreateReturn({super.key, required this.orderDetailsMap,required this.storeImage,this.imageSizeString,required this.imageSizeStrings,required this.storeImages,required this.orderDetails
-  });
+  CreateReturn(
+      {super.key,
+      required this.orderDetailsMap,
+      required this.storeImage,
+      this.imageSizeString,
+      required this.imageSizeStrings,
+      required this.storeImages,
+      required this.orderDetails});
+
   @override
   State<CreateReturn> createState() {
     return _CreateReturnState();
@@ -44,8 +54,7 @@ class CreateReturn extends StatefulWidget {
 }
 
 class _CreateReturnState extends State<CreateReturn> {
-
- // FocusNode _focusNode = FocusNode();
+  // FocusNode _focusNode = FocusNode();
   String? _selectedReason = 'Reason for return';
   final _controller = TextEditingController();
   List<dynamic> _orderDetails = [];
@@ -54,9 +63,9 @@ class _CreateReturnState extends State<CreateReturn> {
   List<TextEditingController> _qtyControllers = [];
   String? _errorText;
   String _enteredValues = '';
-  final List<String> list = [
-    'Reason for return',' Option 1', '  Option 2'];
-  int Index =1 ;
+  final List<String> list = ['Reason for return', ' Option 1', '  Option 2'];
+  int Index = 1;
+
   bool isOrdersSelected = false;
   double totalAmount = 0.0;
   final ScrollController horizontalScroll = ScrollController();
@@ -69,7 +78,8 @@ class _CreateReturnState extends State<CreateReturn> {
   String? errorMessage;
   final TextEditingController ContactPerson = TextEditingController();
   final TextEditingController OrderIDController = TextEditingController();
-  final TextEditingController ShippingAddressController = TextEditingController();
+  final TextEditingController ShippingAddressController =
+      TextEditingController();
   final TextEditingController NotesController = TextEditingController();
   final TextEditingController EmailAddressController = TextEditingController();
   final TextEditingController ContactpersonController = TextEditingController();
@@ -90,35 +100,45 @@ class _CreateReturnState extends State<CreateReturn> {
     'Reports': false,
   };
 
-
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
-      _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
-      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
-      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
-      Container(
+      _buildMenuItem(
+          'Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem(
+          'Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
+      _buildMenuItem(
+          'Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
+      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!,
+          '/Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined,
+          Colors.blue[900]!, '/Invoice'),
 
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!,
+          '/Payment_List'),
+      Container(
           decoration: BoxDecoration(
-            color: Colors.blue[800]  ,
+            color: Colors.blue[800],
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(8), // Radius for top-left corner
               topRight: Radius.circular(8), // No radius for top-right corner
               bottomLeft: Radius.circular(8), // Radius for bottom-left corner
-              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+              bottomRight:
+                  Radius.circular(8), // No radius for bottom-right corner
             ),
-          ),child: _buildMenuItem('Return', Icons.keyboard_return, Colors.white, '/Return_List')),
-      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
+          ),
+          child: _buildMenuItem(
+              'Return', Icons.keyboard_return, Colors.white, '/Return_List')),
+      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!,
+          '/Report_List'),
     ];
   }
 
-  Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+  Widget _buildMenuItem(
+      String title, IconData icon, Color iconColor, String route) {
     iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
-    title == 'Return'? _isHovered[title] = false :  _isHovered[title] = false;
-    title == 'Return'? iconColor = Colors.white : Colors.black;
+    title == 'Return' ? _isHovered[title] = false : _isHovered[title] = false;
+    title == 'Return' ? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -128,14 +148,14 @@ class _CreateReturnState extends State<CreateReturn> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 5,right: 20),
+          margin: const EdgeInsets.only(bottom: 5, right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 5,top: 5),
+            padding: const EdgeInsets.only(left: 5, top: 5),
             child: Row(
               children: [
                 Icon(icon, color: iconColor),
@@ -158,14 +178,12 @@ class _CreateReturnState extends State<CreateReturn> {
 
   final FocusNode _focusNode = FocusNode();
 
-
   Future<void> addReturnMaster() async {
     final orderId = _controller.text.trim();
     print('Order ID: $orderId');
 
     // Step 1: Fetch all return master data to get invoice numbers
-    final returnMasterUrl =
-        '$apicall/return_master/get_all_returnmaster';
+    final returnMasterUrl = '$apicall/return_master/get_all_returnmaster';
 
     final returnMasterResponse = await http.get(
       Uri.parse(returnMasterUrl),
@@ -178,7 +196,8 @@ class _CreateReturnState extends State<CreateReturn> {
       final returnData = jsonDecode(returnMasterResponse.body);
       print('Return Data: $returnData');
       // Step 2: Check if the entered orderId matches any invoice number
-      bool isMatched = returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
+      bool isMatched =
+          returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
       if (isMatched) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -218,7 +237,10 @@ class _CreateReturnState extends State<CreateReturn> {
     for (var item in _orderDetails) {
       if (item['enteredQty'] != null && item['enteredQty'] != 0) {
         String imageId = '';
-        int index = widget.storeImages.map((e) => e.split('-').first).toList().indexOf(item['productName']);
+        int index = widget.storeImages
+            .map((e) => e.split('-').first)
+            .toList()
+            .indexOf(item['productName']);
         //int index = widget.storeImages.indexOf(item['productName']);
         if (index != -1) {
           imageId = widget.imageSizeString![index];
@@ -236,7 +258,6 @@ class _CreateReturnState extends State<CreateReturn> {
         });
       }
     }
-
 
     final requestBody = {
       "contactPerson": ContactpersonController.text,
@@ -280,7 +301,10 @@ class _CreateReturnState extends State<CreateReturn> {
             ),
             title: const Padding(
               padding: EdgeInsets.only(left: 12),
-              child: Text('Return Created Successfully', style: TextStyle(fontSize: 15),),
+              child: Text(
+                'Return Created Successfully',
+                style: TextStyle(fontSize: 15),
+              ),
             ),
             content: Padding(
                 padding: const EdgeInsets.only(left: 25),
@@ -289,11 +313,13 @@ class _CreateReturnState extends State<CreateReturn> {
                     const Text('Your return ID is: '),
                     SelectableText('$returnId'),
                   ],
-                )
-            ),
+                )),
             actions: <Widget>[
               ElevatedButton(
-                child: const Text('OK',style: TextStyle(color: Colors.white),),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   context.go('/Return_List');
                   // Navigator.of(context
@@ -330,71 +356,54 @@ class _CreateReturnState extends State<CreateReturn> {
     }
   }
 
-
   Future<void> _fetchOrderDetails() async {
     final orderId = _controller.text.trim();
+
+    // Step 1: Validate Order ID format
+    if (!orderId.startsWith("INV_")) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Order ID must start with "INV_"'),
+        ),
+      );
+      return;
+    }
+
     print('Order ID: $orderId');
 
-    // Step 1: Fetch all return master data to get invoice numbers
-    final returnMasterUrl =
-        '$apicall/return_master/get_all_returnmaster';
-
-    final returnMasterResponse = await http.get(
-      Uri.parse(returnMasterUrl),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
-
-
-    final orderMasterUrl = '$apicall/order_master/get_all_ordermaster';
-
-    final orderMasterResponse = await http.get(Uri.parse(orderMasterUrl),
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    }
-    );
-
-    if(orderMasterResponse.statusCode == 200) {
-      final orderData = jsonDecode(orderMasterResponse.body);
-      print('Order Data: $orderData');
-
-      bool isMatched2 = orderData.any((order) => order['invoiceNo'] == orderId);
-
-
-    if (returnMasterResponse.statusCode == 200) {
-      final returnData = jsonDecode(returnMasterResponse.body);
-      print('Return Data: $returnData');
-
-      // Step 2: Check if the entered orderId matches any invoice number
-      bool isMatched = returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
-      final  deliveryUrl=
-          '$apicall/delivery_master/get_all_deliverymaster';
-
-      final deliveryMasterResponse = await http.get(
-        Uri.parse(deliveryUrl),
+    try {
+      // Step 2: Fetch data from APIs
+      final returnMasterUrl = '$apicall/return_master/get_all_returnmaster';
+      final returnMasterResponse = await http.get(
+        Uri.parse(returnMasterUrl),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
-      if (deliveryMasterResponse.statusCode == 200) {
-        final returnData1 = jsonDecode(deliveryMasterResponse.body);
-        print('Return Data: $returnData1');
 
-        // Step 2: Check if the entered orderId matches any invoice number
-        bool isMatched1 = returnData1.any((invoice) =>
-        invoice['status'] == 'In Progress' && invoice['invoiceNo'] == orderId);
+      final orderMasterUrl = '$apicall/order_master/get_all_ordermaster';
+      final orderMasterResponse = await http.get(
+        Uri.parse(orderMasterUrl),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (returnMasterResponse.statusCode == 200 &&
+          orderMasterResponse.statusCode == 200) {
+        final returnData = jsonDecode(returnMasterResponse.body);
+        final orderData = jsonDecode(orderMasterResponse.body);
 
-        bool isMatched2 = orderData.any((invoice) => invoice['status'] == 'Not Started' && invoice['invoiceNo'] == orderId);
-        print('details');
-        print(isMatched);
-        print(isMatched1);
+        // Step 3: Match conditions
+        bool isMatchedReturn =
+            returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
+        bool isMatchedInProgress = orderData.any((order) =>
+            order['status'] == 'In Progress' && order['invoiceNo'] == orderId);
+        bool isMatchedNotStarted = orderData.any((order) =>
+            order['status'] == 'Not Started' && order['invoiceNo'] == orderId);
 
-
-        if (isMatched) {
+        if (isMatchedReturn) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('This Product Already Used Return Policy'),
@@ -403,25 +412,14 @@ class _CreateReturnState extends State<CreateReturn> {
           setState(() {
             _orderDetails = [];
           });
-          return; // Exit the function if a match is found
-        }
-        if(isMatched1) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('This Product is In Progress So You Should Not Able to Return'),
-            ),
-          );
-          setState(() {
-            _orderDetails = [];
-          });
           return;
         }
-        if(isMatched2)
-        {
 
+        if (isMatchedInProgress) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('This Order Delivery Status Is Not Started So You can\'t make a Return'),
+              content: Text(
+                  'This Product is In Progress So You Should Not Be Able to Return'),
             ),
           );
           setState(() {
@@ -429,99 +427,302 @@ class _CreateReturnState extends State<CreateReturn> {
           });
           return;
         }
+
+        if (isMatchedNotStarted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'This Order Delivery Status Is Not Started, So You Cannot Make a Return'),
+            ),
+          );
+          setState(() {
+            _orderDetails = [];
+          });
+          return;
+        }
+
+        // Step 4: Fetch delivery data if no matches found
+        final deliveryUrl = '$apicall/delivery_master/get_all_deliverymaster';
+        final deliveryResponse = await http.get(
+          Uri.parse(deliveryUrl),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        );
+
+        if (deliveryResponse.statusCode == 200) {
+          final deliveryData = jsonDecode(deliveryResponse.body);
+          final orderDetails = deliveryData.firstWhere(
+            (order) => order['invoiceNo'] == orderId,
+            orElse: () => null,
+          );
+
+          if (orderDetails != null) {
+            setState(() {
+              ContactPerson.text = orderDetails['contactNumber'];
+              ShippingAddressController.text = orderDetails['comments'];
+              OrderIDController.text = orderDetails['orderId'];
+              customerIdController.text = orderDetails['customerId'];
+              _orderDetails = orderDetails['items']
+                  .map((item) => {
+                        'productName': item['productName'],
+                        'qty': item['qty'],
+                        'totalAmount': item['totalAmount'],
+                        'price': item['price'],
+                        'category': item['category'],
+                        'subCategory': item['subCategory'],
+                      })
+                  .toList();
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Enter the Valid Invoice No'),
+              ),
+            );
+            setState(() {
+              _orderDetails = [];
+            });
+          }
+        } else {
+          throw Exception('Error fetching delivery data');
+        }
+      } else {
+        throw Exception('Error fetching return or order master data');
       }
-    } }else {
+    } catch (e) {
+      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Error fetching return master data'),
+          content: Text('Error fetching order details, please try again'),
         ),
       );
-      return; // Exit the function if there's an error fetching the return data
-    }
-
-    // Step 3: Proceed with fetching order details if no match found
-    final url = '$apicall/delivery_master/get_all_deliverymaster';
-
-
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      print('Response: $jsonData');
-
-      final orderData = jsonData.firstWhere(
-            (order) => order['invoiceNo'] == orderId,  orElse: () => null,);
-      // final orderData = jsonData.firstWhere(
-      //       (order) => order['deliveryId'] == orderId,
-      //   orElse: () => null,
-      // );
-
-      // final orderMaster = '$apicall/order_master/get_all_ordermaster';
-      //
-      // final orderMasterResponse = await http.get(Uri.parse(orderMaster),
-      // headers: {
-      //   'Authorization': 'Bearer $token',
-      //   'Content-Type': 'application/json',
-      // }
-      // );
-      //
-      // if(orderMasterResponse.statusCode == 200){
-      //
-      // }
-
-      if (orderData != null) {
-        // var matchedCustomer = orderData.firstWhere((customer) => customer['customerId'] == orderId);
-        // print('tax and discount details');
-        // print(matchedCustomer['discount']);
-        // print(matchedCustomer['tax']);
-        setState(() {
-          print('customerid');
-          print(orderData['customerId']);
-          print(orderData['tax']);
-          print(orderData['contactNumber']);
-          print(orderData['orderId']);
-          print(orderData['comments']);
-          print(orderData['discount']);
-
-          ContactPerson.text = orderData['contactNumber'];
-          ShippingAddressController.text = orderData['comments'];
-          OrderIDController.text =orderData['orderId'];
-          // contactNumber
-          // orderId
-          // shippingAddress
-          customerIdController.text = orderData['customerId'];
-          print(customerIdController.text);
-          _orderDetails = orderData['items'].map((item) => {
-            'productName': item['productName'],
-            'qty': item['qty'],
-            'totalAmount': item['totalAmount'],
-            'price': item['price'],
-            'category': item['category'],
-            'subCategory': item['subCategory'],
-          }).toList();
-        });
-      } else {
-        setState(() {
-          _orderDetails = [{'productName': 'Order not found'}];
-        });
-      }
-    } else {
       setState(() {
-        _orderDetails = [{'productName': 'Error fetching order details'}];
+        _orderDetails = [
+          {'productName': 'Error fetching order details'}
+        ];
       });
     }
   }
 
+  // old fecthorder
+  // Future<void> _fetchOrderDetails() async {
+  //   final orderId = _controller.text.trim();
+  //   if (!orderId.startsWith("INV_")) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Order ID must start with "INV_"'),
+  //       ),
+  //     );
+  //     return;
+  //   }
+  //
+  //   print('Order ID: $orderId');
+  //
+  //   // Step 1: Fetch all return master data to get invoice numbers
+  //   final returnMasterUrl = '$apicall/return_master/get_all_returnmaster';
+  //
+  //   final returnMasterResponse = await http.get(
+  //     Uri.parse(returnMasterUrl),
+  //     headers: {
+  //       'Authorization': 'Bearer $token',
+  //       'Content-Type': 'application/json',
+  //     },
+  //   );
+  //
+  //   final orderMasterUrl = '$apicall/order_master/get_all_ordermaster';
+  //
+  //   final orderMasterResponse =
+  //       await http.get(Uri.parse(orderMasterUrl), headers: {
+  //     'Authorization': 'Bearer $token',
+  //     'Content-Type': 'application/json',
+  //   });
+  //
+  //   if (orderMasterResponse.statusCode == 200) {
+  //     final orderData = jsonDecode(orderMasterResponse.body);
+  //     print('Order Data: $orderData');
+  //
+  //     bool isMatched2 = orderData.any((order) => order['invoiceNo'] == orderId);
+  //
+  //     if (returnMasterResponse.statusCode == 200) {
+  //       final returnData = jsonDecode(returnMasterResponse.body);
+  //       print('Return Data: $returnData');
+  //
+  //       // Step 2: Check if the entered orderId matches any invoice number
+  //       bool isMatched =
+  //           returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
+  //       final deliveryUrl = '$apicall/delivery_master/get_all_deliverymaster';
+  //
+  //       final deliveryMasterResponse = await http.get(
+  //         Uri.parse(deliveryUrl),
+  //         headers: {
+  //           'Authorization': 'Bearer $token',
+  //           'Content-Type': 'application/json',
+  //         },
+  //       );
+  //       if (deliveryMasterResponse.statusCode == 200) {
+  //         final returnData1 = jsonDecode(deliveryMasterResponse.body);
+  //         print('Return Data: $returnData1');
+  //
+  //         // Step 2: Check if the entered orderId matches any invoice number
+  //         bool isMatched1 = returnData1.any((invoice) =>
+  //             invoice['status'] == 'In Progress' &&
+  //             invoice['invoiceNo'] == orderId);
+  //
+  //         bool isMatched2 = orderData.any((invoice) =>
+  //             invoice['status'] == 'Not Started' &&
+  //             invoice['invoiceNo'] == orderId);
+  //         print('details');
+  //         print(isMatched);
+  //         print(isMatched1);
+  //
+  //         if (isMatched) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(
+  //               content: Text('This Product Already Used Return Policy'),
+  //             ),
+  //           );
+  //           setState(() {
+  //             _orderDetails = [];
+  //           });
+  //           return; // Exit the function if a match is found
+  //         }
+  //         if (isMatched1) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(
+  //               content: Text(
+  //                   'This Product is In Progress So You Should Not Able to Return'),
+  //             ),
+  //           );
+  //           setState(() {
+  //             _orderDetails = [];
+  //           });
+  //           return;
+  //         }
+  //         if (isMatched2) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(
+  //               content: Text(
+  //                   'This Order Delivery Status Is Not Started So You can\'t make a Return'),
+  //             ),
+  //           );
+  //           setState(() {
+  //             _orderDetails = [];
+  //           });
+  //           return;
+  //         }
+  //       }
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Error fetching return master data'),
+  //       ),
+  //     );
+  //     return; // Exit the function if there's an error fetching the return data
+  //   }
+  //
+  //   // Step 3: Proceed with fetching order details if no match found
+  //   final url = '$apicall/delivery_master/get_all_deliverymaster';
+  //
+  //   final response = await http.get(
+  //     Uri.parse(url),
+  //     headers: {
+  //       'Authorization': 'Bearer $token',
+  //       'Content-Type': 'application/json',
+  //     },
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     final jsonData = jsonDecode(response.body);
+  //     print('Response: $jsonData');
+  //
+  //     final orderData = jsonData.firstWhere(
+  //       (order) => order['invoiceNo'] == orderId,
+  //       orElse: () => null,
+  //     );
+  //     // final orderData = jsonData.firstWhere(
+  //     //       (order) => order['deliveryId'] == orderId,
+  //     //   orElse: () => null,
+  //     // );
+  //
+  //     // final orderMaster = '$apicall/order_master/get_all_ordermaster';
+  //     //
+  //     // final orderMasterResponse = await http.get(Uri.parse(orderMaster),
+  //     // headers: {
+  //     //   'Authorization': 'Bearer $token',
+  //     //   'Content-Type': 'application/json',
+  //     // }
+  //     // );
+  //     //
+  //     // if(orderMasterResponse.statusCode == 200){
+  //     //
+  //     // }
+  //
+  //     if (orderData != null) {
+  //       setState(() {
+  //         print('customerid');
+  //         print(orderData['customerId']);
+  //         print(orderData['tax']);
+  //         print(orderData['contactNumber']);
+  //         print(orderData['orderId']);
+  //         print(orderData['comments']);
+  //         print(orderData['discount']);
+  //
+  //         ContactPerson.text = orderData['contactNumber'];
+  //         ShippingAddressController.text = orderData['comments'];
+  //         OrderIDController.text = orderData['orderId'];
+  //         // contactNumber
+  //         // orderId
+  //         // shippingAddress
+  //         customerIdController.text = orderData['customerId'];
+  //         print(customerIdController.text);
+  //         _orderDetails = orderData['items']
+  //             .map((item) => {
+  //                   'productName': item['productName'],
+  //                   'qty': item['qty'],
+  //                   'totalAmount': item['totalAmount'],
+  //                   'price': item['price'],
+  //                   'category': item['category'],
+  //                   'subCategory': item['subCategory'],
+  //                 })
+  //             .toList();
+  //       });
+  //     } else {
+  //       setState(() {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(
+  //             content: Text('Enter the Valid Invoice No'),
+  //           ),
+  //         );
+  //         _orderDetails = [
+  //           {'productName': 'Order not found'}
+  //         ];
+  //       });
+  //     }
+  //   } else {
+  //     setState(() {
+  //       _orderDetails = [
+  //         {'productName': 'Error fetching order details'}
+  //       ];
+  //     });
+  //   }
+  // }
+
   void _onFocusChange() {
     if (!_focusNode.hasFocus) {
+      final orderId = _controller.text.trim();
+      if (orderId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please enter an Invoice No'),
+          ),
+        );
+        return;
+      }
+      _isLoading = true;
       _fetchOrderDetails();
-      _isLoading =true;
       _timer = Timer(const Duration(minutes: 2), () {
         setState(() {
           _isLoading = false;
@@ -539,6 +740,7 @@ class _CreateReturnState extends State<CreateReturn> {
     _focusNode.dispose();
     super.dispose();
   }
+
   void _initializeControllers() {
     _qtyControllers.clear();
     _qtyControllers = List.generate(_orderDetails.length, (index) {
@@ -577,13 +779,10 @@ class _CreateReturnState extends State<CreateReturn> {
       _reasonController.text = 'Reason for return';
     }
 
-
-
     if (widget.storeImage == 'hi') {
       print('bfore');
       print(_selectedReason);
       print(widget.imageSizeString);
-
 
       // Check if emailAddress is not null before trying to assign it to EmailAddressController
       if (widget.orderDetailsMap['emailAddress'] != null) {
@@ -629,7 +828,6 @@ class _CreateReturnState extends State<CreateReturn> {
         ContactPerson.text = widget.orderDetailsMap['ContactNumber'];
       }
 
-
       print('Order Details:');
       if (_orderDetails != null) {
         for (var item in _orderDetails) {
@@ -645,10 +843,9 @@ class _CreateReturnState extends State<CreateReturn> {
           print('enteredqty');
           print(_textController.text);
           print(item['enteredQty']);
-      //    _textController.text = item['enteredQty'].toString();
+          //    _textController.text = item['enteredQty'].toString();
         }
       }
-
 
       print('--dropdown value');
       print(widget.imageSizeString);
@@ -659,7 +856,7 @@ class _CreateReturnState extends State<CreateReturn> {
     _controller.addListener(() {
       if (_controller.text.isEmpty || _controller.text.length != 10) {
         setState(() {
-      //    _isEditing = false;
+          //    _isEditing = false;
           _selectedReason = 'Reason for return';
           ContactpersonController.clear();
           EmailAddressController.clear();
@@ -668,15 +865,10 @@ class _CreateReturnState extends State<CreateReturn> {
           _orderDetails = [];
           widget.storeImages = []; // Clear the storeImages list
           widget.imageSizeStrings = [];
-
         });
       }
     });
-
-
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -685,8 +877,7 @@ class _CreateReturnState extends State<CreateReturn> {
     }
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
-      appBar:
-      AppBar(
+      appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: null,
         backgroundColor: const Color(0xFFFFFFFF),
@@ -708,23 +899,23 @@ class _CreateReturnState extends State<CreateReturn> {
               ),
             ),
           ),
-          const SizedBox(width: 10,),
+          const SizedBox(
+            width: 10,
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 10),
-            child:
-            AccountMenu(),
+            child: AccountMenu(),
           ),
         ],
       ),
-      body: LayoutBuilder(
-          builder: (context, constraints){
-            double maxWidth = constraints.maxWidth;
-            return Stack(
-
-              //   crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  // Added Align widget for the left side menu
+      body: LayoutBuilder(builder: (context, constraints) {
+        double maxWidth = constraints.maxWidth;
+        return Stack(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if(constraints.maxHeight <= 500)...{
+              SingleChildScrollView(
+                child: Align(
                   alignment: Alignment.topLeft,
                   child: Container(
                     width: 200,
@@ -736,187 +927,205 @@ class _CreateReturnState extends State<CreateReturn> {
                     ),
                   ),
                 ),
+              )
 
-                Padding(
-                  padding: const EdgeInsets.only(left: 200,top: 0),
-                  child: Container(
-                    width: 1, // Set the width to 1 for a vertical line
-                    height: 900, // Set the height to your liking
-                    decoration: const BoxDecoration(
-                      border: Border(left: BorderSide(width: 1, color: Colors.grey)),
-                    ),
+            }
+            else...{
+              Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  width: 200,
+                  color: const Color(0xFFF7F6FA),
+                  padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _buildMenuItems(context),
                   ),
                 ),
-                Positioned(
-                    left: 202,
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child:
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: Colors.white,
-                          height: 50,
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon:
-                                const Icon(Icons.arrow_back), // Back button icon
-                                onPressed: () {
-                                 // context.go('/Create_return/Return_List');
-                                  context.go('/Return_List');
-                                },
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 30,top: 5),
-                                child: Text(
-                                  'Order Return',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              const Spacer(),
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 10, right: 90),
-                                  child: OutlinedButton(
-                                    onPressed: () async {
-                                      if (_controller.text.isEmpty &&
-                                          ContactpersonController.text.isEmpty &&
-                                          EmailAddressController.text.isEmpty &&
-                                          _selectedReason == 'Reason for return' &&
-                                          totalController.text.isEmpty ) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Please fill all required fields'),
-                                          //  backgroundColor: Colors.red,
-                                          ),
-                                        );}
-                                        else if(_controller.text.isEmpty){
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text('Please fill Invoice Number'),
-                                              //  backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                      else if (!_orderDetails.any((item) => item['qty'] > 0 && _qtyControllers[_orderDetails.indexOf(item)].text.isNotEmpty) || _orderDetails.any((item) => item['qty'] == 0 && _qtyControllers[_orderDetails.indexOf(item)].text.isNotEmpty)) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Please Enter Valid Qty'),
-                                            //  backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                      // else if (!_orderDetails.any((item) => item['qty'] > 0 && _qtyControllers[_orderDetails.indexOf(item)].text.isNotEmpty)) {
-                                      //   ScaffoldMessenger.of(context).showSnackBar(
-                                      //     SnackBar(
-                                      //       content: Text('Please Enter Valid Qty'),
-                                      //       //  backgroundColor: Colors.red,
-                                      //     ),
-                                      //   );
-                                      // }
-                                      // else if (_qtyControllers.asMap().entries.any((entry) {
-                                      //   int index = entry.key;
-                                      //   String qty = entry.value.text;
-                                      //   var item = _orderDetails[index];
-                                      //   return (item['qty'] ?? 0) > 0 && (qty.isEmpty || qty == "0" || qty == 0);
-                                      // })) {
-                                      //   ScaffoldMessenger.of(context).showSnackBar(
-                                      //     SnackBar(
-                                      //       content: Text('Please Enter Valided Qty'),
-                                      //       //  backgroundColor: Colors.red,
-                                      //     ),
-                                      //   );
-                                      // }
-                                      // else if(_qtyControllers.any((controller) => controller.text.isEmpty || controller.text == "0" || controller.text == 0)){
-                                      //   ScaffoldMessenger.of(context).showSnackBar(
-                                      //     SnackBar(
-                                      //       content: Text('Please Enter Valid Qty'),
-                                      //       //  backgroundColor: Colors.red,
-                                      //     ),
-                                      //   );
-                                      // }
-                                      else if ( _selectedReason == null || _selectedReason!.isEmpty ||  _selectedReason == 'Reason for return'){
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Please Enter Return Reason'),
-                                            //  backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      } else if (ContactpersonController.text.isEmpty){
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text('Please fill Contact Person Name'),
-                                              //  backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }else if (EmailAddressController.text.isEmpty ||
-                                          !RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailAddressController.text)) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Please fill Email Address Format @gmail.com'),
-                                             //  backgroundColor: Colors.red, // You can uncomment this to set a background color
-                                          ),
-                                        );
-                                      }else if (totalController.text.isEmpty){
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text('Please Enter Return Qty'),
-                                              //  backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                       else {
-                                        await addReturnMaster();
-                                      }
-                                    },
-                                    style: OutlinedButton.styleFrom(
-                                      backgroundColor:
-                                      Colors.blue[800],
-                                      // Button background color
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(
-                                            5), // Rounded corners
-                                      ),
-                                      side: BorderSide.none, // No outline
-                                    ),
-                                    child: const Text(
-                                      'Create Return',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w100,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+              ),
+            },
+            Padding(
+              padding: const EdgeInsets.only(left: 200, top: 0),
+              child: Container(
+                width: 1, // Set the width to 1 for a vertical line
+                height: 900, // Set the height to your liking
+                decoration: const BoxDecoration(
+                  border:
+                      Border(left: BorderSide(width: 1, color: Colors.grey)),
+                ),
+              ),
+            ),
+            Positioned(
+                left: 202,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      color: Colors.white,
+                      height: 50,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back),
+                            // Back button icon
+                            onPressed: () {
+                              // context.go('/Create_return/Return_List');
+                              context.go('/Return_List');
+                            },
                           ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 1),
-                          // Space above/below the border
-                          height: 0.3, // Border height
-                          color: Colors.black, // Border color
-                        ),
-                        if(constraints.maxWidth >= 1350)...{
-                          Expanded(child: SingleChildScrollView(child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 30, top: 5),
+                            child: Text(
+                              'Order Return',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const Spacer(),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 10, right: 90),
+                              child: OutlinedButton(
+                                onPressed: () async {
+                                  if (_controller.text.isEmpty &&
+                                      ContactpersonController.text.isEmpty &&
+                                      EmailAddressController.text.isEmpty &&
+                                      _selectedReason == 'Reason for return' &&
+                                      totalController.text.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Please fill all required fields'),
+                                        //  backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  } else if (_controller.text.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Please fill Invoice Number'),
+                                        //  backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                  else if(_orderDetails.isEmpty)
+                                    {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                          Text('Enter Valid  Invoice Number'),
+                                          //  backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  else if (!_orderDetails.any((item) =>
+                                          item['qty'] > 0 &&
+                                          _qtyControllers[
+                                                  _orderDetails.indexOf(item)]
+                                              .text
+                                              .isNotEmpty) ||
+                                      _orderDetails.any((item) =>
+                                          item['qty'] == 0 &&
+                                          _qtyControllers[
+                                                  _orderDetails.indexOf(item)]
+                                              .text
+                                              .isNotEmpty)) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Please Enter Valid Qty'),
+                                        //  backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
 
+                                  else if (_selectedReason == null ||
+                                      _selectedReason!.isEmpty ||
+                                      _selectedReason == 'Reason for return') {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Please Enter Return Reason'),
+                                        //  backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  } else if (ContactpersonController
+                                      .text.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Please fill Contact Person Name'),
+                                        //  backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  } else if (EmailAddressController
+                                          .text.isEmpty ||
+                                      !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$')
+                                          .hasMatch(
+                                              EmailAddressController.text)) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Please fill Email Address Format .com/.in/.net'),
+                                      ),
+                                    );
+                                  } else if (totalController.text.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Please Enter Return Qty'),
+                                        //  backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  } else {
+                                    await addReturnMaster();
+                                  }
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: Colors.blue[800],
+                                  // Button background color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        5), // Rounded corners
+                                  ),
+                                  side: BorderSide.none, // No outline
+                                ),
+                                child: const Text(
+                                  'Create Return',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w100,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 1),
+                      // Space above/below the border
+                      height: 0.3, // Border height
+                      color: Colors.black, // Border color
+                    ),
+                    if (constraints.maxWidth >= 1350) ...{
+                      Expanded(
+                          child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
                               Padding(
-                                padding: const EdgeInsets.only(right:100),
+                                padding: const EdgeInsets.only(right: 100),
                                 child: SizedBox(
                                   width: maxWidth,
                                   child: Column(
@@ -924,20 +1133,27 @@ class _CreateReturnState extends State<CreateReturn> {
                                     // mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding:  EdgeInsets.only(right: maxWidth * 0.08,
+                                        padding: EdgeInsets.only(
+                                            right: maxWidth * 0.08,
                                             //   * 0.089,
                                             top: 20),
-                                        child:  Text('Return Date',style: TextStyle(fontSize: maxWidth * 0.0090),),
+                                        child: Text(
+                                          'Return Date',
+                                          style: TextStyle(
+                                              fontSize: maxWidth * 0.0090),
+                                        ),
                                       ),
                                       DecoratedBox(
                                         decoration: BoxDecoration(
                                           border: Border.all(
-                                              color: const Color(0xFFEBF3FF), width: 1),
-                                          borderRadius: BorderRadius.circular(10),
+                                              color: const Color(0xFFEBF3FF),
+                                              width: 1),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                         child: SizedBox(
                                           height: 39,
-                                          width: maxWidth *0.13,
+                                          width: maxWidth * 0.13,
                                           child: Column(
                                             children: [
                                               Expanded(
@@ -947,14 +1163,22 @@ class _CreateReturnState extends State<CreateReturn> {
                                                   readOnly: true,
                                                   decoration: InputDecoration(
                                                     suffixIcon: Padding(
-                                                      padding: const EdgeInsets.only(right: 20),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 20),
                                                       child: Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            top: 2, left: 10),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                top: 2,
+                                                                left: 10),
                                                         child: IconButton(
                                                           icon: const Padding(
-                                                            padding: EdgeInsets.only(bottom: 16),
-                                                            child: Icon(Icons.calendar_month),
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    bottom: 16),
+                                                            child: Icon(Icons
+                                                                .calendar_month),
                                                           ),
                                                           iconSize: 20,
                                                           onPressed: () {
@@ -965,8 +1189,11 @@ class _CreateReturnState extends State<CreateReturn> {
                                                     ),
                                                     hintText: 'Select Date',
                                                     fillColor: Colors.white,
-                                                    contentPadding: const EdgeInsets.symmetric(
-                                                        horizontal: 8, vertical: 8),
+                                                    contentPadding:
+                                                        const EdgeInsets
+                                                            .symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 8),
                                                     border: InputBorder.none,
                                                     filled: true,
                                                   ),
@@ -977,14 +1204,13 @@ class _CreateReturnState extends State<CreateReturn> {
                                         ),
                                       ),
                                       // SizedBox(height: 20.h),
-
                                     ],
                                   ),
-
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                padding: const EdgeInsets.only(
+                                    left: 50, right: 100, top: 30),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     border: Border.all(color: Colors.grey),
@@ -1001,59 +1227,89 @@ class _CreateReturnState extends State<CreateReturn> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   const Row(
-                                                    mainAxisSize: MainAxisSize.min,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
                                                       Text('Invoice Number'),
-                                                      SizedBox(width: 5,),
-                                                      Text('*', style: TextStyle(color: Colors.red),),
+                                                      SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        '*',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
                                                     ],
                                                   ),
-                                                  const SizedBox(height: 5,),
+                                                  const SizedBox(
+                                                    height: 5,
+                                                  ),
                                                   SizedBox(
                                                     height: 40,
                                                     child: TextFormField(
                                                       controller: _controller,
                                                       focusNode: _focusNode,
                                                       // onEditingComplete: _fetchOrderDetails,
-                                                      decoration: InputDecoration(
-                                                          filled: true,
-                                                          contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
-                                                          fillColor: Colors.grey.shade200,
-                                                          border: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(5.0),
-                                                            borderSide: BorderSide.none,
-                                                          ),
-                                                          hintText: 'INV_03312'
-
-                                                      ),
+                                                      decoration:
+                                                          InputDecoration(
+                                                              filled: true,
+                                                              contentPadding:
+                                                                  const EdgeInsets.symmetric(
+                                                                      vertical:
+                                                                          10,
+                                                                      horizontal:
+                                                                          12),
+                                                              fillColor: Colors
+                                                                  .grey
+                                                                  .shade200,
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5.0),
+                                                                borderSide:
+                                                                    BorderSide
+                                                                        .none,
+                                                              ),
+                                                              hintText:
+                                                                  'INV_03312'),
                                                       inputFormatters: [
                                                         UpperCaseTextFormatter(),
-                                                        FilteringTextInputFormatter.allow(
-                                                            RegExp("[a-zA-Z_0-9]")),
+                                                        FilteringTextInputFormatter
+                                                            .allow(RegExp(
+                                                                "[a-zA-Z_0-9]")),
                                                         // Allow only letters, numbers, and single space
-                                                        FilteringTextInputFormatter.deny(
-                                                            RegExp(r'^\s')),
+                                                        FilteringTextInputFormatter
+                                                            .deny(
+                                                                RegExp(r'^\s')),
                                                         // Disallow starting with a space
-                                                        FilteringTextInputFormatter.deny(
-                                                            RegExp(r'\s\s')),
+                                                        FilteringTextInputFormatter
+                                                            .deny(RegExp(
+                                                                r'\s\s')),
                                                         // Disallow multiple spaces
                                                       ],
                                                       validator: (value) {
-                                                        if (_controller.text != null && _controller.text.trim().isEmpty) {
+                                                        if (_controller.text !=
+                                                                null &&
+                                                            _controller.text
+                                                                .trim()
+                                                                .isEmpty) {
                                                           return 'Please enter a product name';
                                                         }
                                                         return null;
                                                       },
-
                                                     ),
                                                   ),
                                                 ],
@@ -1062,43 +1318,83 @@ class _CreateReturnState extends State<CreateReturn> {
                                             const SizedBox(width: 16),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   const Row(
-                                                    mainAxisSize: MainAxisSize.min,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
                                                       Text('Reason'),
-                                                      SizedBox(width: 5,),
-                                                      Text('*', style: TextStyle(color: Colors.red),),
+                                                      SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        '*',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
                                                     ],
                                                   ),
-                                                  const SizedBox(height: 5,),
+                                                  const SizedBox(
+                                                    height: 5,
+                                                  ),
                                                   SizedBox(
                                                     height: 40,
                                                     child:
-                                                    DropdownButtonFormField<String>(
-
-                                                      decoration: InputDecoration(
+                                                        DropdownButtonFormField<
+                                                            String>(
+                                                      decoration:
+                                                          InputDecoration(
                                                         filled: true,
-                                                        fillColor: Colors.grey.shade200,
-                                                        border: OutlineInputBorder(
-                                                          borderRadius: BorderRadius.circular(5.0),
-                                                          borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
+                                                        fillColor: Colors
+                                                            .grey.shade200,
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      5.0),
+                                                          borderSide: BorderSide
+                                                              .none, // Remove border by setting borderSide to BorderSide.none
                                                         ),
-                                                        contentPadding: const EdgeInsets.symmetric(
-                                                            horizontal: 8, vertical: 8),
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 8,
+                                                                vertical: 8),
                                                       ),
                                                       value: _selectedReason,
-                                                      onChanged: (String? value) {
+                                                      onChanged:
+                                                          (String? value) {
                                                         setState(() {
-                                                          _selectedReason = value!;
-                                                          _reasonController.text = value;
+                                                          _selectedReason =
+                                                              value!;
+                                                          _reasonController
+                                                              .text = value;
                                                         });
                                                       },
-                                                      items:<String>['Reason for return', 'Option 1', 'Option 2'].map<DropdownMenuItem<String>>((String value) {
-                                                        return DropdownMenuItem<String>(
+                                                      items: <String>[
+                                                        'Reason for return',
+                                                        'Option 1',
+                                                        'Option 2'
+                                                      ].map<
+                                                              DropdownMenuItem<
+                                                                  String>>(
+                                                          (String value) {
+                                                        return DropdownMenuItem<
+                                                            String>(
                                                           value: value,
-                                                          child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.black,),),
+                                                          child: Text(
+                                                            value,
+                                                            style: TextStyle(
+                                                              color: value ==
+                                                                      'Reason for return'
+                                                                  ? Colors.grey
+                                                                  : Colors
+                                                                      .black,
+                                                            ),
+                                                          ),
                                                         );
                                                       }).toList(),
                                                       isExpanded: true,
@@ -1111,44 +1407,79 @@ class _CreateReturnState extends State<CreateReturn> {
                                             const SizedBox(width: 16),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   const Row(
-                                                    mainAxisSize: MainAxisSize.min,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
                                                       Text('Contact Person'),
-                                                      SizedBox(width: 5,),
-                                                      Text('*', style: TextStyle(color: Colors.red),),
+                                                      SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        '*',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
                                                     ],
                                                   ),
-                                                  const SizedBox(height: 5,),
+                                                  const SizedBox(
+                                                    height: 5,
+                                                  ),
                                                   SizedBox(
                                                     height: 40,
                                                     child: TextFormField(
-                                                      controller: ContactpersonController,
-                                                      decoration:  InputDecoration(
-                                                          filled: true,
-                                                          fillColor: Colors.grey.shade200,
-                                                          border: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(5.0),
-                                                            borderSide: BorderSide.none,
-                                                          ),
-                                                          contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
-                                                          hintText: 'Person Name'
-                                                      ),
+                                                      controller:
+                                                          ContactpersonController,
+                                                      decoration:
+                                                          InputDecoration(
+                                                              filled: true,
+                                                              fillColor: Colors
+                                                                  .grey
+                                                                  .shade200,
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5.0),
+                                                                borderSide:
+                                                                    BorderSide
+                                                                        .none,
+                                                              ),
+                                                              contentPadding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          10,
+                                                                      horizontal:
+                                                                          12),
+                                                              hintText:
+                                                                  'Person Name'),
                                                       inputFormatters: [
-                                                        FilteringTextInputFormatter.allow(
-                                                            RegExp("[a-zA-Z ]")),
+                                                        FilteringTextInputFormatter
+                                                            .allow(RegExp(
+                                                                "[a-zA-Z ]")),
                                                         // Allow only letters, numbers, and single space
-                                                        FilteringTextInputFormatter.deny(
-                                                            RegExp(r'^\s')),
+                                                        FilteringTextInputFormatter
+                                                            .deny(
+                                                                RegExp(r'^\s')),
                                                         // Disallow starting with a space
-                                                        FilteringTextInputFormatter.deny(
-                                                            RegExp(r'\s\s')),
+                                                        FilteringTextInputFormatter
+                                                            .deny(RegExp(
+                                                                r'\s\s')),
                                                         // Disallow multiple spaces
                                                       ],
                                                       validator: (value) {
-                                                        if (ContactpersonController.text != null && ContactpersonController.text.trim().isEmpty) {
+                                                        if (ContactpersonController
+                                                                    .text !=
+                                                                null &&
+                                                            ContactpersonController
+                                                                .text
+                                                                .trim()
+                                                                .isEmpty) {
                                                           return 'Please enter a product name';
                                                         }
                                                         return null;
@@ -1161,36 +1492,65 @@ class _CreateReturnState extends State<CreateReturn> {
                                             const SizedBox(width: 16),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   const Row(
-                                                    mainAxisSize: MainAxisSize.min,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
                                                       Text('Email'),
-                                                      SizedBox(width: 5,),
-                                                      Text('*', style: TextStyle(color: Colors.red),),
+                                                      SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        '*',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
                                                     ],
                                                   ),
-                                                  const SizedBox(height: 5,),
+                                                  const SizedBox(
+                                                    height: 5,
+                                                  ),
                                                   SizedBox(
                                                     height: 40,
                                                     child: TextFormField(
-                                                      controller: EmailAddressController,
-                                                      decoration: InputDecoration(
+                                                      controller:
+                                                          EmailAddressController,
+                                                      decoration:
+                                                          InputDecoration(
                                                         filled: true,
-                                                        fillColor: Colors.grey.shade200,
-                                                        border: OutlineInputBorder(
-                                                          borderRadius: BorderRadius.circular(5.0),
-                                                          borderSide: BorderSide.none,
+                                                        fillColor: Colors
+                                                            .grey.shade200,
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      5.0),
+                                                          borderSide:
+                                                              BorderSide.none,
                                                         ),
-                                                        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                                                        hintText: 'Person Email',
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 10,
+                                                                horizontal: 12),
+                                                        hintText:
+                                                            'Person Email',
                                                         // errorText: _errorText,
                                                       ),
                                                       inputFormatters: [
-                                                        FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
-                                                        FilteringTextInputFormatter.deny(RegExp(r'^\s')),
-                                                        FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
+                                                        FilteringTextInputFormatter
+                                                            .allow(RegExp(
+                                                                "[a-zA-Z,0-9,@.]")),
+                                                        FilteringTextInputFormatter
+                                                            .deny(
+                                                                RegExp(r'^\s')),
+                                                        FilteringTextInputFormatter
+                                                            .deny(RegExp(
+                                                                r'\s\s')),
                                                       ],
                                                       // inputFormatters: [
                                                       //   FilteringTextInputFormatter.allow(
@@ -1214,16 +1574,26 @@ class _CreateReturnState extends State<CreateReturn> {
                                                       validator: (value) {
                                                         setState(() {
                                                           if (value!.isEmpty) {
-                                                            _errorText = 'Please enter Valid email address';
-                                                          } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
-                                                            _errorText = 'Please enter valid email address';
+                                                            _errorText =
+                                                                'Please enter Valid email address';
+                                                          } else if (!RegExp(
+                                                                  r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+                                                              .hasMatch(
+                                                                  value)) {
+                                                            _errorText =
+                                                                'Please enter valid email address';
                                                           } else {
                                                             _errorText = null;
                                                           }
                                                         });
-                                                        if(_errorText != null){
-                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                            SnackBar(content: Text(_errorText!)),
+                                                        if (_errorText !=
+                                                            null) {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            SnackBar(
+                                                                content: Text(
+                                                                    _errorText!)),
                                                           );
                                                         }
                                                         return null;
@@ -1243,7 +1613,6 @@ class _CreateReturnState extends State<CreateReturn> {
                                                       //   return null;
                                                       // },
                                                     ),
-
                                                   )
                                                 ],
                                               ),
@@ -1256,9 +1625,9 @@ class _CreateReturnState extends State<CreateReturn> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-
                               Padding(
-                                padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                padding: const EdgeInsets.only(
+                                    left: 50, right: 100, top: 30),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFFFFFFF),
@@ -1272,13 +1641,13 @@ class _CreateReturnState extends State<CreateReturn> {
                                       ),
                                     ],
                                   ),
-
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-
                                       const Padding(
-                                        padding: EdgeInsets.only(top: 10,left: 30),
+                                        padding:
+                                            EdgeInsets.only(top: 10, left: 30),
                                         child: Text(
                                           'Add Products',
                                           style: TextStyle(
@@ -1293,12 +1662,17 @@ class _CreateReturnState extends State<CreateReturn> {
                                         width: maxWidth,
                                         decoration: const BoxDecoration(
                                           border: Border(
-                                            top: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
-                                            bottom: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
+                                            top: BorderSide(
+                                                color: Color(0xFFB2C2D3),
+                                                width: 1.2),
+                                            bottom: BorderSide(
+                                                color: Color(0xFFB2C2D3),
+                                                width: 1.2),
                                           ),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                          padding: const EdgeInsets.only(
+                                              top: 5, bottom: 5),
                                           child: Table(
                                             columnWidths: const {
                                               0: FlexColumnWidth(1),
@@ -1311,138 +1685,177 @@ class _CreateReturnState extends State<CreateReturn> {
                                               7: FlexColumnWidth(2),
                                               8: FlexColumnWidth(2),
                                             },
-                                            children:  const [
-                                              TableRow(
-                                                  children: [
-                                                    TableCell(child: Padding(
-                                                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          "SN",
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            //  fontSize: 12,
-                                                          ),
+                                            children: const [
+                                              TableRow(children: [
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10, bottom: 10),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "SN",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          //  fontSize: 12,
                                                         ),
                                                       ),
-                                                    ),),
-                                                    TableCell(child: Padding(
-                                                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          'Product Name',
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            //  fontSize: 12,
-                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10, bottom: 10),
+                                                    child: Center(
+                                                      child: Text(
+                                                        'Product Name',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          //  fontSize: 12,
                                                         ),
                                                       ),
-                                                    ),),
-                                                    TableCell(child: Padding(
-                                                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          "Category",
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            // fontSize: 12,
-                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10, bottom: 10),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Category",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          // fontSize: 12,
                                                         ),
                                                       ),
-                                                    ),),
-                                                    TableCell(child: Padding(
-                                                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          "Sub Category",
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            // fontSize: 12,
-                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10, bottom: 10),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Sub Category",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          // fontSize: 12,
                                                         ),
                                                       ),
-                                                    ),),
-
-                                                    TableCell(child: Padding(
-                                                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          "Price",
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            // fontSize: 12,
-                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10, bottom: 10),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Price",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          // fontSize: 12,
                                                         ),
                                                       ),
-                                                    ),),
-                                                    TableCell(child: Padding(
-                                                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          "QTY",
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            // fontSize: 12,
-                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10, bottom: 10),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "QTY",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          // fontSize: 12,
                                                         ),
                                                       ),
-                                                    ),),
-                                                    TableCell(child: Padding(
-                                                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          "Return QTY",
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            //  fontSize: 12,
-                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10, bottom: 10),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Return QTY",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          //  fontSize: 12,
                                                         ),
                                                       ),
-                                                    ),),
-                                                    TableCell(child: Padding(
-                                                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          "Invoice Amount",
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            //  fontSize: 12,
-                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10, bottom: 10),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Invoice Amount",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          //  fontSize: 12,
                                                         ),
                                                       ),
-                                                    ),),
-                                                    TableCell(child: Padding(
-                                                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          "Credit Request",
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            // fontSize: 12,
-                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10, bottom: 10),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Credit Request",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          // fontSize: 12,
                                                         ),
                                                       ),
-                                                    ),),
-                                                  ]
-                                              )
+                                                    ),
+                                                  ),
+                                                ),
+                                              ])
                                             ],
                                           ),
                                         ),
                                       ),
                                       ListView.builder(
                                         shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         itemCount: _orderDetails.length,
                                         itemBuilder: (context, index) {
-                                          if (index >= _orderDetails.length || index >= _qtyControllers.length) {
-                                            return const SizedBox.shrink(); // Return an empty widget if the index is out of range
+                                          if (index >= _orderDetails.length ||
+                                              index >= _qtyControllers.length) {
+                                            return const SizedBox
+                                                .shrink(); // Return an empty widget if the index is out of range
                                           }
-                                          Map<String, dynamic> item = _orderDetails[index];
+                                          Map<String, dynamic> item =
+                                              _orderDetails[index];
                                           return Table(
                                             border: const TableBorder(
-                                              bottom: BorderSide(width:1 ,color: Colors.grey),
+                                              bottom: BorderSide(
+                                                  width: 1, color: Colors.grey),
                                               //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
-                                              verticalInside: BorderSide(width: 1,color: Colors.grey),
+                                              verticalInside: BorderSide(
+                                                  width: 1, color: Colors.grey),
                                             ),
                                             // border: TableBorder.all(color: Colors.blue),
                                             //  Color(0xFFFFFFFF)
@@ -1459,303 +1872,460 @@ class _CreateReturnState extends State<CreateReturn> {
                                             },
 
                                             children: [
-                                              TableRow(
-                                                  children:[
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only( left: 10,
+                                              TableRow(children: [
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10,
                                                             right: 10,
                                                             top: 15,
                                                             bottom: 5),
-                                                        child: Center(child: Text('${index + 1}')),
+                                                    child: Center(
+                                                        child: Text(
+                                                            '${index + 1}')),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: Container(
+                                                      height: 35,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
                                                       ),
+                                                      child: Center(
+                                                          child: Text(
+                                                        item['productName'],
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      )),
                                                     ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 50,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(child: Text(item['productName'],textAlign: TextAlign.center,)),
-                                                        ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: Container(
+                                                      height: 35,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
                                                       ),
+                                                      child: Center(
+                                                          child: Text(
+                                                        item['category'],
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      )),
                                                     ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 50,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(child: Text(item['category'],textAlign: TextAlign.center,)),
-                                                        ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: Container(
+                                                      height: 35,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
                                                       ),
+                                                      child: Center(
+                                                          child: Text(item[
+                                                              'subCategory'])),
                                                     ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 50,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(child: Text(item['subCategory'])),
-                                                        ),
-                                                      ),
-                                                    ),
+                                                  ),
+                                                ),
 
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 50,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(child: Text(item['price'].toString())),
-                                                        ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: Container(
+                                                      height: 35,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
                                                       ),
+                                                      child: Center(
+                                                          child: Text(
+                                                              item['price']
+                                                                  .toString())),
                                                     ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 50,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(child: Text(item['qty'].toString())),
-                                                        ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: Container(
+                                                      height: 35,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
                                                       ),
+                                                      child: Center(
+                                                          child: Text(
+                                                              item['qty']
+                                                                  .toString())),
                                                     ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 50,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(
-                                                            child: TextFormField(
-                                                              controller: _qtyControllers[index],
-                                                              // controller: _qtyControllers[index],
-                                                              //controller: _textController[item],
-                                                              // controller: TextEditingController.fromValue(TextEditingValue(
-                                                              //   text: (item['enteredQty']?? '').toString(),
-                                                              //   selection: TextSelection.collapsed(offset: (item['enteredQty']?? '').toString().length),
-                                                              // )),
-                                                              textAlign: TextAlign.center, // Center alignment
-                                                              decoration: const InputDecoration(
-                                                                  border: InputBorder.none, // Remove underline
-                                                                  contentPadding: EdgeInsets.only(
-                                                                      bottom: 12
-                                                                  )
-                                                                //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
-                                                              ),
-                                                              inputFormatters: [
-                                                                LengthLimitingTextInputFormatter(4),
-                                                                FilteringTextInputFormatter.allow(
-                                                                    RegExp("[0-9]")),
-                                                                // Allow only letters, numbers, and single space
-                                                                FilteringTextInputFormatter.deny(
-                                                                    RegExp(r'^\s')),
-                                                                // Disallow starting with a space
-                                                                FilteringTextInputFormatter.deny(
-                                                                    RegExp(r'\s\s')),
-                                                                // Disallow multiple spaces
-                                                              ],
-                                                              onChanged: (value) {
-                                                                setState(() {
-                                                                  if (value.isEmpty) {
-                                                                    item['enteredQty'] = 0;
-                                                                    item['totalAmount2'] = 0;
-                                                                    _qtyControllers[index].clear();
-                                                                  } else {
-                                                                    int enteredQty = int.parse(value);
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: Container(
+                                                      height: 35,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
+                                                      ),
+                                                      child: Center(
+                                                        child: TextFormField(
+                                                          controller:
+                                                              _qtyControllers[
+                                                                  index],
+                                                          // controller: _qtyControllers[index],
+                                                          //controller: _textController[item],
+                                                          // controller: TextEditingController.fromValue(TextEditingValue(
+                                                          //   text: (item['enteredQty']?? '').toString(),
+                                                          //   selection: TextSelection.collapsed(offset: (item['enteredQty']?? '').toString().length),
+                                                          // )),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          // Center alignment
+                                                          decoration:
+                                                              const InputDecoration(
+                                                                  border:
+                                                                      InputBorder
+                                                                          .none,
+                                                                  // Remove underline
+                                                                  contentPadding:
+                                                                      EdgeInsets.only(
+                                                                          bottom:
+                                                                              12)
+                                                                  //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
+                                                                  ),
+                                                          inputFormatters: [
+                                                            LengthLimitingTextInputFormatter(
+                                                                4),
+                                                            FilteringTextInputFormatter
+                                                                .allow(RegExp(
+                                                                    "[0-9]")),
+                                                            // Allow only letters, numbers, and single space
+                                                            FilteringTextInputFormatter
+                                                                .deny(RegExp(
+                                                                    r'^\s')),
+                                                            // Disallow starting with a space
+                                                            FilteringTextInputFormatter
+                                                                .deny(RegExp(
+                                                                    r'\s\s')),
+                                                            // Disallow multiple spaces
+                                                          ],
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              if (value
+                                                                  .isEmpty) {
+                                                                item['enteredQty'] =
+                                                                    0;
+                                                                item['totalAmount2'] =
+                                                                    0;
+                                                                _qtyControllers[
+                                                                        index]
+                                                                    .clear();
+                                                              } else {
+                                                                int enteredQty =
+                                                                    int.parse(
+                                                                        value);
 
-                                                                    if (enteredQty > (item['qty']?? 0) || enteredQty == 0) {
-                                                                      //  if (enteredQty > (item['qty']?? 0) || (item['qty'] == 0)) {
-                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                        const SnackBar(content: Text('Return qty must be less than or equal to the order qty.')),
-                                                                      );
-                                                                      // Clear the entered value
-                                                                      item['enteredQty'] = 0;
-                                                                      _qtyControllers[index].clear();
-                                                                      //  _textController.clear(); // Clear the text field
-                                                                    } else {
-                                                                      item['enteredQty'] = enteredQty;
-                                                                      item['totalAmount2'] = (item['totalAmount']  / item['qty'])  * enteredQty;
-                                                                    }
-                                                                  }
-                                                                  // calculate the total amount
-                                                                  totalAmount = _orderDetails.fold(0.0, (sum, item) => sum + (item['totalAmount2']?? 0));
-                                                                  totalController.text = totalAmount.toStringAsFixed(2); // update the totalController
-                                                                  print('enteredqty');
-                                                                  print(_qtyControllers[index].text);
-                                                                  print(item['enteredQty']);
-                                                                  print(_qtyControllers[index].text);
-                                                                });
-                                                              },
-                                                            ),
-                                                          ),
+                                                                if (enteredQty >
+                                                                        (item['qty'] ??
+                                                                            0) ||
+                                                                    enteredQty ==
+                                                                        0) {
+                                                                  //  if (enteredQty > (item['qty']?? 0) || (item['qty'] == 0)) {
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    const SnackBar(
+                                                                        content:
+                                                                            Text('Return qty must be less than or equal to the order qty.')),
+                                                                  );
+                                                                  // Clear the entered value
+                                                                  item['enteredQty'] =
+                                                                      0;
+                                                                  _qtyControllers[
+                                                                          index]
+                                                                      .clear();
+                                                                  //  _textController.clear(); // Clear the text field
+                                                                } else {
+                                                                  item['enteredQty'] =
+                                                                      enteredQty;
+                                                                  item[
+                                                                      'totalAmount2'] = (item[
+                                                                              'totalAmount'] /
+                                                                          item[
+                                                                              'qty']) *
+                                                                      enteredQty;
+                                                                }
+                                                              }
+                                                              // calculate the total amount
+                                                              totalAmount = _orderDetails.fold(
+                                                                  0.0,
+                                                                  (sum, item) =>
+                                                                      sum +
+                                                                      (item['totalAmount2'] ??
+                                                                          0));
+                                                              totalController
+                                                                      .text =
+                                                                  totalAmount
+                                                                      .toStringAsFixed(
+                                                                          2); // update the totalController
+                                                              print(
+                                                                  'enteredqty');
+                                                              print(
+                                                                  _qtyControllers[
+                                                                          index]
+                                                                      .text);
+                                                              print(item[
+                                                                  'enteredQty']);
+                                                              print(
+                                                                  _qtyControllers[
+                                                                          index]
+                                                                      .text);
+                                                            });
+                                                          },
                                                         ),
                                                       ),
                                                     ),
-                                                    // TableCell(
-                                                    //   child: Padding(
-                                                    //     padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                    //     child: Container(
-                                                    //       height: 35,
-                                                    //       width: 50,
-                                                    //       decoration: BoxDecoration(
-                                                    //         color: Colors.grey.shade200,
-                                                    //         borderRadius: BorderRadius.circular(4.0),
-                                                    //       ),
-                                                    //       child: Center(
-                                                    //         child: TextFormField(
-                                                    //           initialValue: (item['enteredQty']?? '').toString(),
-                                                    //           textAlign: TextAlign.center, // Center alignment
-                                                    //           decoration: const InputDecoration(
-                                                    //               border: InputBorder.none, // Remove underline
-                                                    //               contentPadding: EdgeInsets.only(
-                                                    //                   bottom: 12
-                                                    //               )
-                                                    //               //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
-                                                    //           ),
-                                                    //           inputFormatters: [
-                                                    //             LengthLimitingTextInputFormatter(4),
-                                                    //             FilteringTextInputFormatter.allow(
-                                                    //                 RegExp("[0-9]")),
-                                                    //             // Allow only letters, numbers, and single space
-                                                    //             FilteringTextInputFormatter.deny(
-                                                    //                 RegExp(r'^\s')),
-                                                    //             // Disallow starting with a space
-                                                    //             FilteringTextInputFormatter.deny(
-                                                    //                 RegExp(r'\s\s')),
-                                                    //             // Disallow multiple spaces
-                                                    //           ],
-                                                    //           onChanged: (value) {
-                                                    //             setState(() {
-                                                    //               if (value.isEmpty) {
-                                                    //                 item['enteredQty'] = 0;
-                                                    //                 item['totalAmount2'] = 0;
-                                                    //               } else {
-                                                    //                 item['enteredQty'] = int.parse(value);
-                                                    //                 if (item['enteredQty'] > (item['qty']?? 0)) {
-                                                    //                   ScaffoldMessenger.of(context).showSnackBar(
-                                                    //                     const SnackBar(content: Text('Return qty must be less than or equal to the order qty.')),
-                                                    //                   );
-                                                    //                 } else {
-                                                    //                   item['totalAmount2'] = item['price'] * item['enteredQty'];
-                                                    //                 }
-                                                    //               }
-                                                    //               // calculate the total amount
-                                                    //               totalAmount = _orderDetails.fold(0.0, (sum, item) => sum + (item['totalAmount2']?? 0));
-                                                    //               totalController.text = totalAmount.toStringAsFixed(2); // update the totalController
-                                                    //               print('enteredqty');
-                                                    //               print(item['enteredQty']);
-                                                    //             });
-                                                    //           },
-                                                    //         ),
-                                                    //       ),
-                                                    //     ),
-                                                    //   ),
-                                                    // ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 50,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(child: Text(item['totalAmount'].toString())),
-                                                        ),
+                                                  ),
+                                                ),
+                                                // TableCell(
+                                                //   child: Padding(
+                                                //     padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                //     child: Container(
+                                                //       height: 35,
+                                                //       width: 50,
+                                                //       decoration: BoxDecoration(
+                                                //         color: Colors.grey.shade200,
+                                                //         borderRadius: BorderRadius.circular(4.0),
+                                                //       ),
+                                                //       child: Center(
+                                                //         child: TextFormField(
+                                                //           initialValue: (item['enteredQty']?? '').toString(),
+                                                //           textAlign: TextAlign.center, // Center alignment
+                                                //           decoration: const InputDecoration(
+                                                //               border: InputBorder.none, // Remove underline
+                                                //               contentPadding: EdgeInsets.only(
+                                                //                   bottom: 12
+                                                //               )
+                                                //               //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
+                                                //           ),
+                                                //           inputFormatters: [
+                                                //             LengthLimitingTextInputFormatter(4),
+                                                //             FilteringTextInputFormatter.allow(
+                                                //                 RegExp("[0-9]")),
+                                                //             // Allow only letters, numbers, and single space
+                                                //             FilteringTextInputFormatter.deny(
+                                                //                 RegExp(r'^\s')),
+                                                //             // Disallow starting with a space
+                                                //             FilteringTextInputFormatter.deny(
+                                                //                 RegExp(r'\s\s')),
+                                                //             // Disallow multiple spaces
+                                                //           ],
+                                                //           onChanged: (value) {
+                                                //             setState(() {
+                                                //               if (value.isEmpty) {
+                                                //                 item['enteredQty'] = 0;
+                                                //                 item['totalAmount2'] = 0;
+                                                //               } else {
+                                                //                 item['enteredQty'] = int.parse(value);
+                                                //                 if (item['enteredQty'] > (item['qty']?? 0)) {
+                                                //                   ScaffoldMessenger.of(context).showSnackBar(
+                                                //                     const SnackBar(content: Text('Return qty must be less than or equal to the order qty.')),
+                                                //                   );
+                                                //                 } else {
+                                                //                   item['totalAmount2'] = item['price'] * item['enteredQty'];
+                                                //                 }
+                                                //               }
+                                                //               // calculate the total amount
+                                                //               totalAmount = _orderDetails.fold(0.0, (sum, item) => sum + (item['totalAmount2']?? 0));
+                                                //               totalController.text = totalAmount.toStringAsFixed(2); // update the totalController
+                                                //               print('enteredqty');
+                                                //               print(item['enteredQty']);
+                                                //             });
+                                                //           },
+                                                //         ),
+                                                //       ),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: Container(
+                                                      height: 35,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
+                                                      ),
+                                                      child: Center(
+                                                          child: Text(item[
+                                                                  'totalAmount']
+                                                              .toString())),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: Container(
+                                                      height: 35,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(item[
+                                                                    'totalAmount2'] !=
+                                                                null
+                                                            ? item['totalAmount2']
+                                                                .toString()
+                                                            : '0'),
                                                       ),
                                                     ),
-                                                    TableCell(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                        child: Container(
-                                                          height: 35,
-                                                          width: 50,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade200,
-                                                            borderRadius: BorderRadius.circular(4.0),
-                                                          ),
-                                                          child: Center(child: Text(item['totalAmount2']!= null? item['totalAmount2'].toString() : '0'),
-                                                          ),
-                                                        ),
-                                                      ),
-
-                                                    ),
-                                                  ]
-                                              )
+                                                  ),
+                                                ),
+                                              ])
                                             ],
-
                                           );
                                         },
                                       ),
                                       const SizedBox(height: 8),
                                       Padding(
-                                        padding: const EdgeInsets.only(right: 25 ,top: 5,bottom: 5),
+                                        padding: const EdgeInsets.only(
+                                            right: 25, top: 5, bottom: 5),
                                         child: Align(
                                           alignment: Alignment.centerRight,
                                           child: Container(
                                             height: 40,
-                                            padding: const EdgeInsets.only(left: 15,right: 10,top: 6,bottom: 2),
+                                            padding: const EdgeInsets.only(
+                                                left: 15,
+                                                right: 10,
+                                                top: 6,
+                                                bottom: 2),
                                             decoration: BoxDecoration(
-                                              border: Border.all(color: const Color(0xFF0277BD)),
-                                              borderRadius: BorderRadius.circular(2.0),
+                                              border: Border.all(
+                                                  color:
+                                                      const Color(0xFF0277BD)),
+                                              borderRadius:
+                                                  BorderRadius.circular(2.0),
                                               color: Colors.white,
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets.only(bottom: 2),
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 2),
                                               child: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  RichText(text:
-                                                  TextSpan(
-                                                    children: [
-                                                      const TextSpan(
-                                                        text:  'Total Credit',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color: Colors.blue
-                                                          // fontWeight: FontWeight.bold,
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        const TextSpan(
+                                                          text: 'Total Credit',
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              color: Colors.blue
+                                                              // fontWeight: FontWeight.bold,
+                                                              ),
                                                         ),
-                                                      ),
-                                                      const TextSpan(
-                                                        text: '  ₹',
-                                                        style: TextStyle(
-                                                          color: Colors.black,
+                                                        const TextSpan(
+                                                          text: '  ₹',
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                          ),
                                                         ),
-                                                      ),
-                                                      TextSpan(
-                                                        text: totalController.text,
-                                                        style: const TextStyle(
-                                                          color: Colors.black,
-                                                        ),
-                                                      ) ],
-                                                  ),
+                                                        TextSpan(
+                                                          text: totalController
+                                                              .text,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.black,
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
                                                   )
                                                 ],
                                               ),
@@ -1769,7 +2339,8 @@ class _CreateReturnState extends State<CreateReturn> {
                               ),
                               const SizedBox(height: 16),
                               Padding(
-                                padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                padding: const EdgeInsets.only(
+                                    left: 50, right: 100, top: 30),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFFFFFFF),
@@ -1784,9 +2355,9 @@ class _CreateReturnState extends State<CreateReturn> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-
                                       const SizedBox(height: 8),
                                       Row(
                                         children: [
@@ -1802,33 +2373,55 @@ class _CreateReturnState extends State<CreateReturn> {
                                             ),
                                           ),
                                           const Spacer(),
-
                                           Padding(
-                                            padding:  const EdgeInsets.only(right: 30),
+                                            padding: const EdgeInsets.only(
+                                                right: 30),
                                             child: Padding(
-                                              padding:  EdgeInsets.only(left: maxWidth * 0.15),
+                                              padding: EdgeInsets.only(
+                                                  left: maxWidth * 0.15),
                                               child: OutlinedButton.icon(
-                                                icon: const Icon(Icons.upload,color: Colors.white,size: 18,),
-                                                label: const Text('Upload',style: TextStyle(color: Colors.white,),),
+                                                icon: const Icon(
+                                                  Icons.upload,
+                                                  color: Colors.white,
+                                                  size: 18,
+                                                ),
+                                                label: const Text(
+                                                  'Upload',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
                                                 onPressed: () {
-                                                  if(_controller.text.isNotEmpty) {
-                                                    Map<String,
-                                                        dynamic> orderDetailsMap = {
-                                                      'emailAddress': EmailAddressController
-                                                          .text,
-                                                      'contactPerson': ContactpersonController
-                                                          .text,
+                                                  if (_controller
+                                                      .text.isNotEmpty) {
+                                                    Map<String, dynamic>
+                                                        orderDetailsMap = {
+                                                      'emailAddress':
+                                                          EmailAddressController
+                                                              .text,
+                                                      'contactPerson':
+                                                          ContactpersonController
+                                                              .text,
                                                       'reason': _selectedReason,
-                                                      'otherField': _controller
-                                                          .text,
-                                                      'orderDetails': _orderDetails,
-                                                      'totalAmount2': totalController
-                                                          .text,
-                                                      'notes': NotesController.text,
-                                                      'customerId': customerIdController.text,
-                                                      'orderId': OrderIDController.text,
-                                                      'shipAddres': ShippingAddressController.text,
-                                                      'ContactNumber': ContactPerson.text,
+                                                      'otherField':
+                                                          _controller.text,
+                                                      'orderDetails':
+                                                          _orderDetails,
+                                                      'totalAmount2':
+                                                          totalController.text,
+                                                      'notes':
+                                                          NotesController.text,
+                                                      'customerId':
+                                                          customerIdController
+                                                              .text,
+                                                      'orderId':
+                                                          OrderIDController
+                                                              .text,
+                                                      'shipAddres':
+                                                          ShippingAddressController
+                                                              .text,
+                                                      'ContactNumber':
+                                                          ContactPerson.text,
                                                     };
                                                     print(
                                                         'return design module file');
@@ -1845,23 +2438,29 @@ class _CreateReturnState extends State<CreateReturn> {
                                                     //           .imageSizeStrings,
                                                     //       'orderDetailsMap': orderDetailsMap,
                                                     //     });
-                                                    context.go(
-                                                        '/Add_Image',
+                                                    context.go('/Add_Image',
                                                         extra: {
-                                                          'orderDetails': _orderDetails,
-                                                          'imageSizeString': widget.imageSizeString,
+                                                          'orderDetails':
+                                                              _orderDetails,
+                                                          'imageSizeString': widget
+                                                              .imageSizeString,
                                                           'storeImages': widget
                                                               .storeImages,
                                                           'imageSizeStrings': widget
                                                               .imageSizeStrings,
-                                                          'orderDetailsMap': orderDetailsMap,
-                                                          'customerId': customerIdController.text,
+                                                          'orderDetailsMap':
+                                                              orderDetailsMap,
+                                                          'customerId':
+                                                              customerIdController
+                                                                  .text,
                                                         });
-                                                  }
-                                                  else{
-                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                  } else {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
                                                       const SnackBar(
-                                                        content: Text('Please Enter Invoice Number'),
+                                                        content: Text(
+                                                            'Please Enter Invoice Number'),
                                                         //  backgroundColor: Colors.red,
                                                       ),
                                                     );
@@ -1869,14 +2468,15 @@ class _CreateReturnState extends State<CreateReturn> {
                                                 },
                                                 style: OutlinedButton.styleFrom(
                                                   backgroundColor:
-                                                  Colors.blue[800],
+                                                      Colors.blue[800],
                                                   // Button background color
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        5), // Rounded corners
+                                                        BorderRadius.circular(
+                                                            5), // Rounded corners
                                                   ),
-                                                  side: BorderSide.none, // No outline
+                                                  side: BorderSide
+                                                      .none, // No outline
                                                 ),
                                               ),
                                             ),
@@ -1884,26 +2484,38 @@ class _CreateReturnState extends State<CreateReturn> {
                                         ],
                                       ),
                                       const Divider(
-                                        color: Color(0xFFB2C2D3), // Choose a color that contrasts with the background
-                                        thickness: 1, // Set a non-zero thickness
+                                        color: Color(0xFFB2C2D3),
+                                        // Choose a color that contrasts with the background
+                                        thickness:
+                                            1, // Set a non-zero thickness
                                       ),
                                       const SizedBox(height: 8),
                                       Column(
                                         children: [
-                                          if(widget.storeImages != '')
+                                          if (widget.storeImages != '')
                                             Column(
-                                              children: List.generate(widget.storeImages.length, (i) {
+                                              children: List.generate(
+                                                  widget.storeImages.length,
+                                                  (i) {
                                                 return Row(
                                                   children: [
                                                     const Padding(
-                                                      padding: EdgeInsets.only(left: 30),
-                                                      child: Icon(Icons.image,color: Colors.blue,size: 30,),
+                                                      padding: EdgeInsets.only(
+                                                          left: 30),
+                                                      child: Icon(
+                                                        Icons.image,
+                                                        color: Colors.blue,
+                                                        size: 30,
+                                                      ),
                                                     ),
                                                     Padding(
-                                                      padding: const EdgeInsets.only(left: 15),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 15),
                                                       child: Text(
                                                         '${widget.storeImages[i].split('-')[0]}',
-                                                        style: const TextStyle(fontSize: 18),
+                                                        style: const TextStyle(
+                                                            fontSize: 18),
                                                       ),
                                                     ),
                                                     // Padding(
@@ -1912,22 +2524,48 @@ class _CreateReturnState extends State<CreateReturn> {
                                                     // ),
                                                     const Spacer(),
                                                     Padding(
-                                                      padding: const EdgeInsets.only(right: 30), // add 10 pixels of space to the left
-                                                      child: Text('${widget.imageSizeStrings[i]}', style: const TextStyle(fontSize: 18)),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 30),
+                                                      // add 10 pixels of space to the left
+                                                      child: Text(
+                                                          '${widget.imageSizeStrings[i]}',
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize:
+                                                                      18)),
                                                     ),
                                                     IconButton(
-                                                      icon: const Icon(Icons.delete_forever_rounded,color: Colors.deepOrange,size: 35,),
+                                                      icon: const Icon(
+                                                        Icons
+                                                            .delete_forever_rounded,
+                                                        color:
+                                                            Colors.deepOrange,
+                                                        size: 35,
+                                                      ),
                                                       onPressed: () {
-                                                        if (i < widget.storeImages.length - 0) {
+                                                        if (i <
+                                                            widget.storeImages
+                                                                    .length -
+                                                                0) {
                                                           setState(() {
-                                                            widget.storeImages.removeAt(i);
-                                                            widget.imageSizeString!.removeAt(i);
-                                                            widget.imageSizeStrings.removeAt(i);
+                                                            widget.storeImages
+                                                                .removeAt(i);
+                                                            widget
+                                                                .imageSizeString!
+                                                                .removeAt(i);
+                                                            widget
+                                                                .imageSizeStrings
+                                                                .removeAt(i);
                                                           });
                                                         } else {
                                                           setState(() {
-                                                            widget.storeImages.removeAt(i);
-                                                            widget.imageSizeStrings.removeAt(i - 1);
+                                                            widget.storeImages
+                                                                .removeAt(i);
+                                                            widget
+                                                                .imageSizeStrings
+                                                                .removeAt(
+                                                                    i - 1);
                                                           });
                                                         }
                                                       },
@@ -1944,7 +2582,8 @@ class _CreateReturnState extends State<CreateReturn> {
                               ),
                               const SizedBox(height: 16),
                               Padding(
-                                padding: const EdgeInsets.only(left: 50,right: 100,top: 30,bottom: 20),
+                                padding: const EdgeInsets.only(
+                                    left: 50, right: 100, top: 30, bottom: 20),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFFFFFFF),
@@ -1962,59 +2601,77 @@ class _CreateReturnState extends State<CreateReturn> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Notes', style: TextStyle(fontWeight: FontWeight.bold)),
+                                        const Text('Notes',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
                                         const SizedBox(height: 8),
                                         TextFormField(
-                                          controller:  NotesController,
+                                          controller: NotesController,
                                           decoration: InputDecoration(
                                             filled: true,
                                             fillColor: Colors.grey.shade200,
                                             border: InputBorder.none,
                                           ),
-                                          maxLines: 5, // To make it a single line text field
+                                          maxLines:
+                                              5, // To make it a single line text field
                                         )
                                       ],
                                     ),
                                   ),
                                 ),
                               ),
-                            ],),
-                          ),))
-                        }
-                        else...{
-                          Expanded(child: SingleChildScrollView(child: AdaptiveScrollbar(
-
-                            position: ScrollbarPosition.top,controller: horizontalScroll,
-                            child: SingleChildScrollView(
-                                controller: horizontalScroll,
-                              scrollDirection: Axis.horizontal,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  width: 1700,
-                                  child: Column(children: [
-
+                            ],
+                          ),
+                        ),
+                      ))
+                    } else ...{
+                      Expanded(
+                          child: SingleChildScrollView(
+                        child: AdaptiveScrollbar(
+                          position: ScrollbarPosition.top,
+                          controller: horizontalScroll,
+                          child: SingleChildScrollView(
+                            controller: horizontalScroll,
+                            scrollDirection: Axis.horizontal,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                width: 1700,
+                                child: Column(
+                                  children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(right:100),
+                                      padding:
+                                          const EdgeInsets.only(right: 100),
                                       child: SizedBox(
                                         width: 1700,
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
                                           // mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             Padding(
-                                              padding:  EdgeInsets.only(right: 130,
+                                              padding: EdgeInsets.only(
+                                                  right: 130,
                                                   //   * 0.089,
                                                   top: 20),
-                                              child:  Text('Return Date',style: TextStyle(fontSize: maxWidth * 0.0090),),
+                                              child: Text(
+                                                'Return Date',
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        maxWidth * 0.0090),
+                                              ),
                                             ),
                                             DecoratedBox(
                                               decoration: BoxDecoration(
                                                 border: Border.all(
-                                                    color: const Color(0xFFEBF3FF), width: 1),
-                                                borderRadius: BorderRadius.circular(10),
+                                                    color:
+                                                        const Color(0xFFEBF3FF),
+                                                    width: 1),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                               ),
                                               child: SizedBox(
                                                 height: 39,
@@ -2023,19 +2680,32 @@ class _CreateReturnState extends State<CreateReturn> {
                                                   children: [
                                                     Expanded(
                                                       child: TextFormField(
-                                                        controller: _dateController,
+                                                        controller:
+                                                            _dateController,
                                                         // Replace with your TextEditingController
                                                         readOnly: true,
-                                                        decoration: InputDecoration(
+                                                        decoration:
+                                                            InputDecoration(
                                                           suffixIcon: Padding(
-                                                            padding: const EdgeInsets.only(right: 20),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    right: 20),
                                                             child: Padding(
-                                                              padding: const EdgeInsets.only(
-                                                                  top: 2, left: 10),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      top: 2,
+                                                                      left: 10),
                                                               child: IconButton(
-                                                                icon: const Padding(
-                                                                  padding: EdgeInsets.only(bottom: 16),
-                                                                  child: Icon(Icons.calendar_month),
+                                                                icon:
+                                                                    const Padding(
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          bottom:
+                                                                              16),
+                                                                  child: Icon(Icons
+                                                                      .calendar_month),
                                                                 ),
                                                                 iconSize: 20,
                                                                 onPressed: () {
@@ -2044,11 +2714,17 @@ class _CreateReturnState extends State<CreateReturn> {
                                                               ),
                                                             ),
                                                           ),
-                                                          hintText: 'Select Date',
-                                                          fillColor: Colors.white,
-                                                          contentPadding: const EdgeInsets.symmetric(
-                                                              horizontal: 8, vertical: 8),
-                                                          border: InputBorder.none,
+                                                          hintText:
+                                                              'Select Date',
+                                                          fillColor:
+                                                              Colors.white,
+                                                          contentPadding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal: 8,
+                                                                  vertical: 8),
+                                                          border:
+                                                              InputBorder.none,
                                                           filled: true,
                                                         ),
                                                       ),
@@ -2058,18 +2734,19 @@ class _CreateReturnState extends State<CreateReturn> {
                                               ),
                                             ),
                                             // SizedBox(height: 20.h),
-
                                           ],
                                         ),
-
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                      padding: const EdgeInsets.only(
+                                          left: 50, right: 100, top: 30),
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.grey),
-                                          borderRadius: BorderRadius.circular(8),
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                           boxShadow: const [
                                             BoxShadow(
                                               color: Color(0xff00000029),
@@ -2082,59 +2759,96 @@ class _CreateReturnState extends State<CreateReturn> {
                                         child: Padding(
                                           padding: const EdgeInsets.all(16.0),
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Row(
                                                 children: [
                                                   Expanded(
                                                     child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         const Row(
-                                                          mainAxisSize: MainAxisSize.min,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
                                                           children: [
-                                                            Text('Invoice Number'),
-                                                            SizedBox(width: 5,),
-                                                            Text('*', style: TextStyle(color: Colors.red),),
+                                                            Text(
+                                                                'Invoice Number'),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Text(
+                                                              '*',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
                                                           ],
                                                         ),
-                                                        const SizedBox(height: 5,),
+                                                        const SizedBox(
+                                                          height: 5,
+                                                        ),
                                                         SizedBox(
                                                           height: 40,
                                                           child: TextFormField(
-                                                            controller: _controller,
-                                                            focusNode: _focusNode,
+                                                            controller:
+                                                                _controller,
+                                                            focusNode:
+                                                                _focusNode,
                                                             // onEditingComplete: _fetchOrderDetails,
-                                                            decoration: InputDecoration(
-                                                                filled: true,
-                                                                contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
-                                                                fillColor: Colors.grey.shade200,
-                                                                border: OutlineInputBorder(
-                                                                  borderRadius: BorderRadius.circular(5.0),
-                                                                  borderSide: BorderSide.none,
-                                                                ),
-                                                                hintText: 'INV_03312'
-
-                                                            ),
+                                                            decoration:
+                                                                InputDecoration(
+                                                                    filled:
+                                                                        true,
+                                                                    contentPadding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        vertical:
+                                                                            10,
+                                                                        horizontal:
+                                                                            12),
+                                                                    fillColor: Colors
+                                                                        .grey
+                                                                        .shade200,
+                                                                    border:
+                                                                        OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              5.0),
+                                                                      borderSide:
+                                                                          BorderSide
+                                                                              .none,
+                                                                    ),
+                                                                    hintText:
+                                                                        'INV_03312'),
                                                             inputFormatters: [
                                                               UpperCaseTextFormatter(),
-                                                              FilteringTextInputFormatter.allow(
-                                                                  RegExp("[a-zA-Z_0-9]")),
+                                                              FilteringTextInputFormatter
+                                                                  .allow(RegExp(
+                                                                      "[a-zA-Z_0-9]")),
                                                               // Allow only letters, numbers, and single space
-                                                              FilteringTextInputFormatter.deny(
-                                                                  RegExp(r'^\s')),
+                                                              FilteringTextInputFormatter
+                                                                  .deny(RegExp(
+                                                                      r'^\s')),
                                                               // Disallow starting with a space
-                                                              FilteringTextInputFormatter.deny(
-                                                                  RegExp(r'\s\s')),
+                                                              FilteringTextInputFormatter
+                                                                  .deny(RegExp(
+                                                                      r'\s\s')),
                                                               // Disallow multiple spaces
                                                             ],
                                                             validator: (value) {
-                                                              if (_controller.text != null && _controller.text.trim().isEmpty) {
+                                                              if (_controller
+                                                                          .text !=
+                                                                      null &&
+                                                                  _controller
+                                                                      .text
+                                                                      .trim()
+                                                                      .isEmpty) {
                                                                 return 'Please enter a product name';
                                                               }
                                                               return null;
                                                             },
-
                                                           ),
                                                         ),
                                                       ],
@@ -2143,43 +2857,93 @@ class _CreateReturnState extends State<CreateReturn> {
                                                   const SizedBox(width: 16),
                                                   Expanded(
                                                     child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         const Row(
-                                                          mainAxisSize: MainAxisSize.min,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
                                                           children: [
                                                             Text('Reason'),
-                                                            SizedBox(width: 5,),
-                                                            Text('*', style: TextStyle(color: Colors.red),),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Text(
+                                                              '*',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
                                                           ],
                                                         ),
-                                                        const SizedBox(height: 5,),
+                                                        const SizedBox(
+                                                          height: 5,
+                                                        ),
                                                         SizedBox(
                                                           height: 40,
                                                           child:
-                                                          DropdownButtonFormField<String>(
-
-                                                            decoration: InputDecoration(
+                                                              DropdownButtonFormField<
+                                                                  String>(
+                                                            decoration:
+                                                                InputDecoration(
                                                               filled: true,
-                                                              fillColor: Colors.grey.shade200,
-                                                              border: OutlineInputBorder(
-                                                                borderRadius: BorderRadius.circular(5.0),
-                                                                borderSide: BorderSide.none, // Remove border by setting borderSide to BorderSide.none
+                                                              fillColor: Colors
+                                                                  .grey
+                                                                  .shade200,
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5.0),
+                                                                borderSide:
+                                                                    BorderSide
+                                                                        .none, // Remove border by setting borderSide to BorderSide.none
                                                               ),
-                                                              contentPadding: const EdgeInsets.symmetric(
-                                                                  horizontal: 8, vertical: 8),
+                                                              contentPadding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          8,
+                                                                      vertical:
+                                                                          8),
                                                             ),
-                                                            value: _selectedReason,
-                                                            onChanged: (String? value) {
+                                                            value:
+                                                                _selectedReason,
+                                                            onChanged: (String?
+                                                                value) {
                                                               setState(() {
-                                                                _selectedReason = value!;
-                                                                _reasonController.text = value;
+                                                                _selectedReason =
+                                                                    value!;
+                                                                _reasonController
+                                                                        .text =
+                                                                    value;
                                                               });
                                                             },
-                                                            items:<String>['Reason for return', 'Option 1', 'Option 2'].map<DropdownMenuItem<String>>((String value) {
-                                                              return DropdownMenuItem<String>(
+                                                            items: <String>[
+                                                              'Reason for return',
+                                                              'Option 1',
+                                                              'Option 2'
+                                                            ].map<
+                                                                DropdownMenuItem<
+                                                                    String>>((String
+                                                                value) {
+                                                              return DropdownMenuItem<
+                                                                  String>(
                                                                 value: value,
-                                                                child: Text(value,style: TextStyle(color: value == 'Reason for return' ? Colors.grey : Colors.black,),),
+                                                                child: Text(
+                                                                  value,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: value ==
+                                                                            'Reason for return'
+                                                                        ? Colors
+                                                                            .grey
+                                                                        : Colors
+                                                                            .black,
+                                                                  ),
+                                                                ),
                                                               );
                                                             }).toList(),
                                                             isExpanded: true,
@@ -2192,44 +2956,81 @@ class _CreateReturnState extends State<CreateReturn> {
                                                   const SizedBox(width: 16),
                                                   Expanded(
                                                     child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         const Row(
-                                                          mainAxisSize: MainAxisSize.min,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
                                                           children: [
-                                                            Text('Contact Person'),
-                                                            SizedBox(width: 5,),
-                                                            Text('*', style: TextStyle(color: Colors.red),),
+                                                            Text(
+                                                                'Contact Person'),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Text(
+                                                              '*',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
                                                           ],
                                                         ),
-                                                        const SizedBox(height: 5,),
+                                                        const SizedBox(
+                                                          height: 5,
+                                                        ),
                                                         SizedBox(
                                                           height: 40,
                                                           child: TextFormField(
-                                                            controller: ContactpersonController,
-                                                            decoration:  InputDecoration(
-                                                                filled: true,
-                                                                fillColor: Colors.grey.shade200,
-                                                                border: OutlineInputBorder(
-                                                                  borderRadius: BorderRadius.circular(5.0),
-                                                                  borderSide: BorderSide.none,
-                                                                ),
-                                                                contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 12),
-                                                                hintText: 'Person Name'
-                                                            ),
+                                                            controller:
+                                                                ContactpersonController,
+                                                            decoration:
+                                                                InputDecoration(
+                                                                    filled:
+                                                                        true,
+                                                                    fillColor: Colors
+                                                                        .grey
+                                                                        .shade200,
+                                                                    border:
+                                                                        OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              5.0),
+                                                                      borderSide:
+                                                                          BorderSide
+                                                                              .none,
+                                                                    ),
+                                                                    contentPadding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        vertical:
+                                                                            10,
+                                                                        horizontal:
+                                                                            12),
+                                                                    hintText:
+                                                                        'Person Name'),
                                                             inputFormatters: [
-                                                              FilteringTextInputFormatter.allow(
-                                                                  RegExp("[a-zA-Z ]")),
+                                                              FilteringTextInputFormatter
+                                                                  .allow(RegExp(
+                                                                      "[a-zA-Z ]")),
                                                               // Allow only letters, numbers, and single space
-                                                              FilteringTextInputFormatter.deny(
-                                                                  RegExp(r'^\s')),
+                                                              FilteringTextInputFormatter
+                                                                  .deny(RegExp(
+                                                                      r'^\s')),
                                                               // Disallow starting with a space
-                                                              FilteringTextInputFormatter.deny(
-                                                                  RegExp(r'\s\s')),
+                                                              FilteringTextInputFormatter
+                                                                  .deny(RegExp(
+                                                                      r'\s\s')),
                                                               // Disallow multiple spaces
                                                             ],
                                                             validator: (value) {
-                                                              if (ContactpersonController.text != null && ContactpersonController.text.trim().isEmpty) {
+                                                              if (ContactpersonController
+                                                                          .text !=
+                                                                      null &&
+                                                                  ContactpersonController
+                                                                      .text
+                                                                      .trim()
+                                                                      .isEmpty) {
                                                                 return 'Please enter a product name';
                                                               }
                                                               return null;
@@ -2242,36 +3043,71 @@ class _CreateReturnState extends State<CreateReturn> {
                                                   const SizedBox(width: 16),
                                                   Expanded(
                                                     child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         const Row(
-                                                          mainAxisSize: MainAxisSize.min,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
                                                           children: [
                                                             Text('Email'),
-                                                            SizedBox(width: 5,),
-                                                            Text('*', style: TextStyle(color: Colors.red),),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Text(
+                                                              '*',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
                                                           ],
                                                         ),
-                                                        const SizedBox(height: 5,),
+                                                        const SizedBox(
+                                                          height: 5,
+                                                        ),
                                                         SizedBox(
                                                           height: 40,
                                                           child: TextFormField(
-                                                            controller: EmailAddressController,
-                                                            decoration: InputDecoration(
+                                                            controller:
+                                                                EmailAddressController,
+                                                            decoration:
+                                                                InputDecoration(
                                                               filled: true,
-                                                              fillColor: Colors.grey.shade200,
-                                                              border: OutlineInputBorder(
-                                                                borderRadius: BorderRadius.circular(5.0),
-                                                                borderSide: BorderSide.none,
+                                                              fillColor: Colors
+                                                                  .grey
+                                                                  .shade200,
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5.0),
+                                                                borderSide:
+                                                                    BorderSide
+                                                                        .none,
                                                               ),
-                                                              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                                                              hintText: 'Person Email',
+                                                              contentPadding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          10,
+                                                                      horizontal:
+                                                                          12),
+                                                              hintText:
+                                                                  'Person Email',
                                                               // errorText: _errorText,
                                                             ),
                                                             inputFormatters: [
-                                                              FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
-                                                              FilteringTextInputFormatter.deny(RegExp(r'^\s')),
-                                                              FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
+                                                              FilteringTextInputFormatter
+                                                                  .allow(RegExp(
+                                                                      "[a-zA-Z,0-9,@.]")),
+                                                              FilteringTextInputFormatter
+                                                                  .deny(RegExp(
+                                                                      r'^\s')),
+                                                              FilteringTextInputFormatter
+                                                                  .deny(RegExp(
+                                                                      r'\s\s')),
                                                             ],
                                                             // inputFormatters: [
                                                             //   FilteringTextInputFormatter.allow(
@@ -2294,17 +3130,29 @@ class _CreateReturnState extends State<CreateReturn> {
                                                             //  },
                                                             validator: (value) {
                                                               setState(() {
-                                                                if (value!.isEmpty) {
-                                                                  _errorText = 'Please enter Valid email address';
-                                                                } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
-                                                                  _errorText = 'Please enter valid email address';
+                                                                if (value!
+                                                                    .isEmpty) {
+                                                                  _errorText =
+                                                                      'Please enter Valid email address';
+                                                                } else if (!RegExp(
+                                                                        r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+                                                                    .hasMatch(
+                                                                        value)) {
+                                                                  _errorText =
+                                                                      'Please enter valid email address';
                                                                 } else {
-                                                                  _errorText = null;
+                                                                  _errorText =
+                                                                      null;
                                                                 }
                                                               });
-                                                              if(_errorText != null){
-                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                  SnackBar(content: Text(_errorText!)),
+                                                              if (_errorText !=
+                                                                  null) {
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  SnackBar(
+                                                                      content: Text(
+                                                                          _errorText!)),
                                                                 );
                                                               }
                                                               return null;
@@ -2324,7 +3172,6 @@ class _CreateReturnState extends State<CreateReturn> {
                                                             //   return null;
                                                             // },
                                                           ),
-
                                                         )
                                                       ],
                                                     ),
@@ -2337,14 +3184,16 @@ class _CreateReturnState extends State<CreateReturn> {
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                      padding: const EdgeInsets.only(
+                                          left: 50, right: 100, top: 30),
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFFFFFFF),
-                                          border: Border.all(color: Colors.grey),
-                                          borderRadius: BorderRadius.circular(8),
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                           boxShadow: const [
                                             BoxShadow(
                                               color: Color(0xFF00000029),
@@ -2353,13 +3202,13 @@ class _CreateReturnState extends State<CreateReturn> {
                                             ),
                                           ],
                                         ),
-
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-
                                             const Padding(
-                                              padding: EdgeInsets.only(top: 10,left: 30),
+                                              padding: EdgeInsets.only(
+                                                  top: 10, left: 30),
                                               child: Text(
                                                 'Add Products',
                                                 style: TextStyle(
@@ -2374,12 +3223,17 @@ class _CreateReturnState extends State<CreateReturn> {
                                               width: 1700,
                                               decoration: const BoxDecoration(
                                                 border: Border(
-                                                  top: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
-                                                  bottom: BorderSide(color: Color(0xFFB2C2D3), width: 1.2),
+                                                  top: BorderSide(
+                                                      color: Color(0xFFB2C2D3),
+                                                      width: 1.2),
+                                                  bottom: BorderSide(
+                                                      color: Color(0xFFB2C2D3),
+                                                      width: 1.2),
                                                 ),
                                               ),
                                               child: Padding(
-                                                padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                                padding: const EdgeInsets.only(
+                                                    top: 5, bottom: 5),
                                                 child: Table(
                                                   columnWidths: const {
                                                     0: FlexColumnWidth(1),
@@ -2392,138 +3246,209 @@ class _CreateReturnState extends State<CreateReturn> {
                                                     7: FlexColumnWidth(2),
                                                     8: FlexColumnWidth(2),
                                                   },
-                                                  children:  const [
-                                                    TableRow(
-                                                        children: [
-                                                          TableCell(child: Padding(
-                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "SN",
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  //  fontSize: 12,
-                                                                ),
+                                                  children: const [
+                                                    TableRow(children: [
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "SN",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                //  fontSize: 12,
                                                               ),
                                                             ),
-                                                          ),),
-                                                          TableCell(child: Padding(
-                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                            child: Center(
-                                                              child: Text(
-                                                                'Product Name',
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  //  fontSize: 12,
-                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'Product Name',
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                //  fontSize: 12,
                                                               ),
                                                             ),
-                                                          ),),
-                                                          TableCell(child: Padding(
-                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Category",
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  // fontSize: 12,
-                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Category",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                // fontSize: 12,
                                                               ),
                                                             ),
-                                                          ),),
-                                                          TableCell(child: Padding(
-                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Sub Category",
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  // fontSize: 12,
-                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Sub Category",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                // fontSize: 12,
                                                               ),
                                                             ),
-                                                          ),),
-
-                                                          TableCell(child: Padding(
-                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Price",
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  // fontSize: 12,
-                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Price",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                // fontSize: 12,
                                                               ),
                                                             ),
-                                                          ),),
-                                                          TableCell(child: Padding(
-                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "QTY",
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  // fontSize: 12,
-                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "QTY",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                // fontSize: 12,
                                                               ),
                                                             ),
-                                                          ),),
-                                                          TableCell(child: Padding(
-                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Return QTY",
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  //  fontSize: 12,
-                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Return QTY",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                //  fontSize: 12,
                                                               ),
                                                             ),
-                                                          ),),
-                                                          TableCell(child: Padding(
-                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Invoice Amount",
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  //  fontSize: 12,
-                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Invoice Amount",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                //  fontSize: 12,
                                                               ),
                                                             ),
-                                                          ),),
-                                                          TableCell(child: Padding(
-                                                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                                                            child: Center(
-                                                              child: Text(
-                                                                "Credit Request",
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  // fontSize: 12,
-                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "Credit Request",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                // fontSize: 12,
                                                               ),
                                                             ),
-                                                          ),),
-                                                        ]
-                                                    )
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ])
                                                   ],
                                                 ),
                                               ),
                                             ),
                                             ListView.builder(
                                               shrinkWrap: true,
-                                              physics: const NeverScrollableScrollPhysics(),
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
                                               itemCount: _orderDetails.length,
                                               itemBuilder: (context, index) {
-                                                if (index >= _orderDetails.length || index >= _qtyControllers.length) {
-                                                  return const SizedBox.shrink(); // Return an empty widget if the index is out of range
+                                                if (index >=
+                                                        _orderDetails.length ||
+                                                    index >=
+                                                        _qtyControllers
+                                                            .length) {
+                                                  return const SizedBox
+                                                      .shrink(); // Return an empty widget if the index is out of range
                                                 }
-                                                Map<String, dynamic> item = _orderDetails[index];
+                                                Map<String, dynamic> item =
+                                                    _orderDetails[index];
                                                 return Table(
                                                   border: const TableBorder(
-                                                    bottom: BorderSide(width:1 ,color: Colors.grey),
+                                                    bottom: BorderSide(
+                                                        width: 1,
+                                                        color: Colors.grey),
                                                     //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
-                                                    verticalInside: BorderSide(width: 1,color: Colors.grey),
+                                                    verticalInside: BorderSide(
+                                                        width: 1,
+                                                        color: Colors.grey),
                                                   ),
                                                   // border: TableBorder.all(color: Colors.blue),
                                                   //  Color(0xFFFFFFFF)
@@ -2540,303 +3465,492 @@ class _CreateReturnState extends State<CreateReturn> {
                                                   },
 
                                                   children: [
-                                                    TableRow(
-                                                        children:[
-                                                          TableCell(
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only( left: 10,
+                                                    TableRow(children: [
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
                                                                   right: 10,
                                                                   top: 15,
                                                                   bottom: 5),
-                                                              child: Center(child: Text('${index + 1}')),
+                                                          child: Center(
+                                                              child: Text(
+                                                                  '${index + 1}')),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4.0),
                                                             ),
+                                                            child: Center(
+                                                                child: Text(
+                                                              item[
+                                                                  'productName'],
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            )),
                                                           ),
-                                                          TableCell(
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                              child: Container(
-                                                                height: 35,
-                                                                width: 50,
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.grey.shade200,
-                                                                  borderRadius: BorderRadius.circular(4.0),
-                                                                ),
-                                                                child: Center(child: Text(item['productName'],textAlign: TextAlign.center,)),
-                                                              ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4.0),
                                                             ),
+                                                            child: Center(
+                                                                child: Text(
+                                                              item['category'],
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            )),
                                                           ),
-                                                          TableCell(
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                              child: Container(
-                                                                height: 35,
-                                                                width: 50,
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.grey.shade200,
-                                                                  borderRadius: BorderRadius.circular(4.0),
-                                                                ),
-                                                                child: Center(child: Text(item['category'],textAlign: TextAlign.center,)),
-                                                              ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4.0),
                                                             ),
+                                                            child: Center(
+                                                                child: Text(item[
+                                                                    'subCategory'])),
                                                           ),
-                                                          TableCell(
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                              child: Container(
-                                                                height: 35,
-                                                                width: 50,
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.grey.shade200,
-                                                                  borderRadius: BorderRadius.circular(4.0),
-                                                                ),
-                                                                child: Center(child: Text(item['subCategory'])),
-                                                              ),
-                                                            ),
-                                                          ),
+                                                        ),
+                                                      ),
 
-                                                          TableCell(
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                              child: Container(
-                                                                height: 35,
-                                                                width: 50,
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.grey.shade200,
-                                                                  borderRadius: BorderRadius.circular(4.0),
-                                                                ),
-                                                                child: Center(child: Text(item['price'].toString())),
-                                                              ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4.0),
                                                             ),
+                                                            child: Center(
+                                                                child: Text(item[
+                                                                        'price']
+                                                                    .toString())),
                                                           ),
-                                                          TableCell(
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                              child: Container(
-                                                                height: 35,
-                                                                width: 50,
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.grey.shade200,
-                                                                  borderRadius: BorderRadius.circular(4.0),
-                                                                ),
-                                                                child: Center(child: Text(item['qty'].toString())),
-                                                              ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4.0),
                                                             ),
+                                                            child: Center(
+                                                                child: Text(item[
+                                                                        'qty']
+                                                                    .toString())),
                                                           ),
-                                                          TableCell(
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                              child: Container(
-                                                                height: 35,
-                                                                width: 50,
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.grey.shade200,
-                                                                  borderRadius: BorderRadius.circular(4.0),
-                                                                ),
-                                                                child: Center(
-                                                                  child: TextFormField(
-                                                                    controller: _qtyControllers[index],
-                                                                    // controller: _qtyControllers[index],
-                                                                    //controller: _textController[item],
-                                                                    // controller: TextEditingController.fromValue(TextEditingValue(
-                                                                    //   text: (item['enteredQty']?? '').toString(),
-                                                                    //   selection: TextSelection.collapsed(offset: (item['enteredQty']?? '').toString().length),
-                                                                    // )),
-                                                                    textAlign: TextAlign.center, // Center alignment
-                                                                    decoration: const InputDecoration(
-                                                                        border: InputBorder.none, // Remove underline
-                                                                        contentPadding: EdgeInsets.only(
-                                                                            bottom: 12
-                                                                        )
-                                                                      //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
-                                                                    ),
-                                                                    inputFormatters: [
-                                                                      LengthLimitingTextInputFormatter(4),
-                                                                      FilteringTextInputFormatter.allow(
-                                                                          RegExp("[0-9]")),
-                                                                      // Allow only letters, numbers, and single space
-                                                                      FilteringTextInputFormatter.deny(
-                                                                          RegExp(r'^\s')),
-                                                                      // Disallow starting with a space
-                                                                      FilteringTextInputFormatter.deny(
-                                                                          RegExp(r'\s\s')),
-                                                                      // Disallow multiple spaces
-                                                                    ],
-                                                                    onChanged: (value) {
-                                                                      setState(() {
-                                                                        if (value.isEmpty) {
-                                                                          item['enteredQty'] = 0;
-                                                                          item['totalAmount2'] = 0;
-                                                                          _qtyControllers[index].clear();
-                                                                        } else {
-                                                                          int enteredQty = int.parse(value);
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child:
+                                                                  TextFormField(
+                                                                controller:
+                                                                    _qtyControllers[
+                                                                        index],
+                                                                // controller: _qtyControllers[index],
+                                                                //controller: _textController[item],
+                                                                // controller: TextEditingController.fromValue(TextEditingValue(
+                                                                //   text: (item['enteredQty']?? '').toString(),
+                                                                //   selection: TextSelection.collapsed(offset: (item['enteredQty']?? '').toString().length),
+                                                                // )),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                // Center alignment
+                                                                decoration:
+                                                                    const InputDecoration(
+                                                                        border: InputBorder
+                                                                            .none,
+                                                                        // Remove underline
+                                                                        contentPadding:
+                                                                            EdgeInsets.only(bottom: 12)
+                                                                        //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
+                                                                        ),
+                                                                inputFormatters: [
+                                                                  LengthLimitingTextInputFormatter(
+                                                                      4),
+                                                                  FilteringTextInputFormatter
+                                                                      .allow(RegExp(
+                                                                          "[0-9]")),
+                                                                  // Allow only letters, numbers, and single space
+                                                                  FilteringTextInputFormatter
+                                                                      .deny(RegExp(
+                                                                          r'^\s')),
+                                                                  // Disallow starting with a space
+                                                                  FilteringTextInputFormatter
+                                                                      .deny(RegExp(
+                                                                          r'\s\s')),
+                                                                  // Disallow multiple spaces
+                                                                ],
+                                                                onChanged:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    if (value
+                                                                        .isEmpty) {
+                                                                      item['enteredQty'] =
+                                                                          0;
+                                                                      item['totalAmount2'] =
+                                                                          0;
+                                                                      _qtyControllers[
+                                                                              index]
+                                                                          .clear();
+                                                                    } else {
+                                                                      int enteredQty =
+                                                                          int.parse(
+                                                                              value);
 
-                                                                          if (enteredQty > (item['qty']?? 0) || enteredQty == 0) {
-                                                                            //  if (enteredQty > (item['qty']?? 0) || (item['qty'] == 0)) {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(content: Text('Return qty must be less than or equal to the order qty.')),
-                                                                            );
-                                                                            // Clear the entered value
-                                                                            item['enteredQty'] = 0;
-                                                                            _qtyControllers[index].clear();
-                                                                            //  _textController.clear(); // Clear the text field
-                                                                          } else {
-                                                                            item['enteredQty'] = enteredQty;
-                                                                            item['totalAmount2'] = (item['totalAmount']  / item['qty'])  * enteredQty;
-                                                                          }
-                                                                        }
-                                                                        // calculate the total amount
-                                                                        totalAmount = _orderDetails.fold(0.0, (sum, item) => sum + (item['totalAmount2']?? 0));
-                                                                        totalController.text = totalAmount.toStringAsFixed(2); // update the totalController
-                                                                        print('enteredqty');
-                                                                        print(_qtyControllers[index].text);
-                                                                        print(item['enteredQty']);
-                                                                        print(_qtyControllers[index].text);
-                                                                      });
-                                                                    },
-                                                                  ),
-                                                                ),
+                                                                      if (enteredQty >
+                                                                              (item['qty'] ??
+                                                                                  0) ||
+                                                                          enteredQty ==
+                                                                              0) {
+                                                                        //  if (enteredQty > (item['qty']?? 0) || (item['qty'] == 0)) {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          const SnackBar(
+                                                                              content: Text('Return qty must be less than or equal to the order qty.')),
+                                                                        );
+                                                                        // Clear the entered value
+                                                                        item['enteredQty'] =
+                                                                            0;
+                                                                        _qtyControllers[index]
+                                                                            .clear();
+                                                                        //  _textController.clear(); // Clear the text field
+                                                                      } else {
+                                                                        item['enteredQty'] =
+                                                                            enteredQty;
+                                                                        item[
+                                                                            'totalAmount2'] = (item['totalAmount'] /
+                                                                                item['qty']) *
+                                                                            enteredQty;
+                                                                      }
+                                                                    }
+                                                                    // calculate the total amount
+                                                                    totalAmount = _orderDetails.fold(
+                                                                        0.0,
+                                                                        (sum, item) =>
+                                                                            sum +
+                                                                            (item['totalAmount2'] ??
+                                                                                0));
+                                                                    totalController
+                                                                            .text =
+                                                                        totalAmount
+                                                                            .toStringAsFixed(2); // update the totalController
+                                                                    print(
+                                                                        'enteredqty');
+                                                                    print(_qtyControllers[
+                                                                            index]
+                                                                        .text);
+                                                                    print(item[
+                                                                        'enteredQty']);
+                                                                    print(_qtyControllers[
+                                                                            index]
+                                                                        .text);
+                                                                  });
+                                                                },
                                                               ),
                                                             ),
                                                           ),
-                                                          // TableCell(
-                                                          //   child: Padding(
-                                                          //     padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                          //     child: Container(
-                                                          //       height: 35,
-                                                          //       width: 50,
-                                                          //       decoration: BoxDecoration(
-                                                          //         color: Colors.grey.shade200,
-                                                          //         borderRadius: BorderRadius.circular(4.0),
-                                                          //       ),
-                                                          //       child: Center(
-                                                          //         child: TextFormField(
-                                                          //           initialValue: (item['enteredQty']?? '').toString(),
-                                                          //           textAlign: TextAlign.center, // Center alignment
-                                                          //           decoration: const InputDecoration(
-                                                          //               border: InputBorder.none, // Remove underline
-                                                          //               contentPadding: EdgeInsets.only(
-                                                          //                   bottom: 12
-                                                          //               )
-                                                          //               //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
-                                                          //           ),
-                                                          //           inputFormatters: [
-                                                          //             LengthLimitingTextInputFormatter(4),
-                                                          //             FilteringTextInputFormatter.allow(
-                                                          //                 RegExp("[0-9]")),
-                                                          //             // Allow only letters, numbers, and single space
-                                                          //             FilteringTextInputFormatter.deny(
-                                                          //                 RegExp(r'^\s')),
-                                                          //             // Disallow starting with a space
-                                                          //             FilteringTextInputFormatter.deny(
-                                                          //                 RegExp(r'\s\s')),
-                                                          //             // Disallow multiple spaces
-                                                          //           ],
-                                                          //           onChanged: (value) {
-                                                          //             setState(() {
-                                                          //               if (value.isEmpty) {
-                                                          //                 item['enteredQty'] = 0;
-                                                          //                 item['totalAmount2'] = 0;
-                                                          //               } else {
-                                                          //                 item['enteredQty'] = int.parse(value);
-                                                          //                 if (item['enteredQty'] > (item['qty']?? 0)) {
-                                                          //                   ScaffoldMessenger.of(context).showSnackBar(
-                                                          //                     const SnackBar(content: Text('Return qty must be less than or equal to the order qty.')),
-                                                          //                   );
-                                                          //                 } else {
-                                                          //                   item['totalAmount2'] = item['price'] * item['enteredQty'];
-                                                          //                 }
-                                                          //               }
-                                                          //               // calculate the total amount
-                                                          //               totalAmount = _orderDetails.fold(0.0, (sum, item) => sum + (item['totalAmount2']?? 0));
-                                                          //               totalController.text = totalAmount.toStringAsFixed(2); // update the totalController
-                                                          //               print('enteredqty');
-                                                          //               print(item['enteredQty']);
-                                                          //             });
-                                                          //           },
-                                                          //         ),
-                                                          //       ),
-                                                          //     ),
-                                                          //   ),
-                                                          // ),
-                                                          TableCell(
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                              child: Container(
-                                                                height: 35,
-                                                                width: 50,
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.grey.shade200,
-                                                                  borderRadius: BorderRadius.circular(4.0),
-                                                                ),
-                                                                child: Center(child: Text(item['totalAmount'].toString())),
-                                                              ),
+                                                        ),
+                                                      ),
+                                                      // TableCell(
+                                                      //   child: Padding(
+                                                      //     padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                                                      //     child: Container(
+                                                      //       height: 35,
+                                                      //       width: 50,
+                                                      //       decoration: BoxDecoration(
+                                                      //         color: Colors.grey.shade200,
+                                                      //         borderRadius: BorderRadius.circular(4.0),
+                                                      //       ),
+                                                      //       child: Center(
+                                                      //         child: TextFormField(
+                                                      //           initialValue: (item['enteredQty']?? '').toString(),
+                                                      //           textAlign: TextAlign.center, // Center alignment
+                                                      //           decoration: const InputDecoration(
+                                                      //               border: InputBorder.none, // Remove underline
+                                                      //               contentPadding: EdgeInsets.only(
+                                                      //                   bottom: 12
+                                                      //               )
+                                                      //               //contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8) // Set content padding
+                                                      //           ),
+                                                      //           inputFormatters: [
+                                                      //             LengthLimitingTextInputFormatter(4),
+                                                      //             FilteringTextInputFormatter.allow(
+                                                      //                 RegExp("[0-9]")),
+                                                      //             // Allow only letters, numbers, and single space
+                                                      //             FilteringTextInputFormatter.deny(
+                                                      //                 RegExp(r'^\s')),
+                                                      //             // Disallow starting with a space
+                                                      //             FilteringTextInputFormatter.deny(
+                                                      //                 RegExp(r'\s\s')),
+                                                      //             // Disallow multiple spaces
+                                                      //           ],
+                                                      //           onChanged: (value) {
+                                                      //             setState(() {
+                                                      //               if (value.isEmpty) {
+                                                      //                 item['enteredQty'] = 0;
+                                                      //                 item['totalAmount2'] = 0;
+                                                      //               } else {
+                                                      //                 item['enteredQty'] = int.parse(value);
+                                                      //                 if (item['enteredQty'] > (item['qty']?? 0)) {
+                                                      //                   ScaffoldMessenger.of(context).showSnackBar(
+                                                      //                     const SnackBar(content: Text('Return qty must be less than or equal to the order qty.')),
+                                                      //                   );
+                                                      //                 } else {
+                                                      //                   item['totalAmount2'] = item['price'] * item['enteredQty'];
+                                                      //                 }
+                                                      //               }
+                                                      //               // calculate the total amount
+                                                      //               totalAmount = _orderDetails.fold(0.0, (sum, item) => sum + (item['totalAmount2']?? 0));
+                                                      //               totalController.text = totalAmount.toStringAsFixed(2); // update the totalController
+                                                      //               print('enteredqty');
+                                                      //               print(item['enteredQty']);
+                                                      //             });
+                                                      //           },
+                                                      //         ),
+                                                      //       ),
+                                                      //     ),
+                                                      //   ),
+                                                      // ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4.0),
+                                                            ),
+                                                            child: Center(
+                                                                child: Text(item[
+                                                                        'totalAmount']
+                                                                    .toString())),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4.0),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(item[
+                                                                          'totalAmount2'] !=
+                                                                      null
+                                                                  ? item['totalAmount2']
+                                                                      .toString()
+                                                                  : '0'),
                                                             ),
                                                           ),
-                                                          TableCell(
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                                                              child: Container(
-                                                                height: 35,
-                                                                width: 50,
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.grey.shade200,
-                                                                  borderRadius: BorderRadius.circular(4.0),
-                                                                ),
-                                                                child: Center(child: Text(item['totalAmount2']!= null? item['totalAmount2'].toString() : '0'),
-                                                                ),
-                                                              ),
-                                                            ),
-
-                                                          ),
-                                                        ]
-                                                    )
+                                                        ),
+                                                      ),
+                                                    ])
                                                   ],
-
                                                 );
                                               },
                                             ),
                                             const SizedBox(height: 8),
                                             Padding(
-                                              padding: const EdgeInsets.only(right: 25 ,top: 5,bottom: 5),
+                                              padding: const EdgeInsets.only(
+                                                  right: 25, top: 5, bottom: 5),
                                               child: Align(
-                                                alignment: Alignment.centerRight,
+                                                alignment:
+                                                    Alignment.centerRight,
                                                 child: Container(
                                                   height: 40,
-                                                  padding: const EdgeInsets.only(left: 15,right: 10,top: 6,bottom: 2),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 15,
+                                                          right: 10,
+                                                          top: 6,
+                                                          bottom: 2),
                                                   decoration: BoxDecoration(
-                                                    border: Border.all(color: const Color(0xFF0277BD)),
-                                                    borderRadius: BorderRadius.circular(2.0),
+                                                    border: Border.all(
+                                                        color: const Color(
+                                                            0xFF0277BD)),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2.0),
                                                     color: Colors.white,
                                                   ),
                                                   child: Padding(
-                                                    padding: const EdgeInsets.only(bottom: 2),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            bottom: 2),
                                                     child: Row(
-                                                      mainAxisSize: MainAxisSize.min,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
                                                       children: [
-                                                        RichText(text:
-                                                        TextSpan(
-                                                          children: [
-                                                            const TextSpan(
-                                                              text:  'Total Credit',
-                                                              style: TextStyle(
-                                                                  fontSize: 14,
-                                                                  color: Colors.blue
-                                                                // fontWeight: FontWeight.bold,
+                                                        RichText(
+                                                          text: TextSpan(
+                                                            children: [
+                                                              const TextSpan(
+                                                                text:
+                                                                    'Total Credit',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Colors
+                                                                        .blue
+                                                                    // fontWeight: FontWeight.bold,
+                                                                    ),
                                                               ),
-                                                            ),
-                                                            const TextSpan(
-                                                              text: '  ₹',
-                                                              style: TextStyle(
-                                                                color: Colors.black,
+                                                              const TextSpan(
+                                                                text: '  ₹',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
                                                               ),
-                                                            ),
-                                                            TextSpan(
-                                                              text: totalController.text,
-                                                              style: const TextStyle(
-                                                                color: Colors.black,
-                                                              ),
-                                                            ) ],
-                                                        ),
+                                                              TextSpan(
+                                                                text:
+                                                                    totalController
+                                                                        .text,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
                                                         )
                                                       ],
                                                     ),
@@ -2850,7 +3964,8 @@ class _CreateReturnState extends State<CreateReturn> {
                                     ),
                                     const SizedBox(height: 16),
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 50,right: 100,top: 30),
+                                      padding: const EdgeInsets.only(
+                                          left: 50, right: 100, top: 30),
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFFFFFFF),
@@ -2861,59 +3976,94 @@ class _CreateReturnState extends State<CreateReturn> {
                                               blurRadius: 6,
                                             ),
                                           ],
-                                          border: Border.all(color: Colors.grey),
-                                          borderRadius: BorderRadius.circular(8),
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-
                                             const SizedBox(height: 8),
                                             Row(
                                               children: [
                                                 const Padding(
-                                                  padding: EdgeInsets.only(left: 30),
+                                                  padding:
+                                                      EdgeInsets.only(left: 30),
                                                   child: Text(
                                                     'Image Upload',
                                                     style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       fontSize: 14,
-                                                      fontFamily: 'Titillium Web',
+                                                      fontFamily:
+                                                          'Titillium Web',
                                                     ),
                                                   ),
                                                 ),
                                                 const Spacer(),
-
                                                 Padding(
-                                                  padding:  const EdgeInsets.only(right: 30),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 30),
                                                   child: Padding(
-                                                    padding:  EdgeInsets.only(left: maxWidth * 0.15),
+                                                    padding: EdgeInsets.only(
+                                                        left: maxWidth * 0.15),
                                                     child: OutlinedButton.icon(
-                                                      icon: const Icon(Icons.upload,color: Colors.white,size: 18,),
-                                                      label: const Text('Upload',style: TextStyle(color: Colors.white,),),
+                                                      icon: const Icon(
+                                                        Icons.upload,
+                                                        color: Colors.white,
+                                                        size: 18,
+                                                      ),
+                                                      label: const Text(
+                                                        'Upload',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
                                                       onPressed: () {
-                                                        if(_controller.text.isNotEmpty) {
-                                                          Map<String,
-                                                              dynamic> orderDetailsMap = {
-                                                            'emailAddress': EmailAddressController
-                                                                .text,
-                                                            'contactPerson': ContactpersonController
-                                                                .text,
-                                                            'reason': _selectedReason,
-                                                            'otherField': _controller
-                                                                .text,
-                                                            'orderDetails': _orderDetails,
-                                                            'totalAmount2': totalController
-                                                                .text,
-                                                            'notes': NotesController.text,
-                                                            'customerId': customerIdController.text,
-                                                            'orderId': OrderIDController.text,
-                                                            'shipAddres': ShippingAddressController.text,
-                                                            'ContactNumber': ContactPerson.text,
+                                                        if (_controller
+                                                            .text.isNotEmpty) {
+                                                          Map<String, dynamic>
+                                                              orderDetailsMap =
+                                                              {
+                                                            'emailAddress':
+                                                                EmailAddressController
+                                                                    .text,
+                                                            'contactPerson':
+                                                                ContactpersonController
+                                                                    .text,
+                                                            'reason':
+                                                                _selectedReason,
+                                                            'otherField':
+                                                                _controller
+                                                                    .text,
+                                                            'orderDetails':
+                                                                _orderDetails,
+                                                            'totalAmount2':
+                                                                totalController
+                                                                    .text,
+                                                            'notes':
+                                                                NotesController
+                                                                    .text,
+                                                            'customerId':
+                                                                customerIdController
+                                                                    .text,
+                                                            'orderId':
+                                                                OrderIDController
+                                                                    .text,
+                                                            'shipAddres':
+                                                                ShippingAddressController
+                                                                    .text,
+                                                            'ContactNumber':
+                                                                ContactPerson
+                                                                    .text,
                                                           };
                                                           print(
                                                               'return design module file');
-                                                          print(orderDetailsMap);
+                                                          print(
+                                                              orderDetailsMap);
                                                           print(_orderDetails);
                                                           // context.go(
                                                           //     '/Create_Return/Add_Image',
@@ -2929,35 +4079,48 @@ class _CreateReturnState extends State<CreateReturn> {
                                                           context.go(
                                                               '/Add_Image',
                                                               extra: {
-                                                                'orderDetails': _orderDetails,
-                                                                'imageSizeString': widget.imageSizeString,
-                                                                'storeImages': widget
-                                                                    .storeImages,
-                                                                'imageSizeStrings': widget
-                                                                    .imageSizeStrings,
-                                                                'orderDetailsMap': orderDetailsMap,
-                                                                'customerId': customerIdController.text,
+                                                                'orderDetails':
+                                                                    _orderDetails,
+                                                                'imageSizeString':
+                                                                    widget
+                                                                        .imageSizeString,
+                                                                'storeImages':
+                                                                    widget
+                                                                        .storeImages,
+                                                                'imageSizeStrings':
+                                                                    widget
+                                                                        .imageSizeStrings,
+                                                                'orderDetailsMap':
+                                                                    orderDetailsMap,
+                                                                'customerId':
+                                                                    customerIdController
+                                                                        .text,
                                                               });
-                                                        }
-                                                        else{
-                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                        } else {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
                                                             const SnackBar(
-                                                              content: Text('Please Enter Invoice Number'),
+                                                              content: Text(
+                                                                  'Please Enter Invoice Number'),
                                                               //  backgroundColor: Colors.red,
                                                             ),
                                                           );
                                                         }
                                                       },
-                                                      style: OutlinedButton.styleFrom(
+                                                      style: OutlinedButton
+                                                          .styleFrom(
                                                         backgroundColor:
-                                                        Colors.blue[800],
+                                                            Colors.blue[800],
                                                         // Button background color
-                                                        shape: RoundedRectangleBorder(
+                                                        shape:
+                                                            RoundedRectangleBorder(
                                                           borderRadius:
-                                                          BorderRadius.circular(
-                                                              5), // Rounded corners
+                                                              BorderRadius.circular(
+                                                                  5), // Rounded corners
                                                         ),
-                                                        side: BorderSide.none, // No outline
+                                                        side: BorderSide
+                                                            .none, // No outline
                                                       ),
                                                     ),
                                                   ),
@@ -2965,26 +4128,43 @@ class _CreateReturnState extends State<CreateReturn> {
                                               ],
                                             ),
                                             const Divider(
-                                              color: Color(0xFFB2C2D3), // Choose a color that contrasts with the background
-                                              thickness: 1, // Set a non-zero thickness
+                                              color: Color(0xFFB2C2D3),
+                                              // Choose a color that contrasts with the background
+                                              thickness:
+                                                  1, // Set a non-zero thickness
                                             ),
                                             const SizedBox(height: 8),
                                             Column(
                                               children: [
-                                                if(widget.storeImages != '')
+                                                if (widget.storeImages != '')
                                                   Column(
-                                                    children: List.generate(widget.storeImages.length, (i) {
+                                                    children: List.generate(
+                                                        widget.storeImages
+                                                            .length, (i) {
                                                       return Row(
                                                         children: [
                                                           const Padding(
-                                                            padding: EdgeInsets.only(left: 30),
-                                                            child: Icon(Icons.image,color: Colors.blue,size: 30,),
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    left: 30),
+                                                            child: Icon(
+                                                              Icons.image,
+                                                              color:
+                                                                  Colors.blue,
+                                                              size: 30,
+                                                            ),
                                                           ),
                                                           Padding(
-                                                            padding: const EdgeInsets.only(left: 15),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    left: 15),
                                                             child: Text(
                                                               '${widget.storeImages[i].split('-')[0]}',
-                                                              style: const TextStyle(fontSize: 18),
+                                                              style:
+                                                                  const TextStyle(
+                                                                      fontSize:
+                                                                          18),
                                                             ),
                                                           ),
                                                           // Padding(
@@ -2993,22 +4173,55 @@ class _CreateReturnState extends State<CreateReturn> {
                                                           // ),
                                                           const Spacer(),
                                                           Padding(
-                                                            padding: const EdgeInsets.only(right: 30), // add 10 pixels of space to the left
-                                                            child: Text('${widget.imageSizeStrings[i]}', style: const TextStyle(fontSize: 18)),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    right: 30),
+                                                            // add 10 pixels of space to the left
+                                                            child: Text(
+                                                                '${widget.imageSizeStrings[i]}',
+                                                                style:
+                                                                    const TextStyle(
+                                                                        fontSize:
+                                                                            18)),
                                                           ),
                                                           IconButton(
-                                                            icon: const Icon(Icons.delete_forever_rounded,color: Colors.deepOrange,size: 35,),
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .delete_forever_rounded,
+                                                              color: Colors
+                                                                  .deepOrange,
+                                                              size: 35,
+                                                            ),
                                                             onPressed: () {
-                                                              if (i < widget.storeImages.length - 0) {
+                                                              if (i <
+                                                                  widget.storeImages
+                                                                          .length -
+                                                                      0) {
                                                                 setState(() {
-                                                                  widget.storeImages.removeAt(i);
-                                                                  widget.imageSizeString!.removeAt(i);
-                                                                  widget.imageSizeStrings.removeAt(i);
+                                                                  widget
+                                                                      .storeImages
+                                                                      .removeAt(
+                                                                          i);
+                                                                  widget
+                                                                      .imageSizeString!
+                                                                      .removeAt(
+                                                                          i);
+                                                                  widget
+                                                                      .imageSizeStrings
+                                                                      .removeAt(
+                                                                          i);
                                                                 });
                                                               } else {
                                                                 setState(() {
-                                                                  widget.storeImages.removeAt(i);
-                                                                  widget.imageSizeStrings.removeAt(i - 1);
+                                                                  widget
+                                                                      .storeImages
+                                                                      .removeAt(
+                                                                          i);
+                                                                  widget
+                                                                      .imageSizeStrings
+                                                                      .removeAt(
+                                                                          i - 1);
                                                                 });
                                                               }
                                                             },
@@ -3025,7 +4238,11 @@ class _CreateReturnState extends State<CreateReturn> {
                                     ),
                                     const SizedBox(height: 16),
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 50,right: 100,top: 30,bottom: 20),
+                                      padding: const EdgeInsets.only(
+                                          left: 50,
+                                          right: 100,
+                                          top: 30,
+                                          bottom: 20),
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFFFFFFF),
@@ -3036,56 +4253,71 @@ class _CreateReturnState extends State<CreateReturn> {
                                               blurRadius: 6,
                                             ),
                                           ],
-                                          border: Border.all(color: Colors.grey),
-                                          borderRadius: BorderRadius.circular(8),
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                         // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(16.0),
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              const Text('Notes', style: TextStyle(fontWeight: FontWeight.bold)),
+                                              const Text('Notes',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
                                               const SizedBox(height: 8),
                                               TextFormField(
-                                                controller:  NotesController,
+                                                controller: NotesController,
                                                 decoration: InputDecoration(
                                                   filled: true,
-                                                  fillColor: Colors.grey.shade200,
+                                                  fillColor:
+                                                      Colors.grey.shade200,
                                                   border: InputBorder.none,
                                                 ),
-                                                maxLines: 5, // To make it a single line text field
+                                                maxLines:
+                                                    5, // To make it a single line text field
                                               )
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ],),
+                                  ],
                                 ),
                               ),
                             ),
-                          ),))
-                        }
-
-
-                      ],
-                    ))
-
-              ],
-            );
-          }
-      ),
+                          ),
+                        ),
+                      ))
+                    }
+                  ],
+                ))
+          ],
+        );
+      }),
     );
   }
 }
-
 
 String removeCharAt(String str, int index) {
   return str.substring(0, index) + str.substring(index + 1);
 }
 
-DataRow dataRow(int sn, String productName, String brand, String category, String subCategory, String price, int qty, int returnQty, String invoiceAmount, String creditRequest) {
+DataRow dataRow(
+    int sn,
+    String productName,
+    String brand,
+    String category,
+    String subCategory,
+    String price,
+    int qty,
+    int returnQty,
+    String invoiceAmount,
+    String creditRequest) {
   return DataRow(cells: [
     DataCell(
       Container(

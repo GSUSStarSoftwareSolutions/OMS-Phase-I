@@ -39,8 +39,6 @@ class CreateOrderPage extends StatefulWidget {
   @override
   State<CreateOrderPage> createState() => _CreateOrderPageState();
 }
-
-
 class _CreateOrderPageState extends State<CreateOrderPage> {
   Timer? timer;
   bool isLoading  = false;
@@ -53,6 +51,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
   final EmailIdController = TextEditingController();
   final deliveryLocationController = TextEditingController();
   final ContactPersonController = TextEditingController();
+  final CustomerIdController = TextEditingController();
   final deliveryaddressController = TextEditingController();
   final TextEditingController ContactNumberController = TextEditingController();
   TextEditingController ShippingAddress = TextEditingController();
@@ -181,116 +180,102 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                         ),
                       ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // Left Address
+                        Expanded(
+                          child: MouseRegion(
+                            child: GestureDetector(
+                              onTap: ()
+              {
+                                setState(() {
+                                  ShippingAddress.text = shippingAddress1;
+                                });
+                                Navigator.pop(context);
+                              },
+                              child:
+              Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(width: 10),
+                Radio<String>(
+                  value: shippingAddress1,
+                  groupValue: ShippingAddress.text,
+                  onChanged: (String? value) {
+                    setState(() {
+                      ShippingAddress.text = shippingAddress1;
+                    });
+                    Navigator.pop(context);
+                  },
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      shippingAddress1,
+                      textAlign: TextAlign.left,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
-                        // Addresses Row
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Left Address
-                            Expanded(
-                              child: MouseRegion(
-                                child: GestureDetector(
-                                  onTap: () {
+                            ),
+                          ),
+                        ),
+                        // Divider
+                        Container(
+                          width: 1,
+                          height: 120,
+                          color: Colors.grey.shade300,
+                        ),
+                        // Right Address
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                ShippingAddress.text = shippingAddress2;
+                              });
+                              Navigator.pop(context);
+                            },
+                            child:   Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(width: 10),
+                                Radio<String>(
+                                  value: shippingAddress2,
+                                  groupValue: ShippingAddress.text,
+                                  onChanged: (String? value) {
                                     setState(() {
-                                      ShippingAddress.text = shippingAddress1;
+                                      ShippingAddress.text = shippingAddress2;
                                     });
                                     Navigator.pop(context);
                                   },
-                                  child: Column(
-                                    children: [
-                                      const SizedBox(height: 10),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-
-                                          decoration:BoxDecoration(
-                                            //   border: Border.all(color: Colors.grey),
-                                            color: Colors.greenAccent,
-                                            borderRadius: BorderRadius.circular(8),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(0.3), // Soft grey shadow
-                                                spreadRadius: 3,
-                                                blurRadius: 3,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              shippingAddress1,
-                                              textAlign: TextAlign.left,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.black87,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                 ),
-                              ),
-                            ),
-                            // Divider
-                            Container(
-                              width: 1,
-                              height: 120,
-                              color: Colors.grey.shade300,
-                            ),
-                            // Right Address
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    ShippingAddress.text = shippingAddress2;
-                                  });
-                                  Navigator.pop(context);
-                                },
-                                child: Column(
-                                  children: [
-                                    const SizedBox(height: 10),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        decoration:BoxDecoration(
-                                          //   border: Border.all(color: Colors.grey),
-                                          color: Colors.yellow,
-                                          borderRadius: BorderRadius.circular(8),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.3), // Soft grey shadow
-                                              spreadRadius: 3,
-                                              blurRadius: 3,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-
-                                        child: Center(
-                                          child: Text(
-                                            shippingAddress2,
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                        ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      shippingAddress2,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
@@ -312,7 +297,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       Container(
           decoration: BoxDecoration(
@@ -325,9 +310,10 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
             ),
           ),
           child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.white, '/Order_List')),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
@@ -383,7 +369,8 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
 
     final cusMasterUrl ="$apicall/customer_master/get_all_customermaster";
 
-    final cusMasterResponse = await http.get(
+    final cusMasterResponse =
+    await http.get(
       Uri.parse(cusMasterUrl),
       headers: {
         'Authorization': 'Bearer $token',
@@ -397,7 +384,8 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
       if(isMatched){
         var matchedCustomer = cusData.firstWhere((customer) => customer['customerName'] == customerId);
         setState(() {
-          ContactPersonController.text = matchedCustomer['customerName'] ?? ''; // Safely assign the value
+          ContactPersonController.text = matchedCustomer['customerName'] ?? '';
+          CustomerIdController.text = matchedCustomer['customerId'] ?? '';// Safely assign the value
           ContactNumberController.text = matchedCustomer['contactNo']?.toString() ?? ''; // Convert to string and safely assign
           deliveryaddressController.text = matchedCustomer['billingAddress'] ?? '';
           EmailIdController.text = matchedCustomer['email'] ?? '';
@@ -946,19 +934,40 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
               double maxWidth = constraints.maxWidth;
               return Stack(
                 children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Container(
+                  if(constraints.maxHeight <= 500)...{
+                    SingleChildScrollView(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children:
+                            _buildMenuItems(context),
 
-                      width: 200,
-                      color: const Color(0xFFF7F6FA),
-                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildMenuItems(context),
+                          ),
+
+                        ),
+                      ),
+                    )
+
+                  }
+                  else...{
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
                       ),
                     ),
-                  ),
+                  },
                   Padding(
                     padding: const EdgeInsets.only(left: 200,top: 0),
                     child: Container(
@@ -1086,24 +1095,8 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                                                                       hintText: 'CUS-Name'
 
                                                                   ),
-                                                                  inputFormatters: [
 
-                                                                    FilteringTextInputFormatter.allow(
-                                                                        RegExp("[a-zA-Z_0-9]")),
-                                                                    // Allow only letters, numbers, and single space
-                                                                    FilteringTextInputFormatter.deny(
-                                                                        RegExp(r'^\s')),
-                                                                    // Disallow starting with a space
-                                                                    FilteringTextInputFormatter.deny(
-                                                                        RegExp(r'\s\s')),
-                                                                    // Disallow multiple spaces
-                                                                  ],
-                                                                  // validator: (value) {
-                                                                  //   if (_controller.text != null && _controller.text.trim().isEmpty) {
-                                                                  //     return 'Please enter a product name';
-                                                                  //   }
-                                                                  //   return null;
-                                                                  // },
+
 
                                                                 ),
                                                               ),
@@ -1307,9 +1300,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                                                     if (deliveryaddressController.text.isEmpty) {
                                                       return 'Please fill delivery address.';
                                                     }
-                                                    if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                                                      return 'Please fill Email Address Format @gmail.com';
-                                                    }
+                                                    if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
                                                     if (ShippingAddress.text.isEmpty) {
                                                       return 'Please fill Shipping address ';
                                                     }
@@ -1320,7 +1311,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                                                   String validationMessage = validateFields();
                                                   if (validationMessage == '') {
                                                     Map<String, dynamic> data = {
-                                                      'CusId': controller.text,
+                                                      'CusId': CustomerIdController.text,
                                                       'deliveryLocation': EmailIdController.text,
                                                       'ContactName': ContactPersonController.text,
                                                       'Address': deliveryaddressController.text,
@@ -1437,23 +1428,6 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
 
                                                                     ),
 
-                                                                    inputFormatters: [
-                                                                      FilteringTextInputFormatter.allow(
-                                                                          RegExp("[a-zA-Z_0-9]")),
-                                                                      // Allow only letters, numbers, and single space
-                                                                      FilteringTextInputFormatter.deny(
-                                                                          RegExp(r'^\s')),
-                                                                      // Disallow starting with a space
-                                                                      FilteringTextInputFormatter.deny(
-                                                                          RegExp(r'\s\s')),
-                                                                      // Disallow multiple spaces
-                                                                    ],
-                                                                    // validator: (value) {
-                                                                    //   if (_controller.text != null && _controller.text.trim().isEmpty) {
-                                                                    //     return 'Please enter a product name';
-                                                                    //   }
-                                                                    //   return null;
-                                                                    // },
 
                                                                   ),
                                                                 ),
@@ -1647,9 +1621,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                                                               if (deliveryaddressController.text.isEmpty) {
                                                                 return 'Please fill delivery address.';
                                                               }
-                                                              if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                                                                return 'Please fill Email Address Format @gmail.com';
-                                                              }
+                                                              if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
                                                               if (ShippingAddress.text.isEmpty) {
                                                                 return 'Please fill Shipping address ';
                                                               }
@@ -1660,7 +1632,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                                                             String validationMessage = validateFields();
                                                             if (validationMessage == '') {
                                                               Map<String, dynamic> data = {
-                                                                'CusId': controller.text,
+                                                                'CusId': CustomerIdController.text,
                                                                 'deliveryLocation': EmailIdController.text,
                                                                 'ContactName': ContactPersonController.text,
                                                                 'Address': deliveryaddressController.text,

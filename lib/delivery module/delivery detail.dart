@@ -95,10 +95,10 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800]  ,
@@ -110,7 +110,8 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
             ),
           ),
           child: _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.white, '/Delivery_List')),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
@@ -325,6 +326,9 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
             "price": item['price'],
             "productName": item['productName'],
             "qty": item['qty'],
+            "discount": item['discount'],
+            "tax": item['tax'],
+            "actualAmount":item['price'] * item['qty'],
             "subCategory": item['subCategory'],
             "totalAmount": item['totalAmount'],
           });
@@ -339,7 +343,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
             "deliveryLocation":  EmailIdController.text,
             "invoiceNo": InvNoController.text,
             "items": items,
-            "modifiedAt": _dateController.text,
+            "createdDate": _dateController.text,
             "orderId":  _controller.text,
             "total":TotalController.text,
         };
@@ -363,41 +367,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
             context: context,
             builder: (BuildContext context) {
               return
-                AlertDialog(
-                  shape: const RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.blue, width: 1), // Set border color and width
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-
-                  backgroundColor: Colors.transparent,
-                  content: Padding(
-                      padding: const EdgeInsets.only(left: 25),
-                      child: Row(
-                        children: [
-                          const Text('Your Delivery ID is: ',style: TextStyle(color: Colors.white),),
-                          SelectableText('$DeliveryId',style: const TextStyle(color: Colors.red),),
-                        ],
-                      )
-                  ),
-                  actions: <Widget>[
-                    ElevatedButton(
-                      child: const Text('OK',style: TextStyle(color: Colors.white),),
-                      onPressed: () {
-                        //context.go('/Return_List');
-                        // Navigator.of(context
-                        //).pop(); // close the alert dialog
-                        context.go('/Delivery_List');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        side: const BorderSide(color: Colors.blue),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
+                AlertDialog(  shape: const RoundedRectangleBorder(    side: BorderSide(color: Colors.blue, width: 1),     borderRadius: BorderRadius.all(Radius.circular(4)),  ),  backgroundColor: Colors.white,  content: Padding(      padding: const EdgeInsets.only(left: 25),      child: Row(        children: [          const Text('Your Delivery ID is: ',style: TextStyle(color: Colors.black),),          SelectableText('$DeliveryId',style: const TextStyle(color: Colors.black),),        ],      )  ),  actions: <Widget>[    ElevatedButton(      child: const Text('OK',style: TextStyle(color: Colors.white),),      onPressed: () {                     context.go('/Delivery_List');      },      style: ElevatedButton.styleFrom(        backgroundColor: Colors.blue,        side: const BorderSide(color: Colors.blue),        shape: RoundedRectangleBorder(          borderRadius: BorderRadius.circular(10.0),        ),      ),    ),  ],);
             },
           );
         } else {
@@ -502,8 +472,9 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
           _orderDetails = orderData['items'].map((item) => {
             'productName': item['productName'],
             'qty': item['qty'],
-            // 'discount': item['discount'],
-            // 'tax': item['tax'],
+            'discount': item['discount'],
+            'tax': item['tax'],
+            'ActualTotalAmount':item['ActualTotalAmount'],
             'totalAmount': item['totalAmount'],
             'price': item['price'],
             'category': item['category'],
@@ -696,7 +667,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                       borderRadius: BorderRadius.circular(5.0),
                                       borderSide: const BorderSide(color: Colors.blue), // Added blue border
                                     ),
-                                    hintText: 'Enter Your Address',
+                                    hintText: 'Enter Your Name',
                                   ),
 
                                   inputFormatters: [
@@ -815,7 +786,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                       borderRadius: BorderRadius.circular(5.0),
                                       borderSide: const BorderSide(color: Colors.blue), // Added blue border
                                     ),
-                                    hintText: 'Contact Person Name',
+                                    hintText: 'Contact Your Number',
                                     contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 8, vertical: 8),
                                   ),
@@ -836,7 +807,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                             const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('Email Id'),
+                                Text('Email ID'),
                                 SizedBox(width: 5,),
                                 Text('*', style: TextStyle(color: Colors.red),),
                               ],
@@ -870,7 +841,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                       borderRadius: BorderRadius.circular(5.0),
                                       borderSide: const BorderSide(color: Colors.blue), // Added blue border
                                     ),
-                                    hintText: 'Contact Person Number',
+                                    hintText: 'Enter your Email ID',
                                     contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 8, vertical: 8),
                                   ),
@@ -934,20 +905,37 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
             return Stack(
               //   crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  // Added Align widget for the left side menu
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    height: 1400,
-                    width: 200,
-                    color: const Color(0xFFF7F6FA),
-                    padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _buildMenuItems(context),
+                if(constraints.maxHeight <= 500)...{
+                  SingleChildScrollView(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
+                      ),
+                    ),
+                  )
+
+                }
+                else...{
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      width: 200,
+                      color: const Color(0xFFF7F6FA),
+                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _buildMenuItems(context),
+                      ),
                     ),
                   ),
-                ),
+                },
                 Padding(
                   padding: const EdgeInsets.only(left: 200,top: 0),
                   child: Container(
@@ -999,119 +987,99 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                 child: Padding(
                                   padding: const EdgeInsets.only(
                                       top: 10, right: 90),
-                                  child: MouseRegion(
-                                    onEnter: (_) {
-                                      setState(() {
-                                        _isHovered1 = true;
-                                        _controller1.forward(); // Start shake animation when hovered
-                                      });
-                                    },
-                                    onExit: (_) {
-                                      setState(() {
-                                        _isHovered1 = false;
-                                        _controller1.stop(); // Stop shake animation when not hovered
-                                      });
-                                    },
-                                    child: AnimatedBuilder(
-                                      animation: _controller1,
-                                      builder: (context, child) {
+                                  child: AnimatedBuilder(
+                                    animation: _controller1,
+                                    builder: (context, child) {
 
-                                        return Transform.translate(offset: Offset(_isHovered1? _shakeAnimation.value : 0,0),
-                                          child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
-                                          curve: Curves.easeInOut,
-                                          decoration: BoxDecoration(
-                                            color: _isHovered1
-                                                ? Colors.blue[800]
-                                                : Colors.blue[800], // Background color change on hover
-                                            borderRadius: BorderRadius.circular(5),
-                                            boxShadow: _isHovered1
-                                                ? [
-                                              const BoxShadow(
-                                                  color: Colors.black45,
-                                                  blurRadius: 6,
-                                                  spreadRadius: 2)
-                                            ]
-                                                : [],
-                                          ),
-                                          child: OutlinedButton(
-                                            onPressed: () async {
-                                              print('naveen');
-                                              if(_controller.text.isEmpty){
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Please fill Order Id'),
-                                          //  backgroundColor: Colors.red,
-                                                  ),
-                                                );
-                                              }
-                                              else if(_orderDetails.isEmpty){
-                                                _fetchOrderDetails();
-                                              }
-                                              else if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Please fill Email Address Format @gmail.com'),
-                                                  ),
-                                                );
-                                              }
-                                              else if(ContactperController.text.isEmpty || ContactperController.text.length <=2){
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Please enter a contact person name'),
-                                                  ),
-                                                );
-                                              }
-                                              else if (DelAddController.text.isEmpty){
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Please Enter Delivery Address'),
-                                                    //  backgroundColor: Colors.red,
-                                                  ),
-                                                );
-                                              }
-                                              else if (ShippingAddress.text.isEmpty){
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Please Enter Shipping Address'),
-                                                    //  backgroundColor: Colors.red,
-                                                  ),
-                                                );
-                                              }
-                                              else if(ContactNumberContoller.text.isEmpty || ContactNumberContoller.text.length !=10){
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Please enter a valid phone number.'),
-                                                  ),
-                                                );
-                                              }
-                                              else{
-                                                await addReturnMaster();
-                                              }
-                                            },
-                                            style: OutlinedButton.styleFrom(
-                                              backgroundColor:
-                                              Colors.blue[800],
-                                              // Button background color
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                BorderRadius.circular(
-                                                    5), // Rounded corners
-                                              ),
-                                              side: BorderSide.none, // No outline
+                                      return Transform.translate(offset: Offset(_isHovered1? _shakeAnimation.value : 0,0),
+                                        child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                        decoration: BoxDecoration(
+                                          color: _isHovered1
+                                              ? Colors.blue[800]
+                                              : Colors.blue[800], // Background color change on hover
+                                          borderRadius: BorderRadius.circular(5),
+                                          boxShadow: _isHovered1
+                                              ? [
+                                            const BoxShadow(
+                                                color: Colors.black45,
+                                                blurRadius: 6,
+                                                spreadRadius: 2)
+                                          ]
+                                              : [],
+                                        ),
+                                        child: OutlinedButton(
+                                          onPressed: () async {
+                                            print('naveen');
+                                            if(_controller.text.isEmpty){
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Please fill Order Id'),
+                                        //  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                            }
+                                            else if(_orderDetails.isEmpty){
+                                              _fetchOrderDetails();
+                                            }
+                                            else if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
+                                            else if(ContactperController.text.isEmpty || ContactperController.text.length <=2){
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Please enter a contact person name'),
+                                                ),
+                                              );
+                                            }
+                                            else if (DelAddController.text.isEmpty){
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Please Enter Delivery Address'),
+                                                  //  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                            }
+                                            else if (ShippingAddress.text.isEmpty){
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Please Enter Shipping Address'),
+                                                  //  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                            }
+                                            else if(ContactNumberContoller.text.isEmpty || ContactNumberContoller.text.length !=10){
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Please enter a valid phone number.'),
+                                                ),
+                                              );
+                                            }
+                                            else{
+                                              await addReturnMaster();
+                                            }
+                                          },
+                                          style: OutlinedButton.styleFrom(
+                                            backgroundColor:
+                                            Colors.blue[800],
+                                            // Button background color
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(
+                                                  5), // Rounded corners
                                             ),
-                                            child: const Text(
-                                              'Create Delivery',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w100,
-                                                color: Colors.white,
-                                              ),
+                                            side: BorderSide.none, // No outline
+                                          ),
+                                          child: const Text(
+                                            'Create Delivery',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w100,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                        ));
-                                      }
-                                    ),
+                                        ),
+                                      ));
+                                    }
                                   ),
                                 ),
                               ),
@@ -1301,22 +1269,20 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                             flex: 1,
                                             child: Column(
                                               children: [
-                                                if(Status == 'Not Started')...{
-
+                                                if(Status == 'Created')...{
                                                   const Icon(
                                                     Icons.check_box,
                                                     color: Colors.green,
                                                   ),
                                                 }
                                                 else...{
-
                                                   const Icon(
                                                     Icons.check_box,
                                                     color: Colors.grey,
                                                   ),
                                                 },
                                                 const Text(
-                                                  'Order Placed',
+                                                  'Order Created',
                                                   style: TextStyle(
                                                     color: Colors.black,
                                                   ),
@@ -1333,7 +1299,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                                   color:  Colors.grey,// default color
                                                 ),
                                                 Text(
-                                                  'Shipped',
+                                                  'Picked',
                                                   style: TextStyle(
                                                     color: Colors.black,
                                                   ),
@@ -1352,7 +1318,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                                 Text(
                                                   'Delivered',
                                                   style: TextStyle(
-                                                    color: Colors.grey,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
                                               ],
@@ -1922,7 +1888,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                                   flex: 1,
                                                   child: Column(
                                                     children: [
-                                                      if(Status == 'Not Started')...{
+                                                      if(Status == 'Created')...{
 
                                                         const Icon(
                                                           Icons.check_box,
@@ -1937,7 +1903,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                                         ),
                                                       },
                                                       const Text(
-                                                        'Order Placed',
+                                                        'Order Create',
                                                         style: TextStyle(
                                                           color: Colors.black,
                                                         ),
@@ -1954,7 +1920,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                                         color:  Colors.grey,// default color
                                                       ),
                                                       Text(
-                                                        'Shipped',
+                                                        'Picked',
                                                         style: TextStyle(
                                                           color: Colors.black,
                                                         ),
@@ -1973,7 +1939,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
                                                       Text(
                                                         'Delivered',
                                                         style: TextStyle(
-                                                          color: Colors.grey,
+                                                          color: Colors.black,
                                                         ),
                                                       ),
                                                     ],

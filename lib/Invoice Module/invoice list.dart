@@ -75,9 +75,10 @@ class _InvoiceListState extends State<InvoiceList> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
+      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -91,7 +92,7 @@ class _InvoiceListState extends State<InvoiceList> {
             ),
           ),
           child: _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.white, '/Invoice')),
-      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
+
       _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
@@ -173,7 +174,7 @@ class _InvoiceListState extends State<InvoiceList> {
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage',
+          '$apicall/invoice_master/get_all_invoice_master?page=$page&limit=$itemsPerPage',
         ),
         headers: {
           "Content-type": "application/json",
@@ -912,7 +913,7 @@ class _InvoiceListState extends State<InvoiceList> {
         Column(
           children: [
             Container(
-              width: right * 0.78,
+              width:right * 0.81,
 
               decoration:const BoxDecoration(
                   color: Color(0xFFF7F7F7),
@@ -1509,7 +1510,7 @@ class _InvoiceListState extends State<InvoiceList> {
         Column(
           children: [
             Container(
-              width: right * 0.78,
+              width: right * 0.81,
 
               decoration:const BoxDecoration(
                   color: Color(0xFFF7F7F7),

@@ -145,6 +145,7 @@ class _CusAddtoCartState extends State<CusAddtoCart> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -157,8 +158,9 @@ class _CusAddtoCartState extends State<CusAddtoCart> {
               bottomRight: Radius.circular(8), // No radius for bottom-right corner
             ),
           ),child: _buildMenuItem('Orders', Icons.warehouse, Colors.blueAccent, '/Customer_Order_List')),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
+
       _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Customer_Payment_List'),
       _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Customer_Return_List'),
     ];
@@ -743,19 +745,38 @@ class _CusAddtoCartState extends State<CusAddtoCart> {
 
                 return Stack(
                   children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 1200,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if (constraints.maxHeight <= 310) ...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding:
+                            const EdgeInsets.only(left: 15, top: 10, right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
+                    } else ...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          height: 984,
+                          color: const Color(0xFFF7F6FA),
+                          padding:
+                          const EdgeInsets.only(left: 15, top: 10, right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
                     Padding(
                       padding: const EdgeInsets.only(left: 200,top: 0),
                       child: Container(
@@ -803,14 +824,7 @@ class _CusAddtoCartState extends State<CusAddtoCart> {
                                             ),
                                           );
                                         }
-                                        else if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text('Please fill Email Address Format @gmail.com'),
-                                            ),
-                                          );
-                                          //return ;
-                                        }
+                                        else if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
                                         else if(deliveryAddressController.text.isEmpty){
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             const SnackBar(
@@ -1459,14 +1473,13 @@ class _CusAddtoCartState extends State<CusAddtoCart> {
                                       .text,
                                   'Comments': ShippingAddress
                                       .text,
-                                  'date': _selectedDate
-                                      .toString(),
+                                  'date': _dateController.text,
                                 };
                                 data2 = data;
                                 print('details ');
                                 print(data2);
                                 // Navigate to the page with empty data or handle it as needed
-                                context.go('/Cart_Selected_Products',extra: {
+                                context.go('/Add_Product_items',extra: {
                                   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
                                   'product': Product(
                                       prodId: '',
@@ -2162,14 +2175,13 @@ class _CusAddtoCartState extends State<CusAddtoCart> {
                                                   .text,
                                               'Comments': ShippingAddress
                                                   .text,
-                                              'date': _selectedDate
-                                                  .toString(),
+                                              'date': _dateController.text,
                                             };
                                             data2 = data;
                                             print('details ');
                                             print(data2);
                                             // Navigate to the page with empty data or handle it as needed
-                                            context.go('/Cart_Selected_Products',extra: {
+                                            context.go('/Add_Product_items',extra: {
                                               // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
                                               'product': Product(
                                                   prodId: '',

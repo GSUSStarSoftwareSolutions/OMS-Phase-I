@@ -79,12 +79,13 @@ class _ReturnViewState extends State<ReturnView> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800]  ,
@@ -354,20 +355,37 @@ class _ReturnViewState extends State<ReturnView> {
             return Stack(
               //   crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  // Added Align widget for the left side menu
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    height: 1400,
-                    width: 200,
-                    color: const Color(0xFFF7F6FA),
-                    padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _buildMenuItems(context),
+                if(constraints.maxHeight <= 500)...{
+                  SingleChildScrollView(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
+                      ),
+                    ),
+                  )
+
+                }
+                else...{
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      width: 200,
+                      color: const Color(0xFFF7F6FA),
+                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _buildMenuItems(context),
+                      ),
                     ),
                   ),
-                ),
+                },
                 Padding(
                   padding: const EdgeInsets.only(left: 200,top: 0),
                   child: Container(

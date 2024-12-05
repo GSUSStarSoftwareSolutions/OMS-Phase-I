@@ -219,7 +219,7 @@ class _ProductForm1State extends State<ProductForm1> {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
       _buildMenuItem(
-          'Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+          'Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -235,11 +235,12 @@ class _ProductForm1State extends State<ProductForm1> {
               'Products', Icons.image_outlined, Colors.black, '/Product_List')),
       _buildMenuItem(
           'Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined,
-          Colors.blue[900]!, '/Invoice'),
+
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!,
           '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!,
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined,
+          Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!,
           '/Payment_List'),
       _buildMenuItem(
           'Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
@@ -636,20 +637,37 @@ class _ProductForm1State extends State<ProductForm1> {
                   height: maxHeight, //height
                   child: Stack(
                     children: [
-                      Align(
-                        // Added Align widget for the left side menu
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          height: 1400,
-                          width: 200,
-                          color: const Color(0xFFF7F6FA),
-                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: _buildMenuItems(context),
+                      if(constraints.maxHeight <= 500)...{
+                        SingleChildScrollView(
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Container(
+                              width: 200,
+                              color: const Color(0xFFF7F6FA),
+                              padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: _buildMenuItems(context),
+                              ),
+                            ),
+                          ),
+                        )
+
+                      }
+                      else...{
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
                           ),
                         ),
-                      ),
+                      },
                       Container(
                         margin: const EdgeInsets.only(
                           top: 60,
@@ -1298,20 +1316,37 @@ class _ProductForm1State extends State<ProductForm1> {
                   width: 1500,
                   child: Stack(
                     children: [
-                      Align(
-                        // Added Align widget for the left side menu
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          height: 1400,
-                          width: 200,
-                          color: const Color(0xFFF7F6FA),
-                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: _buildMenuItems(context),
+                      if(constraints.maxHeight <= 500)...{
+                        SingleChildScrollView(
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Container(
+                              width: 200,
+                              color: const Color(0xFFF7F6FA),
+                              padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: _buildMenuItems(context),
+                              ),
+                            ),
+                          ),
+                        )
+
+                      }
+                      else...{
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
                           ),
                         ),
-                      ),
+                      },
                       Container(
                         padding: const EdgeInsets.only(left: 200),
                         child: AdaptiveScrollbar(

@@ -105,6 +105,7 @@ class _CusViewScreenState extends State<CusViewScreen> with SingleTickerProvider
   late Animation<Offset> _offsetAnimation;
   late AnimationController _controller;
   Map<String, bool> _isHovered = {
+    'Home': false,
     'Orders': false,
     'Invoice': false,
     'Delivery': false,
@@ -112,17 +113,32 @@ class _CusViewScreenState extends State<CusViewScreen> with SingleTickerProvider
     'Return': false,
   };
 
+
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blueAccent, '/Customer_Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[800],
+            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+            // color: Color.fromRGBO(224, 59, 48, 1.0),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8), // Radius for top-left corner
+              topRight: Radius.circular(8), // No radius for top-right corner
+              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+            ),
+          ),child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blueAccent, '/Customer_Order_List')),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Customer_Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Customer_Return_List'),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Customer_Return_List'),
     ];
   }
-
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Orders'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Orders'? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -132,25 +148,28 @@ class _CusViewScreenState extends State<CusViewScreen> with SingleTickerProvider
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10,right: 20),
+          margin: const EdgeInsets.only(bottom: 5,right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: iconColor,
-                  fontSize: 16,
-                  decoration: TextDecoration.none, // Remove underline
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -926,19 +945,38 @@ if(constraints.maxWidth>= 1366){
   return  Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Align(
-        alignment: Alignment.topLeft,
-        child: Container(
-          width: 200,
-          height: 984,
-          color: const Color(0xFFF7F6FA),
-          padding: const EdgeInsets.only(left: 20, top: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildMenuItems(context),
+      if (constraints.maxHeight <= 310) ...{
+        SingleChildScrollView(
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              width: 200,
+              color: const Color(0xFFF7F6FA),
+              padding:
+              const EdgeInsets.only(left: 15, top: 10, right: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _buildMenuItems(context),
+              ),
+            ),
+          ),
+        )
+      } else ...{
+        Align(
+          alignment: Alignment.topLeft,
+          child: Container(
+            width: 200,
+            height: 984,
+            color: const Color(0xFFF7F6FA),
+            padding:
+            const EdgeInsets.only(left: 15, top: 10, right: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _buildMenuItems(context),
+            ),
           ),
         ),
-      ),
+      },
       Container(
         margin: const EdgeInsets.symmetric(
             horizontal: 1), // Space above/below the border
@@ -1946,19 +1984,38 @@ if(constraints.maxWidth>= 1366){
 else{
   return  Stack(
     children: [
-      Align(
-        alignment: Alignment.topLeft,
-        child: Container(
-          width: 200,
-          height: 984,
-          color: const Color(0xFFF7F6FA),
-          padding: const EdgeInsets.only(left: 20, top: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildMenuItems(context),
+      if (constraints.maxHeight <= 310) ...{
+        SingleChildScrollView(
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              width: 200,
+              color: const Color(0xFFF7F6FA),
+              padding:
+              const EdgeInsets.only(left: 15, top: 10, right: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _buildMenuItems(context),
+              ),
+            ),
+          ),
+        )
+      } else ...{
+        Align(
+          alignment: Alignment.topLeft,
+          child: Container(
+            width: 200,
+            height: 984,
+            color: const Color(0xFFF7F6FA),
+            padding:
+            const EdgeInsets.only(left: 15, top: 10, right: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _buildMenuItems(context),
+            ),
           ),
         ),
-      ),
+      },
       Container(
         padding: const EdgeInsets.only(left: 200),
         child: AdaptiveScrollbar(

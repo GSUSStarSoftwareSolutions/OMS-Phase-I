@@ -144,8 +144,9 @@ class _CusPaymentListState extends State<CusPaymentList> {
     return [
     _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
       _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Customer_Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
+
       Container(decoration: BoxDecoration(
         color: Colors.blue[800],
         // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
@@ -1205,7 +1206,25 @@ class _CusPaymentListState extends State<CusPaymentList> {
                               activeColor: Colors.blue[800],
                               onChanged: (selected) {
                                 setState(() {
-                                  _selectedProduct = selected! ? detail : null;
+                                  if (selected != null && selected) {
+                                    _selectedProduct = detail;
+
+                                    _selectedProductMap = {
+                                      'orderId': _selectedProduct!.orderId,
+                                      'deliveredDate': _selectedProduct!.deliveredDate,
+                                      'invoiceNo': _selectedProduct!.invoiceNo,//
+                                      'paymentDate': _selectedProduct!.paymentDate.toString(),
+                                      'paymentMode': _selectedProduct!.paymentMode.toString(),
+                                      'paymentStatus': _selectedProduct!.paymentStatus.toString(),
+                                      'grossAmount': _selectedProduct!.grossAmount.toString(),
+                                      'payableAmount': _selectedProduct!.payableAmount.toString(),
+                                      'paidAmount': _selectedProduct!.paidAmount.toString(),//
+
+                                    };
+                                  } else {
+                                    _selectedProduct = null;
+                                    _selectedProductMap ={};
+                                  }
                                 });
                               },
                             ),
@@ -1543,7 +1562,25 @@ class _CusPaymentListState extends State<CusPaymentList> {
                               activeColor: Colors.blue[800],
                               onChanged: (selected) {
                                 setState(() {
-                                  _selectedProduct = selected! ? detail : null;
+                                  if (selected != null && selected) {
+                                    _selectedProduct = detail;
+
+                                    _selectedProductMap = {
+                                      'orderId': _selectedProduct!.orderId,
+                                      'deliveredDate': _selectedProduct!.deliveredDate,
+                                      'invoiceNo': _selectedProduct!.invoiceNo,//
+                                      'paymentDate': _selectedProduct!.paymentDate.toString(),
+                                      'paymentMode': _selectedProduct!.paymentMode.toString(),
+                                      'paymentStatus': _selectedProduct!.paymentStatus.toString(),
+                                      'grossAmount': _selectedProduct!.grossAmount.toString(),
+                                      'payableAmount': _selectedProduct!.payableAmount.toString(),
+                                      'paidAmount': _selectedProduct!.paidAmount.toString(),//
+
+                                    };
+                                  } else {
+                                    _selectedProduct = null;
+                                    _selectedProductMap ={};
+                                  }
                                 });
                               },
                             ),

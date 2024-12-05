@@ -192,7 +192,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       Container(
           decoration: BoxDecoration(
@@ -207,8 +207,9 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
             ),
           ),
           child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.white, '/Order_List')),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
       _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
@@ -1659,6 +1660,7 @@ class detail {
   final String? invoiceNo;
   final double? creditUsed;
   final String? modifiedAt;
+  final String? pickedDate;
   bool isSelected = false;
   final double total;
   String status;
@@ -1703,6 +1705,7 @@ class detail {
     this.draftId,
     this.transactionsId,
     this.modifiedAt,
+    this.pickedDate,
     this.grossAmount,
     this.deliveredDate,
     this.totalAmount,
@@ -1746,7 +1749,9 @@ class detail {
       grossAmount: json['grossAmount'] ?? 0.0,
       deliveryId: json['deliveryId'] ?? '',
       orderDate: json['orderDate'] ?? 'Unknown date',
-      modifiedAt: json['modifiedAt'] ?? 'Unknown date',
+      modifiedAt: json['createdDate'] ?? 'Unknown date',
+      pickedDate: json['pickedDate'] ?? 'Unknown date',
+
       totalAmount: json['totalAmount'] ?? 0.0,
       //totalAmount: (json['totalAmount'] ?? 0.0).round(),
 //totalAmount: json['totalAmount'] != null ? int.parse(json['totalAmount'].toString()) : 0,
@@ -1780,6 +1785,7 @@ class detail {
     return jsonEncode({
       "orderId": orderId,
       "orderDate": orderDate,
+      "pickedDate":pickedDate,
       "total": total,
       "paidBy": paidBy,
       "status": status,

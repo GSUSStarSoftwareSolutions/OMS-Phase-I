@@ -136,7 +136,7 @@ class _FifthPageState extends State<FifthPage> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       Container(
           decoration: BoxDecoration(
@@ -150,9 +150,10 @@ class _FifthPageState extends State<FifthPage> {
           ),
           child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.white
               , '/Order_List')),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
@@ -333,7 +334,7 @@ class _FifthPageState extends State<FifthPage> {
 
      // String orderId;
       try {
-        orderId = responseData['id'];
+        orderId = responseData['orderId'];
         invoiceNo = responseData['invoiceNo'];
       } catch (e) {
         print('Error parsing orderId: $e');
@@ -913,19 +914,40 @@ class _FifthPageState extends State<FifthPage> {
 
                 return Stack(
                   children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 1200,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children:
+                              _buildMenuItems(context),
+
+                            ),
+
+                          ),
+                        ),
+                      )
+
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
                     Padding(
                       padding: const EdgeInsets.only(left: 200,top: 0),
                       child: Container(
@@ -981,14 +1003,7 @@ class _FifthPageState extends State<FifthPage> {
                                         //   );
                                         //
                                         // }
-                                        else if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Please fill Email Address Format @gmail.com'),
-                                            ),
-                                          );
-                                          //return ;
-                                        }
+                                        else if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
                                         else if(deliveryAddressController.text.isEmpty){
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(
@@ -1625,46 +1640,7 @@ class _FifthPageState extends State<FifthPage> {
                                                           'subText': 'hii',
                                                           'notselect': 'selectedproduct',
                                                         });
-                                                        // context.go('/Add_Product/PlaceOrder/Placed_Order_List', extra: {
-                                                        //   'products': products,
-                                                        //   'selectedProducts': selectedProducts,
-                                                        //   'selectedProduct': selectedProduct,
-                                                        //   'data': data2,
-                                                        //   'subText': 'hii',
-                                                        //   'inputText': '',
-                                                        //   'notselect': 'selectedproduct',
-                                                        // });
-                                                        //original code
-                                                        // Navigator.push(
-                                                        //   context,
-                                                        //   PageRouteBuilder(
-                                                        //     pageBuilder: (context,
-                                                        //         animation,
-                                                        //         secondaryAnimation) =>
-                                                        //         NextPage(
-                                                        //           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
-                                                        //           data: data2,
-                                                        //           product: selectedProduct,
-                                                        //           inputText: '',
-                                                        //           products: products,
-                                                        //           subText: 'hii',
-                                                        //           selectedProducts: widget.selectedProducts,
-                                                        //           notselect: 'selectedproduct',),
-                                                        //     transitionDuration:
-                                                        //     const Duration(
-                                                        //         milliseconds: 200),
-                                                        //     transitionsBuilder: (
-                                                        //         context,
-                                                        //         animation,
-                                                        //         secondaryAnimation,
-                                                        //         child) {
-                                                        //       return FadeTransition(
-                                                        //         opacity: animation,
-                                                        //         child: child,
-                                                        //       );
-                                                        //     },
-                                                        //   ),
-                                                        // );
+
                                                       }
 
                                                     }
@@ -1685,8 +1661,7 @@ class _FifthPageState extends State<FifthPage> {
                                                             .text,
                                                         'Comments': ShippingAddress
                                                             .text,
-                                                        'date': _selectedDate
-                                                            .toString(),
+                                                        'date': _dateController.text,
                                                       };
                                                       data2 = data;
                                                       print('details ');
@@ -1719,190 +1694,10 @@ class _FifthPageState extends State<FifthPage> {
                                                         'subText': 'hii',
                                                         'notselect': 'selectedproduct',
                                                       });
-                                                      // context.go('/Add_Products',extra: {
-                                                      //   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
-                                                      //   'product': Product(
-                                                      //       prodId: '',
-                                                      //       price: 0,
-                                                      //       productName: '',
-                                                      //       proId: '',
-                                                      //       category: '',
-                                                      //       selectedVariation: '',
-                                                      //       selectedUOM: '',
-                                                      //       subCategory: '',
-                                                      //       totalamount: 0,
-                                                      //       total: 0,
-                                                      //       tax: '',
-                                                      //       quantity: 0,
-                                                      //       discount: '',
-                                                      //       imageId: '',
-                                                      //       unit: '',
-                                                      //       totalAmount: 0.0,
-                                                      //       qty: 0), // You need to pass a list of Product objects here
-                                                      //   'data': data2,
-                                                      //   'products': products,
-                                                      //   'selectedProducts': widget.selectedProducts,
-                                                      //   'inputText': '',
-                                                      //   'subText': 'hii',
-                                                      //   'notselect': 'selectedproduct',
-                                                      // });
-                                                      // Navigator.push(
-                                                      //   context,
-                                                      //   PageRouteBuilder(
-                                                      //     pageBuilder: (context,
-                                                      //         animation,
-                                                      //         secondaryAnimation) =>
-                                                      //         NextPage(
-                                                      //           data:data2,
-                                                      //           product: Product(
-                                                      //               prodId: '',
-                                                      //               price: 0,
-                                                      //               productName: '',
-                                                      //               proId: '',
-                                                      //               category: '',
-                                                      //               selectedVariation: '',
-                                                      //               selectedUOM: '',
-                                                      //               subCategory: '',
-                                                      //               totalamount: 0,
-                                                      //               total: 0,
-                                                      //               tax: '',
-                                                      //               quantity: 0,
-                                                      //               discount: '',
-                                                      //               imageId: '',
-                                                      //               unit: '',
-                                                      //               totalAmount: 0.0,
-                                                      //               qty: 0),
-                                                      //           // or you can pass a default product or null
-                                                      //           inputText: '',
-                                                      //           products: products,
-                                                      //           subText: 'hii',
-                                                      //           selectedProducts: widget
-                                                      //               .selectedProducts,
-                                                      //           // pass an empty list or null
-                                                      //           notselect: 'selectedproduct',
-                                                      //         ),
-                                                      //     transitionDuration: const Duration(
-                                                      //         milliseconds: 200),
-                                                      //     transitionsBuilder: (
-                                                      //         context, animation,
-                                                      //         secondaryAnimation,
-                                                      //         child) {
-                                                      //       return FadeTransition(
-                                                      //         opacity: animation,
-                                                      //         child: child,
-                                                      //       );
-                                                      //     },
-                                                      //   ),
-                                                      // );
+
                                                     }
                                                   },
-                                                  //                                            onPressed: () {
-                                                  //                                              // List<Product> products = widget.selectedProducts;
-                                                  //                                              Product? selectedProduct;
-                                                  //                                              if (widget.selectedProducts.isNotEmpty) {
-                                                  //                                                for (var selectedProduct in widget.selectedProducts) {
-                                                  //                                                  print('----yes');
-                                                  //                                                  Map<String, dynamic> data = {
-                                                  //                                                    'deliveryLocation': data2['deliveryLocation'],
-                                                  //                                                    'ContactName': contactPersonController.text,
-                                                  //                                                    'Address': deliveryAddressController.text,
-                                                  //                                                    'ContactNumber': contactNumberController.text,
-                                                  //                                                    'Comments': commentsController.text,
-                                                  //                                                    'date': _selectedDate.toString(),
-                                                  //                                                  };
-                                                  //                                                  data2 = data;
-                                                  //                                                  print(selectedProduct);
-                                                  //                                                  //original
-                                                  //                                                  context.go('/Add_products',extra: {
-                                                  //                                                   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
-                                                  //                                                    'product': selectedProduct, // You need to pass a list of Product objects here
-                                                  //                                                    'data': data2,
-                                                  //                                                  'products': products,
-                                                  //                                                    'selectedProducts': widget.selectedProducts,
-                                                  //                                                    'inputText': '',
-                                                  //                                                    'subText': 'hii',
-                                                  //                                                    'notselect': 'selectedproduct',
-                                                  //                                                  });
-                                                  //                                                  // context.go('/Add_Product/PlaceOrder/Placed_Order_List', extra: {
-                                                  //                                                  //   'products': products,
-                                                  //                                                  //   'selectedProducts': selectedProducts,
-                                                  //                                                  //   'selectedProduct': selectedProduct,
-                                                  //                                                  //   'data': data2,
-                                                  //                                                  //   'subText': 'hii',
-                                                  //                                                  //   'inputText': '',
-                                                  //                                                  //   'notselect': 'selectedproduct',
-                                                  //                                                  // });
-                                                  //                                                              //original
-                                                  //                                                  // Navigator.push(
-                                                  //                                                  //   context,
-                                                  //                                                  //   PageRouteBuilder(
-                                                  //                                                  //     pageBuilder: (context,
-                                                  //                                                  //         animation,
-                                                  //                                                  //         secondaryAnimation) =>
-                                                  //                                                  //         NextPage(
-                                                  //                                                  //           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
-                                                  //                                                  //           data: data2,
-                                                  //                                                  //           product: selectedProduct,
-                                                  //                                                  //           inputText: '',
-                                                  //                                                  //           products: products,
-                                                  //                                                  //           subText: 'hii',
-                                                  //                                                  //           selectedProducts: widget.selectedProducts,
-                                                  //                                                  //           notselect: 'selectedproduct',),
-                                                  //                                                  //     transitionDuration:
-                                                  //                                                  //     const Duration(
-                                                  //                                                  //         milliseconds: 200),
-                                                  //                                                  //     transitionsBuilder: (
-                                                  //                                                  //         context,
-                                                  //                                                  //         animation,
-                                                  //                                                  //         secondaryAnimation,
-                                                  //                                                  //         child) {
-                                                  //                                                  //       return FadeTransition(
-                                                  //                                                  //         opacity: animation,
-                                                  //                                                  //         child: child,
-                                                  //                                                  //       );
-                                                  //                                                  //     },
-                                                  //                                                  //   ),
-                                                  //                                                  // );
-                                                  //                                                }
-                                                  //
-                                                  //                                              } else {
-                                                  //                                                print('well');
-                                                  //                                                selectedProduct =null;
-                                                  //
-                                                  // // Navigator.push(
-                                                  // //                                                   context,
-                                                  // //                                                   PageRouteBuilder(
-                                                  // //                                                     pageBuilder: (context,
-                                                  // //                                                         animation,
-                                                  // //                                                         secondaryAnimation) =>
-                                                  // //                                                         NextPage(
-                                                  // //                                                           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
-                                                  // //                                                           data: data2,
-                                                  // //                                                           product: selectedProduct!,
-                                                  // //                                                           inputText: '',
-                                                  // //                                                           products: products,
-                                                  // //                                                           subText: 'hii',
-                                                  // //                                                           selectedProducts: widget.selectedProducts,
-                                                  // //                                                           notselect: 'selectedproduct',),
-                                                  // //                                                     transitionDuration:
-                                                  // //                                                     const Duration(
-                                                  // //                                                         milliseconds: 200),
-                                                  // //                                                     transitionsBuilder: (
-                                                  // //                                                         context,
-                                                  // //                                                         animation,
-                                                  // //                                                         secondaryAnimation,
-                                                  // //                                                         child) {
-                                                  // //                                                       return FadeTransition(
-                                                  // //                                                         opacity: animation,
-                                                  // //                                                         child: child,
-                                                  // //                                                       );
-                                                  // //                                                     },
-                                                  // //                                                   ),
-                                                  // //                                                 );
-                                                  //                                              }
-                                                  //
-                                                  //
-                                                  //                                            },
+
                                                   style: OutlinedButton.styleFrom(
                                                     backgroundColor: Colors.blue[800],
                                                     // Blue background color
@@ -1933,7 +1728,7 @@ class _FifthPageState extends State<FifthPage> {
                                           Padding(
                                             padding: const EdgeInsets.only(top:9,bottom: 9),
                                             child: Align(
-                                              alignment: const Alignment(0.74,0.8),
+                                              alignment: const Alignment(0.6,0.8),
                                               child: Container(
                                                 padding: const EdgeInsets.only(left: 15,right: 10,top: 2,bottom: 2),
                                                 decoration: BoxDecoration(
@@ -2696,8 +2491,7 @@ class _FifthPageState extends State<FifthPage> {
                                                                           .text,
                                                                       'Comments': ShippingAddress
                                                                           .text,
-                                                                      'date': _selectedDate
-                                                                          .toString(),
+                                                                      'date': _dateController.text,
                                                                     };
                                                                     data2 = data;
                                                                     print('details ');
@@ -2730,190 +2524,10 @@ class _FifthPageState extends State<FifthPage> {
                                                                       'subText': 'hii',
                                                                       'notselect': 'selectedproduct',
                                                                     });
-                                                                    // context.go('/Add_Products',extra: {
-                                                                    //   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
-                                                                    //   'product': Product(
-                                                                    //       prodId: '',
-                                                                    //       price: 0,
-                                                                    //       productName: '',
-                                                                    //       proId: '',
-                                                                    //       category: '',
-                                                                    //       selectedVariation: '',
-                                                                    //       selectedUOM: '',
-                                                                    //       subCategory: '',
-                                                                    //       totalamount: 0,
-                                                                    //       total: 0,
-                                                                    //       tax: '',
-                                                                    //       quantity: 0,
-                                                                    //       discount: '',
-                                                                    //       imageId: '',
-                                                                    //       unit: '',
-                                                                    //       totalAmount: 0.0,
-                                                                    //       qty: 0), // You need to pass a list of Product objects here
-                                                                    //   'data': data2,
-                                                                    //   'products': products,
-                                                                    //   'selectedProducts': widget.selectedProducts,
-                                                                    //   'inputText': '',
-                                                                    //   'subText': 'hii',
-                                                                    //   'notselect': 'selectedproduct',
-                                                                    // });
-                                                                    // Navigator.push(
-                                                                    //   context,
-                                                                    //   PageRouteBuilder(
-                                                                    //     pageBuilder: (context,
-                                                                    //         animation,
-                                                                    //         secondaryAnimation) =>
-                                                                    //         NextPage(
-                                                                    //           data:data2,
-                                                                    //           product: Product(
-                                                                    //               prodId: '',
-                                                                    //               price: 0,
-                                                                    //               productName: '',
-                                                                    //               proId: '',
-                                                                    //               category: '',
-                                                                    //               selectedVariation: '',
-                                                                    //               selectedUOM: '',
-                                                                    //               subCategory: '',
-                                                                    //               totalamount: 0,
-                                                                    //               total: 0,
-                                                                    //               tax: '',
-                                                                    //               quantity: 0,
-                                                                    //               discount: '',
-                                                                    //               imageId: '',
-                                                                    //               unit: '',
-                                                                    //               totalAmount: 0.0,
-                                                                    //               qty: 0),
-                                                                    //           // or you can pass a default product or null
-                                                                    //           inputText: '',
-                                                                    //           products: products,
-                                                                    //           subText: 'hii',
-                                                                    //           selectedProducts: widget
-                                                                    //               .selectedProducts,
-                                                                    //           // pass an empty list or null
-                                                                    //           notselect: 'selectedproduct',
-                                                                    //         ),
-                                                                    //     transitionDuration: const Duration(
-                                                                    //         milliseconds: 200),
-                                                                    //     transitionsBuilder: (
-                                                                    //         context, animation,
-                                                                    //         secondaryAnimation,
-                                                                    //         child) {
-                                                                    //       return FadeTransition(
-                                                                    //         opacity: animation,
-                                                                    //         child: child,
-                                                                    //       );
-                                                                    //     },
-                                                                    //   ),
-                                                                    // );
+
                                                                   }
                                                                 },
-                                                                //                                            onPressed: () {
-                                                                //                                              // List<Product> products = widget.selectedProducts;
-                                                                //                                              Product? selectedProduct;
-                                                                //                                              if (widget.selectedProducts.isNotEmpty) {
-                                                                //                                                for (var selectedProduct in widget.selectedProducts) {
-                                                                //                                                  print('----yes');
-                                                                //                                                  Map<String, dynamic> data = {
-                                                                //                                                    'deliveryLocation': data2['deliveryLocation'],
-                                                                //                                                    'ContactName': contactPersonController.text,
-                                                                //                                                    'Address': deliveryAddressController.text,
-                                                                //                                                    'ContactNumber': contactNumberController.text,
-                                                                //                                                    'Comments': commentsController.text,
-                                                                //                                                    'date': _selectedDate.toString(),
-                                                                //                                                  };
-                                                                //                                                  data2 = data;
-                                                                //                                                  print(selectedProduct);
-                                                                //                                                  //original
-                                                                //                                                  context.go('/Add_products',extra: {
-                                                                //                                                   // 'product': Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
-                                                                //                                                    'product': selectedProduct, // You need to pass a list of Product objects here
-                                                                //                                                    'data': data2,
-                                                                //                                                  'products': products,
-                                                                //                                                    'selectedProducts': widget.selectedProducts,
-                                                                //                                                    'inputText': '',
-                                                                //                                                    'subText': 'hii',
-                                                                //                                                    'notselect': 'selectedproduct',
-                                                                //                                                  });
-                                                                //                                                  // context.go('/Add_Product/PlaceOrder/Placed_Order_List', extra: {
-                                                                //                                                  //   'products': products,
-                                                                //                                                  //   'selectedProducts': selectedProducts,
-                                                                //                                                  //   'selectedProduct': selectedProduct,
-                                                                //                                                  //   'data': data2,
-                                                                //                                                  //   'subText': 'hii',
-                                                                //                                                  //   'inputText': '',
-                                                                //                                                  //   'notselect': 'selectedproduct',
-                                                                //                                                  // });
-                                                                //                                                              //original
-                                                                //                                                  // Navigator.push(
-                                                                //                                                  //   context,
-                                                                //                                                  //   PageRouteBuilder(
-                                                                //                                                  //     pageBuilder: (context,
-                                                                //                                                  //         animation,
-                                                                //                                                  //         secondaryAnimation) =>
-                                                                //                                                  //         NextPage(
-                                                                //                                                  //           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
-                                                                //                                                  //           data: data2,
-                                                                //                                                  //           product: selectedProduct,
-                                                                //                                                  //           inputText: '',
-                                                                //                                                  //           products: products,
-                                                                //                                                  //           subText: 'hii',
-                                                                //                                                  //           selectedProducts: widget.selectedProducts,
-                                                                //                                                  //           notselect: 'selectedproduct',),
-                                                                //                                                  //     transitionDuration:
-                                                                //                                                  //     const Duration(
-                                                                //                                                  //         milliseconds: 200),
-                                                                //                                                  //     transitionsBuilder: (
-                                                                //                                                  //         context,
-                                                                //                                                  //         animation,
-                                                                //                                                  //         secondaryAnimation,
-                                                                //                                                  //         child) {
-                                                                //                                                  //       return FadeTransition(
-                                                                //                                                  //         opacity: animation,
-                                                                //                                                  //         child: child,
-                                                                //                                                  //       );
-                                                                //                                                  //     },
-                                                                //                                                  //   ),
-                                                                //                                                  // );
-                                                                //                                                }
-                                                                //
-                                                                //                                              } else {
-                                                                //                                                print('well');
-                                                                //                                                selectedProduct =null;
-                                                                //
-                                                                // // Navigator.push(
-                                                                // //                                                   context,
-                                                                // //                                                   PageRouteBuilder(
-                                                                // //                                                     pageBuilder: (context,
-                                                                // //                                                         animation,
-                                                                // //                                                         secondaryAnimation) =>
-                                                                // //                                                         NextPage(
-                                                                // //                                                           //product: Product(prodId: '', category: '', productName: '', subCategory: '', unit: '', selectedUOM: '', selectedVariation: '', quantity: 0, total: 0, totalamount: 0, tax: '', discount: '', price: 0, imageId: ''),
-                                                                // //                                                           data: data2,
-                                                                // //                                                           product: selectedProduct!,
-                                                                // //                                                           inputText: '',
-                                                                // //                                                           products: products,
-                                                                // //                                                           subText: 'hii',
-                                                                // //                                                           selectedProducts: widget.selectedProducts,
-                                                                // //                                                           notselect: 'selectedproduct',),
-                                                                // //                                                     transitionDuration:
-                                                                // //                                                     const Duration(
-                                                                // //                                                         milliseconds: 200),
-                                                                // //                                                     transitionsBuilder: (
-                                                                // //                                                         context,
-                                                                // //                                                         animation,
-                                                                // //                                                         secondaryAnimation,
-                                                                // //                                                         child) {
-                                                                // //                                                       return FadeTransition(
-                                                                // //                                                         opacity: animation,
-                                                                // //                                                         child: child,
-                                                                // //                                                       );
-                                                                // //                                                     },
-                                                                // //                                                   ),
-                                                                // //                                                 );
-                                                                //                                              }
-                                                                //
-                                                                //
-                                                                //                                            },
+
                                                                 style: OutlinedButton.styleFrom(
                                                                   backgroundColor: Colors.blue[800],
                                                                   // Blue background color

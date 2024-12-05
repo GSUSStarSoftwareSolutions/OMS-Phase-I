@@ -120,7 +120,7 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       Container(
           decoration: BoxDecoration(
@@ -132,9 +132,11 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
               bottomRight: Radius.circular(8), // No radius for bottom-right corner
             ),
           ),child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.white, '/Order_List')),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
+
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
@@ -994,19 +996,37 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                 return  Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        width: 200,
-                        height: 984,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
+
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
                     Container(
                       margin: const EdgeInsets.symmetric(
                           horizontal: 1), // Space above/below the border
@@ -1218,13 +1238,13 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                       //  Text(orderIdController.text),
                                       const SizedBox(width: 10,),
                                       const Spacer(),
-                                      deliveryStatusController.text == 'Delivered' ||deliveryStatusController.text == 'In Progress' ? Container():
+                                      deliveryStatusController.text == 'Delivered' ||deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Created'? Container():
                                       Padding(
                                         padding: const EdgeInsets.only(right: 30),
                                         child: OutlinedButton(
                                           onPressed: () {
                                             print(deliveryStatusController.text);
-                                            if(deliveryStatusController.text == 'Delivered' ||deliveryStatusController.text == 'In Progress' ){
+                                            if(deliveryStatusController.text == 'Delivered' ||deliveryStatusController.text == 'picked' ||deliveryStatusController.text == 'Created'){
                                               ScaffoldMessenger.of(context).showSnackBar(
                                                 const SnackBar(content: Text('You Should Not Able To Edit')),
                                               );
@@ -1399,6 +1419,7 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                             ],
                                           ),
                                         ),
+
                                         Expanded(
                                           flex: 1,
                                           child: Column(
@@ -1412,8 +1433,8 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                                     : Colors.grey, // default color
                                               ),
                                               Text(
-                                                'Invoice',
-                                                style:TextStyle(
+                                                deliveryStatusController.text == 'In Progress' ? '    Delivery\n(In Progress)' : 'Delivered',
+                                                style: TextStyle(
                                                   color: deliveryStatusController.text == 'Not Started'
                                                       ? Colors.grey
                                                       : deliveryStatusController.text == 'In Progress'
@@ -1437,11 +1458,11 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                                     : Colors.grey, // default color
                                               ),
                                               Text(
-                                                deliveryStatusController.text == 'In Progress' ? '    Delivery\n(In Progress)' : 'Delivered',
-                                                style: TextStyle(
+                                                'Invoice',
+                                                style:TextStyle(
                                                   color: deliveryStatusController.text == 'Not Started'
                                                       ? Colors.grey
-                                                      : deliveryStatusController.text == 'In Progress'
+                                                      : deliveryStatusController.text == 'Delivered'
                                                       ? Colors.grey
                                                       : Colors.black,
                                                 ),
@@ -2606,19 +2627,37 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                 return  Stack(
                   //crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        width: 200,
-                        height: 984,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
+
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
                     Container(
                       padding: const EdgeInsets.only(left: 200),
                       child: AdaptiveScrollbar(
@@ -2841,13 +2880,13 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                                   //  Text(orderIdController.text),
                                                   const SizedBox(width: 10,),
                                                   const Spacer(),
-                                                  deliveryStatusController.text == 'Delivered' ||deliveryStatusController.text == 'In Progress' ? Container():
+                                                  deliveryStatusController.text == 'Delivered' ||deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Created' ? Container():
                                                   Padding(
                                                     padding: const EdgeInsets.only(right: 30),
                                                     child: OutlinedButton(
                                                       onPressed: () {
                                                         print(deliveryStatusController.text);
-                                                        if(deliveryStatusController.text == 'Delivered' ||deliveryStatusController.text == 'In Progress' ){
+                                                        if(deliveryStatusController.text == 'Delivered' ||deliveryStatusController.text == 'Picked' ||deliveryStatusController.text == 'Created'){
                                                           ScaffoldMessenger.of(context).showSnackBar(
                                                             const SnackBar(content: Text('You Should Not Able To Edit')),
                                                           );
@@ -3022,6 +3061,7 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                                         ],
                                                       ),
                                                     ),
+
                                                     Expanded(
                                                       flex: 1,
                                                       child: Column(
@@ -3035,8 +3075,8 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                                                 : Colors.grey, // default color
                                                           ),
                                                           Text(
-                                                            'Invoice',
-                                                            style:TextStyle(
+                                                            deliveryStatusController.text == 'In Progress' ? '    Delivery\n(In Progress)' : 'Delivered',
+                                                            style: TextStyle(
                                                               color: deliveryStatusController.text == 'Not Started'
                                                                   ? Colors.grey
                                                                   : deliveryStatusController.text == 'In Progress'
@@ -3060,11 +3100,11 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                                                 : Colors.grey, // default color
                                                           ),
                                                           Text(
-                                                            deliveryStatusController.text == 'In Progress' ? '    Delivery\n(In Progress)' : 'Delivered',
-                                                            style: TextStyle(
+                                                            'Invoice',
+                                                            style:TextStyle(
                                                               color: deliveryStatusController.text == 'Not Started'
                                                                   ? Colors.grey
-                                                                  : deliveryStatusController.text == 'In Progress'
+                                                                  : deliveryStatusController.text == 'Delivered'
                                                                   ? Colors.grey
                                                                   : Colors.black,
                                                             ),

@@ -55,7 +55,7 @@ class _CreateusrState extends State<Createusr> {
       "mobileNumber": mobileController.text,
       "role": selectedValue,
       "userName": userNameController.text,
-      "returnCredit": 0.00
+      "returnCredit": 0.00,
     };
     Map<String, String> headers = {
       'Content-Type': 'application/json',

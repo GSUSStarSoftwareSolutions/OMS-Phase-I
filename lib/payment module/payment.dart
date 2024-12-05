@@ -93,11 +93,12 @@ class _PaymentListState extends State<PaymentList> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -1261,7 +1262,25 @@ class _PaymentListState extends State<PaymentList> {
                               activeColor: Colors.blue[800],
                               onChanged: (selected) {
                                 setState(() {
-                                  _selectedProduct = selected! ? detail : null;
+                                  if (selected != null && selected) {
+                                    _selectedProduct = detail;
+
+                                    _selectedProductMap = {
+                                      'orderId': _selectedProduct!.orderId,
+                                      'deliveredDate': _selectedProduct!.deliveredDate,
+                                      'invoiceNo': _selectedProduct!.invoiceNo,//
+                                      'paymentDate': _selectedProduct!.paymentDate.toString(),
+                                      'paymentMode': _selectedProduct!.paymentMode.toString(),
+                                      'paymentStatus': _selectedProduct!.paymentStatus.toString(),
+                                      'grossAmount': _selectedProduct!.grossAmount.toString(),
+                                      'payableAmount': _selectedProduct!.payableAmount.toString(),
+                                      'paidAmount': _selectedProduct!.paidAmount.toString(),//
+
+                                    };
+                                  } else {
+                                    _selectedProduct = null;
+                                    _selectedProductMap ={};
+                                  }
                                 });
                               },
                             ),
@@ -1284,30 +1303,6 @@ class _PaymentListState extends State<PaymentList> {
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          // DataCell(
-                          //   Padding(
-                          //     padding: const EdgeInsets.only(left: 13),
-                          //     child: Text(
-                          //       detail.paymentDate.toString(),
-                          //       style: TextStyle(color: Colors.grey),
-                          //     ),
-                          //   ),
-                          // ),
-                          // DataCell(
-                          //   Padding(
-                          //     padding: const EdgeInsets.only(left: 10),
-                          //     child: Text(
-                          //       detail.paymentMode.toString(),
-                          //       style: TextStyle(
-                          //         color: detail.deliveryStatus == "In Progress"
-                          //             ? Colors.orange
-                          //             : detail.deliveryStatus == "Delivered"
-                          //             ? Colors.green
-                          //             : Colors.grey,
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
                           DataCell(
                             Text(
                               detail.paymentStatus.toString(),
@@ -1748,7 +1743,25 @@ class _PaymentListState extends State<PaymentList> {
                             activeColor: Colors.blue[800],
                             onChanged: (selected) {
                               setState(() {
-                                _selectedProduct = selected! ? detail : null;
+                                if (selected != null && selected) {
+                                  _selectedProduct = detail;
+
+                                  _selectedProductMap = {
+                                    'orderId': _selectedProduct!.orderId,
+                                    'deliveredDate': _selectedProduct!.deliveredDate,
+                                    'invoiceNo': _selectedProduct!.invoiceNo,//
+                                    'paymentDate': _selectedProduct!.paymentDate.toString(),
+                                    'paymentMode': _selectedProduct!.paymentMode.toString(),
+                                    'paymentStatus': _selectedProduct!.paymentStatus.toString(),
+                                    'grossAmount': _selectedProduct!.grossAmount.toString(),
+                                    'payableAmount': _selectedProduct!.payableAmount.toString(),
+                                    'paidAmount': _selectedProduct!.paidAmount.toString(),//
+
+                                  };
+                                } else {
+                                  _selectedProduct = null;
+                                  _selectedProductMap ={};
+                                }
                               });
                             },
                           ),

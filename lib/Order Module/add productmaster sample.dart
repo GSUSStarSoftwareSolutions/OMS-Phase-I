@@ -237,7 +237,7 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       Container(decoration: BoxDecoration(
         color: Colors.blue[800]  ,
@@ -249,9 +249,10 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
         ),
       ),
           child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.white, '/Order_List')),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
@@ -1281,9 +1282,7 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
                   if (_deliveryaddressController.text.isEmpty) {
                     errors.add('Delivery address is required');
                   }
-                  if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                    errors.add('Please fill Email Address Format @gmail.com');
-                  }
+                  if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
                   if (_contactPersonController.text.isEmpty || _contactPersonController.text.length <=2) {
                     errors.add('Please enter a contact person name.');
                   }
@@ -1342,20 +1341,37 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
                 double maxWidth = constraints.maxWidth;
                 return Stack(
                   children: [
-                    Align(
-                      // Added Align widget for the left side menu
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 984,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
+
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
                     Padding(
                       padding: const EdgeInsets.only(left: 200,top: 0),
                       child: Container(
@@ -1951,8 +1967,7 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
                           widget.data['items'].forEach((item) => item['totalAmount'] = item['actualAmount']);
                           print(widget.data['items']);
                           print(widget.data['total']);
-                          //  productList = widget.data['items'];
-                          //   print(productList);
+
                           widget.data['contactPerson'] = _contactPersonController.text;
                           widget.data['deliveryAddress'] = _deliveryaddressController.text;
                           widget.data['contactNumber'] = _contactNumberController.text;
@@ -1964,14 +1979,6 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
                           List<Product> productList = (widget.data['items'] as List)
                               .map((item) => Product.fromJson(item))
                               .toList();
-
-
-
-                          //data2 = data;
-
-                          // Map<String, dynamic> data2 = {
-                          //   'actualamount': _total1,
-                          // };
 
                           data1 = widget.data;
 
@@ -2012,20 +2019,7 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
                             'subText': 'some_text',
                             'notselect': '',
                           });
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => NextPage(
-                          //       product: Product(prodId: '',price: 0,productName: '',proId: '',category: '',selectedVariation: '',selectedUOM: '',subCategory: '',totalamount: 0,total: 0,tax: '',quantity: 0,discount: '',imageId: '',unit: '', totalAmount: 0.0,qty: 0), // You need to pass a Product object here
-                          //       products: const [], // You need to pass a list of Product objects here
-                          //       data: widget.data,
-                          //       selectedProducts: productList,
-                          //       inputText: 'hello',
-                          //       // You need to pass a string here
-                          //       subText: 'some_text', notselect: '',
-                          //     ),
-                          //   ),
-                          // );
+
                         },
                         // icon: Icon(Icons.add,color: Colors.white,),
                         child: const Text('+Add Products',style: TextStyle(color: Colors.white),),
@@ -2041,7 +2035,7 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
                     Padding(
                       padding: const EdgeInsets.only(top:9,bottom: 9),
                       child: Align(
-                        alignment: const Alignment(0.74,0.8),
+                        alignment: const Alignment(0.9,0.8),
                         child: Container(
                           height: 40,
                           padding: const EdgeInsets.only(left: 15,right: 10,top: 2,bottom: 2),

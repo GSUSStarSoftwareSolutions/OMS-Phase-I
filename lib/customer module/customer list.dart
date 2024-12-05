@@ -256,7 +256,7 @@ class _CusListState extends State<CusList> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Home', Icons.dashboard, Colors.blue[900]!, '/Home'),
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -269,14 +269,14 @@ class _CusListState extends State<CusList> {
               bottomRight: Radius.circular(8), // No radius for bottom-right corner
             ),
           ),
-          child: _buildMenuItem('Customer', Icons.account_circle, Colors.white, '/Customer')),
+          child: _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.white, '/Customer')),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart, Colors.blue[900]!, '/Report_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
+      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
   }
 
@@ -533,7 +533,7 @@ class _CusListState extends State<CusList> {
     filteredData = productList.
     where((product) {
       final matchesSearchText= product.cusId!.toLowerCase().contains(_searchText.toLowerCase());
-      final matchlocation = product.location!.toLowerCase().contains(location.toLowerCase());
+      final matchlocation = product.email!.toLowerCase().contains(location.toLowerCase());
       final MatchName = product.cusName!.toLowerCase().contains(Name.toLowerCase());
       return matchesSearchText && matchlocation && MatchName;
     }).toList();
@@ -1122,7 +1122,7 @@ class _CusListState extends State<CusList> {
                                 border: Border.all(color: Colors.grey),
                               ),
                               child:
-                              TextFormField(  decoration:  InputDecoration(    hintText: 'Search by Location',    hintStyle: const TextStyle(fontSize: 13,color: Colors.grey),    contentPadding: const EdgeInsets.only(bottom: 20,left: 10), border: InputBorder.none,  ),  onChanged: _updateSearch1,),
+                              TextFormField(  decoration:  InputDecoration(    hintText: 'Search by Email',    hintStyle: const TextStyle(fontSize: 13,color: Colors.grey),    contentPadding: const EdgeInsets.only(bottom: 20,left: 10), border: InputBorder.none,  ),  onChanged: _updateSearch1,),
                             ),
                           ),
                         ),

@@ -1178,6 +1178,7 @@ class _AdminListState extends State<AdminList> {
                           onPressed: () {
                             var selectedCustomer =
                                 filteredData1[customerIndex].toJson();
+                            print('select');
                             print(selectedCustomer);
                             context.go('/Edit_User', extra: {
                               'EditUser': selectedCustomer,
@@ -1674,8 +1675,10 @@ class _AdminListState extends State<AdminList> {
                         IconButton(
                           icon: Icon(Icons.edit, color: Colors.green),
                           onPressed: () {
+
                             var selectedCustomer =
                                 filteredData1[customerIndex].toJson();
+                            print('select');
                             print(selectedCustomer);
                             context.go('/Edit_User', extra: {
                               'EditUser': selectedCustomer,
@@ -1816,6 +1819,8 @@ class UserResponse {
   final String companyName;
   final String mobileNumber;
   final String location;
+  final String shippingAddress1;
+  final String shippingAddress2;
 
 
   UserResponse({
@@ -1829,10 +1834,10 @@ class UserResponse {
     required this.companyName,
     required this.mobileNumber,
     required this.location,
-
+    required this.shippingAddress1,
+    required this.shippingAddress2,
   });
 
-  // Factory method to create an instance from JSON
   factory UserResponse.fromJson(Map<String, dynamic> json) {
     return UserResponse(
       userId: json['userId'] ?? '',
@@ -1844,10 +1849,11 @@ class UserResponse {
       companyName: json['companyName'] ?? '',
       mobileNumber: json['mobileNumber'] ?? '',
       location: json['location'] ?? '',
+      shippingAddress1: json['shippingAddress1'] ?? '',
+      shippingAddress2: json['shippingAddress2'] ?? '',
     );
   }
 
-  // Method to convert an instance to JSON
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
@@ -1859,6 +1865,8 @@ class UserResponse {
       'companyName': companyName,
       'mobileNumber': mobileNumber,
       'location': location,
+      'shippingAddress1': shippingAddress1,
+      'shippingAddress2':shippingAddress2,
     };
   }
 

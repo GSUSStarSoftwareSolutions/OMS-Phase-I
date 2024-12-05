@@ -702,20 +702,37 @@ class _SeventhPageState extends State<SeventhPage> {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      // Added Align widget for the left side menu
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 984,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
+
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
                     Padding(
                       padding: const EdgeInsets.only(left: 0,top: 0),
                       child: Container(
@@ -1778,19 +1795,37 @@ class _SeventhPageState extends State<SeventhPage> {
                 return  Stack(
                   //crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        width: 200,
-                        height: 984,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 20, top: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
+
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
                     Container(
                       padding: const EdgeInsets.only(left: 200),
                       child: AdaptiveScrollbar(

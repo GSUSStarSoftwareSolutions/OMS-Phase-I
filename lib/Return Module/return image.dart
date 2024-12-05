@@ -67,12 +67,13 @@ class _ReturnImageState extends State<ReturnImage> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800]  ,
@@ -541,471 +542,492 @@ class _ReturnImageState extends State<ReturnImage> {
             ),
           ],
         ),
-        body: Stack(
-            children: [
-              Align(
-                // Added Align widget for the left side menu
-                alignment: Alignment.topLeft,
-                child: Container(
-                  height: 1400,
-                  width: 200,
-                  color: const Color(0xFFF7F6FA),
-                  padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _buildMenuItems(context),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 200,top: 0),
-                child: Container(
-                  width: 1, // Set the width to 1 for a vertical line
-                  height: 900, // Set the height to your liking
-                  decoration: BoxDecoration(
-                    border: Border(left: BorderSide(width: 1, color: Colors.grey)),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 201),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    color: Colors.white,
-                    height: 50,
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon:
-                          const Icon(Icons.arrow_back), // Back button icon
-                          onPressed: () {
-                            context.go('/Create_return_back',
-                                extra: {
-                                  'storeImage': 'hi',
-                                  'imageSizeString': widget.imageSizeString,
-                                  'imageSizeStrings': widget.imageSizeStrings,
-                                  'storeImages': widget.storeImages,
-                                  'orderDetails': widget.orderDetails,
-                                  'orderDetailsMap': widget.orderDetailsMap,
-                                }
-                            );
-                            // context.go('/Arrow_back/Create_return',
-                            //     extra: {
-                            //       'storeImage': 'hi',
-                            //       'imageSizeString': widget.imageSizeString,
-                            //       'imageSizeStrings': widget.imageSizeStrings,
-                            //       'storeImages': widget.storeImages,
-                            //       'orderDetails': widget.orderDetails,
-                            //       'orderDetailsMap': widget.orderDetailsMap,
-                            //     }
-                            // );
-                            // Navigator.push(
-                            //   context,
-                            //   PageRouteBuilder(
-                            //     pageBuilder: (context, animation,
-                            //         secondaryAnimation) =>
-                            //         CreateReturn(orderDetailsMap: const {}, storeImage: '', imageSizeStrings: const [], storeImages: const [], orderDetails: const [],imageSizeString: '',),
-                            //     transitionDuration:
-                            //     const Duration(milliseconds: 200),
-                            //     transitionsBuilder: (context, animation,
-                            //         secondaryAnimation, child) {
-                            //       return FadeTransition(
-                            //         opacity: animation,
-                            //         child: child,
-                            //       );
-                            //     },
-                            //   ),
-                            // );
-
-                          },
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 30),
-                          child: Text(
-                            'Order Return',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
+        body: LayoutBuilder(
+            builder: (context, constraints){
+            return Stack(
+                children: [
+                  if(constraints.maxHeight <= 500)...{
+                    SingleChildScrollView(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
                           ),
                         ),
-                        const Spacer(),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 12, right: 130),
-                            child: OutlinedButton(
+                      ),
+                    )
+
+                  }
+                  else...{
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
+                      ),
+                    ),
+                  },
+                  Padding(
+                    padding: const EdgeInsets.only(left: 200,top: 0),
+                    child: Container(
+                      width: 1, // Set the width to 1 for a vertical line
+                      height: 900, // Set the height to your liking
+                      decoration: BoxDecoration(
+                        border: Border(left: BorderSide(width: 1, color: Colors.grey)),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 201),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        color: Colors.white,
+                        height: 50,
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon:
+                              const Icon(Icons.arrow_back), // Back button icon
                               onPressed: () {
-                                if(_selectedProduct == null || _selectedProduct!.isEmpty ){
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Please Select Product")));
-                                }else if(imageSizeString.isNotEmpty && _selectedProduct!.isEmpty){
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Please Select Product")));
-                                }else if(imageSizeString.isEmpty && _selectedProduct!.isNotEmpty){
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Please Select Image")));
-                                }
-                                else if(imageSizeString.isNotEmpty && _selectedProduct!.isNotEmpty){
-                                  print('---test');
-                                  //  print(storeImage);
-                                  print('dddd');
-                                  print(widget.orderDetailsMap);
-                                  // List<String> tempStoreImages = [...widget.storeImages];
-                                  // widget.storeImages = _selectedProduct as List<String>;
-                                  //  widget.storeImages.add(_selectedProduct as String);
-                                  widget.storeImages = [...widget.storeImages, _selectedProduct as String];
-                                  print(widget.storeImages);
-                                  print(_selectedProduct);
-                                  print(widget.imageSizeStrings);
-                                  // print(imageIdController);
-
-                                  // context.go(
-                                  //   '/Add_Image/Create_return',
-                                  //   extra: {
-                                  //     'storeImage': 'hi',
-                                  //     'imageSizeString': widget.imageSizeString,
-                                  //     'imageSizeStrings': widget.imageSizeStrings,
-                                  //     'storeImages': widget.storeImages,
-                                  //     'orderDetails': widget.orderDetails,
-                                  //     'orderDetailsMap': widget.orderDetailsMap,
-                                  //   }
-                                  // );
-                                  context.go(
-                                      '/Create_return_image',
-                                      extra: {
-                                        'storeImage': 'hi',
-                                        'imageSizeString': widget.imageSizeString,
-                                        'imageSizeStrings': widget.imageSizeStrings,
-                                        'storeImages': widget.storeImages,
-                                        'orderDetails': widget.orderDetails,
-                                        'orderDetailsMap': widget.orderDetailsMap,
-                                      }
-                                  );
-
-                                  // Navigator.push(
-                                  //   context,
-                                  //   PageRouteBuilder(
-                                  //     pageBuilder: (context, animation,
-                                  //         secondaryAnimation) =>
-                                  //         CreateReturn(
-                                  //           storeImage: 'hi',
-                                  //           imageSizeString: widget.imageSizeString,
-                                  //           imageSizeStrings: widget.imageSizeStrings,
-                                  //           storeImages: widget.storeImages,
-                                  //           orderDetails: widget.orderDetails,
-                                  //           orderDetailsMap: widget.orderDetailsMap,),
-                                  //     transitionDuration:
-                                  //     const Duration(milliseconds: 200),
-                                  //     transitionsBuilder: (context, animation,
-                                  //         secondaryAnimation, child) {
-                                  //       return FadeTransition(
-                                  //         opacity: animation,
-                                  //         child: child,
-                                  //       );
-                                  //     },
-                                  //   ),
-                                  // );
-                                }
-                                else{
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Please Pick Image")));
-                                }
-                                // if(imageSizeString.isNotEmpty && _selectedProduct!.isNotEmpty){
-                                //   print('---test');
-                                //   //  print(storeImage);
-                                //   print('dddd');
-                                //   print(widget.orderDetailsMap);
-                                //  // List<String> tempStoreImages = [...widget.storeImages];
-                                //   // widget.storeImages = _selectedProduct as List<String>;
-                                // //  widget.storeImages.add(_selectedProduct as String);
-                                //   widget.storeImages = [...widget.storeImages, _selectedProduct as String];
-                                //   print(widget.storeImages);
-                                //   print(_selectedProduct);
-                                //   print(widget.imageSizeStrings);
-                                //   // print(imageIdController);
-                                //
-                                //   // context.go(
-                                //   //   '/Add_Image/Create_return',
-                                //   //   extra: {
-                                //   //     'storeImage': 'hi',
-                                //   //     'imageSizeString': widget.imageSizeString,
-                                //   //     'imageSizeStrings': widget.imageSizeStrings,
-                                //   //     'storeImages': widget.storeImages,
-                                //   //     'orderDetails': widget.orderDetails,
-                                //   //     'orderDetailsMap': widget.orderDetailsMap,
-                                //   //   }
-                                //   // );
-                                //   context.go(
-                                //       '/Create_return_image',
-                                //       extra: {
-                                //         'storeImage': 'hi',
-                                //         'imageSizeString': widget.imageSizeString,
-                                //         'imageSizeStrings': widget.imageSizeStrings,
-                                //         'storeImages': widget.storeImages,
-                                //         'orderDetails': widget.orderDetails,
-                                //         'orderDetailsMap': widget.orderDetailsMap,
-                                //       }
-                                //   );
-                                //
-                                //   // Navigator.push(
-                                //   //   context,
-                                //   //   PageRouteBuilder(
-                                //   //     pageBuilder: (context, animation,
-                                //   //         secondaryAnimation) =>
-                                //   //         CreateReturn(
-                                //   //           storeImage: 'hi',
-                                //   //           imageSizeString: widget.imageSizeString,
-                                //   //           imageSizeStrings: widget.imageSizeStrings,
-                                //   //           storeImages: widget.storeImages,
-                                //   //           orderDetails: widget.orderDetails,
-                                //   //           orderDetailsMap: widget.orderDetailsMap,),
-                                //   //     transitionDuration:
-                                //   //     const Duration(milliseconds: 200),
-                                //   //     transitionsBuilder: (context, animation,
-                                //   //         secondaryAnimation, child) {
-                                //   //       return FadeTransition(
-                                //   //         opacity: animation,
-                                //   //         child: child,
-                                //   //       );
-                                //   //     },
-                                //   //   ),
-                                //   // );
-                                // }else if(_selectedProduct == null || _selectedProduct!.isEmpty ){
-                                //   ScaffoldMessenger.of(context).showSnackBar(
-                                //       const SnackBar(content: Text("Please Select Product")));
-                                // }
-                                // else{
-                                //   ScaffoldMessenger.of(context).showSnackBar(
-                                //       const SnackBar(content: Text("Please Pick Image")));
-                                // }
+                                context.go('/Create_return_back',
+                                    extra: {
+                                      'storeImage': 'hi',
+                                      'imageSizeString': widget.imageSizeString,
+                                      'imageSizeStrings': widget.imageSizeStrings,
+                                      'storeImages': widget.storeImages,
+                                      'orderDetails': widget.orderDetails,
+                                      'orderDetailsMap': widget.orderDetailsMap,
+                                    }
+                                );
+                                // context.go('/Arrow_back/Create_return',
+                                //     extra: {
+                                //       'storeImage': 'hi',
+                                //       'imageSizeString': widget.imageSizeString,
+                                //       'imageSizeStrings': widget.imageSizeStrings,
+                                //       'storeImages': widget.storeImages,
+                                //       'orderDetails': widget.orderDetails,
+                                //       'orderDetailsMap': widget.orderDetailsMap,
+                                //     }
+                                // );
+                                // Navigator.push(
+                                //   context,
+                                //   PageRouteBuilder(
+                                //     pageBuilder: (context, animation,
+                                //         secondaryAnimation) =>
+                                //         CreateReturn(orderDetailsMap: const {}, storeImage: '', imageSizeStrings: const [], storeImages: const [], orderDetails: const [],imageSizeString: '',),
+                                //     transitionDuration:
+                                //     const Duration(milliseconds: 200),
+                                //     transitionsBuilder: (context, animation,
+                                //         secondaryAnimation, child) {
+                                //       return FadeTransition(
+                                //         opacity: animation,
+                                //         child: child,
+                                //       );
+                                //     },
+                                //   ),
+                                // );
 
                               },
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor:
-                                Colors.blue[800],
-                                // Button background color
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(
-                                      5), // Rounded corners
-                                ),
-                                side: BorderSide.none, // No outline
-                              ),
-                              child: const Text(
-                                'Save',
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 30),
+                              child: Text(
+                                'Order Return',
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w100,
-                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const Spacer(),
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 12, right: 130),
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    if(_selectedProduct == null || _selectedProduct!.isEmpty ){
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text("Please Select Product")));
+                                    }else if(imageSizeString.isNotEmpty && _selectedProduct!.isEmpty){
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text("Please Select Product")));
+                                    }else if(imageSizeString.isEmpty && _selectedProduct!.isNotEmpty){
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text("Please Select Image")));
+                                    }
+                                    else if(imageSizeString.isNotEmpty && _selectedProduct!.isNotEmpty){
+                                      print('---test');
+                                      //  print(storeImage);
+                                      print('dddd');
+                                      print(widget.orderDetailsMap);
+                                      // List<String> tempStoreImages = [...widget.storeImages];
+                                      // widget.storeImages = _selectedProduct as List<String>;
+                                      //  widget.storeImages.add(_selectedProduct as String);
+                                      widget.storeImages = [...widget.storeImages, _selectedProduct as String];
+                                      print(widget.storeImages);
+                                      print(_selectedProduct);
+                                      print(widget.imageSizeStrings);
+                                      // print(imageIdController);
+
+                                      // context.go(
+                                      //   '/Add_Image/Create_return',
+                                      //   extra: {
+                                      //     'storeImage': 'hi',
+                                      //     'imageSizeString': widget.imageSizeString,
+                                      //     'imageSizeStrings': widget.imageSizeStrings,
+                                      //     'storeImages': widget.storeImages,
+                                      //     'orderDetails': widget.orderDetails,
+                                      //     'orderDetailsMap': widget.orderDetailsMap,
+                                      //   }
+                                      // );
+                                      context.go(
+                                          '/Create_return_image',
+                                          extra: {
+                                            'storeImage': 'hi',
+                                            'imageSizeString': widget.imageSizeString,
+                                            'imageSizeStrings': widget.imageSizeStrings,
+                                            'storeImages': widget.storeImages,
+                                            'orderDetails': widget.orderDetails,
+                                            'orderDetailsMap': widget.orderDetailsMap,
+                                          }
+                                      );
+
+                                      // Navigator.push(
+                                      //   context,
+                                      //   PageRouteBuilder(
+                                      //     pageBuilder: (context, animation,
+                                      //         secondaryAnimation) =>
+                                      //         CreateReturn(
+                                      //           storeImage: 'hi',
+                                      //           imageSizeString: widget.imageSizeString,
+                                      //           imageSizeStrings: widget.imageSizeStrings,
+                                      //           storeImages: widget.storeImages,
+                                      //           orderDetails: widget.orderDetails,
+                                      //           orderDetailsMap: widget.orderDetailsMap,),
+                                      //     transitionDuration:
+                                      //     const Duration(milliseconds: 200),
+                                      //     transitionsBuilder: (context, animation,
+                                      //         secondaryAnimation, child) {
+                                      //       return FadeTransition(
+                                      //         opacity: animation,
+                                      //         child: child,
+                                      //       );
+                                      //     },
+                                      //   ),
+                                      // );
+                                    }
+                                    else{
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text("Please Pick Image")));
+                                    }
+                                    // if(imageSizeString.isNotEmpty && _selectedProduct!.isNotEmpty){
+                                    //   print('---test');
+                                    //   //  print(storeImage);
+                                    //   print('dddd');
+                                    //   print(widget.orderDetailsMap);
+                                    //  // List<String> tempStoreImages = [...widget.storeImages];
+                                    //   // widget.storeImages = _selectedProduct as List<String>;
+                                    // //  widget.storeImages.add(_selectedProduct as String);
+                                    //   widget.storeImages = [...widget.storeImages, _selectedProduct as String];
+                                    //   print(widget.storeImages);
+                                    //   print(_selectedProduct);
+                                    //   print(widget.imageSizeStrings);
+                                    //   // print(imageIdController);
+                                    //
+                                    //   // context.go(
+                                    //   //   '/Add_Image/Create_return',
+                                    //   //   extra: {
+                                    //   //     'storeImage': 'hi',
+                                    //   //     'imageSizeString': widget.imageSizeString,
+                                    //   //     'imageSizeStrings': widget.imageSizeStrings,
+                                    //   //     'storeImages': widget.storeImages,
+                                    //   //     'orderDetails': widget.orderDetails,
+                                    //   //     'orderDetailsMap': widget.orderDetailsMap,
+                                    //   //   }
+                                    //   // );
+                                    //   context.go(
+                                    //       '/Create_return_image',
+                                    //       extra: {
+                                    //         'storeImage': 'hi',
+                                    //         'imageSizeString': widget.imageSizeString,
+                                    //         'imageSizeStrings': widget.imageSizeStrings,
+                                    //         'storeImages': widget.storeImages,
+                                    //         'orderDetails': widget.orderDetails,
+                                    //         'orderDetailsMap': widget.orderDetailsMap,
+                                    //       }
+                                    //   );
+                                    //
+                                    //   // Navigator.push(
+                                    //   //   context,
+                                    //   //   PageRouteBuilder(
+                                    //   //     pageBuilder: (context, animation,
+                                    //   //         secondaryAnimation) =>
+                                    //   //         CreateReturn(
+                                    //   //           storeImage: 'hi',
+                                    //   //           imageSizeString: widget.imageSizeString,
+                                    //   //           imageSizeStrings: widget.imageSizeStrings,
+                                    //   //           storeImages: widget.storeImages,
+                                    //   //           orderDetails: widget.orderDetails,
+                                    //   //           orderDetailsMap: widget.orderDetailsMap,),
+                                    //   //     transitionDuration:
+                                    //   //     const Duration(milliseconds: 200),
+                                    //   //     transitionsBuilder: (context, animation,
+                                    //   //         secondaryAnimation, child) {
+                                    //   //       return FadeTransition(
+                                    //   //         opacity: animation,
+                                    //   //         child: child,
+                                    //   //       );
+                                    //   //     },
+                                    //   //   ),
+                                    //   // );
+                                    // }else if(_selectedProduct == null || _selectedProduct!.isEmpty ){
+                                    //   ScaffoldMessenger.of(context).showSnackBar(
+                                    //       const SnackBar(content: Text("Please Select Product")));
+                                    // }
+                                    // else{
+                                    //   ScaffoldMessenger.of(context).showSnackBar(
+                                    //       const SnackBar(content: Text("Please Pick Image")));
+                                    // }
+
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor:
+                                    Colors.blue[800],
+                                    // Button background color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(
+                                          5), // Rounded corners
+                                    ),
+                                    side: BorderSide.none, // No outline
+                                  ),
+                                  child: const Text(
+                                    'Save',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w100,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 50 ,left: 200),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 1),
+                      // Space above/below the border
+                      height: 0.3, // Border height
+                      color: Colors.black, // Border color
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      print('---imagePath---');
+                      filePicker();
+                    },
+                    child: Padding(
+                      padding:  EdgeInsets.only(left: size* 0.35,top: size * 0.075,bottom: size * 0.1,right:
+                      size *0.3),
+                      child: Card(
+                        //margin: EdgeInsets.only(left: maxWidth * 0.08, top: maxHeight * 0.27,bottom: maxHeight * 0.3),
+                        child: Container(
+                          width:size,
+                          height: 500,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              //in this place u need to show in the ui
+                              if (selectedImages.isNotEmpty)
+                                for (var imageBytes in selectedImages)
+                                  Expanded(
+                                    child: Image.memory(
+                                      imageBytes,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                              Icon(Icons.cloud_upload_outlined,
+                                  color: Colors.blue[900], size: 50),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Click to upload image',
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'PNG, JPG or GIF Recommended size below 1MB',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 50 ,left: 200),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                      vertical: 1),
-                  // Space above/below the border
-                  height: 0.3, // Border height
-                  color: Colors.black, // Border color
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  print('---imagePath---');
-                  filePicker();
-                },
-                child: Padding(
-                  padding:  EdgeInsets.only(left: size* 0.35,top: size * 0.075,bottom: size * 0.1,right:
-                  size *0.3),
-                  child: Card(
-                    //margin: EdgeInsets.only(left: maxWidth * 0.08, top: maxHeight * 0.27,bottom: maxHeight * 0.3),
-                    child: Container(
-                      width:size,
-                      height: 500,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          //in this place u need to show in the ui
-                          if (selectedImages.isNotEmpty)
-                            for (var imageBytes in selectedImages)
-                              Expanded(
-                                child: Image.memory(
-                                  imageBytes,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                          Icon(Icons.cloud_upload_outlined,
-                              color: Colors.blue[900], size: 50),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Click to upload image',
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'PNG, JPG or GIF Recommended size below 1MB',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
                       ),
                     ),
                   ),
-                ),
-              ),
-              //SizedBox(height: 60,),
-              Padding(
-                  padding: EdgeInsets.only(top: 500, left: size * 0.34, right: size * 0.3),
-                  child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (widget.orderDetails != null)
-                            const SizedBox(height: 40,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                  //SizedBox(height: 60,),
+                  Padding(
+                      padding: EdgeInsets.only(top: 500, left: size * 0.34, right: size * 0.3),
+                      child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('Select Product'),
-                              const SizedBox(height: 10,),
-                              SizedBox(
-                                height: 40,
-                                width: size,
-                                child: DropdownButtonFormField(
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(2.0),
-                                      borderSide: const BorderSide(color: Colors.blue), // Set border color here
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                      borderSide: const BorderSide(color: Colors.blue), // Set focused border color here
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                      borderSide: const BorderSide(color: Colors.blue), // Set enabled border color here
-                                    ),
-                                    hintText: 'Select Product Name',
-                                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                    suffixIcon: const Icon(Icons.arrow_drop_down_circle_rounded, color: Colors.blueAccent,), // Add arrow down icon here
-                                  ),
-                                  icon: Container(),
-                                  value: _selectedProduct,
+                              if (widget.orderDetails != null)
+                                const SizedBox(height: 40,),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Select Product'),
+                                  const SizedBox(height: 10,),
+                                  SizedBox(
+                                    height: 40,
+                                    width: size,
+                                    child: DropdownButtonFormField(
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(2.0),
+                                          borderSide: const BorderSide(color: Colors.blue), // Set border color here
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(5.0),
+                                          borderSide: const BorderSide(color: Colors.blue), // Set focused border color here
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(5.0),
+                                          borderSide: const BorderSide(color: Colors.blue), // Set enabled border color here
+                                        ),
+                                        hintText: 'Select Product Name',
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                        suffixIcon: const Icon(Icons.arrow_drop_down_circle_rounded, color: Colors.blueAccent,), // Add arrow down icon here
+                                      ),
+                                      icon: Container(),
+                                      value: _selectedProduct,
 
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      _selectedProduct = newValue as String;
-                                      // widget.storeImages = [_selectedProduct as String];
-                                      // widget.storeImages.add(_selectedProduct as String);
-                                      if (_selectedProduct != null) {
-                                        //printImageId(); // Call the printImageId function
-                                      }
-                                    });
-                                  },
-                                  items: widget.orderDetails!.map((item) {
-                                    String productName = item['productName'];
-                                    String category = item['category'];
-                                    String uniqueProduct = '$productName-$category';
-                                    return DropdownMenuItem(
-                                      value: uniqueProduct,
-                                      child: Text(productName),
-                                    );
-                                  }).toList(),
-                                  isExpanded: true,
-                                ),
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          _selectedProduct = newValue as String;
+                                          // widget.storeImages = [_selectedProduct as String];
+                                          // widget.storeImages.add(_selectedProduct as String);
+                                          if (_selectedProduct != null) {
+                                            //printImageId(); // Call the printImageId function
+                                          }
+                                        });
+                                      },
+                                      items: widget.orderDetails!.map((item) {
+                                        String productName = item['productName'];
+                                        String category = item['category'];
+                                        String uniqueProduct = '$productName-$category';
+                                        return DropdownMenuItem(
+                                          value: uniqueProduct,
+                                          child: Text(productName),
+                                        );
+                                      }).toList(),
+                                      isExpanded: true,
+                                    ),
+                                  )
+                                ],
                               )
                             ],
                           )
-                        ],
                       )
                   )
-              )
-              // Padding(
-              //     padding:  EdgeInsets.only(top: 500,left: size * 0.34,right: size*0.3),
-              //     child: Padding(
-              //         padding: const EdgeInsets.all(16.0),
-              //         child: Column(
-              //           mainAxisAlignment: MainAxisAlignment.center,
-              //           children: [
-              //             if(widget.orderDetails != null)
-              //             const SizedBox(height: 40,),
-              //             Column(
-              //               crossAxisAlignment: CrossAxisAlignment.start,
-              //               children: [
-              //                 const Text('Select Product'),
-              //                 const SizedBox(height: 10,),
-              //                 SizedBox(height: 40,
-              //                   width: size,
-              //                   child:DropdownButtonFormField(
-              //                     decoration: InputDecoration(
-              //                       filled: true,
-              //                       fillColor: Colors.white,
-              //                       border: OutlineInputBorder(
-              //                         borderRadius: BorderRadius.circular(2.0),
-              //                         borderSide: const BorderSide(color: Colors.blue), // Set border color here
-              //                       ),
-              //                       focusedBorder: OutlineInputBorder(
-              //                         borderRadius: BorderRadius.circular(5.0),
-              //                         borderSide: const BorderSide(color: Colors.blue), // Set focused border color here
-              //                       ),
-              //                       enabledBorder: OutlineInputBorder(
-              //                         borderRadius: BorderRadius.circular(5.0),
-              //                         borderSide: const BorderSide(color: Colors.blue), // Set enabled border color here
-              //                       ),
-              //                       hintText: 'Select Product Name',
-              //                       contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-              //                       suffixIcon: const Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blueAccent,), // Add arrow down icon here
-              //                     ),
-              //                     icon: Container(),
-              //                     value: _selectedProduct,
-              //
-              //                     onChanged: (newValue) {
-              //                       setState(() {
-              //                         _selectedProduct = newValue as String;
-              //                         // widget.storeImages = [_selectedProduct as String];
-              //                         // widget.storeImages.add(_selectedProduct as String);
-              //                         if (_selectedProduct != null) {
-              //                           //printImageId(); // Call the printImageId function
-              //                         }
-              //                       });
-              //                     },
-              //                     items: widget.orderDetails!.map((item) {
-              //                       return DropdownMenuItem(
-              //                         value: item['productName'],
-              //                         child: Text(item['productName'] ?? 'Unknown Product'),
-              //                       );
-              //                     }).toList(),
-              //                     isExpanded: true,
-              //                   ),
-              //                 )
-              //               ],
-              //             )
-              //           ],
-              //         )
-              //     )
-              // )
-            ]
+                  // Padding(
+                  //     padding:  EdgeInsets.only(top: 500,left: size * 0.34,right: size*0.3),
+                  //     child: Padding(
+                  //         padding: const EdgeInsets.all(16.0),
+                  //         child: Column(
+                  //           mainAxisAlignment: MainAxisAlignment.center,
+                  //           children: [
+                  //             if(widget.orderDetails != null)
+                  //             const SizedBox(height: 40,),
+                  //             Column(
+                  //               crossAxisAlignment: CrossAxisAlignment.start,
+                  //               children: [
+                  //                 const Text('Select Product'),
+                  //                 const SizedBox(height: 10,),
+                  //                 SizedBox(height: 40,
+                  //                   width: size,
+                  //                   child:DropdownButtonFormField(
+                  //                     decoration: InputDecoration(
+                  //                       filled: true,
+                  //                       fillColor: Colors.white,
+                  //                       border: OutlineInputBorder(
+                  //                         borderRadius: BorderRadius.circular(2.0),
+                  //                         borderSide: const BorderSide(color: Colors.blue), // Set border color here
+                  //                       ),
+                  //                       focusedBorder: OutlineInputBorder(
+                  //                         borderRadius: BorderRadius.circular(5.0),
+                  //                         borderSide: const BorderSide(color: Colors.blue), // Set focused border color here
+                  //                       ),
+                  //                       enabledBorder: OutlineInputBorder(
+                  //                         borderRadius: BorderRadius.circular(5.0),
+                  //                         borderSide: const BorderSide(color: Colors.blue), // Set enabled border color here
+                  //                       ),
+                  //                       hintText: 'Select Product Name',
+                  //                       contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                  //                       suffixIcon: const Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blueAccent,), // Add arrow down icon here
+                  //                     ),
+                  //                     icon: Container(),
+                  //                     value: _selectedProduct,
+                  //
+                  //                     onChanged: (newValue) {
+                  //                       setState(() {
+                  //                         _selectedProduct = newValue as String;
+                  //                         // widget.storeImages = [_selectedProduct as String];
+                  //                         // widget.storeImages.add(_selectedProduct as String);
+                  //                         if (_selectedProduct != null) {
+                  //                           //printImageId(); // Call the printImageId function
+                  //                         }
+                  //                       });
+                  //                     },
+                  //                     items: widget.orderDetails!.map((item) {
+                  //                       return DropdownMenuItem(
+                  //                         value: item['productName'],
+                  //                         child: Text(item['productName'] ?? 'Unknown Product'),
+                  //                       );
+                  //                     }).toList(),
+                  //                     isExpanded: true,
+                  //                   ),
+                  //                 )
+                  //               ],
+                  //             )
+                  //           ],
+                  //         )
+                  //     )
+                  // )
+                ]
+            );
+          }
         )
     );
   }

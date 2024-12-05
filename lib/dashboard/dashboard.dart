@@ -54,7 +54,9 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
   late Animation<double> _shakeAnimation;
   bool _isHovered1 = false;
   bool _isHovered2 = false;
+  bool _isHovered5 = false;
   bool orderhover = false;
+  bool orderhover2 = false;
   Map<String, dynamic> PaymentMap = {};
   String? dropdownValue1 = 'Delivery Status';
   String searchQuery = '';
@@ -430,31 +432,36 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                 children: [
                   if(constraints.maxHeight <= 500)...{
                     SingleChildScrollView(
-                      child: Align(
+                      child:  Align(
+                        // Added Align widget for the left side menu
                         alignment: Alignment.topLeft,
                         child: Container(
+                          height: 1400,
                           width: 200,
                           color: const Color(0xFFF7F6FA),
                           padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: _buildMenuItems(context),
+
                           ),
                         ),
                       ),
-                    )
-
+                    ),
                   }
                   else...{
                     Align(
+                      // Added Align widget for the left side menu
                       alignment: Alignment.topLeft,
                       child: Container(
+                        height: 1400,
                         width: 200,
                         color: const Color(0xFFF7F6FA),
                         padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: _buildMenuItems(context),
+
                         ),
                       ),
                     ),
@@ -841,110 +848,142 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                                       Padding(
                                                         padding:
                                                         const EdgeInsets.only(top: 10,bottom: 10),
-                                                        child: Card(
-                                                          // margin:  EdgeInsets.only(left: 600, top: 150),
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                            BorderRadius.circular(10),
-                                                          ),
-                                                          color: Colors.white,
-                                                          // Set the color to white
-                                                          elevation: 2,
-                                                          // equivalent to the boxShadow in the original code
-                                                          child: Container(
-                                                            // height: 140,
-                                                            width: maxWidth * 0.15,
-                                                            padding: const EdgeInsets.all(16),
-                                                            decoration: BoxDecoration(
-                                                              gradient: LinearGradient(
-                                                                colors: [
-                                                                  const Color.fromRGBO(218, 180, 255, 0.8).withOpacity(0.1),
-                                                                  //Color.fromRGBO(159, 134, 255, 0.8),
-                                                                  // Color(0xFF9F86FF),
-                                                                  const Color(0xFFFFFFFF),
-                                                                  // Icon background color
-                                                                  // Slightly darker shade of the icon background color
-                                                                ],
-                                                                begin: Alignment.topLeft,
-                                                                end: Alignment.bottomRight,
-                                                              ),
-                                                              borderRadius: BorderRadius.circular(8),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: const Color(0xFFE5D8F2).withOpacity(0.1),
-                                                                  spreadRadius: 2,
-                                                                  blurRadius: 3,
-                                                                  offset: const Offset(0, 1),
+                                                        child: MouseRegion(
+                                                          onEnter: (_) {
+                                                            setState(() {
+                                                              _isHovered5 = true;
+                                                            });
+                                                          },
+                                                          onExit: (_) {
+                                                            setState(() {
+                                                              _isHovered5 = false;
+                                                            });
+                                                          },
+                                                          child: AnimatedScale(
+                                                            scale: _isHovered5
+                                                                ? 1.05
+                                                                : 1.0,
+                                                            duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                200),
+                                                            child: InkWell(
+                                                              onTap: () {
+                                                                context.go(
+                                                                    '/Picked_order');
+                                                              },
+                                                              child: Card(
+                                                                // margin:  EdgeInsets.only(left: 600, top: 150),
+                                                                shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                  BorderRadius.circular(10),
                                                                 ),
-                                                              ],
-                                                            ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                              CrossAxisAlignment.start,
-                                                              children: [
-                                                                Padding(
-                                                                  padding:
-                                                                  const EdgeInsets.only(
-                                                                      top: 3),
-                                                                  child: Container(
-                                                                    width: 34,
-                                                                    height: 34,
-                                                                    decoration: BoxDecoration(
-                                                                      border: Border.all(
-                                                                          color: const Color(
-                                                                              0xFF9F86FF),
-                                                                          width: 1.5),
-                                                                      color: const Color(
-                                                                          0xFFF8F6FF),
-                                                                      borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(4),
-                                                                      boxShadow: [
-                                                                        BoxShadow(
-                                                                          color: const Color(
-                                                                              0xFF418CFC33)
-                                                                              .withOpacity(
-                                                                              0.1),
-                                                                          // Soft grey shadow
-                                                                          spreadRadius: 1,
-                                                                          blurRadius: 3,
-                                                                          offset:
-                                                                          const Offset(
-                                                                              0, 1),
-                                                                        ),
+                                                                color: Colors.white,
+                                                                // Set the color to white
+                                                                elevation: 2,
+                                                                // equivalent to the boxShadow in the original code
+                                                                child: Container(
+                                                                  // height: 140,
+                                                                  width: maxWidth * 0.15,
+                                                                  padding: const EdgeInsets.all(16),
+                                                                  decoration: BoxDecoration(
+                                                                    gradient: LinearGradient(
+                                                                      colors: [
+                                                                        const Color.fromRGBO(218, 180, 255, 0.8).withOpacity(0.1),
+                                                                        //Color.fromRGBO(159, 134, 255, 0.8),
+                                                                        // Color(0xFF9F86FF),
+                                                                        const Color(0xFFFFFFFF),
+                                                                        // Icon background color
+                                                                        // Slightly darker shade of the icon background color
                                                                       ],
+                                                                      begin: Alignment.topLeft,
+                                                                      end: Alignment.bottomRight,
                                                                     ),
-                                                                    child: Image.asset(
-                                                                        "images/file.png",
-                                                                        fit:
-                                                                        BoxFit.scaleDown),
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                    boxShadow: [
+                                                                      BoxShadow(
+                                                                        color: const Color(0xFFE5D8F2).withOpacity(0.1),
+                                                                        spreadRadius: 2,
+                                                                        blurRadius: 3,
+                                                                        offset: const Offset(0, 1),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                    CrossAxisAlignment.start,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding:
+                                                                        const EdgeInsets.only(
+                                                                            top: 3),
+                                                                        child: Container(
+                                                                          width: 34,
+                                                                          height: 34,
+                                                                          decoration: BoxDecoration(
+                                                                            border: Border.all(
+                                                                                color: const Color(
+                                                                                    0xFF9F86FF),
+                                                                                width: 1.5),
+                                                                            color: const Color(
+                                                                                0xFFF8F6FF),
+                                                                            borderRadius:
+                                                                            BorderRadius
+                                                                                .circular(4),
+                                                                            boxShadow: [
+                                                                              BoxShadow(
+                                                                                color: const Color(
+                                                                                    0xFF418CFC33)
+                                                                                    .withOpacity(
+                                                                                    0.1),
+                                                                                // Soft grey shadow
+                                                                                spreadRadius: 1,
+                                                                                blurRadius: 3,
+                                                                                offset:
+                                                                                const Offset(
+                                                                                    0, 1),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          child: Image.asset(
+                                                                              "images/file.png",
+                                                                              fit:
+                                                                              BoxFit.scaleDown),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height: 5,
+                                                                      ),
+                                                                       Padding(
+                                                                        padding: EdgeInsets.only(
+                                                                            left: 10),
+                                                                        child: Text(
+                                                                          _dashboardCounts != null
+                                                                              ? _dashboardCounts!
+                                                                              .Picked
+                                                                              .toString()
+                                                                              : '0',
+                                                                          style: const TextStyle(
+                                                                              fontSize: 25,
+                                                                              fontWeight:
+                                                                              FontWeight
+                                                                                  .bold),
+                                                                        ),
+                                                                      ),
+                                                                      const Padding(
+                                                                        padding: EdgeInsets.only(
+                                                                            left: 10),
+                                                                        child: Text(
+                                                                          'Picked Orders',
+                                                                          style: TextStyle(
+                                                                            fontSize: 15,
+                                                                            color: Color(0xFF455A64),),
+                                                                        ),
+                                                                      )
+                                                                    ],
                                                                   ),
                                                                 ),
-                                                                const SizedBox(
-                                                                  height: 5,
-                                                                ),
-                                                                const Padding(
-                                                                  padding: EdgeInsets.only(
-                                                                      left: 10),
-                                                                  child: Text(
-                                                                    '0',
-                                                                    style: TextStyle(
-                                                                        fontSize: 25,
-                                                                        fontWeight:
-                                                                        FontWeight.bold),
-                                                                  ),
-                                                                ),
-                                                                const Padding(
-                                                                  padding: EdgeInsets.only(
-                                                                      left: 10),
-                                                                  child: Text(
-                                                                    'Open Invoices',
-                                                                    style: TextStyle(
-                                                                      fontSize: 15,
-                                                                      color: Color(0xFF455A64),),
-                                                                  ),
-                                                                )
-                                                              ],
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -952,113 +991,133 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                                       Padding(
                                                         padding:
                                                         const EdgeInsets.only(top: 10,bottom: 10),
-                                                        child: Card(
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                            BorderRadius.circular(10),
-                                                          ),
-                                                          color: Colors.white,
-                                                          // Set the color to white
-                                                          elevation: 2,
-                                                          // equivalent to the boxShadow in the original code
-                                                          child: Container(
-                                                            // height: 140,
-                                                            width: maxWidth * 0.15,
-                                                            padding: const EdgeInsets.all(16),
-                                                            decoration: BoxDecoration(
-                                                              gradient: LinearGradient(
-                                                                colors: [
-                                                                  Colors.blue.shade100.withOpacity(0.1),// Light blue
-                                                                  const Color(0xFFFFFFFF), // Grey
-                                                                ],
-                                                                begin: Alignment.topLeft,
-                                                                end: Alignment.bottomRight,
-                                                              ),
-                                                              borderRadius: BorderRadius.circular(4),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: const Color(0xFFE5E5EA).withOpacity(0.1),
-                                                                  spreadRadius: 1,
-                                                                  blurRadius: 3,
-                                                                  offset: const Offset(0, 1),
+                                                        child: MouseRegion(
+                                                          onEnter: (_){setState(() {
+                                                            orderhover2 = true;
+                                                          });
+                                                          },
+                                                          onExit: (_){setState(() {
+                                                            orderhover2 = false;
+                                                          });
+                                                          },
+                                                          child: AnimatedScale(
+                                                            scale: orderhover2 ? 1.05: 1.0,
+                                                            duration:  const Duration(milliseconds: 200),
+                                                            child: InkWell(
+                                                              onTap: () {
+
+                                                                context.go('/Order_Complete');
+                                                              },
+                                                              child: Card(
+                                                                shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                  BorderRadius.circular(10),
                                                                 ),
-                                                              ],
-                                                            ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                              CrossAxisAlignment.start,
-                                                              children: [
-                                                                Padding(
-                                                                  padding:
-                                                                  const EdgeInsets.only(
-                                                                      top: 3),
-                                                                  child: Container(
-                                                                    width: 34,
-                                                                    height: 34,
-                                                                    decoration: BoxDecoration(
-                                                                      border: Border.all(
-                                                                          color: const Color(
-                                                                              0xFF0388AB),
-                                                                          width: 1.5),
-                                                                      color: const Color(
-                                                                          0xFFF8F6FF),
-                                                                      borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(4),
-                                                                      boxShadow: [
-                                                                        BoxShadow(
-                                                                          color: const Color(
-                                                                              0xFF418CFC33)
-                                                                              .withOpacity(
-                                                                              0.1),
-                                                                          // Soft grey shadow
-                                                                          spreadRadius: 1,
-                                                                          blurRadius: 3,
-                                                                          offset:
-                                                                          const Offset(
-                                                                              0, 1),
-                                                                        ),
+                                                                color: Colors.white,
+                                                                // Set the color to white
+                                                                elevation: 2,
+                                                                // equivalent to the boxShadow in the original code
+                                                                child: Container(
+                                                                  // height: 140,
+                                                                  width: maxWidth * 0.15,
+                                                                  padding: const EdgeInsets.all(16),
+                                                                  decoration: BoxDecoration(
+                                                                    gradient: LinearGradient(
+                                                                      colors: [
+                                                                        Colors.blue.shade100.withOpacity(0.1),// Light blue
+                                                                        const Color(0xFFFFFFFF), // Grey
                                                                       ],
+                                                                      begin: Alignment.topLeft,
+                                                                      end: Alignment.bottomRight,
                                                                     ),
-                                                                    child: Image.asset(
-                                                                        "images/dash.png",
-                                                                        fit:
-                                                                        BoxFit.scaleDown),
+                                                                    borderRadius: BorderRadius.circular(4),
+                                                                    boxShadow: [
+                                                                      BoxShadow(
+                                                                        color: const Color(0xFFE5E5EA).withOpacity(0.1),
+                                                                        spreadRadius: 1,
+                                                                        blurRadius: 3,
+                                                                        offset: const Offset(0, 1),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                    CrossAxisAlignment.start,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding:
+                                                                        const EdgeInsets.only(
+                                                                            top: 3),
+                                                                        child: Container(
+                                                                          width: 34,
+                                                                          height: 34,
+                                                                          decoration: BoxDecoration(
+                                                                            border: Border.all(
+                                                                                color: const Color(
+                                                                                    0xFF0388AB),
+                                                                                width: 1.5),
+                                                                            color: const Color(
+                                                                                0xFFF8F6FF),
+                                                                            borderRadius:
+                                                                            BorderRadius
+                                                                                .circular(4),
+                                                                            boxShadow: [
+                                                                              BoxShadow(
+                                                                                color: const Color(
+                                                                                    0xFF418CFC33)
+                                                                                    .withOpacity(
+                                                                                    0.1),
+                                                                                // Soft grey shadow
+                                                                                spreadRadius: 1,
+                                                                                blurRadius: 3,
+                                                                                offset:
+                                                                                const Offset(
+                                                                                    0, 1),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          child: Image.asset(
+                                                                              "images/dash.png",
+                                                                              fit:
+                                                                              BoxFit.scaleDown),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height: 5,
+                                                                      ),
+                                                                      Padding(
+                                                                        padding:
+                                                                        const EdgeInsets.only(
+                                                                            left: 10),
+                                                                        child: Text(
+                                                                          _dashboardCounts != null
+                                                                              ? _dashboardCounts!
+                                                                              .Delivered
+                                                                              .toString()
+                                                                              : '0',
+                                                                          style: const TextStyle(
+                                                                              fontSize: 25,
+                                                                              fontWeight:
+                                                                              FontWeight.bold),
+                                                                        ),
+                                                                      ),
+                                                                      const Padding(
+                                                                        padding: EdgeInsets.only(
+                                                                            left: 10),
+                                                                        child: Text(
+                                                                          'Order Delivered',
+                                                                          style: TextStyle(
+                                                                            fontSize: 15,
+                                                                            color: Color(0xFF455A64), // Dark grey-blue
+                                                                            fontWeight: FontWeight.w500,
+                                                                            letterSpacing: 0.5,
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ],
                                                                   ),
                                                                 ),
-                                                                const SizedBox(
-                                                                  height: 5,
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                  const EdgeInsets.only(
-                                                                      left: 10),
-                                                                  child: Text(
-                                                                    _dashboardCounts != null
-                                                                        ? _dashboardCounts!
-                                                                        .totalAmount
-                                                                        .toString()
-                                                                        : '0',
-                                                                    style: const TextStyle(
-                                                                        fontSize: 25,
-                                                                        fontWeight:
-                                                                        FontWeight.bold),
-                                                                  ),
-                                                                ),
-                                                                const Padding(
-                                                                  padding: EdgeInsets.only(
-                                                                      left: 10),
-                                                                  child: Text(
-                                                                    'Available Credit Limit',
-                                                                    style: TextStyle(
-                                                                      fontSize: 15,
-                                                                      color: Color(0xFF455A64), // Dark grey-blue
-                                                                      fontWeight: FontWeight.w500,
-                                                                      letterSpacing: 0.5,
-                                                                    ),
-                                                                  ),
-                                                                )
-                                                              ],
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -1081,13 +1140,8 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                                             duration:  const Duration(milliseconds: 200),
                                                             child: InkWell(
                                                               onTap: () {
-                                                                context.go('/Order_Complete');
-                                                                // Navigator.push(
-                                                                //   context,
-                                                                //   MaterialPageRoute(
-                                                                //       builder: (context) =>
-                                                                //           OrderList()),
-                                                                // );
+
+                                                                context.go('/Pay_Complete');
                                                               },
                                                               child: Card(
                                                                 shape: RoundedRectangleBorder(
@@ -1176,7 +1230,7 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                                                         child: Text(
                                                                           _dashboardCounts != null
                                                                               ? _dashboardCounts!
-                                                                              .Delivered
+                                                                              .Cleard
                                                                               .toString()
                                                                               : '0',
                                                                           style: const TextStyle(
@@ -1577,110 +1631,142 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                                          Padding(
                                                            padding:
                                                            const EdgeInsets.only(top: 10,bottom: 10),
-                                                           child: Card(
-                                                             // margin:  EdgeInsets.only(left: 600, top: 150),
-                                                             shape: RoundedRectangleBorder(
-                                                               borderRadius:
-                                                               BorderRadius.circular(10),
-                                                             ),
-                                                             color: Colors.white,
-                                                             // Set the color to white
-                                                             elevation: 2,
-                                                             // equivalent to the boxShadow in the original code
-                                                             child: Container(
-                                                               // height: 140,
-                                                               width: 200,
-                                                               padding: const EdgeInsets.all(16),
-                                                               decoration: BoxDecoration(
-                                                                 gradient: LinearGradient(
-                                                                   colors: [
-                                                                     const Color.fromRGBO(218, 180, 255, 0.8).withOpacity(0.1),
-                                                                     //Color.fromRGBO(159, 134, 255, 0.8),
-                                                                     // Color(0xFF9F86FF),
-                                                                     const Color(0xFFFFFFFF),
-                                                                     // Icon background color
-                                                                     // Slightly darker shade of the icon background color
-                                                                   ],
-                                                                   begin: Alignment.topLeft,
-                                                                   end: Alignment.bottomRight,
-                                                                 ),
-                                                                 borderRadius: BorderRadius.circular(8),
-                                                                 boxShadow: [
-                                                                   BoxShadow(
-                                                                     color: const Color(0xFFE5D8F2).withOpacity(0.1),
-                                                                     spreadRadius: 2,
-                                                                     blurRadius: 3,
-                                                                     offset: const Offset(0, 1),
+                                                           child:MouseRegion(
+                                                             onEnter: (_) {
+                                                               setState(() {
+                                                                 _isHovered5 = true;
+                                                               });
+                                                             },
+                                                             onExit: (_) {
+                                                               setState(() {
+                                                                 _isHovered5 = false;
+                                                               });
+                                                             },
+                                                             child: AnimatedScale(
+                                                               scale: _isHovered5
+                                                                   ? 1.05
+                                                                   : 1.0,
+                                                               duration:
+                                                               const Duration(
+                                                                   milliseconds:
+                                                                   200),
+                                                               child: InkWell(
+                                                                 onTap: () {
+                                                                   context.go(
+                                                                       '/Picked_order');
+                                                                 },
+                                                                 child: Card(
+                                                                   // margin:  EdgeInsets.only(left: 600, top: 150),
+                                                                   shape: RoundedRectangleBorder(
+                                                                     borderRadius:
+                                                                     BorderRadius.circular(10),
                                                                    ),
-                                                                 ],
-                                                               ),
-                                                               child: Column(
-                                                                 crossAxisAlignment:
-                                                                 CrossAxisAlignment.start,
-                                                                 children: [
-                                                                   Padding(
-                                                                     padding:
-                                                                     const EdgeInsets.only(
-                                                                         top: 3),
-                                                                     child: Container(
-                                                                       width: 34,
-                                                                       height: 34,
-                                                                       decoration: BoxDecoration(
-                                                                         border: Border.all(
-                                                                             color: const Color(
-                                                                                 0xFF9F86FF),
-                                                                             width: 1.5),
-                                                                         color: const Color(
-                                                                             0xFFF8F6FF),
-                                                                         borderRadius:
-                                                                         BorderRadius
-                                                                             .circular(4),
-                                                                         boxShadow: [
-                                                                           BoxShadow(
-                                                                             color: const Color(
-                                                                                 0xFF418CFC33)
-                                                                                 .withOpacity(
-                                                                                 0.1),
-                                                                             // Soft grey shadow
-                                                                             spreadRadius: 1,
-                                                                             blurRadius: 3,
-                                                                             offset:
-                                                                             const Offset(
-                                                                                 0, 1),
-                                                                           ),
+                                                                   color: Colors.white,
+                                                                   // Set the color to white
+                                                                   elevation: 2,
+                                                                   // equivalent to the boxShadow in the original code
+                                                                   child: Container(
+                                                                     // height: 140,
+                                                                     width: 200,
+                                                                     padding: const EdgeInsets.all(16),
+                                                                     decoration: BoxDecoration(
+                                                                       gradient: LinearGradient(
+                                                                         colors: [
+                                                                           const Color.fromRGBO(218, 180, 255, 0.8).withOpacity(0.1),
+                                                                           //Color.fromRGBO(159, 134, 255, 0.8),
+                                                                           // Color(0xFF9F86FF),
+                                                                           const Color(0xFFFFFFFF),
+                                                                           // Icon background color
+                                                                           // Slightly darker shade of the icon background color
                                                                          ],
+                                                                         begin: Alignment.topLeft,
+                                                                         end: Alignment.bottomRight,
                                                                        ),
-                                                                       child: Image.asset(
-                                                                           "images/file.png",
-                                                                           fit:
-                                                                           BoxFit.scaleDown),
+                                                                       borderRadius: BorderRadius.circular(8),
+                                                                       boxShadow: [
+                                                                         BoxShadow(
+                                                                           color: const Color(0xFFE5D8F2).withOpacity(0.1),
+                                                                           spreadRadius: 2,
+                                                                           blurRadius: 3,
+                                                                           offset: const Offset(0, 1),
+                                                                         ),
+                                                                       ],
+                                                                     ),
+                                                                     child: Column(
+                                                                       crossAxisAlignment:
+                                                                       CrossAxisAlignment.start,
+                                                                       children: [
+                                                                         Padding(
+                                                                           padding:
+                                                                           const EdgeInsets.only(
+                                                                               top: 3),
+                                                                           child: Container(
+                                                                             width: 34,
+                                                                             height: 34,
+                                                                             decoration: BoxDecoration(
+                                                                               border: Border.all(
+                                                                                   color: const Color(
+                                                                                       0xFF9F86FF),
+                                                                                   width: 1.5),
+                                                                               color: const Color(
+                                                                                   0xFFF8F6FF),
+                                                                               borderRadius:
+                                                                               BorderRadius
+                                                                                   .circular(4),
+                                                                               boxShadow: [
+                                                                                 BoxShadow(
+                                                                                   color: const Color(
+                                                                                       0xFF418CFC33)
+                                                                                       .withOpacity(
+                                                                                       0.1),
+                                                                                   // Soft grey shadow
+                                                                                   spreadRadius: 1,
+                                                                                   blurRadius: 3,
+                                                                                   offset:
+                                                                                   const Offset(
+                                                                                       0, 1),
+                                                                                 ),
+                                                                               ],
+                                                                             ),
+                                                                             child: Image.asset(
+                                                                                 "images/file.png",
+                                                                                 fit:
+                                                                                 BoxFit.scaleDown),
+                                                                           ),
+                                                                         ),
+                                                                         const SizedBox(
+                                                                           height: 5,
+                                                                         ),
+                                                                          Padding(
+                                                                           padding: EdgeInsets.only(
+                                                                               left: 10),
+                                                                           child: Text(
+                                                                             _dashboardCounts != null
+                                                                                 ? _dashboardCounts!
+                                                                                 .Picked
+                                                                                 .toString()
+                                                                                 : '0',
+                                                                             style: const TextStyle(
+                                                                                 fontSize: 25,
+                                                                                 fontWeight:
+                                                                                 FontWeight
+                                                                                     .bold),
+                                                                           ),
+                                                                         ),
+                                                                         const Padding(
+                                                                           padding: EdgeInsets.only(
+                                                                               left: 10),
+                                                                           child: Text(
+                                                                             'Picked Orders',
+                                                                             style: TextStyle(
+                                                                               fontSize: 15,
+                                                                               color: Color(0xFF455A64),),
+                                                                           ),
+                                                                         )
+                                                                       ],
                                                                      ),
                                                                    ),
-                                                                   const SizedBox(
-                                                                     height: 5,
-                                                                   ),
-                                                                   const Padding(
-                                                                     padding: EdgeInsets.only(
-                                                                         left: 10),
-                                                                     child: Text(
-                                                                       '0',
-                                                                       style: TextStyle(
-                                                                           fontSize: 25,
-                                                                           fontWeight:
-                                                                           FontWeight.bold),
-                                                                     ),
-                                                                   ),
-                                                                   const Padding(
-                                                                     padding: EdgeInsets.only(
-                                                                         left: 10),
-                                                                     child: Text(
-                                                                       'Open Invoices',
-                                                                       style: TextStyle(
-                                                                         fontSize: 15,
-                                                                         color: Color(0xFF455A64),),
-                                                                     ),
-                                                                   )
-                                                                 ],
+                                                                 ),
                                                                ),
                                                              ),
                                                            ),
@@ -1688,113 +1774,132 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                                          Padding(
                                                            padding:
                                                            const EdgeInsets.only(top: 10,bottom: 10),
-                                                           child: Card(
-                                                             shape: RoundedRectangleBorder(
-                                                               borderRadius:
-                                                               BorderRadius.circular(10),
-                                                             ),
-                                                             color: Colors.white,
-                                                             // Set the color to white
-                                                             elevation: 2,
-                                                             // equivalent to the boxShadow in the original code
-                                                             child: Container(
-                                                               // height: 140,
-                                                               width: 200,
-                                                               padding: const EdgeInsets.all(16),
-                                                               decoration: BoxDecoration(
-                                                                 gradient: LinearGradient(
-                                                                   colors: [
-                                                                     Colors.blue.shade100.withOpacity(0.1),// Light blue
-                                                                     const Color(0xFFFFFFFF), // Grey
-                                                                   ],
-                                                                   begin: Alignment.topLeft,
-                                                                   end: Alignment.bottomRight,
-                                                                 ),
-                                                                 borderRadius: BorderRadius.circular(4),
-                                                                 boxShadow: [
-                                                                   BoxShadow(
-                                                                     color: const Color(0xFFE5E5EA).withOpacity(0.1),
-                                                                     spreadRadius: 1,
-                                                                     blurRadius: 3,
-                                                                     offset: const Offset(0, 1),
+                                                           child:  MouseRegion(
+                                                             onEnter: (_){setState(() {
+                                                               orderhover2 = true;
+                                                             });
+                                                             },
+                                                             onExit: (_){setState(() {
+                                                               orderhover2 = false;
+                                                             });
+                                                             },
+                                                             child: AnimatedScale(
+                                                               scale: orderhover2 ? 1.05: 1.0,
+                                                               duration:  const Duration(milliseconds: 200),
+                                                               child: InkWell(
+                                                                 onTap: () {
+                                                                   context.go('/Order_Complete');
+                                                                 },
+                                                                 child: Card(
+                                                                   shape: RoundedRectangleBorder(
+                                                                     borderRadius:
+                                                                     BorderRadius.circular(10),
                                                                    ),
-                                                                 ],
-                                                               ),
-                                                               child: Column(
-                                                                 crossAxisAlignment:
-                                                                 CrossAxisAlignment.start,
-                                                                 children: [
-                                                                   Padding(
-                                                                     padding:
-                                                                     const EdgeInsets.only(
-                                                                         top: 3),
-                                                                     child: Container(
-                                                                       width: 34,
-                                                                       height: 34,
-                                                                       decoration: BoxDecoration(
-                                                                         border: Border.all(
-                                                                             color: const Color(
-                                                                                 0xFF0388AB),
-                                                                             width: 1.5),
-                                                                         color: const Color(
-                                                                             0xFFF8F6FF),
-                                                                         borderRadius:
-                                                                         BorderRadius
-                                                                             .circular(4),
-                                                                         boxShadow: [
-                                                                           BoxShadow(
-                                                                             color: const Color(
-                                                                                 0xFF418CFC33)
-                                                                                 .withOpacity(
-                                                                                 0.1),
-                                                                             // Soft grey shadow
-                                                                             spreadRadius: 1,
-                                                                             blurRadius: 3,
-                                                                             offset:
-                                                                             const Offset(
-                                                                                 0, 1),
-                                                                           ),
+                                                                   color: Colors.white,
+                                                                   // Set the color to white
+                                                                   elevation: 2,
+                                                                   // equivalent to the boxShadow in the original code
+                                                                   child: Container(
+                                                                     // height: 140,
+                                                                     width: 200,
+                                                                     padding: const EdgeInsets.all(16),
+                                                                     decoration: BoxDecoration(
+                                                                       gradient: LinearGradient(
+                                                                         colors: [
+                                                                           Colors.blue.shade100.withOpacity(0.1),// Light blue
+                                                                           const Color(0xFFFFFFFF), // Grey
                                                                          ],
+                                                                         begin: Alignment.topLeft,
+                                                                         end: Alignment.bottomRight,
                                                                        ),
-                                                                       child: Image.asset(
-                                                                           "images/dash.png",
-                                                                           fit:
-                                                                           BoxFit.scaleDown),
+                                                                       borderRadius: BorderRadius.circular(4),
+                                                                       boxShadow: [
+                                                                         BoxShadow(
+                                                                           color: const Color(0xFFE5E5EA).withOpacity(0.1),
+                                                                           spreadRadius: 1,
+                                                                           blurRadius: 3,
+                                                                           offset: const Offset(0, 1),
+                                                                         ),
+                                                                       ],
+                                                                     ),
+                                                                     child: Column(
+                                                                       crossAxisAlignment:
+                                                                       CrossAxisAlignment.start,
+                                                                       children: [
+                                                                         Padding(
+                                                                           padding:
+                                                                           const EdgeInsets.only(
+                                                                               top: 3),
+                                                                           child: Container(
+                                                                             width: 34,
+                                                                             height: 34,
+                                                                             decoration: BoxDecoration(
+                                                                               border: Border.all(
+                                                                                   color: const Color(
+                                                                                       0xFF0388AB),
+                                                                                   width: 1.5),
+                                                                               color: const Color(
+                                                                                   0xFFF8F6FF),
+                                                                               borderRadius:
+                                                                               BorderRadius
+                                                                                   .circular(4),
+                                                                               boxShadow: [
+                                                                                 BoxShadow(
+                                                                                   color: const Color(
+                                                                                       0xFF418CFC33)
+                                                                                       .withOpacity(
+                                                                                       0.1),
+                                                                                   // Soft grey shadow
+                                                                                   spreadRadius: 1,
+                                                                                   blurRadius: 3,
+                                                                                   offset:
+                                                                                   const Offset(
+                                                                                       0, 1),
+                                                                                 ),
+                                                                               ],
+                                                                             ),
+                                                                             child: Image.asset(
+                                                                                 "images/dash.png",
+                                                                                 fit:
+                                                                                 BoxFit.scaleDown),
+                                                                           ),
+                                                                         ),
+                                                                         const SizedBox(
+                                                                           height: 5,
+                                                                         ),
+                                                                         Padding(
+                                                                           padding:
+                                                                           const EdgeInsets.only(
+                                                                               left: 10),
+                                                                           child: Text(
+                                                                             _dashboardCounts != null
+                                                                                 ? _dashboardCounts!
+                                                                                 .Delivered
+                                                                                 .toString()
+                                                                                 : '0',
+                                                                             style: const TextStyle(
+                                                                                 fontSize: 25,
+                                                                                 fontWeight:
+                                                                                 FontWeight.bold),
+                                                                           ),
+                                                                         ),
+                                                                         const Padding(
+                                                                           padding: EdgeInsets.only(
+                                                                               left: 10),
+                                                                           child: Text(
+                                                                             'Order Delivered',
+                                                                             style: TextStyle(
+                                                                               fontSize: 15,
+                                                                               color: Color(0xFF455A64), // Dark grey-blue
+                                                                               fontWeight: FontWeight.w500,
+                                                                               letterSpacing: 0.5,
+                                                                             ),
+                                                                           ),
+                                                                         )
+                                                                       ],
                                                                      ),
                                                                    ),
-                                                                   const SizedBox(
-                                                                     height: 5,
-                                                                   ),
-                                                                   Padding(
-                                                                     padding:
-                                                                     const EdgeInsets.only(
-                                                                         left: 10),
-                                                                     child: Text(
-                                                                       _dashboardCounts != null
-                                                                           ? _dashboardCounts!
-                                                                           .totalAmount
-                                                                           .toString()
-                                                                           : '0',
-                                                                       style: const TextStyle(
-                                                                           fontSize: 25,
-                                                                           fontWeight:
-                                                                           FontWeight.bold),
-                                                                     ),
-                                                                   ),
-                                                                   const Padding(
-                                                                     padding: EdgeInsets.only(
-                                                                         left: 10),
-                                                                     child: Text(
-                                                                       'Available Credit Limit',
-                                                                       style: TextStyle(
-                                                                         fontSize: 15,
-                                                                         color: Color(0xFF455A64), // Dark grey-blue
-                                                                         fontWeight: FontWeight.w500,
-                                                                         letterSpacing: 0.5,
-                                                                       ),
-                                                                     ),
-                                                                   )
-                                                                 ],
+                                                                 ),
                                                                ),
                                                              ),
                                                            ),
@@ -1817,13 +1922,7 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                                                duration:  const Duration(milliseconds: 200),
                                                                child: InkWell(
                                                                  onTap: () {
-                                                                   context.go('/Order_Complete');
-                                                                   // Navigator.push(
-                                                                   //   context,
-                                                                   //   MaterialPageRoute(
-                                                                   //       builder: (context) =>
-                                                                   //           OrderList()),
-                                                                   // );
+                                                                   context.go('/Pay_Complete');
                                                                  },
                                                                  child: Card(
                                                                    shape: RoundedRectangleBorder(
@@ -1912,7 +2011,7 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                                                            child: Text(
                                                                              _dashboardCounts != null
                                                                                  ? _dashboardCounts!
-                                                                                 .Delivered
+                                                                                 .Cleard
                                                                                  .toString()
                                                                                  : '0',
                                                                              style: const TextStyle(
@@ -2169,11 +2268,11 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
         ],
       ),
       // _buildMenuItem('Home', Icons.dashboard, Colors.blueAccent, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
@@ -2937,68 +3036,69 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                   color: Colors.grey)),
                         ),
                       ],
-                      onSelectChanged: (selected) {
-                        if (selected != null && selected) {
-                          final orderId = detail
-                              .orderId; // Capture the orderId of the selected row
-                          final detail1 = filteredData.firstWhere(
-                                  (element) => element.orderId == orderId);
-                          //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                          //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-
-                          if (filteredData1.length <= 9) {
-                            //fetchOrders();
-                            PaymentMap = {
-                              'paymentmode': detail.paymentMode,
-                              'paymentStatus': detail.paymentStatus,
-                              'paymentdate': detail.paymentDate,
-                              'paidamount': detail.paidAmount,
-                            };
-
-                            context.go('/Order_Placed_List', extra: {
-                              'product': detail1,
-                              'item': [], // pass an empty list of maps
-                              'arrow': 'Home',
-                              'status': detail.deliveryStatus,
-                              'paymentStatus': PaymentMap,
-                              'body': {},
-                              // 'status': detail.deliveryStatus,
-                              'itemsList': [], // pass an empty list of maps
-                              'orderDetails': filteredData
-                                  .map((detail) => ors.OrderDetail(
-                                orderId: detail.orderId,
-                                orderDate: detail.orderDate, items: [],
-                                // Add other fields as needed
-                              ))
-                                  .toList(),
-                            });
-                          } else {
-                            PaymentMap = {
-                              'paymentmode': detail.paymentMode,
-                              'paymentStatus': detail.paymentStatus,
-                              'paymentdate': detail.paymentDate,
-                              'paidamount': detail.paidAmount,
-                            };
-                            context.go('/Order_Placed_List', extra: {
-                              'product': detail1,
-                              'arrow': 'Home',
-                              'item': [], // pass an empty list of maps
-                              'status': detail.deliveryStatus,
-                              'paymentStatus': PaymentMap,
-                              'body': {},
-                              'itemsList': [], // pass an empty list of maps
-                              'orderDetails': filteredData
-                                  .map((detail) => ors.OrderDetail(
-                                orderId: detail.orderId,
-                                orderDate: detail.orderDate, items: [],
-                                // Add other fields as needed
-                              ))
-                                  .toList(),
-                            });
-
-                          }
-                        }
-                      });
+                      // onSelectChanged: (selected) {
+                      //   if (selected != null && selected) {
+                      //     final orderId = detail
+                      //         .orderId; // Capture the orderId of the selected row
+                      //     final detail1 = filteredData.firstWhere(
+                      //             (element) => element.orderId == orderId);
+                      //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                      //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+                      //
+                      //     if (filteredData1.length <= 9) {
+                      //       //fetchOrders();
+                      //       PaymentMap = {
+                      //         'paymentmode': detail.paymentMode,
+                      //         'paymentStatus': detail.paymentStatus,
+                      //         'paymentdate': detail.paymentDate,
+                      //         'paidamount': detail.paidAmount,
+                      //       };
+                      //
+                      //       context.go('/Order_Placed_List', extra: {
+                      //         'product': detail1,
+                      //         'item': [], // pass an empty list of maps
+                      //         'arrow': 'Home',
+                      //         'status': detail.deliveryStatus,
+                      //         'paymentStatus': PaymentMap,
+                      //         'body': {},
+                      //         // 'status': detail.deliveryStatus,
+                      //         'itemsList': [], // pass an empty list of maps
+                      //         'orderDetails': filteredData
+                      //             .map((detail) => ors.OrderDetail(
+                      //           orderId: detail.orderId,
+                      //           orderDate: detail.orderDate, items: [],
+                      //           // Add other fields as needed
+                      //         ))
+                      //             .toList(),
+                      //       });
+                      //     } else {
+                      //       PaymentMap = {
+                      //         'paymentmode': detail.paymentMode,
+                      //         'paymentStatus': detail.paymentStatus,
+                      //         'paymentdate': detail.paymentDate,
+                      //         'paidamount': detail.paidAmount,
+                      //       };
+                      //       context.go('/Order_Placed_List', extra: {
+                      //         'product': detail1,
+                      //         'arrow': 'Home',
+                      //         'item': [], // pass an empty list of maps
+                      //         'status': detail.deliveryStatus,
+                      //         'paymentStatus': PaymentMap,
+                      //         'body': {},
+                      //         'itemsList': [], // pass an empty list of maps
+                      //         'orderDetails': filteredData
+                      //             .map((detail) => ors.OrderDetail(
+                      //           orderId: detail.orderId,
+                      //           orderDate: detail.orderDate, items: [],
+                      //           // Add other fields as needed
+                      //         ))
+                      //             .toList(),
+                      //       });
+                      //
+                      //     }
+                      //   }
+                      // }
+                      );
                 })),
           ),
         ],
@@ -3316,68 +3416,69 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                   color: Colors.grey)),
                         ),
                       ],
-                      onSelectChanged: (selected) {
-                        if (selected != null && selected) {
-                          final orderId = detail
-                              .orderId; // Capture the orderId of the selected row
-                          final detail1 = filteredData.firstWhere(
-                              (element) => element.orderId == orderId);
-                          //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                          //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-
-                          if (filteredData1.length <= 9) {
-                            //fetchOrders();
-                            PaymentMap = {
-                              'paymentmode': detail.paymentMode,
-                              'paymentStatus': detail.paymentStatus,
-                              'paymentdate': detail.paymentDate,
-                              'paidamount': detail.paidAmount,
-                            };
-
-                            context.go('/Order_Placed_List', extra: {
-                              'product': detail1,
-                              'item': [], // pass an empty list of maps
-                              'arrow': 'Home',
-                              'status': detail.deliveryStatus,
-                              'paymentStatus': PaymentMap,
-                              'body': {},
-                              // 'status': detail.deliveryStatus,
-                              'itemsList': [], // pass an empty list of maps
-                              'orderDetails': filteredData
-                                  .map((detail) => ors.OrderDetail(
-                                        orderId: detail.orderId,
-                                        orderDate: detail.orderDate, items: [],
-                                        // Add other fields as needed
-                                      ))
-                                  .toList(),
-                            });
-                          } else {
-                            PaymentMap = {
-                              'paymentmode': detail.paymentMode,
-                              'paymentStatus': detail.paymentStatus,
-                              'paymentdate': detail.paymentDate,
-                              'paidamount': detail.paidAmount,
-                            };
-                            context.go('/Order_Placed_List', extra: {
-                              'product': detail1,
-                              'arrow': 'Home',
-                              'item': [], // pass an empty list of maps
-                              'status': detail.deliveryStatus,
-                              'paymentStatus': PaymentMap,
-                              'body': {},
-                              'itemsList': [], // pass an empty list of maps
-                              'orderDetails': filteredData
-                                  .map((detail) => ors.OrderDetail(
-                                        orderId: detail.orderId,
-                                        orderDate: detail.orderDate, items: [],
-                                        // Add other fields as needed
-                                      ))
-                                  .toList(),
-                            });
-
-                          }
-                        }
-                      });
+                      // onSelectChanged: (selected) {
+                      //   if (selected != null && selected) {
+                      //     final orderId = detail
+                      //         .orderId; // Capture the orderId of the selected row
+                      //     final detail1 = filteredData.firstWhere(
+                      //         (element) => element.orderId == orderId);
+                      //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                      //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+                      //
+                      //     if (filteredData1.length <= 9) {
+                      //       //fetchOrders();
+                      //       PaymentMap = {
+                      //         'paymentmode': detail.paymentMode,
+                      //         'paymentStatus': detail.paymentStatus,
+                      //         'paymentdate': detail.paymentDate,
+                      //         'paidamount': detail.paidAmount,
+                      //       };
+                      //
+                      //       context.go('/Order_Placed_List', extra: {
+                      //         'product': detail1,
+                      //         'item': [], // pass an empty list of maps
+                      //         'arrow': 'Home',
+                      //         'status': detail.deliveryStatus,
+                      //         'paymentStatus': PaymentMap,
+                      //         'body': {},
+                      //         // 'status': detail.deliveryStatus,
+                      //         'itemsList': [], // pass an empty list of maps
+                      //         'orderDetails': filteredData
+                      //             .map((detail) => ors.OrderDetail(
+                      //                   orderId: detail.orderId,
+                      //                   orderDate: detail.orderDate, items: [],
+                      //                   // Add other fields as needed
+                      //                 ))
+                      //             .toList(),
+                      //       });
+                      //     } else {
+                      //       PaymentMap = {
+                      //         'paymentmode': detail.paymentMode,
+                      //         'paymentStatus': detail.paymentStatus,
+                      //         'paymentdate': detail.paymentDate,
+                      //         'paidamount': detail.paidAmount,
+                      //       };
+                      //       context.go('/Order_Placed_List', extra: {
+                      //         'product': detail1,
+                      //         'arrow': 'Home',
+                      //         'item': [], // pass an empty list of maps
+                      //         'status': detail.deliveryStatus,
+                      //         'paymentStatus': PaymentMap,
+                      //         'body': {},
+                      //         'itemsList': [], // pass an empty list of maps
+                      //         'orderDetails': filteredData
+                      //             .map((detail) => ors.OrderDetail(
+                      //                   orderId: detail.orderId,
+                      //                   orderDate: detail.orderDate, items: [],
+                      //                   // Add other fields as needed
+                      //                 ))
+                      //             .toList(),
+                      //       });
+                      //
+                      //     }
+                      //   }
+                      // }
+                      );
                 })),
           ),
         ],
@@ -3478,23 +3579,35 @@ class Dashboard1 {
 
 class DashboardCounts {
   final int openOrders;
+  final int Cleard;
+  final int Inprepare;
+  final int Picked;
 
   //final int? openInvoices;
-  final int totalAmount;
+  final double totalAmount;
   final int Delivered;
 
   DashboardCounts(
       {required this.openOrders,
+        required this.Cleard,
+      required this.Inprepare,
+        required this.Picked,
+
       //   required this.openInvoices,
       required this.totalAmount,
       required this.Delivered});
 
   factory DashboardCounts.fromJson(Map<String, dynamic> json) {
     return DashboardCounts(
-      openOrders: json['Not Started'],
+      Picked: json['Picked'] ?? 0,
+      openOrders: json['Not Started'] ?? 0.0,
+      Cleard: json['Cleared'] ?? 0.0,
+      Inprepare: json['In Progress'] ?? 0.0,
+
       //    openInvoices: json['Open Invoices'],
-      totalAmount: json['totalAmount'],
-      Delivered: json['Delivered'],
+      totalAmount: json['totalAmount']?? 0.0,
+      Delivered: json['Delivered']?? 0.0,
+
     );
   }
 }

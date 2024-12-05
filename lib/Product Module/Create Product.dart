@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
-
+void main() => runApp(MaterialApp(debugShowCheckedModeBanner:false,home: SecondPage()));
 
 
 class SecondPage extends StatefulWidget {
@@ -39,6 +39,7 @@ class _SecondPageState extends State<SecondPage> {
   final List<String> list1 = ['Select', '12%', '18%', '28%', '10%'];
   String? selectedDropdownItem;
   String dropdownValue1 = 'Select';
+  final ScrollController verticalscroll= ScrollController();
   String imageName = '';
   List<Uint8List> selectedImages = [];
   String storeImage = '';
@@ -83,7 +84,7 @@ class _SecondPageState extends State<SecondPage> {
         // Check if the file size exceeds 1MB (1MB = 1024 * 1024 bytes)
         if (element.size > 1024 * 1024) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('File size exceeds 1MB. Please choose a smaller file.'),
             ),
           );
@@ -183,11 +184,11 @@ class _SecondPageState extends State<SecondPage> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                icon: Icon(Icons.warning_sharp, color: Colors.red, size: 25,),
-                content: Text('A product with the same details already exists.'),
+                icon: const Icon(Icons.warning_sharp, color: Colors.red, size: 25,),
+                content: const Text('A product with the same details already exists.'),
                 actions: <Widget>[
                   TextButton(
-                    child: Text('OK'),
+                    child: const Text('OK'),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -229,10 +230,10 @@ class _SecondPageState extends State<SecondPage> {
                         child: Column(
                           children: [
                             // Warning Icon
-                            Icon(Icons.check_circle_rounded, color: Colors.green, size: 50),
-                            SizedBox(height: 16),
+                            const Icon(Icons.check_circle_rounded, color: Colors.green, size: 50),
+                            const SizedBox(height: 16),
                             // Confirmation Message
-                            Text(
+                            const Text(
                               'Product Added Successfully',
                               style: TextStyle(
                                 fontSize: 14,
@@ -240,7 +241,7 @@ class _SecondPageState extends State<SecondPage> {
                                 color: Colors.black,
                               ),
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
                             // Buttons
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -254,12 +255,12 @@ class _SecondPageState extends State<SecondPage> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue,
-                                    side: BorderSide(color: Colors.blue),
+                                    side: const BorderSide(color: Colors.blue),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
                                   ),
-                                  child: Text(
+                                  child: const Text(
                                     'OK',
                                     style: TextStyle(
                                       color: Colors.white,
@@ -468,11 +469,11 @@ class _SecondPageState extends State<SecondPage> {
               context: context,
               builder: (context) {
                 return AlertDialog(
-                  icon: Icon(Icons.warning_sharp, color: Colors.red, size: 25,),
-                  content: Text('Product already exists.'),
+                  icon: const Icon(Icons.warning_sharp, color: Colors.red, size: 25,),
+                  content: const Text('Product already exists.'),
                   actions: <Widget>[
                     TextButton(
-                      child: Text('OK'),
+                      child: const Text('OK'),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -512,7 +513,7 @@ class _SecondPageState extends State<SecondPage> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800] ,
@@ -525,9 +526,9 @@ class _SecondPageState extends State<SecondPage> {
           ),
           child: _buildMenuItem('Products', Icons.image_outlined, Colors.white, '/Product_List')),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
@@ -753,19 +754,73 @@ class _SecondPageState extends State<SecondPage> {
 
                 if(constraints.maxWidth >= 1366){
                   return Stack(children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 1400,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
+
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
+                    // if(constraints.maxHeight <= 500)...{
+                    //   SingleChildScrollView(
+                    //     scrollDirection: Axis.vertical,
+                    //     controller: verticalscroll,
+                    //     child: Align(
+                    //       alignment: Alignment.topLeft,
+                    //       child: Container(
+                    //         width: 200,
+                    //         height: 800,
+                    //         color: const Color(0xFFF7F6FA),
+                    //         padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: _buildMenuItems(context),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   )
+                    // }
+                    // else...{
+                    //   SingleChildScrollView(
+                    //     child: Align(
+                    //       alignment: Alignment.topLeft,
+                    //       child: Container(
+                    //         width: 200,
+                    //         height: maxHeight,
+                    //         color: const Color(0xFFF7F6FA),
+                    //         padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: _buildMenuItems(context),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // },
                     Padding(
                       padding: const EdgeInsets.only( left: 190),
                       child: Container(
@@ -777,7 +832,7 @@ class _SecondPageState extends State<SecondPage> {
                     ),
                     Positioned(
                       top: 0,
-                      left: 0,
+                      left: 10,
                       right: 0,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 205),
@@ -822,855 +877,926 @@ class _SecondPageState extends State<SecondPage> {
                         margin: const EdgeInsets.symmetric(
                             vertical: 10), // Space above/below the border
                         height: 1, // Border height
-                        width: 1500,
+                        width: maxWidth,
                         color: Colors.grey, // Border color
                       ),
                     ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 250),
-                          child: GestureDetector(
-                            onTap: () {
-                              print('---imagePath---');
-                              // print(imagePath);
-                              // print(selectedImage);
-                              filePicker();
-                            },
-                            child: Card(
-                              margin: EdgeInsets.only(left: maxWidth * 0.08, top: 220,bottom: maxHeight * 0.35),
-
-                              child: Flex(
-                                direction: Axis.vertical, // use vertical direction
-                                children: [
-                                  Flexible(
-                                    flex: 2, // take up 3 parts of the available space
-                                    child: Container(
-                                      width: maxWidth * 0.3,
-                                      height: maxHeight * 1.2,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey),
-                                        color: Colors.white70,
-                                        borderRadius: BorderRadius.circular(8),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.blue.withOpacity(0.1), // Soft grey shadow
-                                            spreadRadius: 1,
-                                            blurRadius: 1,
-                                            offset: const Offset(0, 1),
-                                          ),
-                                        ],
-                                      ),
-                                      // decoration: BoxDecoration(
-                                      //   color: Colors.grey[300],
-                                      //   borderRadius: BorderRadius.circular(4),
-                                      // ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          if (selectedImages.isNotEmpty)
-                                            for (var imageBytes in selectedImages)
-                                              Flexible(
-                                                child: Image.memory(
-                                                  imageBytes,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                          Icon(Icons.cloud_upload_outlined,
-                                              color: Colors.blue[900], size: 50),
-                                          const SizedBox(height: 8),
-                                          const Text(
-                                            'Click to upload image',
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          const SizedBox(height: 8),
-                                          const Text(
-                                            'PNG, JPG or GIF Recommended size below 1MB',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Expanded(
-                          child: Card(
-                            margin: EdgeInsets.only(left: maxWidth * 0.08, top: maxHeight * 0.2,right: maxWidth * 0.1),
+                    Padding(
+                      padding:  EdgeInsets.only(left: 250,right: 50,top: maxHeight * 0.18,),
+                      child: Container(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Container(
                             color: Colors.white,
-                            elevation: 0.0,
-                            child: Form(
-                              key: _validate,
-                              child: Flex(
-                                direction: Axis.vertical,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // Product Name field
-                                      Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Align(
-                                          alignment: const Alignment(-1.0,-0.3),
-                                          child: RichText(
-                                            text:  TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: 'Product Name ',
-                                                  style: TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 16,// Set the product name to black color
-                                                  ),
-                                                ),
-                                                const TextSpan(
-                                                  text: '*',
-                                                  style: TextStyle(
-                                                    color: Colors.red, // Set the asterisk to red color
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(2),
-                                            border: Border.all(color: Colors.blue[100]!),
-                                          ),
-                                          child: Align(
-                                            alignment: const Alignment(0.1, 0.0),
-                                            child: SizedBox(
-                                              height: 40,
-                                              width: constraints.maxWidth * 0.5,
-                                              child: Form(
-                                                  key: _formKey,
-                                                  child: TextFormField(
-                                                    controller: productNameController,
-                                                    decoration: InputDecoration(
-                                                      fillColor: Colors.white,
-                                                      contentPadding:
-                                                      const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
-                                                      border: InputBorder.none,
-                                                      filled: true,
-                                                      hintText: 'Enter Product Name',
-                                                      hintStyle: const TextStyle(color: Colors.grey),
-                                                    ),
-                                                    inputFormatters: [
-                                                      // Allow only letters, numbers, and single space
-                                                      FilteringTextInputFormatter.deny(
-                                                          RegExp(r'^\s')),
-                                                      // Disallow starting with a space
-                                                      FilteringTextInputFormatter.deny(
-                                                          RegExp(r'\s\s')),
-                                                      // Disallow multiple spaces
-                                                    ],
-                                                    // No inputFormatters to allow all characters
-                                                    validator: (value) {
-                                                      if (value != null && value.trim().isEmpty) {
-                                                        return 'Please enter a product name';
-                                                      }
-                                                      return null;
-                                                    },
-                                                    // validator: (value) {
-                                                    //   final RegExp specialCharRegExp =
-                                                    //   RegExp(r'[!@#$%^&*(),.?":{}|<>]');
-                                                    //   if (value != null && value.trim().isEmpty) {
-                                                    //     return 'Please enter a product name';
-                                                    //   } else if (value != null && specialCharRegExp.hasMatch(value)) {
-                                                    //     WidgetsBinding.instance.addPostFrameCallback((_) {
-                                                    //       ScaffoldMessenger.of(context).showSnackBar(
-                                                    //         const SnackBar(
-                                                    //           content: Text('Special characters are not allowed!'),
-                                                    //         ),
-                                                    //       );
-                                                    //     });
-                                                    //   }else{
-                                                    //     addProductMaster();
-                                                    //   }
-                                                    //   return null;
-                                                    // },
-                                                    maxLines: 1,
-                                                    minLines: 1,
-                                                  )
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  // const SizedBox(height: 5),
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        flex: 2,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            // Category field
-                                            Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Align(
-                                                alignment: const  Alignment(-1.0,-0.3),
-                                                child: RichText(
-                                                  text:  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text: 'Category ',
-                                                        style: TextStyle(
-                                                          color: Colors.black87,
-                                                          fontSize: 16,// Set the product name to black color
-                                                        ),
-                                                      ),
-                                                      const TextSpan(
-                                                        text: '*',
-                                                        style: TextStyle(
-                                                          color: Colors.red, // Set the asterisk to red color
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                height: 40,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(2),
-                                                  border: Border.all(color: Colors.blue[100]!),
-                                                ),
-                                                child: SizedBox(
-                                                  height: 50,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                    child: DropdownButton<String>(
-                                                      value: dropdownValue,
-                                                      icon:  Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blue[800],),
-                                                      iconSize: 18, // Size of the icon
-                                                      elevation: 16,
-                                                      style: const TextStyle(color: Colors.black),
-                                                      underline: Container(), // We don't need the default underline since we're using a custom border
-                                                      onChanged: (String? value) {
-                                                        setState(() {
-                                                          dropdownValue = value!;
-                                                        });
-                                                      },
-                                                      items: list.map<DropdownMenuItem<String>>((String value) {
-                                                        return DropdownMenuItem<String>(
-                                                          value: value,
-                                                          child: Text(value,style: const TextStyle(color: Colors.grey),),
-                                                        );
-                                                      }).toList(),
-                                                      isExpanded: true,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Flexible(
-                                        flex: 2,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            // Sub Category field
-                                            Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Align(
-                                                alignment: const Alignment(-1.0,-0.3),
-                                                child: RichText(
-                                                  text:  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text: 'Sub Category ',
-                                                        style: TextStyle(
-                                                            color: Colors.black87,
-                                                            fontSize: 16// Set the product name to black color
-                                                        ),
-                                                      ),
-                                                      const TextSpan(
-                                                        text: '*',
-                                                        style: TextStyle(
-                                                          color: Colors.red, // Set the asterisk to red color
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                height: 40,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(2),
-                                                  border: Border.all(color:
-                                                  Colors.blue[100]!),
-                                                ),
-                                                child: Padding(
-                                                  padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                                  child: DropdownButton<String>(
-                                                    value: dropdownValue3,
-                                                    icon:  Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blue[800],),
-                                                    iconSize: 18,
-                                                    // Size of the icon
-                                                    elevation: 16,
-                                                    style: const TextStyle(
-                                                        color: Colors.black),
-                                                    underline: Container(),
-                                                    // We don't need the default underline since we're using a custom border
-                                                    onChanged: (String? value) {
-                                                      setState(() {
-                                                        dropdownValue3 = value!;
-                                                      });
-                                                    },
-                                                    items: list3.map<
-                                                        DropdownMenuItem<
-                                                            String>>(
-                                                            (String value) {
-                                                          return DropdownMenuItem<
-                                                              String>(
-                                                            value: value,
-                                                            child: Text(value,style: const TextStyle(color: Colors.grey),),
-                                                          );
-                                                        }).toList(),
-                                                    isExpanded: true,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Align(
-                                                alignment:  const Alignment(-1.0,-0.3),
-                                                child: RichText(
-                                                  text:  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text: 'Tax ',
-                                                        style: TextStyle(
-                                                          color: Colors.black87,
-                                                          fontSize: 16,// Set the product name to black color
-                                                        ),
-                                                      ),
-                                                      const TextSpan(
-                                                        text: '*',
-                                                        style: TextStyle(
-                                                          color: Colors
-                                                              .red, // Set the asterisk to red color
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                height: 40,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                  BorderRadius.circular(2),
-                                                  border: Border.all(
-                                                      color: Colors.blue[100]!),
-                                                ),
-                                                child: SizedBox(
-                                                  height: 50,
-                                                  child: Padding(
-                                                    padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                    child: SizedBox(
-                                                      height: 40,
-                                                      width: constraints.maxWidth * 0.5,
-                                                      child: DropdownButton<String>(
-                                                        value: dropdownValue1,
-                                                        icon:   Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blue[800],),
-                                                        iconSize: 18,
-                                                        // Size of the icon
-                                                        elevation: 16,
-                                                        style: const TextStyle(
-                                                            color: Colors.black),
-                                                        underline: Container(),
-                                                        // We don't need the default underline since we're using a custom border
-                                                        onChanged: (String? value) {
-                                                          setState(() {
-                                                            dropdownValue1 = value!;
-                                                          });
-                                                        },
-                                                        items: list1.map<
-                                                            DropdownMenuItem<
-                                                                String>>(
-                                                                (String value) {
-                                                              return DropdownMenuItem<
-                                                                  String>(
-                                                                value: value,
-                                                                child: Text(value,style: const TextStyle(color: Colors.grey),),
-                                                              );
-                                                            }).toList(),
-                                                        isExpanded: true,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Align(
-                                                alignment: const Alignment(-1.0,-0.3),
-                                                child: RichText(
-                                                  text:  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text: 'Unit ',
-                                                        style: TextStyle(
-                                                          color: Colors.black87, //
-                                                          fontSize: 16,// Set the product name to black color
-                                                        ),
-                                                      ),
-                                                      const TextSpan(
-                                                        text: '*',
-                                                        style: TextStyle(
-                                                          color: Colors
-                                                              .red, // Set the asterisk to red color
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                height: 40,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                  BorderRadius.circular(2),
-                                                  border: Border.all(
-                                                      color: Colors.blue[100]!),
-                                                ),
-                                                child: SizedBox(
-                                                  height: 50,
+                            width: maxWidth * 1.5,
+                            height: maxHeight * 0.8,
+                            child: Stack(
+                              children: [
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 100),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          print('---imagePath---');
+                                          // print(imagePath);
+                                          // print(selectedImage);
+                                          filePicker();
+                                        },
+                                        child: Card(
+                                          margin: EdgeInsets.only(left: maxWidth * 0.06, top: 100,bottom: maxHeight * 0.17),
 
-                                                  child: Padding(
-                                                    padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                    child: SizedBox(
-                                                      height: 40,
-                                                      width: constraints.maxWidth * 0.5,
-                                                      child: DropdownButton<String>(
-                                                        value: dropdownValue2,
-                                                        icon:   Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blue[800],),
-                                                        iconSize: 18,
-                                                        // Size of the icon
-                                                        elevation: 16,
-                                                        style: const TextStyle(
-                                                            color: Colors.black),
-                                                        underline: Container(),
-                                                        // We don't need the default underline since we're using a custom border
-                                                        onChanged: (String? value) {
-                                                          setState(() {
-                                                            dropdownValue2 = value!;
-                                                          });
-                                                        },
-                                                        items: list2.map<
-                                                            DropdownMenuItem<
-                                                                String>>(
-                                                                (String value) {
-                                                              return DropdownMenuItem<
-                                                                  String>(
-                                                                value: value,
-                                                                child: Text(value,style:const TextStyle(color: Colors.grey),),
-                                                              );
-                                                            }).toList(),
-                                                        isExpanded: true,
+                                          child: Flex(
+                                            direction: Axis.vertical, // use vertical direction
+                                            children: [
+                                              Flexible(
+                                                flex: 2, // take up 3 parts of the available space
+                                                child: Container(
+                                                  width: maxWidth * 0.3,
+                                                  height: maxHeight * 1.2,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(color: Colors.grey),
+                                                    color: Colors.white70,
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.blue.withOpacity(0.1), // Soft grey shadow
+                                                        spreadRadius: 1,
+                                                        blurRadius: 1,
+                                                        offset: const Offset(0, 1),
                                                       ),
-                                                    ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Align(
-                                                alignment:const Alignment(-1.0,-0.3),
-                                                child: RichText(
-                                                  text:  TextSpan(
+                                                  // decoration: BoxDecoration(
+                                                  //   color: Colors.grey[300],
+                                                  //   borderRadius: BorderRadius.circular(4),
+                                                  // ),
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
                                                     children: [
-                                                      TextSpan(
-                                                        text: 'Price ',
-                                                        style: TextStyle(
-                                                          color: Colors.black87,
-
-                                                          fontSize: 16,// Set the product name to black color
-                                                        ),
+                                                      if (selectedImages.isNotEmpty)
+                                                        for (var imageBytes in selectedImages)
+                                                          Flexible(
+                                                            child: Image.memory(
+                                                              imageBytes,
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          ),
+                                                      Icon(Icons.cloud_upload_outlined,
+                                                          color: Colors.blue[900], size: 50),
+                                                      const SizedBox(height: 8),
+                                                      const Text(
+                                                        'Click to upload image',
+                                                        textAlign: TextAlign.center,
                                                       ),
-                                                      const TextSpan(
-                                                        text: '*',
-                                                        style: TextStyle(
-                                                          color: Colors
-                                                              .red, // Set the asterisk to red color
-                                                        ),
+                                                      const SizedBox(height: 8),
+                                                      const Text(
+                                                        'PNG, JPG or GIF Recommended size below 1MB',
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(fontSize: 12),
                                                       ),
                                                     ],
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                height: 40,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                  BorderRadius.circular(2),
-                                                  border: Border.all(
-                                                      color: Colors.blue[100]!),
-                                                ),
-                                                child: TextFormField(
-                                                  controller: priceController,
-                                                  keyboardType:
-                                                  TextInputType.number,
-                                                  inputFormatters: [
-                                                    FilteringTextInputFormatter
-                                                        .digitsOnly,
-                                                    LengthLimitingTextInputFormatter(
-                                                        10),
-                                                    // limits to 10 digits
-                                                  ],
-                                                  decoration: InputDecoration(
-                                                    fillColor: Colors.white,
-                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 13),
-                                                    border: InputBorder.none,
-                                                    filled: true,
-                                                    hintText: 'Enter Price',
-                                                    hintStyle: TextStyle(color: Colors.grey),
-                                                    errorText: errorMessage,
-                                                  ),
-                                                  onChanged: (value) {
-                                                    if (value.isNotEmpty &&
-                                                        !isNumeric(value)) {
-                                                      setState(() {
-                                                        errorMessage =
-                                                        'Please enter numbers only';
-                                                      });
-                                                    } else {
-                                                      setState(() {
-                                                        errorMessage = null;
-                                                      });
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Align(
-                                                alignment: const Alignment(-1.0,-0.3),
-                                                child: RichText(
-                                                  text:  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text: 'Discount ',
-                                                        style: TextStyle(
-                                                          color: Colors.black87,
-                                                          fontSize: 16,// Set the product name to black color
-                                                        ),
-                                                      ),
-                                                      const TextSpan(
-                                                        text: '*',
-                                                        style: TextStyle(
-                                                          color: Colors
-                                                              .red, // Set the asterisk to red color
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                height: 40,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(2),
-                                                  border: Border.all(color: Colors.blue[100]!),
-                                                ),
-                                                child: TextFormField(
-                                                  controller: discountController,
-                                                  keyboardType: TextInputType.number,
-                                                  inputFormatters: [
-                                                    FilteringTextInputFormatter.digitsOnly,
-                                                    LengthLimitingTextInputFormatter(2),
-                                                  ],
-                                                  decoration: InputDecoration(
-                                                    fillColor: Colors.white,
-                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 13),
-                                                    border: InputBorder.none,
-                                                    filled: true,
-                                                    hintText: 'Enter Discount',
-                                                    hintStyle: TextStyle(color: Colors.grey),
-                                                    errorText: errorMessage,
-                                                  ),
-                                                  onChanged: (value) {
-                                                    if (value.isNotEmpty && !isNumeric(value)) {
-                                                      setState(() {
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                          const SnackBar(content: Text("Please enter decimal number only")),
-                                                        );
-                                                      });
-                                                    } else {
-                                                      setState(() {
-                                                        errorMessage = null;
-                                                      });
-                                                      if (value.isNotEmpty) {
-                                                        discountController.text = '$value%';
-                                                        discountController.selection = TextSelection.fromPosition(
-                                                          TextPosition(offset: discountController.text.length - 1),
-                                                        );
-                                                      } else {
-                                                        discountController.text = value;
-                                                      }
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 40,),
-                                  Align(
-                                    alignment: Alignment.bottomLeft,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Align(
-                                          alignment: const Alignment(0.8,0.7),
-                                          child: OutlinedButton(
-                                            onPressed: () {
-                                              dropdownValue = 'Select';
-                                              dropdownValue3 = 'Select';
-                                              dropdownValue1 = 'Select';
-                                              dropdownValue2 = 'Select';
-                                              productNameController.clear();
-                                              priceController.clear();
-                                              selectedImages.clear();
-                                              imageIdController.clear();
-                                              discountController.clear();
-                                              setState(() {});
-
-                                              // Optionally, display a message
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                    content: Text("Form cleared")),
-                                              );
-                                            },
-                                            style: OutlinedButton.styleFrom(
-                                              backgroundColor: Colors
-                                                  .grey[300], // Blue background color
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(
-                                                    5), // Rounded corners
-                                              ),
-                                              side: BorderSide.none, // No outline
-                                            ),
-                                            child: Text(
-                                              'Cancel',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                // Increase font size if desired
-                                                // Bold text
-                                                color: Colors
-                                                    .indigo[900], // White text color
-                                              ),
-                                            ),
+                                            ],
                                           ),
                                         ),
-                                        const SizedBox(width: 16),
-                                        Align(alignment: Alignment.bottomLeft,
-                                          child: OutlinedButton(
-                                            onPressed: () async {
-                                              print('--------------');
-                                              // print(productNameController.text);
-                                              print('-------saveTo');
-                                              if (productNameController.text.isEmpty &&
-                                                  dropdownValue == 'Select' &&
-                                                  // dropdownValue3 != 'Select' &&
-                                                  dropdownValue1 == 'Select' &&
-                                                  dropdownValue2 == 'Select' &&
-                                                  dropdownValue3 == 'Select' &&
-                                                  priceController.text.isEmpty &&
-                                                  discountController.text.isEmpty &&
-                                                  selectedImages.isEmpty) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Please Fill all required Fields")),
-                                                );
-                                              } else if (productNameController.text.isEmpty) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Please Enter Product Name")),
-                                                );
-                                              } else if (dropdownValue == 'Select') {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Please Select Category")),
-                                                );
-                                              } else if (dropdownValue3 == 'Select') {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Please Select Sub Category")),
-                                                );
-                                              } else if (dropdownValue1 == 'Select') {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Please Select Tax")),
-                                                );
-                                              }else if (dropdownValue2 == 'Select') {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Please Select Unit")),
-                                                );
-                                              }   else if (priceController.text.isEmpty) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Please Enter Price")),
-                                                );
-                                              } else if (discountController.text.isEmpty) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Please Enter Discount")),
-                                                );
-                                              }  else if (selectedImages.isEmpty) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Please Select Image")),
-                                                );
-                                              }
-                                              else{
-                                                await addProductMaster();
-                                              }
-                                            },
-
-                                            style: OutlinedButton.styleFrom(
-                                              backgroundColor: Colors.blue[800],
-                                              // Blue background color
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(
-                                                    5), // Rounded corners
-                                              ),
-                                              side: BorderSide.none, // No outline
-                                            ),
-                                            child: const Text(
-                                              "Save",
-                                              style: TextStyle(
-                                                  color: Colors.white, fontSize: 15),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Expanded(
+                                      child: Card(
+                                        margin: EdgeInsets.only(left: maxWidth * 0.06, top: maxHeight * 0.03,right: maxWidth * 0.07),
+                                        color: Colors.white,
+                                        elevation: 0.0,
+                                        child: Form(
+                                          key: _validate,
+                                          child: Flex(
+                                            direction: Axis.vertical,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  // Product Name field
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(4.0),
+                                                    child: Align(
+                                                      alignment: const Alignment(-1.0,-0.3),
+                                                      child: RichText(
+                                                        text:  const TextSpan(
+                                                          children: [
+                                                            TextSpan(
+                                                              text: 'Product Name ',
+                                                              style: TextStyle(
+                                                                color: Colors.black87,
+                                                                fontSize: 16,// Set the product name to black color
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                              text: '*',
+                                                              style: TextStyle(
+                                                                color: Colors.red, // Set the asterisk to red color
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius: BorderRadius.circular(2),
+                                                        border: Border.all(color: Colors.blue[100]!),
+                                                      ),
+                                                      child: Align(
+                                                        alignment: const Alignment(0.1, 0.0),
+                                                        child: SizedBox(
+                                                          height: 40,
+                                                          width: constraints.maxWidth * 0.5,
+                                                          child: Form(
+                                                              key: _formKey,
+                                                              child: TextFormField(
+                                                                controller: productNameController,
+                                                                decoration: const InputDecoration(
+                                                                  fillColor: Colors.white,
+                                                                  contentPadding:
+                                                                  EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+                                                                  border: InputBorder.none,
+                                                                  filled: true,
+                                                                  hintText: 'Enter Product Name',
+                                                                  hintStyle: TextStyle(color: Colors.grey),
+                                                                ),
+                                                                inputFormatters: [
+                                                                  // Allow only letters, numbers, and single space
+                                                                  FilteringTextInputFormatter.deny(
+                                                                      RegExp(r'^\s')),
+                                                                  // Disallow starting with a space
+                                                                  FilteringTextInputFormatter.deny(
+                                                                      RegExp(r'\s\s')),
+                                                                  // Disallow multiple spaces
+                                                                ],
+                                                                // No inputFormatters to allow all characters
+                                                                validator: (value) {
+                                                                  if (value != null && value.trim().isEmpty) {
+                                                                    return 'Please enter a product name';
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                                // validator: (value) {
+                                                                //   final RegExp specialCharRegExp =
+                                                                //   RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+                                                                //   if (value != null && value.trim().isEmpty) {
+                                                                //     return 'Please enter a product name';
+                                                                //   } else if (value != null && specialCharRegExp.hasMatch(value)) {
+                                                                //     WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                                //       ScaffoldMessenger.of(context).showSnackBar(
+                                                                //         const SnackBar(
+                                                                //           content: Text('Special characters are not allowed!'),
+                                                                //         ),
+                                                                //       );
+                                                                //     });
+                                                                //   }else{
+                                                                //     addProductMaster();
+                                                                //   }
+                                                                //   return null;
+                                                                // },
+                                                                maxLines: 1,
+                                                                minLines: 1,
+                                                              )
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              // const SizedBox(height: 5),
+                                              Row(
+                                                children: [
+                                                  Flexible(
+                                                    flex: 2,
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        // Category field
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(4.0),
+                                                          child: Align(
+                                                            alignment: const  Alignment(-1.0,-0.3),
+                                                            child: RichText(
+                                                              text:  const TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: 'Category ',
+                                                                    style: TextStyle(
+                                                                      color: Colors.black87,
+                                                                      fontSize: 16,// Set the product name to black color
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: '*',
+                                                                    style: TextStyle(
+                                                                      color: Colors.red, // Set the asterisk to red color
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 2),
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Container(
+                                                            height: 40,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.white,
+                                                              borderRadius: BorderRadius.circular(2),
+                                                              border: Border.all(color: Colors.blue[100]!),
+                                                            ),
+                                                            child: SizedBox(
+                                                              height: 50,
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                child: DropdownButton<String>(
+                                                                  value: dropdownValue,
+                                                                  icon:  Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blue[800],),
+                                                                  iconSize: 18, // Size of the icon
+                                                                  elevation: 16,
+                                                                  style: const TextStyle(color: Colors.black),
+                                                                  underline: Container(), // We don't need the default underline since we're using a custom border
+                                                                  onChanged: (String? value) {
+                                                                    setState(() {
+                                                                      dropdownValue = value!;
+                                                                    });
+                                                                  },
+                                                                  items: list.map<DropdownMenuItem<String>>((String value) {
+                                                                    return DropdownMenuItem<String>(
+                                                                      value: value,
+                                                                      child: Text(value,style: const TextStyle(color: Colors.grey),),
+                                                                    );
+                                                                  }).toList(),
+                                                                  isExpanded: true,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  Flexible(
+                                                    flex: 2,
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        // Sub Category field
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(4.0),
+                                                          child: Align(
+                                                            alignment: const Alignment(-1.0,-0.3),
+                                                            child: RichText(
+                                                              text:  const TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: 'Sub Category ',
+                                                                    style: TextStyle(
+                                                                        color: Colors.black87,
+                                                                        fontSize: 16// Set the product name to black color
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: '*',
+                                                                    style: TextStyle(
+                                                                      color: Colors.red, // Set the asterisk to red color
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 2),
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Container(
+                                                            height: 40,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.white,
+                                                              borderRadius: BorderRadius.circular(2),
+                                                              border: Border.all(color:
+                                                              Colors.blue[100]!),
+                                                            ),
+                                                            child: Padding(
+                                                              padding:
+                                                              const EdgeInsets.symmetric(
+                                                                  horizontal: 10),
+                                                              child: DropdownButton<String>(
+                                                                value: dropdownValue3,
+                                                                icon:  Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blue[800],),
+                                                                iconSize: 18,
+                                                                // Size of the icon
+                                                                elevation: 16,
+                                                                style: const TextStyle(
+                                                                    color: Colors.black),
+                                                                underline: Container(),
+                                                                // We don't need the default underline since we're using a custom border
+                                                                onChanged: (String? value) {
+                                                                  setState(() {
+                                                                    dropdownValue3 = value!;
+                                                                  });
+                                                                },
+                                                                items: list3.map<
+                                                                    DropdownMenuItem<
+                                                                        String>>(
+                                                                        (String value) {
+                                                                      return DropdownMenuItem<
+                                                                          String>(
+                                                                        value: value,
+                                                                        child: Text(value,style: const TextStyle(color: Colors.grey),),
+                                                                      );
+                                                                    }).toList(),
+                                                                isExpanded: true,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(4.0),
+                                                          child: Align(
+                                                            alignment:  const Alignment(-1.0,-0.3),
+                                                            child: RichText(
+                                                              text:  const TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: 'Tax ',
+                                                                    style: TextStyle(
+                                                                      color: Colors.black87,
+                                                                      fontSize: 16,// Set the product name to black color
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: '*',
+                                                                    style: TextStyle(
+                                                                      color: Colors
+                                                                          .red, // Set the asterisk to red color
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 2),
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Container(
+                                                            height: 40,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.white,
+                                                              borderRadius:
+                                                              BorderRadius.circular(2),
+                                                              border: Border.all(
+                                                                  color: Colors.blue[100]!),
+                                                            ),
+                                                            child: SizedBox(
+                                                              height: 50,
+                                                              child: Padding(
+                                                                padding:
+                                                                const EdgeInsets.symmetric(
+                                                                    horizontal: 10),
+                                                                child: SizedBox(
+                                                                  height: 40,
+                                                                  width: constraints.maxWidth * 0.5,
+                                                                  child: DropdownButton<String>(
+                                                                    value: dropdownValue1,
+                                                                    icon:   Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blue[800],),
+                                                                    iconSize: 18,
+                                                                    // Size of the icon
+                                                                    elevation: 16,
+                                                                    style: const TextStyle(
+                                                                        color: Colors.black),
+                                                                    underline: Container(),
+                                                                    // We don't need the default underline since we're using a custom border
+                                                                    onChanged: (String? value) {
+                                                                      setState(() {
+                                                                        dropdownValue1 = value!;
+                                                                      });
+                                                                    },
+                                                                    items: list1.map<
+                                                                        DropdownMenuItem<
+                                                                            String>>(
+                                                                            (String value) {
+                                                                          return DropdownMenuItem<
+                                                                              String>(
+                                                                            value: value,
+                                                                            child: Text(value,style: const TextStyle(color: Colors.grey),),
+                                                                          );
+                                                                        }).toList(),
+                                                                    isExpanded: true,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(4.0),
+                                                          child: Align(
+                                                            alignment: const Alignment(-1.0,-0.3),
+                                                            child: RichText(
+                                                              text:  const TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: 'Unit ',
+                                                                    style: TextStyle(
+                                                                      color: Colors.black87, //
+                                                                      fontSize: 16,// Set the product name to black color
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: '*',
+                                                                    style: TextStyle(
+                                                                      color: Colors
+                                                                          .red, // Set the asterisk to red color
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 2),
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Container(
+                                                            height: 40,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.white,
+                                                              borderRadius:
+                                                              BorderRadius.circular(2),
+                                                              border: Border.all(
+                                                                  color: Colors.blue[100]!),
+                                                            ),
+                                                            child: SizedBox(
+                                                              height: 50,
+
+                                                              child: Padding(
+                                                                padding:
+                                                                const EdgeInsets.symmetric(
+                                                                    horizontal: 10),
+                                                                child: SizedBox(
+                                                                  height: 40,
+                                                                  width: constraints.maxWidth * 0.5,
+                                                                  child: DropdownButton<String>(
+                                                                    value: dropdownValue2,
+                                                                    icon:   Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blue[800],),
+                                                                    iconSize: 18,
+                                                                    // Size of the icon
+                                                                    elevation: 16,
+                                                                    style: const TextStyle(
+                                                                        color: Colors.black),
+                                                                    underline: Container(),
+                                                                    // We don't need the default underline since we're using a custom border
+                                                                    onChanged: (String? value) {
+                                                                      setState(() {
+                                                                        dropdownValue2 = value!;
+                                                                      });
+                                                                    },
+                                                                    items: list2.map<
+                                                                        DropdownMenuItem<
+                                                                            String>>(
+                                                                            (String value) {
+                                                                          return DropdownMenuItem<
+                                                                              String>(
+                                                                            value: value,
+                                                                            child: Text(value,style:const TextStyle(color: Colors.grey),),
+                                                                          );
+                                                                        }).toList(),
+                                                                    isExpanded: true,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(4.0),
+                                                          child: Align(
+                                                            alignment:const Alignment(-1.0,-0.3),
+                                                            child: RichText(
+                                                              text:  const TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: 'Price ',
+                                                                    style: TextStyle(
+                                                                      color: Colors.black87,
+
+                                                                      fontSize: 16,// Set the product name to black color
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: '*',
+                                                                    style: TextStyle(
+                                                                      color: Colors
+                                                                          .red, // Set the asterisk to red color
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 2),
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Container(
+                                                            height: 40,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.white,
+                                                              borderRadius:
+                                                              BorderRadius.circular(2),
+                                                              border: Border.all(
+                                                                  color: Colors.blue[100]!),
+                                                            ),
+                                                            child: TextFormField(
+                                                              controller: priceController,
+                                                              keyboardType:
+                                                              TextInputType.number,
+                                                              inputFormatters: [
+                                                                FilteringTextInputFormatter
+                                                                    .digitsOnly,
+                                                                LengthLimitingTextInputFormatter(
+                                                                    10),
+                                                                // limits to 10 digits
+                                                              ],
+                                                              decoration: InputDecoration(
+                                                                fillColor: Colors.white,
+                                                                contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 13),
+                                                                border: InputBorder.none,
+                                                                filled: true,
+                                                                hintText: 'Enter Price',
+                                                                hintStyle: const TextStyle(color: Colors.grey),
+                                                                errorText: errorMessage,
+                                                              ),
+                                                              onChanged: (value) {
+                                                                if (value.isNotEmpty &&
+                                                                    !isNumeric(value)) {
+                                                                  setState(() {
+                                                                    errorMessage =
+                                                                    'Please enter numbers only';
+                                                                  });
+                                                                } else {
+                                                                  setState(() {
+                                                                    errorMessage = null;
+                                                                  });
+                                                                }
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(4.0),
+                                                          child: Align(
+                                                            alignment: const Alignment(-1.0,-0.3),
+                                                            child: RichText(
+                                                              text:  const TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: 'Discount ',
+                                                                    style: TextStyle(
+                                                                      color: Colors.black87,
+                                                                      fontSize: 16,// Set the product name to black color
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: '*',
+                                                                    style: TextStyle(
+                                                                      color: Colors
+                                                                          .red, // Set the asterisk to red color
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 2),
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Container(
+                                                            height: 40,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.white,
+                                                              borderRadius: BorderRadius.circular(2),
+                                                              border: Border.all(color: Colors.blue[100]!),
+                                                            ),
+                                                            child: TextFormField(
+                                                              controller: discountController,
+                                                              keyboardType: TextInputType.number,
+                                                              inputFormatters: [
+                                                                FilteringTextInputFormatter.digitsOnly,
+                                                                LengthLimitingTextInputFormatter(2),
+                                                              ],
+                                                              decoration: InputDecoration(
+                                                                fillColor: Colors.white,
+                                                                contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 13),
+                                                                border: InputBorder.none,
+                                                                filled: true,
+                                                                hintText: 'Enter Discount',
+                                                                hintStyle: const TextStyle(color: Colors.grey),
+                                                                errorText: errorMessage,
+                                                              ),
+                                                              onChanged: (value) {
+                                                                if (value.isNotEmpty && !isNumeric(value)) {
+                                                                  setState(() {
+                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                      const SnackBar(content: Text("Please enter decimal number only")),
+                                                                    );
+                                                                  });
+                                                                } else {
+                                                                  setState(() {
+                                                                    errorMessage = null;
+                                                                  });
+                                                                  if (value.isNotEmpty) {
+                                                                    discountController.text = '$value%';
+                                                                    discountController.selection = TextSelection.fromPosition(
+                                                                      TextPosition(offset: discountController.text.length - 1),
+                                                                    );
+                                                                  } else {
+                                                                    discountController.text = value;
+                                                                  }
+                                                                }
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 40,),
+                                              Align(
+                                                alignment: Alignment.bottomLeft,
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  children: [
+                                                    Align(
+                                                      alignment: const Alignment(0.8,0.7),
+                                                      child: OutlinedButton(
+                                                        onPressed: () {
+                                                          dropdownValue = 'Select';
+                                                          dropdownValue3 = 'Select';
+                                                          dropdownValue1 = 'Select';
+                                                          dropdownValue2 = 'Select';
+                                                          productNameController.clear();
+                                                          priceController.clear();
+                                                          selectedImages.clear();
+                                                          imageIdController.clear();
+                                                          discountController.clear();
+                                                          setState(() {});
+
+                                                          // Optionally, display a message
+                                                          ScaffoldMessenger.of(context)
+                                                              .showSnackBar(
+                                                            const SnackBar(
+                                                                content: Text("Form cleared")),
+                                                          );
+                                                        },
+                                                        style: OutlinedButton.styleFrom(
+                                                          backgroundColor: Colors
+                                                              .grey[300], // Blue background color
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(
+                                                                5), // Rounded corners
+                                                          ),
+                                                          side: BorderSide.none, // No outline
+                                                        ),
+                                                        child: Text(
+                                                          'Cancel',
+                                                          style: TextStyle(
+                                                            fontSize: 15,
+                                                            // Increase font size if desired
+                                                            // Bold text
+                                                            color: Colors
+                                                                .indigo[900], // White text color
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 16),
+                                                    Align(alignment: Alignment.bottomLeft,
+                                                      child: OutlinedButton(
+                                                        onPressed: () async {
+                                                          print('--------------');
+                                                          // print(productNameController.text);
+                                                          print('-------saveTo');
+                                                          if (productNameController.text.isEmpty &&
+                                                              dropdownValue == 'Select' &&
+                                                              // dropdownValue3 != 'Select' &&
+                                                              dropdownValue1 == 'Select' &&
+                                                              dropdownValue2 == 'Select' &&
+                                                              dropdownValue3 == 'Select' &&
+                                                              priceController.text.isEmpty &&
+                                                              discountController.text.isEmpty &&
+                                                              selectedImages.isEmpty) {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(content: Text("Please Fill all required Fields")),
+                                                            );
+                                                          } else if (productNameController.text.isEmpty) {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(content: Text("Please Enter Product Name")),
+                                                            );
+                                                          } else if (dropdownValue == 'Select') {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(content: Text("Please Select Category")),
+                                                            );
+                                                          } else if (dropdownValue3 == 'Select') {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(content: Text("Please Select Sub Category")),
+                                                            );
+                                                          } else if (dropdownValue1 == 'Select') {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(content: Text("Please Select Tax")),
+                                                            );
+                                                          }else if (dropdownValue2 == 'Select') {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(content: Text("Please Select Unit")),
+                                                            );
+                                                          }   else if (priceController.text.isEmpty) {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(content: Text("Please Enter Price")),
+                                                            );
+                                                          } else if (discountController.text.isEmpty) {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(content: Text("Please Enter Discount")),
+                                                            );
+                                                          }  else if (selectedImages.isEmpty) {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(content: Text("Please Select Image")),
+                                                            );
+                                                          }
+                                                          else{
+                                                            await addProductMaster();
+                                                          }
+                                                        },
+
+                                                        style: OutlinedButton.styleFrom(
+                                                          backgroundColor: Colors.blue[800],
+                                                          // Blue background color
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(
+                                                                5), // Rounded corners
+                                                          ),
+                                                          side: BorderSide.none, // No outline
+                                                        ),
+                                                        child: const Text(
+                                                          "Save",
+                                                          style: TextStyle(
+                                                              color: Colors.white, fontSize: 15),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     )
 
                   ]);
                 }else{
                   return Stack(children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        height: 1400,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                    if(constraints.maxHeight <= 500)...{
+                      SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            width: 200,
+                            color: const Color(0xFFF7F6FA),
+                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
+                          ),
+                        ),
+                      )
+
+                    }
+                    else...{
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
-                    ),
+                    },
+                    // if(constraints.maxHeight <= 500)...{
+                    //   SingleChildScrollView(
+                    //     scrollDirection: Axis.vertical,
+                    //     controller: verticalscroll,
+                    //     child: Align(
+                    //       alignment: Alignment.topLeft,
+                    //       child: Container(
+                    //         width: 200,
+                    //         height: 800,
+                    //         color: const Color(0xFFF7F6FA),
+                    //         padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: _buildMenuItems(context),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   )
+                    // }
+                    // else...{
+                    //   SingleChildScrollView(
+                    //     child: Align(
+                    //       alignment: Alignment.topLeft,
+                    //       child: Container(
+                    //         width: 200,
+                    //         height: maxHeight,
+                    //         color: const Color(0xFFF7F6FA),
+                    //         padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: _buildMenuItems(context),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // },
                     Padding(
                       padding: const EdgeInsets.only( left: 190),
                       child: Container(
@@ -1680,9 +1806,8 @@ class _SecondPageState extends State<SecondPage> {
                         color: Colors.grey, // Border color
                       ),
                     ),
-                    Container(
-                      width: 1500,
-                      padding: EdgeInsets.only(left: 201),
+                    Padding(
+                      padding: const EdgeInsets.only(left:201),
                       child: Container(
                         width: 1000,
                         height: 800,
@@ -1690,7 +1815,7 @@ class _SecondPageState extends State<SecondPage> {
                           children: [
                             Positioned(
                               top: 0,
-                              left: 0,
+                              left: 10,
                               right: 0,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 0),
@@ -1735,7 +1860,7 @@ class _SecondPageState extends State<SecondPage> {
                                 margin: const EdgeInsets.symmetric(
                                     vertical: 10), // Space above/below the border
                                 height: 1, // Border height
-                                width: 1500,
+                                width: 1600,
                                 color: Colors.grey, // Border color
                               ),
                             ),
@@ -1768,7 +1893,7 @@ class _SecondPageState extends State<SecondPage> {
                                                         filePicker();
                                                       },
                                                       child: Card(
-                                                        margin: EdgeInsets.only(left: 30, top: 80,bottom: 120),
+                                                        margin: const EdgeInsets.only(left: 30, top: 80,bottom: 120),
 
                                                         child: Flex(
                                                           direction: Axis.vertical, // use vertical direction
@@ -1784,7 +1909,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                   borderRadius: BorderRadius.circular(8),
                                                                   boxShadow: [
                                                                     BoxShadow(
-                                                                      color: Colors.blue.withOpacity(0.1), // Soft grey shadow
+                                                                      color: Colors.blue.withOpacity(0.1),
                                                                       spreadRadius: 1,
                                                                       blurRadius: 1,
                                                                       offset: const Offset(0, 1),
@@ -1810,7 +1935,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                         color: Colors.blue[900], size: 50),
                                                                     const SizedBox(height: 8),
                                                                     const Text(
-                                                                      'Click to upload image',
+                                                                      'Click to uplowad image',
                                                                       textAlign: TextAlign.center,
                                                                     ),
                                                                     const SizedBox(height: 8),
@@ -1828,12 +1953,10 @@ class _SecondPageState extends State<SecondPage> {
                                                       ),
                                                     ),
                                                   ),
-                                                  const SizedBox(
-                                                    height: 10,
-                                                  ),
+                                                  const SizedBox(height: 10,),
                                                   Expanded(
                                                     child: Card(
-                                                      margin: EdgeInsets.only(left:40, top: 30,right: 100  ,bottom: 10),
+                                                      margin: const EdgeInsets.only(left:40, top: 30,right: 100  ,bottom: 10),
                                                       color: Colors.white,
                                                       elevation: 0.0,
                                                       child: Form(
@@ -1850,7 +1973,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                   child: Align(
                                                                     alignment: const Alignment(-1.0,-0.3),
                                                                     child: RichText(
-                                                                      text:  TextSpan(
+                                                                      text:  const TextSpan(
                                                                         children: [
                                                                           TextSpan(
                                                                             text: 'Product Name ',
@@ -1859,7 +1982,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                               fontSize: 16,// Set the product name to black color
                                                                             ),
                                                                           ),
-                                                                          const TextSpan(
+                                                                          TextSpan(
                                                                             text: '*',
                                                                             style: TextStyle(
                                                                               color: Colors.red, // Set the asterisk to red color
@@ -1886,14 +2009,14 @@ class _SecondPageState extends State<SecondPage> {
                                                                           key: _formKey,
                                                                           child: TextFormField(
                                                                             controller: productNameController,
-                                                                            decoration: InputDecoration(
+                                                                            decoration: const InputDecoration(
                                                                               fillColor: Colors.white,
                                                                               contentPadding:
-                                                                              const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+                                                                              EdgeInsets.symmetric(horizontal: 10, vertical: 13),
                                                                               border: InputBorder.none,
                                                                               filled: true,
                                                                               hintText: 'Enter Product Name',
-                                                                              hintStyle: const TextStyle(color: Colors.grey),
+                                                                              hintStyle: TextStyle(color: Colors.grey),
                                                                             ),
                                                                             inputFormatters: [
                                                                               // Allow only letters, numbers, and single space
@@ -1952,7 +2075,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                         child: Align(
                                                                           alignment: const  Alignment(-1.0,-0.3),
                                                                           child: RichText(
-                                                                            text:  TextSpan(
+                                                                            text:  const TextSpan(
                                                                               children: [
                                                                                 TextSpan(
                                                                                   text: 'Category ',
@@ -1961,7 +2084,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                                     fontSize: 16,// Set the product name to black color
                                                                                   ),
                                                                                 ),
-                                                                                const TextSpan(
+                                                                                TextSpan(
                                                                                   text: '*',
                                                                                   style: TextStyle(
                                                                                     color: Colors.red, // Set the asterisk to red color
@@ -2025,7 +2148,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                         child: Align(
                                                                           alignment: const Alignment(-1.0,-0.3),
                                                                           child: RichText(
-                                                                            text:  TextSpan(
+                                                                            text:  const TextSpan(
                                                                               children: [
                                                                                 TextSpan(
                                                                                   text: 'Sub Category ',
@@ -2034,7 +2157,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                                       fontSize: 16// Set the product name to black color
                                                                                   ),
                                                                                 ),
-                                                                                const TextSpan(
+                                                                                TextSpan(
                                                                                   text: '*',
                                                                                   style: TextStyle(
                                                                                     color: Colors.red, // Set the asterisk to red color
@@ -2108,7 +2231,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                         child: Align(
                                                                           alignment:  const Alignment(-1.0,-0.3),
                                                                           child: RichText(
-                                                                            text:  TextSpan(
+                                                                            text:  const TextSpan(
                                                                               children: [
                                                                                 TextSpan(
                                                                                   text: 'Tax ',
@@ -2117,7 +2240,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                                     fontSize: 16,// Set the product name to black color
                                                                                   ),
                                                                                 ),
-                                                                                const TextSpan(
+                                                                                TextSpan(
                                                                                   text: '*',
                                                                                   style: TextStyle(
                                                                                     color: Colors
@@ -2196,7 +2319,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                         child: Align(
                                                                           alignment: const Alignment(-1.0,-0.3),
                                                                           child: RichText(
-                                                                            text:  TextSpan(
+                                                                            text:  const TextSpan(
                                                                               children: [
                                                                                 TextSpan(
                                                                                   text: 'Unit ',
@@ -2205,7 +2328,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                                     fontSize: 16,// Set the product name to black color
                                                                                   ),
                                                                                 ),
-                                                                                const TextSpan(
+                                                                                TextSpan(
                                                                                   text: '*',
                                                                                   style: TextStyle(
                                                                                     color: Colors
@@ -2289,7 +2412,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                         child: Align(
                                                                           alignment:const Alignment(-1.0,-0.3),
                                                                           child: RichText(
-                                                                            text:  TextSpan(
+                                                                            text:  const TextSpan(
                                                                               children: [
                                                                                 TextSpan(
                                                                                   text: 'Price ',
@@ -2299,7 +2422,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                                     fontSize: 16,// Set the product name to black color
                                                                                   ),
                                                                                 ),
-                                                                                const TextSpan(
+                                                                                TextSpan(
                                                                                   text: '*',
                                                                                   style: TextStyle(
                                                                                     color: Colors
@@ -2340,7 +2463,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                               border: InputBorder.none,
                                                                               filled: true,
                                                                               hintText: 'Enter Price',
-                                                                              hintStyle: TextStyle(color: Colors.grey),
+                                                                              hintStyle: const TextStyle(color: Colors.grey),
                                                                               errorText: errorMessage,
                                                                             ),
                                                                             onChanged: (value) {
@@ -2373,7 +2496,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                         child: Align(
                                                                           alignment: const Alignment(-1.0,-0.3),
                                                                           child: RichText(
-                                                                            text:  TextSpan(
+                                                                            text:  const TextSpan(
                                                                               children: [
                                                                                 TextSpan(
                                                                                   text: 'Discount ',
@@ -2382,7 +2505,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                                     fontSize: 16,// Set the product name to black color
                                                                                   ),
                                                                                 ),
-                                                                                const TextSpan(
+                                                                                TextSpan(
                                                                                   text: '*',
                                                                                   style: TextStyle(
                                                                                     color: Colors
@@ -2417,7 +2540,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                               border: InputBorder.none,
                                                                               filled: true,
                                                                               hintText: 'Enter Discount',
-                                                                              hintStyle: TextStyle(color: Colors.grey),
+                                                                              hintStyle: const TextStyle(color: Colors.grey),
                                                                               errorText: errorMessage,
                                                                             ),
                                                                             onChanged: (value) {
@@ -2608,10 +2731,10 @@ class _SecondPageState extends State<SecondPage> {
   }
 
   void _showSnackBar(String message) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 }
 
 bool isNumeric(String value) {
@@ -2634,4 +2757,5 @@ customerFieldDecoration(
     const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
   );
 }
+
 

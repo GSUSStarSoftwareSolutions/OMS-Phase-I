@@ -87,8 +87,8 @@ class _CusReturnpageState extends State<CusReturnpage> {
     return [
     _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Customer_Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Customer_Payment_List'),
       Container(decoration: BoxDecoration(
         color: Colors.blue[800],

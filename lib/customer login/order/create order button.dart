@@ -18,11 +18,14 @@ import 'package:http/http.dart' as http;
 
 void main() => runApp(MaterialApp(
   debugShowCheckedModeBanner: false,
-  home:CusCreateOrderPage() ,));
+  home:CusCreateOrderPage(testing: '',) ,));
 
 
 
 class CusCreateOrderPage extends StatefulWidget {
+  final String testing;
+
+  const CusCreateOrderPage({super.key, required this.testing});
   @override
   State<CusCreateOrderPage> createState() => _CusCreateOrderPageState();
 }
@@ -37,11 +40,15 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
   final EmailIdController = TextEditingController();
   final deliveryLocationController = TextEditingController();
   final ContactPersonController = TextEditingController();
+  final companyNameController =TextEditingController();
+  final userRoleController = TextEditingController();
   final deliveryaddressController = TextEditingController();
   final TextEditingController ContactNumberController = TextEditingController();
   final ShippingAddress = TextEditingController();
   DateTime? _selectedDate;
   bool _isLoading= false;
+  String shippingAddress1 = "";
+  String shippingAddress2 = "";
   final controller = TextEditingController();
   String token = window.sessionStorage["token"] ?? " ";
   String userId = window.sessionStorage['userId'] ?? '';
@@ -60,6 +67,7 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -72,13 +80,12 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
               bottomRight: Radius.circular(8), // No radius for bottom-right corner
             ),
           ),child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blueAccent, '/Customer_Order_List')),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Customer_Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Customer_Return_List'),
     ];
   }
-
   Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
     iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
     title == 'Orders'? _isHovered[title] = false :  _isHovered[title] = false;
@@ -207,6 +214,13 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
               ContactPersonController.text = foundEmployee.userName;
               EmailIdController.text = foundEmployee.email;
               deliveryaddressController.text = foundEmployee.location;
+              companyNameController.text = foundEmployee.companyName;
+              userRoleController.text = foundEmployee.role;
+              shippingAddress1 = foundEmployee.shippingAddress1;
+              shippingAddress2 = foundEmployee.shippingAddress2;
+              ShippingAddress.text = shippingAddress1;
+
+
 
               // = foundEmployee.empId;
               // Date.text = foundEmployee.joiningDate;
@@ -235,6 +249,153 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
     }
   }
 
+  void _showAddressDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0), // Rounded corners
+          ),
+          child: IntrinsicWidth(
+            child: IntrinsicHeight(
+              child: Container(
+                width: 500,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15.0),
+                  color: Colors.white,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.max, // Adjust height to content
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: const Center(child: Text("Select Shipping Address",style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),),
+                    ),
+                    // Close Icon
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0, right: 8.0),
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: IconButton(
+                          icon: Icon(Icons.close, color: Colors.grey),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Left Address
+                        Expanded(
+                          child: MouseRegion(
+                            child: GestureDetector(
+                              onTap: ()
+                              {
+                                setState(() {
+                                  ShippingAddress.text = shippingAddress1;
+                                });
+                                Navigator.pop(context);
+                              },
+                              child:
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(width: 10),
+                                  Radio<String>(
+                                    value: shippingAddress1,
+                                    groupValue: ShippingAddress.text,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        ShippingAddress.text = shippingAddress1;
+                                      });
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Text(
+                                        shippingAddress1,
+                                        textAlign: TextAlign.left,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                            ),
+                          ),
+                        ),
+                        // Divider
+                        Container(
+                          width: 1,
+                          height: 120,
+                          color: Colors.grey.shade300,
+                        ),
+                        // Right Address
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                ShippingAddress.text = shippingAddress2;
+                              });
+                              Navigator.pop(context);
+                            },
+                            child:   Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(width: 10),
+                                Radio<String>(
+                                  value: shippingAddress2,
+                                  groupValue: ShippingAddress.text,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      ShippingAddress.text = shippingAddress2;
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      shippingAddress2,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
 
 
@@ -242,18 +403,23 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getCusRecord();
-    fetchProducts();
-    print(userId);
 
-    _dateController = TextEditingController();
-    _selectedDate = DateTime.now();
-    String formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate!);
-    _dateController.text = formattedDate;
-    print('date init');
-    print(_dateController.text);
-    // _selectedDate = _dateController.text as DateTime?;
-  }
+        print(widget.testing);
+        _getCusRecord();
+        fetchProducts();
+        print(userId);
+
+        _dateController = TextEditingController();
+        _selectedDate = DateTime.now();
+        String formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate!);
+        _dateController.text = formattedDate;
+        print('date init');
+        print(_dateController.text);
+
+
+    }
+
+
 
 
 
@@ -269,7 +435,7 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    TableRow row1 = const TableRow(
+    TableRow row1 =  TableRow(
       children: [
         TableCell(
           child: Padding(
@@ -277,9 +443,67 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
             child: Text('Delivery Details',style: TextStyle(fontSize: 19),),
           ),
         ),
-        TableCell(
-          child: Text(''),
-        ),
+        if(ShippingAddress.text.isNotEmpty)...{
+          TableCell(
+            child:
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const  EdgeInsets.only(
+                    top: 10, right: 30),
+                child:OutlinedButton(
+                  onPressed: (){
+                    print('paaa');
+                    _showAddressDialog(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor : Colors.blue[800],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    side: BorderSide.none,
+                  ),
+                  child: Text("Change Address",style: TextStyle(color: Colors.white),),
+                ),
+              ),
+            ),
+          ),
+        }
+        else...{
+          TableCell(
+            child:
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const  EdgeInsets.only(
+                    top: 10, right: 30),
+                child:OutlinedButton(
+                  onPressed: (){
+                    Map<String, dynamic> User_details ={
+                      "Name": ContactPersonController.text,
+                      "Number": ContactNumberController.text,
+                      "Email":EmailIdController.text,
+                      "Billing":deliveryaddressController.text,
+                      "CompanyName":companyNameController.text,
+                      "Role":userRoleController.text,
+                      "text": "testing",
+                    };
+context.go('/Cus_Profile', extra: {'Usr_detail': User_details});
+                  },
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor : Colors.blue[800],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    side: BorderSide.none,
+                  ),
+                  child: Text("Add Address",style: TextStyle(color: Colors.white),),
+                ),
+              ),
+            ),
+          ),
+        }
+
       ],
     );
 
@@ -700,19 +924,38 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
               double maxWidth = constraints.maxWidth;
               return Stack(
                 children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                      height: 984,
-                      width: 200,
-                      color: const Color(0xFFF7F6FA),
-                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildMenuItems(context),
+                  if (constraints.maxHeight <= 310) ...{
+                    SingleChildScrollView(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding:
+                          const EdgeInsets.only(left: 15, top: 10, right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
+                        ),
+                      ),
+                    )
+                  } else ...{
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        height: 984,
+                        color: const Color(0xFFF7F6FA),
+                        padding:
+                        const EdgeInsets.only(left: 15, top: 10, right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
                       ),
                     ),
-                  ),
+                  },
                   Padding(
                     padding: const EdgeInsets.only(left: 200,top: 0),
                     child: Container(
@@ -954,9 +1197,7 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
                               if (deliveryaddressController.text.isEmpty) {
                                 return 'Please fill delivery address.';
                               }
-                              if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                                return 'Please fill Email Address Format @gmail.com';
-                              }
+                              if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
                               if (ShippingAddress.text.isEmpty) {
                                 return 'Please fill Shipping address ';
                               }
@@ -1199,9 +1440,7 @@ class _CusCreateOrderPageState extends State<CusCreateOrderPage> {
                                   if (deliveryaddressController.text.isEmpty) {
                                     return 'Please fill delivery address.';
                                   }
-                                  if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                                    return 'Please fill Email Address Format @gmail.com';
-                                  }
+                                  if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
                                   if (ShippingAddress.text.isEmpty) {
                                     return 'Please fill Shipping address ';
                                   }

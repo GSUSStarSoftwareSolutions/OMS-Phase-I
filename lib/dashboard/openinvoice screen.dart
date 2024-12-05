@@ -1,40 +1,50 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 import 'dart:html';
+import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart' as ord;
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'dashboard.dart';
+import '../Order Module/firstpage.dart';
 import '../widgets/confirmdialog.dart';
 import '../widgets/custom loading.dart';
+import '../widgets/no datafound.dart';
 import '../widgets/pagination.dart';
 import '../widgets/productdata.dart';
 
 
-void main() => runApp(OpenInvoice());
+void main() => runApp(OpenpickList());
 
-class OpenInvoice extends StatefulWidget {
-  const OpenInvoice({super.key});
+class OpenpickList extends StatefulWidget {
+  const OpenpickList({super.key});
 //  final ord.Product? product;
   @override
-  State<OpenInvoice> createState() => _OpenInvoiceState();
+  State<OpenpickList> createState() => _OpenpickListState();
 }
 
-class _OpenInvoiceState extends State<OpenInvoice> {
+class _OpenpickListState extends State<OpenpickList> {
   ord.Product? _selectedProduct;
   late ProductData productData;
+  final ScrollController horizontalScroll = ScrollController();
   bool isHomeSelected = false;
   bool isOrdersSelected = false;
+  List<dynamic> detailJson =[];
   Timer? _searchDebounceTimer;
-
+  late Future<List<detail>> futureOrders;
+  List<String> _sortOrder = List.generate(6, (index) => 'asc');
+  List<String> columns = ['Order ID','Created Date','Delivery Date','Total Amount' ,'Delivery Status','Payment'];
+  List<double> columnWidths = [100,130, 130, 139, 160, 135,];
+  List<bool> columnSortState = [true, true, true,true,true,true];
   String _searchText = '';
   String _category = '';
-
+  String searchQuery = '';
   late TextEditingController _dateController;
   String _subCategory = '';
   int startIndex = 0;
@@ -43,8 +53,14 @@ class _OpenInvoiceState extends State<OpenInvoice> {
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
   bool _hasShownPopup = false;
-  List<Dashboard1> productList = [];
-  List<Dashboard1> _filteredData = [];
+  List<detail>filteredData1 = [];
+  List<detail>filteredData= [];
+  List<detail> productList = [];
+
+  //List<Product> productList1 = [];
+
+
+
 
   void _onSearchTextChanged(String text) {
     if (_searchDebounceTimer != null) {
@@ -69,64 +85,135 @@ class _OpenInvoiceState extends State<OpenInvoice> {
   bool isLoading = false;
   //List<ord.Product> productList = [];
 
-// Example method for fetching products
-  Future<void> fetchProducts(int? page, int? itemsPerPage) async {
+
+
+  Future<void> fetchProducts(int page, int itemsPerPage) async {
     if (isLoading) return;
+    if (!mounted) return;
     setState(() {
       isLoading = true;
     });
-
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/dashboard/get_open_invoices_list?page=$page&limit=$itemsPerPage',
+          '$apicall/dashboard/get_all_dashboard?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",
           "Authorization": 'Bearer $token',
         },
       );
-
       if (response.statusCode == 200) {
-        final responseBody = response.body;
-        final jsonData = jsonDecode(responseBody);
+        final jsonData = jsonDecode(response.body);
+        print('json data');
         print(jsonData);
-
-        List<Dashboard1> products = [];
-
+        List<detail> products = [];
         if (jsonData is List) {
-          products = jsonData.map((item) => Dashboard1.fromJson(item)).toList();
+          products = jsonData.map((item) => detail.fromJson(item)).toList();
         } else if (jsonData is Map && jsonData.containsKey('body')) {
-          products = (jsonData['body'] as List).map((item) => Dashboard1.fromJson(item)).toList();
+          final body = jsonData['body'];
+          if (body != null) {
+            products = (body as List).map((item) => detail.fromJson(item)).toList();
+            totalItems = jsonData['totalItems'] ?? 0; // Get the total number of items
+          } else {
+            print('Body is null');
+          }
+        } else {
+          print('Invalid JSON data');
         }
 
-       // print('products: $products');
-
-        int totalCount = products.length; // Initialize total count
-
-//        print('Current Page: $page');
-        setState(() {
-          //productList = products.where((product) => product.status == 'completed').toList();
-          productList = products;
-         // print('productList: $productList');
-
-          // Calculate the total pages using the total count
-          totalPages = (totalCount / itemsPerPage!).ceil();
-          print('Total Pages: $totalPages');
-          _filterAndPaginateProducts();
-        });
+        if (mounted) {
+          setState(() {
+            totalPages = (products.length / itemsPerPage).ceil();
+            print('pages');
+            print(totalPages);
+            productList = products;
+            print(productList);
+            _filterAndPaginateProducts();
+          });
+        }
       } else {
         throw Exception('Failed to load data');
       }
     } catch (e) {
-      print('Error: $e');
-      // Optionally, show an error message to the user
+      print('Error decoding JSON: $e');
+      if (mounted) {
+        if (context.findAncestorWidgetOfExactType<Scaffold>() != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        } else {
+          print('No Scaffold ancestor found');
+        }
+      }
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
+
+
+
+// Example method for fetching products
+//   Future<void> fetchProducts(int page, int itemsPerPage) async {
+//
+//     if (isLoading) return;
+//     if (!mounted) return;
+//     setState(() {
+//       isLoading = true;
+//     });
+//     try {
+//       final response = await http.get(
+//         Uri.parse(
+//           '$apicall/dashboard/get_all_dashboard?page=$page&limit=$itemsPerPage', // Changed limit to 10
+//         ),
+//         headers: {
+//           "Content-type": "application/json",
+//           "Authorization": 'Bearer $token',
+//         },
+//       );
+//       if (response.statusCode == 200) {
+//         final jsonData = jsonDecode(response.body);
+//         print('json data');
+//         print(jsonData);
+//         List<detail> products = [];
+//         if (jsonData != null) {
+//           if (jsonData is List) {
+//             products = jsonData.map((item) => detail.fromJson(item)).toList();
+//           } else if (jsonData is Map && jsonData.containsKey('body')) {
+//             products = (jsonData['body'] as List).map((item) => detail.fromJson(item)).toList();
+//             totalItems = jsonData['totalItems'] ?? 0; // Get the total number of items
+//           }
+//
+//           if(mounted){
+//             setState(() {
+//               totalPages = (products.length / itemsPerPage).ceil();
+//               print('pages');
+//               print(totalPages);
+//               productList = products;
+//               print(productList);
+//               _filterAndPaginateProducts();
+//             });
+//           }
+//         }
+//       } else {
+//         throw Exception('Failed to load data');
+//       }
+//     } catch (e) {
+//       print('Error decoding JSON: $e');
+//       // Optionally, show an error message to the user
+//     } finally {
+//       if(mounted){
+//         setState(() {
+//           isLoading = false;
+//         });
+//       }
+//
+//     }
+//   }
 
 
   void _updateSearch(String searchText) {
@@ -142,7 +229,7 @@ class _OpenInvoiceState extends State<OpenInvoice> {
     print("previos");
 
     if (currentPage > 1) {
-      if(filteredProducts.length > itemsPerPage) {
+      if(filteredData1.length > itemsPerPage) {
         setState(() {
           currentPage--;
           //  fetchProducts(currentPage, itemsPerPage);
@@ -153,11 +240,92 @@ class _OpenInvoiceState extends State<OpenInvoice> {
     }
   }
 
+
+  Map<String, bool> _isHovered = {
+    'Home': false,
+    'Customer': false,
+    'Products': false,
+    'Orders': false,
+    'Invoice': false,
+    'Delivery': false,
+    'Payment': false,
+    'Return': false,
+    'Reports': false,
+  };
+
+
+  List<Widget> _buildMenuItems(BuildContext context) {
+    return [
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[800],
+            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+            // color: Color.fromRGBO(224, 59, 48, 1.0),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8), // Radius for top-left corner
+              topRight: Radius.circular(8), // No radius for top-right corner
+              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
+              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+            ),
+          ),
+          child: _buildMenuItem('Home', Icons.home_outlined, Colors.white, '/Home')),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
+      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
+      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
+      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
+    ];
+  }
+
+  Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
+    title == 'Home'? _isHovered[title] = false :  _isHovered[title] = false;
+    title == 'Home'? iconColor = Colors.white : Colors.black;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovered[title] = true),
+      onExit: (_) => setState(() => _isHovered[title] = false),
+      child: GestureDetector(
+        onTap: () {
+          context.go(route);
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 5,right: 10),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5,top: 5),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    decoration: TextDecoration.none, // Remove underline
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _goToNextPage() {
     print('nextpage');
 
     if (currentPage < totalPages) {
-      if(filteredProducts.length > currentPage * itemsPerPage) {
+      if(filteredData1.length > currentPage * itemsPerPage) {
         setState(() {
           currentPage++;
         });
@@ -268,10 +436,75 @@ class _OpenInvoiceState extends State<OpenInvoice> {
   @override
   void initState() {
     super.initState();
+    //FetchList();
+    //futureOrders = fetchOrders() as Future<List<detail>>;
+
     fetchProducts(currentPage, itemsPerPage);
+    fetchOrders();
+
   }
 
 
+  Future<void> fetchOrders() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$apicall/order_master/get_all_ordermaster',
+        ),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": 'Bearer $token',
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        print('json data1');
+        print(jsonData);
+        if (jsonData == null) {
+          print('JSON data is null');
+          return;
+        }
+        // List<detail> filteredData = [];
+        if (jsonData is List) {
+          filteredData = jsonData.map((item) => detail.fromJson(item)).toList();
+        } else if (jsonData is Map && jsonData.containsKey('body')) {
+          final body = jsonData['body'];
+          if (body != null) {
+            filteredData = (body as List).map((item) => detail.fromJson(item)).toList();
+          } else {
+            print('Body is null');
+          }
+        } else {
+          print('Invalid JSON data');
+        }
+
+        if (mounted) {
+          setState(() {
+            filteredData = filteredData; // Update the filteredData list
+          });
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error decoding JSON: $e');
+      if (mounted) {
+        if (context.findAncestorWidgetOfExactType<Scaffold>() != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        } else {
+          print('No Scaffold ancestor found');
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -320,124 +553,39 @@ class _OpenInvoiceState extends State<OpenInvoice> {
             double maxWidth = constraints.maxWidth;
             return Stack(
               children: [
-                Align(
-                  // Added Align widget for the left side menu
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    height: 1400,
-                    width: 200,
-                    color: const Color(0xFFF7F6FA),
-                    padding: const EdgeInsets.only(left: 20, top: 30),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextButton.icon(
-                          onPressed: ()  {
-                            context.go('/Home');
-                          },
-                          icon: Icon(Icons.dashboard,
-                              color: isHomeSelected
-                                  ? Colors.blueAccent
-                                  : Colors.blueAccent),
-                          label: Text(
-                            'Home',
-                            style: TextStyle(color: Colors.blueAccent,fontSize: 16),
-                          ),
+                if(constraints.maxHeight <= 500)...{
+                  SingleChildScrollView(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
                         ),
-                        const SizedBox(height: 20),
-                        TextButton.icon(
-                          onPressed: () {
-                            context.go('/Product_List');
-                            setState(() {
-                              isOrdersSelected = false;
-                              // Handle button press19
-                            });
-                          },
-                          icon: Icon(Icons.image_outlined,
-                              color: Colors.indigo[900]),
-                          label:  Text(
-                            'Products',
-                            style: TextStyle(color: Colors.indigo[900],fontSize: 16),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextButton.icon(
-                          onPressed: () {
-                            context.go('/Order_List');
-                            //context.go('/Products/Orderspage/:Orders');
-                            setState(() {
-                              isOrdersSelected = false;
-                              // Handle button press19
-                            });
-                          },
-                          icon:
-                          Icon(Icons.warehouse, color: Colors.blue[900]),
-                          label: Text(
-                            'Orders',
-                            style: TextStyle(
-                                color: Colors.indigo[900],fontSize: 16
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.fire_truck_outlined,
-                              color: Colors.blue[900]),
-                          label: Text(
-                            'Delivery',
-                            style: TextStyle(color: Colors.indigo[900],fontSize: 16),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.document_scanner_rounded,
-                              color: Colors.blue[900]),
-                          label: Text(
-                            'Invoice',
-                            style: TextStyle(color: Colors.indigo[900],fontSize: 16),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.payment_outlined,
-                              color: Colors.blue[900]),
-                          label: Text(
-                            'Payment',
-                            style: TextStyle(color: Colors.indigo[900],fontSize: 16),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextButton.icon(
-                          onPressed: () {
-                            context.go('/Return_List');
-                            // context.go('/Home/Products/:Return');
-                          },
-                          icon: Icon(Icons.backspace_sharp,
-                              color: Colors.blue[900]),
-                          label: Text(
-                            'Return',
-                            style: TextStyle(color: Colors.indigo[900],fontSize: 16),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.insert_chart,
-                              color: Colors.blue[900]),
-                          label: Text(
-                            'Reports',
-                            style: TextStyle(color: Colors.indigo[900],fontSize: 16),
-                          ),
-                        ),
-                      ],
+                      ),
+                    ),
+                  )
+
+                }
+                else...{
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      width: 200,
+                      color: const Color(0xFFF7F6FA),
+                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _buildMenuItems(context),
+                      ),
                     ),
                   ),
-                ),
+                },
                 Padding(
-                  padding: const EdgeInsets.only( left: 192),
+                  padding: const EdgeInsets.only( left: 190),
                   child: Container(
                     margin: const EdgeInsets.symmetric(
                         horizontal: 10), // Space above/below the border
@@ -447,119 +595,238 @@ class _OpenInvoiceState extends State<OpenInvoice> {
                 ),
                 Positioned(
                   top: 0,
-                  left: 0,
+                  left: 201,
                   right: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 203),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      color: Color(0xFFFFFDFF),
-                      height: 50,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                                Icons.arrow_back), // Back button icon
-                            onPressed: () {
-                              context.go(
-                                  '/Home');
-                              // Navigator.of(context).push(PageRouteBuilder(
-                              //   pageBuilder: (context, animation,
-                              //       secondaryAnimation) =>
-                              //   const ProductPage(product: null),
-                              // ));
-                            },
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 20),
-                            child: Text(
-                              'Open Invoice',
-                              style: TextStyle(
-                                fontSize: 20,
-                                //fontWeight: FontWeight.bold,
+                  bottom: 0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          color: Color(0xFFFFFDFF),
+                          height: 50,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                    Icons.arrow_back), // Back button icon
+                                onPressed: () {
+                                  context.go(
+                                      '/Home');
+                                  // Navigator.of(context).push(PageRouteBuilder(
+                                  //   pageBuilder: (context, animation,
+                                  //       secondaryAnimation) =>
+                                  //   const ProductPage(product: null),
+                                  // ));
+                                },
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const Spacer(),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 33, left: 202),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 16), // Space above/below the border
-                    height: 1, // Border height
-                    color: Colors.grey, // Border color
-                  ),
-                ),
-                Padding(
-                  padding:  EdgeInsets.only(left: 300, top: 120,right: maxWidth * 0.062,bottom: 15),
-                  child: Container(
-                    width: maxWidth,
-                    height: 700,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.blue.withOpacity(0.1), // Soft grey shadow
-                      //     spreadRadius: 1,
-                      //     blurRadius: 3,
-                      //     offset: const Offset(0, 1),
-                      //   ),
-                      // ],
-                    ),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: SizedBox(
-                        //  height: 1300,
-                        width: maxWidth * 0.79,
-                        // padding: EdgeInsets.only(),
-                        // margin: EdgeInsets.only(left: 400, right: 100),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            buildSearchField(),
-                            // buildSearchField(),
-                            const SizedBox(height: 10),
-                            Scrollbar(
-                              controller: _scrollController,
-                              thickness: 6,
-                              thumbVisibility: true,
-                              child: SingleChildScrollView(
-                                controller: _scrollController,
-                                scrollDirection: Axis.horizontal,
-                                child: buildDataTable(),
-                              ),
-                            ),
-                            SizedBox(),
-                            Padding(
-                              padding: const EdgeInsets.only(right:30),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  PaginationControls(
-                                    currentPage: currentPage,
-                                    totalPages: _filteredData.length > itemsPerPage ? totalPages : 1,//totalPages//totalPages,
-                                    onPreviousPage: _goToPreviousPage,
-                                    onNextPage: _goToNextPage,
+                              const Padding(
+                                padding: EdgeInsets.only(left: 20),
+                                child: Text(
+                                  'Open Order',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    //fontWeight: FontWeight.bold,
                                   ),
-                                ],
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                            ),
-                          ],
+                              const Spacer(),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
 
+                      Container(
+                        margin: const EdgeInsets.only(left: 0),
+                        // Space above/below the border
+                        height: 1,
+                        // width: 10  00,
+                        width: constraints.maxWidth,
+                        // Border height
+                        color: Colors.grey, // Border color
+                      ),
+                      if(constraints.maxWidth >= 1355)...{
+
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 30,
+                                          top: 50,
+                                          right: 30,
+                                          bottom: 15),
+                                      child: Container(
+                                        width: maxWidth * 0.8,
+                                        height: 755,
+                                        decoration: BoxDecoration(
+                                          // border: Border.all(color: Colors.grey),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                              8),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                  0.3), // Soft grey shadow
+                                              spreadRadius: 3,
+                                              blurRadius: 3,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: SizedBox(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .start,
+                                            children: [
+                                              buildSearchField(),
+                                              const SizedBox(height: 10),
+                                              Expanded(
+                                                child: Scrollbar(
+                                                  controller: _scrollController,
+                                                  thickness: 6,
+                                                  thumbVisibility: true,
+                                                  child: SingleChildScrollView(
+                                                    controller: _scrollController,
+                                                    scrollDirection: Axis
+                                                        .horizontal,
+                                                    child: buildDataTable(),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 30),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment
+                                                      .end,
+                                                  children: [
+                                                    PaginationControls(
+                                                      currentPage: currentPage,
+                                                      totalPages: (filteredData1
+                                                          .where((product) =>
+                                                      product.deliveryStatus ==
+                                                          'Picked')
+                                                          .length /
+                                                          itemsPerPage).ceil(),
+                                                      onPreviousPage: _goToPreviousPage,
+                                                      onNextPage: _goToNextPage,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      }
+                      else...{
+                        Expanded(
+                          child:  AdaptiveScrollbar(
+                            position: ScrollbarPosition.bottom,controller: horizontalScroll,
+                            child: SingleChildScrollView(
+                              controller: horizontalScroll,
+                              scrollDirection: Axis.horizontal,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 30,
+                                              top: 50,
+                                              right: 30,
+                                              bottom: 15),
+                                          child: Container(
+                                            width: 1200,
+                                            height: 755,
+                                            decoration: BoxDecoration(
+                                              // border: Border.all(color: Colors.grey),
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(
+                                                  8),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(
+                                                      0.3), // Soft grey shadow
+                                                  spreadRadius: 3,
+                                                  blurRadius: 3,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
+                                            ),
+                                            child: SizedBox(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment
+                                                    .start,
+                                                children: [
+                                                  buildSearchField(),
+                                                  const SizedBox(height: 10),
+                                                  Expanded(
+                                                    child: Scrollbar(
+                                                      controller: _scrollController,
+                                                      thickness: 6,
+                                                      thumbVisibility: true,
+                                                      child: SingleChildScrollView(
+                                                        controller: _scrollController,
+                                                        scrollDirection: Axis
+                                                            .horizontal,
+                                                        child: buildDataTable2(),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(
+                                                        right: 30),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment
+                                                          .end,
+                                                      children: [
+                                                        PaginationControls(
+                                                          currentPage: currentPage,
+                                                          totalPages: (filteredData1
+                                                              .where((product) =>
+                                                          product.deliveryStatus ==
+                                                              'Picked')
+                                                              .length /
+                                                              itemsPerPage).ceil(),
+                                                          onPreviousPage: _goToPreviousPage,
+                                                          onNextPage: _goToNextPage,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      }
+                    ],
                   ),
                 ),
-                const SizedBox(height: 50,),
+                // const SizedBox(height: 50,),
               ],
             );
           }
@@ -567,6 +834,8 @@ class _OpenInvoiceState extends State<OpenInvoice> {
       ),
     );
   }
+
+
 
 
   Widget buildSearchField() {
@@ -584,7 +853,7 @@ class _OpenInvoiceState extends State<OpenInvoice> {
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 30),
                   child: Container(
-                    width: maxWidth1 * 0.2, // reduced width
+                    width: 300, // reduced width
                     height: 35, // reduced height
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -593,7 +862,7 @@ class _OpenInvoiceState extends State<OpenInvoice> {
                     ),
                     child: TextFormField(
                       decoration: const InputDecoration(
-                        hintText: 'Search',
+                        hintText: 'Search by Order ID',
                         hintStyle: TextStyle(color: Colors.grey,fontSize: 13),
                         contentPadding:
                         EdgeInsets.only(bottom: 20,left: 10) ,// adjusted padding
@@ -619,27 +888,21 @@ class _OpenInvoiceState extends State<OpenInvoice> {
                     Padding(
                       padding: const EdgeInsets.only(left: 30),
                       child: Container(
-                        width: maxWidth1 * 0.1, // reduced width
+                        width: 140, // reduced width
                         height: 35, // reduced height
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(2),
                           border: Border.all(color: Colors.grey),
                         ),
-                        child: DropdownButtonFormField<String>(
+                        child: DropdownButtonFormField2<String>(
                           decoration: const InputDecoration(
                             contentPadding:
                             EdgeInsets.only(bottom: 15,left: 9), // adjusted padding
                             border: InputBorder.none,
                             filled: true,
                             fillColor: Colors.white,
-                            suffixIcon: Padding(
-                              padding: EdgeInsets.only(right: 5),
-                              child: Icon(Icons.arrow_drop_down_circle_rounded,
-                                  color: Colors.indigo, size: 16),
-                            ),
                           ),
-                          icon: Container(),
                           value: dropdownValue1,
                           onChanged: (String? newValue) {
                             setState(() {
@@ -651,7 +914,8 @@ class _OpenInvoiceState extends State<OpenInvoice> {
                           items: <String>[
                             'Delivery Status',
                             'Not Started',
-                            'Completed',
+                            'In Progress',
+                            'Delivered',
                           ]
                               .map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
@@ -662,6 +926,27 @@ class _OpenInvoiceState extends State<OpenInvoice> {
                               ),
                             );
                           }).toList(),
+                          iconStyleData: const IconStyleData(
+                            icon: Icon(
+                              Icons.arrow_drop_down_circle_rounded,
+                              color: Colors.indigo,
+                              size: 16,
+                            ),
+                            iconSize: 16,
+                          ),
+                          buttonStyleData: const ButtonStyleData(
+                            height: 50, // Button height
+                            padding: EdgeInsets.only(left: 10, right: 10), // Button padding
+                          ),
+                          dropdownStyleData: DropdownStyleData(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(7), // Rounded corners
+                              color: Colors.white, // Dropdown background color
+                            ),
+                            maxHeight: 200, // Max height for dropdown items
+                            width: maxWidth1 * 0.1, // Dropdown width
+                            offset:  const Offset(0, -10),
+                          ),
                         ),
                       ),
                     ),
@@ -675,27 +960,21 @@ class _OpenInvoiceState extends State<OpenInvoice> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
-                        width: maxWidth1 * 0.095, // reduced width
+                        width: 140, // reduced width
                         height: 35, // reduced height
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(2),
                           border: Border.all(color: Colors.grey),
                         ),
-                        child: DropdownButtonFormField<String>(
+                        child: DropdownButtonFormField2<String>(
                           decoration: const InputDecoration(
                             contentPadding:
                             EdgeInsets.only(bottom: 15,left: 10), // adjusted padding
                             border: InputBorder.none,
                             filled: true,
                             fillColor: Colors.white,
-                            suffixIcon: Padding(
-                              padding: EdgeInsets.only(right: 5),
-                              child: Icon(Icons.arrow_drop_down_circle_rounded,
-                                  color: Colors.indigo, size: 16),
-                            ),
                           ),
-                          icon: Container(),
                           value: dropdownValue2,
                           onChanged: (String? newValue) {
                             setState(() {
@@ -714,6 +993,27 @@ class _OpenInvoiceState extends State<OpenInvoice> {
                               ),
                             );
                           }).toList(),
+                          iconStyleData: const IconStyleData(
+                            icon: Icon(
+                              Icons.arrow_drop_down_circle_rounded,
+                              color: Colors.indigo,
+                              size: 16,
+                            ),
+                            iconSize: 16,
+                          ),
+                          buttonStyleData: const ButtonStyleData(
+                            height: 50, // Button height
+                            padding: EdgeInsets.only(left: 10, right: 10), // Button padding
+                          ),
+                          dropdownStyleData: DropdownStyleData(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(7), // Rounded corners
+                              color: Colors.white, // Dropdown background color
+                            ),
+                            maxHeight: 200, // Max height for dropdown items
+                            width: maxWidth1 * 0.1, // Dropdown width
+                            offset:  const Offset(0, -10),
+                          ),
                         ),
                       ),
                     ),
@@ -729,168 +1029,768 @@ class _OpenInvoiceState extends State<OpenInvoice> {
 
 
   Widget buildDataTable() {
-    var _mediaQuery = MediaQuery.of(context).size.width;
+
     if (isLoading) {
       _loading = true;
       var width = MediaQuery.of(context).size.width;
       var Height = MediaQuery.of(context).size.height;
       // Show loading indicator while data is being fetched
       return Padding(
-        padding: EdgeInsets.only(bottom: Height * 0.100,left: width * 0.300),
+        padding: EdgeInsets.only(top: Height * 0.100,bottom: Height * 0.100,left: width * 0.300),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
 
-    if (_filteredData.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 250, left: 500),
-        child: Text('No products found'),
-      );
-    }
-    return  Column(
-      children: [
-        Container(
-          width: _mediaQuery * 0.78,
-          // height: 300,
-          decoration:  BoxDecoration(
-              color: Color(0xFFECEFF1),
-              //   color: Color(0xFFF7F7F7),
-              border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+    if (filteredData1.isEmpty) {
+      double right = MediaQuery.of(context).size.width;
+      return  Column(
+        children: [
+          Container(
+            width: right -250,
+
+            decoration:const BoxDecoration(
+                color: Color(0xFFF7F7F7),
+                border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+            ),
+            child: DataTable(
+              showCheckboxColumn: false,
+              headingRowHeight: 40,
+              columnSpacing: 35,
+              columns: [
+                DataColumn(label: Container(
+                    child: Text('Order ID',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),))),
+                DataColumn(label: Container(
+                    child: Text('Created Date',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),))),
+                DataColumn(label: Container(child: Text(
+                  'Delivery Date',style:TextStyle(
+                    color: Colors.indigo[900],
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold
+                ),))),
+                DataColumn(label: Container(child: Text(
+                  'Total Amount',style:TextStyle(
+                    color: Colors.indigo[900],
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold
+                ),))),
+                DataColumn(label: Container(child: Text(
+                  'Delivery Status',style:  TextStyle(
+
+                    color: Colors.indigo[900],
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold
+                ),))),
+                DataColumn(label: Container(child: Text(
+                  'Payment',style:TextStyle(
+                    color: Colors.indigo[900],
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold
+                ),))),
+              ],
+              rows:
+              [],
+
+            ),
           ),
-          child: DataTable(
-            headingRowHeight: 40,
-            columns: [
-              DataColumn(label: Container(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 16),
-                    child: Text('Status',style:TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.indigo[900],
-                      fontSize: 15,
-                    ),),
-                  ))),
-              DataColumn(label: Container(child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Text('Order ID',style:TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.indigo[900],
-                  fontSize: 15,
-                ),),
-              ))),
-              DataColumn(label: Container(child: Text(
-                'Created Date',style:TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.indigo[900],
-                fontSize: 15,
-              ),))),
-              DataColumn(label: Container(child: Text(
-                'Reference Number',style:TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.indigo[900],
-                fontSize: 15,
-              ),))),
-              DataColumn(label: Container(child: Text(
-                'Total Amount',style:TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.indigo[900],
-                fontSize: 15,
-              ),))),
-              DataColumn(label: Container(child: Padding(
-                padding: const EdgeInsets.only(left: 2),
-                child: Text('Delivery Status',style:  TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.indigo[900],
-                  fontSize: 15,
-                ),),
-              ))),
-            ],
-            rows:
-            _filteredData
-                .where((dashboard) => dashboard.status == 'Completed') // Filter the data
-                .skip((currentPage - 1) * itemsPerPage)
-                .take(itemsPerPage)
-                .map((dashboard)
-            // _filteredData.skip((currentPage - 1) * itemsPerPage)
-            //     .take(itemsPerPage)
-            //     .map((dashboard)
-            {
-              final isSelected = false;
-              return DataRow(
-                  color: MaterialStateColor.resolveWith(
-                          (states) => isSelected ? Colors.grey[200]! : Colors.white),
-                  cells: [
-                    DataCell(
-                      Container(
-                        child: Text(
-                          dashboard.status,
-                          style: TextStyle(
-                            // fontSize: 15,
-                            color: dashboard.status == 'Completed'
-                                ? Colors.green
-                                : isSelected
-                                ? Colors.deepOrange[200]
-                                : const Color(0xFFFFB315),
+          Padding(
+            padding: EdgeInsets.only(top: 80,left: 130,right: 150),
+            child: CustomDatafound(),
+          ),
+        ],
+
+      );
+
+    }
+
+
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData1.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.orderId!.compareTo(b.orderId!);
+          } else if (columnIndex == 1) {
+            return a.createdDate!.compareTo(b.createdDate!);
+          } else if (columnIndex == 2) {
+            return a.deliveredDate!.compareTo(b.deliveredDate!);
+          } else if (columnIndex == 3) {
+            return a.totalAmount!.compareTo(b.totalAmount!);
+          } else if (columnIndex == 4) {
+            return a.deliveryStatus.compareTo(b.deliveryStatus);
+          }
+          else if (columnIndex == 5) {
+            return a.paymentStatus!.toLowerCase().compareTo(b.paymentStatus!.toLowerCase());
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData1.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.orderId!.compareTo(a.orderId!); // Reverse the comparison
+          } else if (columnIndex == 1) {
+            return b.createdDate!.compareTo(a.createdDate!); // Reverse the comparison
+          } else if (columnIndex == 2) {
+            return b.deliveredDate!.compareTo(a.deliveredDate!); // Reverse the comparison
+          } else if (columnIndex == 3) {
+            return b.totalAmount!.compareTo(a.totalAmount!); // Reverse the comparison
+          } else if (columnIndex == 4) {
+            return b.deliveryStatus.compareTo(a.deliveryStatus); // Reverse the comparison
+          }
+          else if (columnIndex == 5) {
+            return b.paymentStatus!.toLowerCase().compareTo(a.paymentStatus!.toLowerCase()); // Reverse the comparison
+          }else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
+
+    return LayoutBuilder(builder: (context, constraints){
+      // double padding = constraints.maxWidth * 0.065;
+      double right = MediaQuery.of(context).size.width;
+
+
+      return  Column(
+        children: [
+          Container(
+            width: right - 250,
+
+            decoration:const BoxDecoration(
+                color: Color(0xFFF7F7F7),
+                border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+            ),
+            child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columnSpacing: 35,
+                columns: columns.map((column) {
+                  return
+                    DataColumn(
+                      label: Stack(
+                        children: [
+                          Container(
+                            //   padding: EdgeInsets.only(left: 5,right: 5),
+                            width: columnWidths[columns.indexOf(column)], // Dynamic width based on user interaction
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              //crossAxisAlignment: CrossAxisAlignment.end,
+                              //   mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  column,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.indigo[900],
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                //  if (columns.indexOf(column) > 0)
+                                IconButton(
+                                  icon: _sortOrder[columns.indexOf(column)] == 'asc'
+                                      ?  SizedBox(width: 12,
+                                      child: Image.asset("images/sort.png",color: Colors.grey,))
+                                      : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                  onPressed: () {
+                                    setState(() {
+                                      _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
+                                      _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
+                                    });
+                                  },
+                                ),
+                                //SizedBox(width: 50,),
+                                //Padding(
+                                //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
+                                //  child:
+
+                                Spacer(),
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.resizeColumn,
+                                  child: GestureDetector(
+                                      onHorizontalDragUpdate: (details) {
+                                        // Update column width dynamically as user drags
+                                        setState(() {
+                                          columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                          columnWidths[columns.indexOf(column)] =
+                                              columnWidths[columns.indexOf(column)].clamp(50.0, 300.0);
+                                        });
+                                        // setState(() {
+                                        //   columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                        //   if (columnWidths[columns.indexOf(column)] < 50) {
+                                        //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
+                                        //   }
+                                        // });
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 10,bottom: 10),
+                                        child: Row(
+                                          children: [
+                                            VerticalDivider(
+                                              width: 5,
+                                              thickness: 4,
+                                              color: Colors.grey,
+
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                  ),
+                                ),
+                                // ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      onSort: (columnIndex, ascending){
+                        _sortOrder;
+                      },
+                    );
+                }).toList(),
+                rows: List.generate(
+                    math.min(itemsPerPage, filteredData1
+                        .where((detail) => detail.deliveryStatus == 'Picked')
+                        .length - (currentPage - 1) * itemsPerPage),(index){
+                  // final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                  final detail = filteredData1.
+                  where((detail) => detail.deliveryStatus == 'Picked').
+                  skip((currentPage - 1) * itemsPerPage).elementAt(index);
+
+                  final isSelected = _selectedProduct == detail;
+                  // final isSelected = _selectedProduct == detail;
+                  //final product = filteredData[(currentPage - 1) * itemsPerPage + index];
+                  return DataRow(
+                      color: MaterialStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue.shade500.withOpacity(0.8); // Add some opacity to the dark blue
+                        } else {
+                          return Colors.white.withOpacity(0.9);
+                        }
+                      }),
+                      cells:
+                      [
+                        DataCell(
+                            Text(detail.orderId.toString(), style: TextStyle(
+                              //fontSize: 16,
+                              color:isSelected ? Colors.deepOrange[200] : const Color(0xFFFFB315) ,),)),
+                        DataCell(
+                            Text(detail.createdDate!,style:
+                            TextStyle(
+                              // fontSize: 16,
+                                color: Colors.grey),)),
+                        DataCell(
+                          Padding(
+                            padding: const EdgeInsets.only(left: 30),
+                            child: Text(detail.deliveredDate!,style: TextStyle(
+                              // fontSize: 16,
+                                color: Colors.grey)),
                           ),
                         ),
-                      ),
-                    ),
-                    DataCell(Container( child: Text(
-                      dashboard.orderId,style:
-                    TextStyle(color: Color(0xFFA6A6A6),
-                        //   fontSize: 15,
-                        fontStyle: FontStyle.normal),))),
-                    DataCell(Container( child: Padding(
-                      padding: const EdgeInsets.only(left: 5),
-                      child: Text(
-                        dashboard.createdDate,
-                        style:TextStyle(color:
-                        Color(0xFFA6A6A6),
+                        DataCell(
+                          Text(detail.totalAmount.toString(),style: TextStyle(
+                            //fontSize: 16,
+                              color: Colors.grey)),
+                        ),
+                        DataCell(
+                          Text(detail.deliveryStatus.toString(),style: TextStyle(
+                            // fontSize: 16,
+                            color: detail.deliveryStatus == "In Progress" ? Colors.orange : detail.deliveryStatus == "Delivered" ? Colors.green : Colors.grey,
+                          )),
+                        ),
+                        DataCell(
+                          Text(detail.paymentStatus.toString(),style: TextStyle(
+                            //fontSize: 16,
+                              color: Colors.grey)),
+                        ),
 
-                            fontStyle: FontStyle.normal),),
-                    ))),
-                    DataCell(Container(child: Padding(
-                      padding: const EdgeInsets.only(left: 50),
-                      child: Text(dashboard.referenceNumber.toString(),
-                        style: TextStyle(color: Color(0xFFA6A6A6),
-                            fontStyle: FontStyle.normal),),
-                    ))),
-                    DataCell(Container(child: Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Text(dashboard.totalAmount.toString(),
-                        style: TextStyle(color:
-                        Color(0xFFA6A6A6),
-                            fontStyle: FontStyle.normal),),
-                    ))),
-                    DataCell(Container(child: Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: Text(dashboard.deliveryStatus.toString(),
-                        style: TextStyle(color:
-                        Color(0xFFA6A6A6),
-                            fontStyle: FontStyle.normal),),
-                    ))),
-                  ]);
-            }).toList(),
+                      ],
+                      onSelectChanged: (selected){
+                        if(selected != null && selected){
+                          print('what is this');
+
+                          print(detail);
+                          print('filtereddata');
+                          print(filteredData);
+                          print('roduct');
+                          print(productList);
+                          //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                          //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+                          final orderId = detail.orderId; // Capture the orderId of the selected row
+                          final detail1 = filteredData.firstWhere((element) => element.orderId == orderId);
+
+                          if (filteredData.length <= 9) {
+                            //fetchOrders();
+                            context.go('/Order_Placed_List', extra: {
+                              'product': detail1,
+                              'arrow': 'open_order',
+                              'item': [], // pass an empty list of maps
+                              'body': {},
+                              'status': detail.deliveryStatus,
+                              // 'status': detail.deliveryStatus,
+                              'itemsList': [], // pass an empty list of maps
+                              'orderDetails': filteredData.map((detail) => OrderDetail(
+                                orderId: detail.orderId,
+                                orderDate: detail.orderDate, items: [],
+                                deliveryStatus: detail.deliveryStatus,
+                                // Add other fields as needed
+                              )).toList(),
+
+                            });
+                            // context.go('/Order_Placed_List', extra: {
+                            //   'product': detail,
+                            //   'item': [], // pass an empty list of maps
+                            //   'body': {},
+                            //   'status': detail.deliveryStatus,
+                            //   'itemsList': [], // pass an empty list of maps
+                            //   'orderDetails': filteredData.map((detail) => OrderDetail(
+                            //     orderId: detail.orderId,
+                            //     orderDate: detail.orderDate, items: [],
+                            //     deliveryStatus: detail.deliveryStatus,
+                            //     // Add other fields as needed
+                            //   )).toList(),
+                            // });
+                            // context.go('/OrdersList', extra: {
+                            //   'product': detail,
+                            //   'item': [], // pass an empty list of maps
+                            //   'body': {},
+                            //   'itemsList': [], // pass an empty list of maps
+                            //   'orderDetails': productList.map((detail) => OrderDetail(
+                            //     orderId: detail.orderId,
+                            //     orderDate: detail.orderDate, items: [],
+                            //     // Add other fields as needed
+                            //   )).toList(),
+                            // });
+                          } else {
+
+                            context.go('/Order_Placed_List', extra: {
+                              'product': detail1,
+                              'item': [], // pass an empty list of maps
+                              'arrow': 'open_order',
+                              'status': detail.deliveryStatus,
+                              'body': {},
+                              'itemsList': [], // pass an empty list of maps
+                              'orderDetails': filteredData.map((detail) => OrderDetail(
+                                orderId: detail.orderId,
+                                orderDate: detail.orderDate, items: [],
+                                deliveryStatus: detail.deliveryStatus,
+                                // Add other fields as needed
+                              )).toList(),
+                            });
+                          }
+                        }
+                      }
+                  );
+                })
+            ),
           ),
-        ),
-      ],
-    );
+
+        ],
+
+      );
+    });
+
+  }
+  Widget buildDataTable2() {
+
+    if (isLoading) {
+      _loading = true;
+      var width = MediaQuery.of(context).size.width;
+      var Height = MediaQuery.of(context).size.height;
+      // Show loading indicator while data is being fetched
+      return Padding(
+        padding: EdgeInsets.only(top: Height * 0.100,bottom: Height * 0.100,left: width * 0.300),
+        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+      );
+    }
+
+    if (filteredData1.isEmpty) {
+      double right = MediaQuery.of(context).size.width;
+      return  Column(
+        children: [
+          Container(
+            width: 1200,
+
+            decoration:const BoxDecoration(
+                color: Color(0xFFF7F7F7),
+                border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+            ),
+            child: DataTable(
+              showCheckboxColumn: false,
+              headingRowHeight: 40,
+              columns: [
+                DataColumn(label: Container(
+                    child: Text('Order ID',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),))),
+                DataColumn(label: Container(
+                    child: Text('Created Date',style:TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold
+                    ),))),
+                DataColumn(label: Container(child: Text(
+                  'Delivery Date',style:TextStyle(
+                    color: Colors.indigo[900],
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold
+                ),))),
+                DataColumn(label: Container(child: Text(
+                  'Total Amount',style:TextStyle(
+                    color: Colors.indigo[900],
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold
+                ),))),
+                DataColumn(label: Container(child: Text(
+                  'Delivery Status',style:  TextStyle(
+
+                    color: Colors.indigo[900],
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold
+                ),))),
+                DataColumn(label: Container(child: Text(
+                  'Payment',style:TextStyle(
+                    color: Colors.indigo[900],
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold
+                ),))),
+              ],
+              rows:
+              [],
+
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 80,left: 130,right: 150),
+            child: CustomDatafound(),
+          ),
+        ],
+
+      );
+
+    }
+
+
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData1.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.orderId!.compareTo(b.orderId!);
+          } else if (columnIndex == 1) {
+            return a.createdDate!.compareTo(b.createdDate!);
+          } else if (columnIndex == 2) {
+            return a.deliveredDate!.compareTo(b.deliveredDate!);
+          } else if (columnIndex == 3) {
+            return a.totalAmount!.compareTo(b.totalAmount!);
+          } else if (columnIndex == 4) {
+            return a.deliveryStatus.compareTo(b.deliveryStatus);
+          }
+          else if (columnIndex == 5) {
+            return a.paymentStatus!.toLowerCase().compareTo(b.paymentStatus!.toLowerCase());
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData1.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.orderId!.compareTo(a.orderId!); // Reverse the comparison
+          } else if (columnIndex == 1) {
+            return b.createdDate!.compareTo(a.createdDate!); // Reverse the comparison
+          } else if (columnIndex == 2) {
+            return b.deliveredDate!.compareTo(a.deliveredDate!); // Reverse the comparison
+          } else if (columnIndex == 3) {
+            return b.totalAmount!.compareTo(a.totalAmount!); // Reverse the comparison
+          } else if (columnIndex == 4) {
+            return b.deliveryStatus.compareTo(a.deliveryStatus); // Reverse the comparison
+          }
+          else if (columnIndex == 5) {
+            return b.paymentStatus!.toLowerCase().compareTo(a.paymentStatus!.toLowerCase()); // Reverse the comparison
+          }else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
+
+    return LayoutBuilder(builder: (context, constraints){
+      // double padding = constraints.maxWidth * 0.065;
+      double right = MediaQuery.of(context).size.width;
+
+
+      return  Column(
+        children: [
+          Container(
+            width: 1200,
+
+            decoration:const BoxDecoration(
+                color: Color(0xFFF7F7F7),
+                border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+            ),
+            child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columns: columns.map((column) {
+                  return
+                    DataColumn(
+                      label: Stack(
+                        children: [
+                          Container(
+                            //   padding: EdgeInsets.only(left: 5,right: 5),
+                            width: columnWidths[columns.indexOf(column)], // Dynamic width based on user interaction
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              //crossAxisAlignment: CrossAxisAlignment.end,
+                              //   mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  column,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.indigo[900],
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                //  if (columns.indexOf(column) > 0)
+                                IconButton(
+                                  icon: _sortOrder[columns.indexOf(column)] == 'asc'
+                                      ?  SizedBox(width: 12,
+                                      child: Image.asset("images/sort.png",color: Colors.grey,))
+                                      : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                  onPressed: () {
+                                    setState(() {
+                                      _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
+                                      _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
+                                    });
+                                  },
+                                ),
+                                //SizedBox(width: 50,),
+                                //Padding(
+                                //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
+                                //  child:
+
+                                Spacer(),
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.resizeColumn,
+                                  child: GestureDetector(
+                                      onHorizontalDragUpdate: (details) {
+                                        // Update column width dynamically as user drags
+                                        setState(() {
+                                          columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                          columnWidths[columns.indexOf(column)] =
+                                              columnWidths[columns.indexOf(column)].clamp(50.0, 300.0);
+                                        });
+                                        // setState(() {
+                                        //   columnWidths[columns.indexOf(column)] += details.delta.dx;
+                                        //   if (columnWidths[columns.indexOf(column)] < 50) {
+                                        //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
+                                        //   }
+                                        // });
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 10,bottom: 10),
+                                        child: Row(
+                                          children: [
+                                            VerticalDivider(
+                                              width: 5,
+                                              thickness: 4,
+                                              color: Colors.grey,
+
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                  ),
+                                ),
+                                // ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      onSort: (columnIndex, ascending){
+                        _sortOrder;
+                      },
+                    );
+                }).toList(),
+                rows: List.generate(
+                    math.min(itemsPerPage, filteredData1
+                        .where((detail) => detail.deliveryStatus == 'Picked')
+                        .length - (currentPage - 1) * itemsPerPage),(index){
+                  // final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                  final detail = filteredData1.
+                  where((detail) => detail.deliveryStatus == 'Picked').
+                  skip((currentPage - 1) * itemsPerPage).elementAt(index);
+
+                  final isSelected = _selectedProduct == detail;
+                  // final isSelected = _selectedProduct == detail;
+                  //final product = filteredData[(currentPage - 1) * itemsPerPage + index];
+                  return DataRow(
+                      color: MaterialStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue.shade500.withOpacity(0.8); // Add some opacity to the dark blue
+                        } else {
+                          return Colors.white.withOpacity(0.9);
+                        }
+                      }),
+                      cells:
+                      [
+                        DataCell(
+                            Text(detail.orderId.toString(), style: TextStyle(
+                              //fontSize: 16,
+                              color:isSelected ? Colors.deepOrange[200] : const Color(0xFFFFB315) ,),)),
+                        DataCell(
+                            Text(detail.createdDate!,style:
+                            TextStyle(
+                              // fontSize: 16,
+                                color: Colors.grey),)),
+                        DataCell(
+                          Padding(
+                            padding: const EdgeInsets.only(left: 30),
+                            child: Text(detail.deliveredDate!,style: TextStyle(
+                              // fontSize: 16,
+                                color: Colors.grey)),
+                          ),
+                        ),
+                        DataCell(
+                          Text(detail.totalAmount.toString(),style: TextStyle(
+                            //fontSize: 16,
+                              color: Colors.grey)),
+                        ),
+                        DataCell(
+                          Text(detail.deliveryStatus.toString(),style: TextStyle(
+                            // fontSize: 16,
+                            color: detail.deliveryStatus == "In Progress" ? Colors.orange : detail.deliveryStatus == "Delivered" ? Colors.green : Colors.grey,
+                          )),
+                        ),
+                        DataCell(
+                          Text(detail.paymentStatus.toString(),style: TextStyle(
+                            //fontSize: 16,
+                              color: Colors.grey)),
+                        ),
+
+                      ],
+                      onSelectChanged: (selected){
+                        if(selected != null && selected){
+                          print('what is this');
+
+                          print(detail);
+                          print('filtereddata');
+                          print(filteredData);
+                          print('roduct');
+                          print(productList);
+                          //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                          //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+                          final orderId = detail.orderId; // Capture the orderId of the selected row
+                          final detail1 = filteredData.firstWhere((element) => element.orderId == orderId);
+
+                          if (filteredData.length <= 9) {
+                            //fetchOrders();
+                            context.go('/Order_Placed_List', extra: {
+                              'product': detail1,
+                              'arrow': 'open_order',
+                              'item': [], // pass an empty list of maps
+                              'body': {},
+                              'status': detail.deliveryStatus,
+                              // 'status': detail.deliveryStatus,
+                              'itemsList': [], // pass an empty list of maps
+                              'orderDetails': filteredData.map((detail) => OrderDetail(
+                                orderId: detail.orderId,
+                                orderDate: detail.orderDate, items: [],
+                                deliveryStatus: detail.deliveryStatus,
+                                // Add other fields as needed
+                              )).toList(),
+
+                            });
+                            // context.go('/Order_Placed_List', extra: {
+                            //   'product': detail,
+                            //   'item': [], // pass an empty list of maps
+                            //   'body': {},
+                            //   'status': detail.deliveryStatus,
+                            //   'itemsList': [], // pass an empty list of maps
+                            //   'orderDetails': filteredData.map((detail) => OrderDetail(
+                            //     orderId: detail.orderId,
+                            //     orderDate: detail.orderDate, items: [],
+                            //     deliveryStatus: detail.deliveryStatus,
+                            //     // Add other fields as needed
+                            //   )).toList(),
+                            // });
+                            // context.go('/OrdersList', extra: {
+                            //   'product': detail,
+                            //   'item': [], // pass an empty list of maps
+                            //   'body': {},
+                            //   'itemsList': [], // pass an empty list of maps
+                            //   'orderDetails': productList.map((detail) => OrderDetail(
+                            //     orderId: detail.orderId,
+                            //     orderDate: detail.orderDate, items: [],
+                            //     // Add other fields as needed
+                            //   )).toList(),
+                            // });
+                          } else {
+
+                            context.go('/Order_Placed_List', extra: {
+                              'product': detail1,
+                              'item': [], // pass an empty list of maps
+                              'arrow': 'open_order',
+                              'status': detail.deliveryStatus,
+                              'body': {},
+                              'itemsList': [], // pass an empty list of maps
+                              'orderDetails': filteredData.map((detail) => OrderDetail(
+                                orderId: detail.orderId,
+                                orderDate: detail.orderDate, items: [],
+                                deliveryStatus: detail.deliveryStatus,
+                                // Add other fields as needed
+                              )).toList(),
+                            });
+                          }
+                        }
+                      }
+                  );
+                })
+            ),
+          ),
+
+        ],
+
+      );
+    });
+
   }
 
 
   void _filterAndPaginateProducts() {
-
-    _filteredData = productList.where((product) {
-
-      final matchesSearchText= product.orderId.toLowerCase().contains(_searchText.toLowerCase());
+    filteredData1 = productList.where((product) {
+      final matchesSearchText= product.orderId!.toLowerCase().contains(_searchText.toLowerCase());
       print('-----');
-      print(product.createdDate);
+      print(product.orderDate);
       String orderYear = '';
-      if (product.createdDate.contains('-')) {
-        final dateParts = product.createdDate.split('-');
+      if (product.createdDate!.contains('/') || product.createdDate!.contains('-')) {
+        String separator = product.createdDate!.contains('/') ? '/' : '-';
+        final dateParts = product.createdDate!.split(separator);
         if (dateParts.length == 3) {
-          orderYear = dateParts[0]; // Extract the year
+          orderYear = dateParts[2]; // Extract the year
+          //Extract the day
         }
       }
+      // if (product.deliveredDate!.contains('/')) {
+      //   final dateParts = product.deliveredDate!.split('/');
+      //   if (dateParts.length == 3) {
+      //     orderYear = dateParts[2]; // Extract the year
+      //   }
+      // }
+      // final orderYear = element.orderDate.substring(5,9);
       if (status.isEmpty && selectDate.isEmpty) {
         return matchesSearchText; // Include all products that match the search text
       }
@@ -922,15 +1822,17 @@ class _OpenInvoiceState extends State<OpenInvoice> {
           (product.deliveryStatus == status && orderYear == selectDate);
       //  return false;
     }).toList();
+    totalPages = (filteredData1.length / itemsPerPage).ceil();
+    //totalPages = (productList.length / itemsPerPage).ceil();
     setState(() {
-      print('fileterpaginate');
-      print(_filteredData);
       currentPage = 1;
     });
-
   }
 
 }
+
+
+
 
 
 

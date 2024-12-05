@@ -74,6 +74,7 @@ class _CusInvoiceListState extends State<CusInvoiceList> {
     return [
     _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Customer_Order_List'),
+      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -86,7 +87,7 @@ class _CusInvoiceListState extends State<CusInvoiceList> {
               bottomRight: Radius.circular(8), // No radius for bottom-right corner
             ),
           ),child: _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.white, '/Customer_Invoice_List')),
-      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
+
       _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Customer_Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Customer_Return_List'),
     ];
@@ -198,15 +199,11 @@ class _CusInvoiceListState extends State<CusInvoiceList> {
       }
     } catch (e) {
       print('Error decoding JSON: $e');
-// Optionally, show an error message to the user
     } finally {
       if (mounted) {
       }
     }
   }
-
-
-
   Future<void> fetchProducts(int page, int itemsPerPage) async {
 
     if (isLoading) return;
@@ -217,7 +214,7 @@ class _CusInvoiceListState extends State<CusInvoiceList> {
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage',
+          '$apicall/invoice_master/get_all_invoice_master?page=$page&limit=$itemsPerPage',
         ),
         headers: {
           "Content-type": "application/json",

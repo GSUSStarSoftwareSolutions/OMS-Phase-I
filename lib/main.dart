@@ -6,6 +6,8 @@ import 'package:btb/admin/admin%20edit.dart';
 import 'package:btb/admin/admin%20list.dart';
 import 'package:btb/admin/create%20login.dart';
 import 'package:btb/customer%20login/credit/credit%20list.dart';
+import 'package:btb/customer%20login/cus_dashboard/Cus_Open_Order.dart';
+import 'package:btb/customer%20login/cus_dashboard/Cus_pick_order.dart';
 import 'package:btb/customer%20login/delivery/delivery.dart';
 import 'package:btb/customer%20login/invoice/invoice%20list.dart';
 import 'package:btb/customer%20login/order/create%20order%20button.dart';
@@ -18,6 +20,7 @@ import 'package:btb/customer%20login/payment/pay%20cus.dart';
 import 'package:btb/customer%20login/return/return%20list.dart';
 import 'package:btb/customer%20module/create%20customer.dart';
 import 'package:btb/customer%20module/customer%20view.dart';
+import 'package:btb/dashboard/pay%20complete.dart';
 import 'package:btb/delivery%20module/delivery%20list.dart';
 import 'package:btb/payment%20module/pay%20screen.dart';
 import 'package:btb/payment%20module/payment.dart';
@@ -49,7 +52,9 @@ import 'Return Module/return module design.dart';
 import 'Return Module/return ontap.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'admin/create users.dart';
+import 'customer login/cus_dashboard/Cus_del_order.dart';
 import 'customer login/cus_dashboard/dash_cus.dart';
+import 'customer login/cus_profile/Profile.dart';
 import 'customer login/order/add to cart.dart';
 import 'customer login/order/draft list.dart';
 import 'customer login/order/editable view screen.dart';
@@ -196,7 +201,9 @@ class MyApp extends StatelessWidget {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return CustomTransitionPage(
             key: state.pageKey,
-            child: userEdit(EditUser: extra['EditUser'] ?? {},),
+            child: userEdit(
+              EditUser: extra['EditUser'] ?? {},
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -269,6 +276,96 @@ class MyApp extends StatelessWidget {
           return CustomTransitionPage(
             key: state.pageKey,
             child: OpenorderList(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/Picked_order',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: OpenpickList(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/Pay_Complete',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: PayCompleteList(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/Cus_Open_Order',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: CusOpenorder(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/Cus_Pick_Order',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: CusPickorder(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/Cus_Deliver_Order',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: Cusorderdlvy(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -668,27 +765,6 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
-        path: '/Open_Invoice',
-        pageBuilder: (context, state) {
-          final cameFromRoute = state.extra != null
-              ? (state.extra as Map<String, dynamic>)['cameFromRoute'] ?? false
-              : false;
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: OpenInvoice(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
         path: '/Order_Complete',
         pageBuilder: (context, state) {
           final cameFromRoute = state.extra != null
@@ -892,6 +968,25 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
+        path: '/Cus_Profile',
+        pageBuilder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: UserProfile(Usr_detail: data['Usr_detail'] ?? ''),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(milliseconds: 5),
+          );
+        },
+      ),
+      GoRoute(
         path: '/Draft_Placed_List',
         pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>?;
@@ -953,7 +1048,7 @@ class MyApp extends StatelessWidget {
                 );
               },
               transitionDuration:
-              Duration(milliseconds: 300), // Adjust transition duration
+                  Duration(milliseconds: 300), // Adjust transition duration
             );
           }
           // If extra is not null, load the SixthPage
@@ -977,7 +1072,7 @@ class MyApp extends StatelessWidget {
               );
             },
             transitionDuration:
-            Duration(milliseconds: 300), // Adjust transition duration
+                Duration(milliseconds: 300), // Adjust transition duration
           );
         },
       ),
@@ -1627,7 +1722,9 @@ class MyApp extends StatelessWidget {
           final data = state.extra as Map<String, dynamic>?;
           return CustomTransitionPage(
             key: state.pageKey,
-            child: CustomerDetails(orderId: data!['orderId'],),
+            child: CustomerDetails(
+              orderId: data!['orderId'],
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -1839,9 +1936,10 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/Cus_Create_Order',
         pageBuilder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? {};
           return CustomTransitionPage(
             key: state.pageKey,
-            child: CusCreateOrderPage(),
+            child: CusCreateOrderPage(testing: data['testing'],),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(

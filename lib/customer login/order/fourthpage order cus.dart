@@ -132,6 +132,7 @@ class _CusSelectedProductsState extends State<CusSelectedProducts> {
   };
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -144,8 +145,9 @@ class _CusSelectedProductsState extends State<CusSelectedProducts> {
               bottomRight: Radius.circular(8), // No radius for bottom-right corner
             ),
           ),child: _buildMenuItem('Orders', Icons.warehouse, Colors.white, '/Customer_Order_List')),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
+
       _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Customer_Payment_List'),
       _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Customer_Return_List'),
     ];
@@ -576,7 +578,40 @@ class _CusSelectedProductsState extends State<CusSelectedProducts> {
               double maxWidth = constraints.maxWidth;
               return Stack(
                 children: [
-                  buildSideMenu(),
+
+                  if (constraints.maxHeight <= 310) ...{
+                    SingleChildScrollView(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding:
+                          const EdgeInsets.only(left: 15, top: 10, right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
+                        ),
+                      ),
+                    )
+                  } else ...{
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        height: 984,
+                        color: const Color(0xFFF7F6FA),
+                        padding:
+                        const EdgeInsets.only(left: 15, top: 10, right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
+                      ),
+                    ),
+                  },
+
                   Padding(
                     padding: const EdgeInsets.only(left: 200,top: 0),
                     child: Container(
@@ -1762,22 +1797,7 @@ class _CusSelectedProductsState extends State<CusSelectedProducts> {
   }
 
 
-  Widget buildSideMenu() {
-    return
-      Align(
-        alignment: Alignment.topLeft,
-        child: Container(
-          width: 200,
-          height: 984,
-          color: const Color(0xFFF7F6FA),
-          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildMenuItems(context),
-          ),
-        ),
-      );
-  }
+
 
 
 

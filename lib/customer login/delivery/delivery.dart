@@ -85,7 +85,7 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
     return [
     _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Customer_Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
+
       Container(decoration: BoxDecoration(
         color: Colors.blue[800],
          // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
@@ -97,6 +97,7 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
           bottomRight: Radius.circular(8), // No radius for bottom-right corner
         ),
       ),child: _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.white, '/Customer_Delivery_List')),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Customer_Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Customer_Return_List'),
     ];
@@ -176,7 +177,8 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
         if (jsonData != null) {
           if (jsonData is List) {
             products = jsonData.map((item) => detail.fromJson(item)).toList();
-          } else if (jsonData is Map && jsonData.containsKey('body')) {
+          }
+          else if (jsonData is Map && jsonData.containsKey('body')) {
             products = (jsonData['body'] as List)
                 .map((item) => detail.fromJson(item))
                 .toList();
@@ -189,6 +191,7 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
           // Check the data structure
           print('Product Customer IDs:');
           products.forEach((product) => print(product.CusId));
+
 
           // Apply filtering for CusId
           List<detail> matchedCustomers = products.where((customer) {

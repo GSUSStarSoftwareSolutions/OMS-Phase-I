@@ -26,16 +26,18 @@ class DeliveryList extends StatefulWidget {
 
 class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderStateMixin{
   final ScrollController horizontalScroll = ScrollController();
-  List<String> _sortOrder = List.generate(6, (index) => 'asc');
+  List<String> _sortOrder = List.generate(7, (index) => 'asc');
   List<String> columns = [
     'Delivery Id',
     'Name',
     'Created Date',
+    'Picked Date',
+    'Delivered Date',
     'Total Amount',
     'Delivery Status'
   ];
-  List<double> columnWidths = [110, 90, 130, 125, 135];
-  List<bool> columnSortState = [true, true, true, true, true];
+  List<double> columnWidths = [110, 90, 130, 125, 130, 125, 135];
+  List<bool> columnSortState = [true, true, true, true, true, true, true];
   Timer? _searchDebounceTimer;
   String _searchText = '';
   bool isOrdersSelected = false;
@@ -78,10 +80,10 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -94,6 +96,7 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
               bottomRight: Radius.circular(8), // No radius for bottom-right corner
             ),
           ),child: _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blueAccent, '/Delivery_List')),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
@@ -915,6 +918,24 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
                     DataColumn(
                         label: Container(
                             child: Text(
+                              'Name',
+                              style: TextStyle(
+                                  color: Colors.indigo[900],
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold),
+                            ))),
+                    DataColumn(
+                        label: Container(
+                            child: Text(
+                              'Name',
+                              style: TextStyle(
+                                  color: Colors.indigo[900],
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold),
+                            ))),
+                    DataColumn(
+                        label: Container(
+                            child: Text(
                               'Created Date',
                               style: TextStyle(
                                   color: Colors.indigo[900],
@@ -1106,6 +1127,28 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
                               ),
                               DataCell(
                                 Container(
+                                  width: columnWidths[2],
+                                  child: Text(
+                                    detail.pickedDate!,
+                                    style: const TextStyle(
+                                      color: Color(0xFFA6A6A6),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  width: columnWidths[2],
+                                  child: Text(
+                                    detail.deliveredDate!,
+                                    style: const TextStyle(
+                                      color: Color(0xFFA6A6A6),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
                                   width: columnWidths[3],
                                   child: Text(
                                     detail.total.toString(),
@@ -1122,8 +1165,8 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
                                       style: TextStyle(
 //fontSize: 16,
                                           color: detail.deliveryStatus ==
-                                              "In Progress"
-                                              ? Colors.orange
+                                              "Create"
+                                              ? Colors.greenAccent
                                               : detail.deliveryStatus == "Delivered"
                                               ? Colors.green
                                               : Colors.grey)),
@@ -1174,7 +1217,7 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
       return Column(
         children: [
           Container(
-            width: right -200,
+            width: right,
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -1215,6 +1258,24 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
                   DataColumn(
                       label: Container(
                           child: Text(
+                            'Created Date',
+                            style: TextStyle(
+                                color: Colors.indigo[900],
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold),
+                          ))),
+                  DataColumn(
+                      label: Container(
+                          child: Text(
+                            'Picked Date',
+                            style: TextStyle(
+                                color: Colors.indigo[900],
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold),
+                          ))),
+                  DataColumn(
+                      label: Container(
+                          child: Text(
                     'Total Amount',
                     style: TextStyle(
                         color: Colors.indigo[900],
@@ -1249,7 +1310,7 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
       return Column(
         children: [
           Container(
-            width: right -200,
+            width: right -80,
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -1397,6 +1458,28 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
                         ),
                         DataCell(
                           Container(
+                            width: columnWidths[2],
+                            child: Text(
+                              detail.pickedDate!,
+                              style: const TextStyle(
+                                color: Color(0xFFA6A6A6),
+                              ),
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[2],
+                            child: Text(
+                              detail.deliveredDate!,
+                              style: const TextStyle(
+                                color: Color(0xFFA6A6A6),
+                              ),
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
                             width: columnWidths[3],
                             child: Text(
                               detail.total.toString(),
@@ -1413,8 +1496,8 @@ class _DeliveryListState extends State<DeliveryList> with SingleTickerProviderSt
                                 style: TextStyle(
 //fontSize: 16,
                                     color: detail.deliveryStatus ==
-                                            "In Progress"
-                                        ? Colors.orange
+                                            "Created"
+                                        ? Colors.greenAccent
                                         : detail.deliveryStatus == "Delivered"
                                             ? Colors.green
                                             : Colors.grey)),

@@ -76,9 +76,11 @@ class _CusPaymentState extends State<CusPayment> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
       _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Customer_Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Customer_Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Customer_Invoice_List'),
+
       Container(
     decoration: BoxDecoration(
     color: Colors.blue[800],
@@ -477,19 +479,38 @@ class _CusPaymentState extends State<CusPayment> {
               return  Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                      width: 200,
-                      height: 984,
-                      color: const Color(0xFFF7F6FA),
-                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildMenuItems(context),
+                  if (constraints.maxHeight <= 310) ...{
+                    SingleChildScrollView(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: 200,
+                          color: const Color(0xFFF7F6FA),
+                          padding:
+                          const EdgeInsets.only(left: 15, top: 10, right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
+                        ),
+                      ),
+                    )
+                  } else ...{
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        height: 984,
+                        color: const Color(0xFFF7F6FA),
+                        padding:
+                        const EdgeInsets.only(left: 15, top: 10, right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
                       ),
                     ),
-                  ),
+                  },
                   Container(
                     margin: const EdgeInsets.symmetric(
                         horizontal: 1), // Space above/below the border

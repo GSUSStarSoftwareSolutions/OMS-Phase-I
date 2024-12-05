@@ -25,6 +25,8 @@ class _userEditState extends State<userEdit> {
   TextEditingController location = TextEditingController();
   TextEditingController userNameController = TextEditingController();
   TextEditingController userId = TextEditingController();
+  TextEditingController ShippingAddress1 = TextEditingController();
+  TextEditingController ShippingAddress2 = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController departmentController = TextEditingController();
@@ -57,6 +59,8 @@ class _userEditState extends State<userEdit> {
       "mobileNumber": mobileController.text,
       "role": selectedValue,
       "userName": userNameController.text,
+      "ShippingAddress1": ShippingAddress1.text,
+      "ShippingAddress2": ShippingAddress2.text,
     };
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -154,6 +158,8 @@ class _userEditState extends State<userEdit> {
     departmentController.text = widget.EditUser!['companyName']?? '';
     mobileController.text = widget.EditUser!['mobileNumber']?? '';
     location.text = widget.EditUser!['location']?? '';
+    ShippingAddress1.text = widget.EditUser!['shippingAddress1']?? '';
+    ShippingAddress2.text = widget.EditUser!['shippingAddress2']?? '';
     dateController = TextEditingController();
     dateController.text = 'Joining Date';
   }

@@ -1,20 +1,11 @@
 import 'dart:convert';
 import 'dart:html';
 import 'package:btb/admin/Api%20name.dart';
-import 'package:btb/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
-
-import '../Order Module/firstpage.dart';
-import '../admin/admin list.dart';
-import '../customer login/order/order list.dart';
-import '../dashboard/dashboard.dart';
 import 'verify_emailid.dart';
-
 void main() => runApp(MaterialApp(
       home: LoginContainer2(),
     ));
@@ -50,22 +41,19 @@ class _LoginContainer2State extends State<LoginContainer2> {
       Map tempData = json.decode(response.body);
       if (tempData.containsKey("error")) {
         // Handle empty input fields with appropriate messages
-        if (userName.text.isEmpty && Password.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please enter username & password")),
-          );
-        } else if (userName.text.isNotEmpty && Password.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please enter password")),
-          );
-        } else if (userName.text.isEmpty && Password.text.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please enter username")),
-          );
-        } else if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Something went wrong")));
-        }
+      if (tempData['code'] == '401' &&
+          tempData['error'] == 'INVALID EMPLOYEE NAME or PASSWORD') {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text("Enter valid  password")));
+      }
+
+      else if (tempData['code'] == '404' &&
+          tempData['status'] == 'failed') {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("User name not found")));
+      }
+
       } else {
         window.sessionStorage["userId"] = tempData['userId'];
         // Check the role and handle accordingly
@@ -88,26 +76,6 @@ class _LoginContainer2State extends State<LoginContainer2> {
           context.go('/User_List');
           // Navigate to Admin-specific home
         }
-        // else if (role == 'User') {
-        //   // Handle Admin role
-        //   window.sessionStorage["token"] = tempData['token'];
-        //   Navigator.push(
-        //     context,
-        //     PageRouteBuilder(
-        //       pageBuilder: (context, animation, secondaryAnimation) =>
-        //           AdminList(),
-        //       transitionDuration: const Duration(milliseconds: 200),
-        //       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        //         return FadeTransition(
-        //           opacity: animation,
-        //           child: child,
-        //         );
-        //       },
-        //     ),
-        //   );
-        // //  context.go('/AdminHome');
-        //   // Navigate to Admin-specific home
-        // }
         else {
           // Handle other roles, if needed
           ScaffoldMessenger.of(context).showSnackBar(
@@ -119,7 +87,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
     } else {
       // Handle non-200 responses
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Invalid response from server")),
+        const SnackBar(content: Text("Invalid response from this ")),
       );
     }
   }
@@ -128,7 +96,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if(constraints.maxHeight >= 650){
+        if(constraints.maxHeight >= 630){
           return Container(
             constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
             // 80% of screen width
@@ -299,14 +267,25 @@ class _LoginContainer2State extends State<LoginContainer2> {
                           width:200,
                           child: ElevatedButton(
                             onPressed: () async {
-                              // bool isValid = await checkLogin(userName.text, Password.text);
-                              // if (isValid) {
-                              //   context.go('/Home');
-                              //   ScaffoldMessenger.of(context).showSnackBar(
-                              //     const SnackBar(content: Text("Something went wrong")),
-                              //   );
-                              // }
-                              await checkLogin(userName.text, Password.text);
+                              if (userName.text.isEmpty && Password.text.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please enter username & password")),
+                                );
+                              }
+                              else if (userName.text.isEmpty && Password.text.isNotEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please enter username")),
+                                );
+                              }
+                              else if (userName.text.isNotEmpty && Password.text.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please enter password")),
+                                );
+                              }
+                              else{
+                                await checkLogin(userName.text, Password.text);
+                              }
+
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[800],
@@ -431,7 +410,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
                                           Text("Please enter password")),
                                     );
                                   }
-            
+
                                 }
                               },
                             ),
@@ -489,7 +468,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
                                           Text("Please enter username")),
                                     );
                                   }
-            
+
                                 }
                               },
                             ),
@@ -526,14 +505,25 @@ class _LoginContainer2State extends State<LoginContainer2> {
                             width: constraints.maxWidth * 0.2,
                             child: ElevatedButton(
                               onPressed: () async {
-                                // bool isValid = await checkLogin(userName.text, Password.text);
-                                // if (isValid) {
-                                //   context.go('/Home');
-                                //   ScaffoldMessenger.of(context).showSnackBar(
-                                //     const SnackBar(content: Text("Something went wrong")),
-                                //   );
-                                // }
-                                await checkLogin(userName.text, Password.text);
+                                if (userName.text.isEmpty && Password.text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Please enter username & password")),
+                                  );
+                                }
+                                else if (userName.text.isEmpty && Password.text.isNotEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Please enter username")),
+                                  );
+                                }
+                                else if (userName.text.isNotEmpty && Password.text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Please enter password")),
+                                  );
+                                }
+                                else{
+                                  await checkLogin(userName.text, Password.text);
+                                }
+
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[800],
@@ -550,11 +540,11 @@ class _LoginContainer2State extends State<LoginContainer2> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 140),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 30),
-                          child: Align(
-                            alignment: const Alignment(0.1, 0.0),
+                        SizedBox(height: constraints.maxHeight *  0.06),
+                        Align(
+                          alignment: const Alignment(0.1, 0.0),
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 30),
                             child: RichText(
                               textAlign: TextAlign.center,
                               text: const TextSpan(
@@ -584,7 +574,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
             ),
           );
         }
-      
+
       },
     );
   }
@@ -642,7 +632,7 @@ class ImageContainer extends StatelessWidget {
                         width: MediaQuery.of(context).size.width *
                             0.4, // Take 70% of screen width
                         height: MediaQuery.of(context).size.width *
-                            0.3, // Take 70% of screen width
+                            0.7, // Take 70% of screen width
                         child: SingleChildScrollView(
                           child: Image.asset(
                             'images/ikyam1.png',
@@ -650,16 +640,16 @@ class ImageContainer extends StatelessWidget {
                           ),
                         ),
                       ),
-                    
+
                   ),
                 ],
               ),
             ),
           );
         }
-       
+
       }
     );
-    
+
   }
 }

@@ -102,10 +102,10 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+
       Container(decoration: BoxDecoration(
         color: Colors.blue[800]  ,
         borderRadius: const BorderRadius.only(
@@ -115,7 +115,8 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
           bottomRight: Radius.circular(8), // No radius for bottom-right corner
         ),
       ),child: _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.white, '/Delivery_List')),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
@@ -162,8 +163,7 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
     );
   }
 
-
-  Future<void> addReturnMaster() async {
+  Future<void> addReturnMaster1() async {
     final orderId = widget.deliveryId?.trim();
     print('Order ID: $orderId');
 
@@ -225,15 +225,17 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
 
     for (var item in items) {
       items1.add({
-       // "deliveryId": item['deliveryId'],
+        // "deliveryId": item['deliveryId'],
         "deliveryMasterItemId": item['deliveryMasterItemId'],
         "category": item['category'],
         "price": item['price'],
         "productName": item['productName'],
         "qty": item['qty'],
+        "actualAmount":item['actualAmount'],
+        'discount': item['discount'],
+        'tax': item['tax'],
         "subCategory": item['subCategory'],
         "totalAmount": item['totalAmount'],
-
       });
     }
 
@@ -248,9 +250,9 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
       "items": items1,
       "customerId" :CustomerIdcontroller.text,
       "invoiceNo": InvNoController.text,
-      "modifiedAt": _dateController.text,
+      "pickedDate": _dateController.text,
       "orderId": _controller.text,
-     // "status": "Delivered",
+      // "status": "Delivered",
       "total": TotalController.text,
     };
     print(requestBody);
@@ -261,60 +263,233 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
     );
 
     if (response.statusCode == 200) {
-      print('Return Master added successfully');
-      final responseBody = jsonDecode(response.body);
-      print(responseBody);
-      await showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-            ),
-            icon: const Icon(
-              Icons.check_circle_rounded,
-              color: Colors.green,
-              size: 25,
-            ),
-            title: const Padding(
-              padding: EdgeInsets.only(left: 12),
-              child: Text('Delivery Confirmed Successfully', style: TextStyle(fontSize: 15),),
-            ),
-            actions: <Widget>[
-              ElevatedButton(
-                child: const Text('OK',style: TextStyle(color: Colors.white),),
-                onPressed: () {
-                 // context.go('/Return_List');
-                  Navigator.of(context
-                  ).pop(); // close the alert dialog
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                      const DeliveryList(),
-                      transitionDuration: const Duration(milliseconds: 200),
-                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
+      {
+
+        print('Return Master added successfully');
+        final responseBody = jsonDecode(response.body);
+        print(responseBody);
+        await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              icon: const Icon(
+                Icons.check_circle_rounded,
+                color: Colors.green,
+                size: 25,
+              ),
+              title: const Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: Text('Delivery has been picked', style: TextStyle(fontSize: 15),),
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: const Text('OK',style: TextStyle(color: Colors.white),),
+                  onPressed: () {
+                    context.go('/Delivery_List');
+
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    side: const BorderSide(color: Colors.blue),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  side: const BorderSide(color: Colors.blue),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        );
+      }
+    } else {
+      print('Error: ${response.statusCode}');
+    }
+  }
+  Future<void> addReturnMaster() async {
+    final orderId = widget.deliveryId?.trim();
+    print('Order ID: $orderId');
+
+    // Step 1: Fetch all return master data to get invoice numbers
+    final returnMasterUrl =
+        '$apicall/delivery_master/get_all_deliverymaster';
+
+    final returnMasterResponse = await http.get(
+      Uri.parse(returnMasterUrl),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (returnMasterResponse.statusCode == 200) {
+      final returnData = jsonDecode(returnMasterResponse.body);
+      print('Return Data: $returnData');
+
+      // Step 2: Check if the entered orderId matches any invoice number
+      bool isMatched = returnData.any((invoice) => invoice['deliveryId'] == orderId && invoice['status'] == "Delivered");
+
+      if (isMatched) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('This Product Already Used Return Policy'),
+          ),
+        );
+
+
+        setState(() {
+          // _selectedReason = 'Reason for return';
+          // _reasonController.text = 'Reason for return';
+          ContactpersonController.text ='';
+          EmailAddressController.text ='';
+          _controller.text = '';
+          _orderDetails = [];
+          totalController.text = '';
+        });
+        return; // Exit the function if a match is found
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error fetching return master data'),
+        ),
       );
+      return; // Exit the function if there's an error fetching the return data
+    }
+    print('enter');
+
+    final apiUrl = '$apicall/delivery_master/update_delivered';
+
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+
+    List<Map<String, dynamic>> items1 = [];
+
+    for (var item in items) {
+      items1.add({
+       // "deliveryId": item['deliveryId'],
+        "deliveryMasterItemId": item['deliveryMasterItemId'],
+        "category": item['category'],
+        "price": item['price'],
+        "productName": item['productName'],
+        "qty": item['qty'],
+        "actualAmount":item['actualAmount'],
+        'discount': item['discount'],
+        'tax': item['tax'],
+        "subCategory": item['subCategory'],
+        "totalAmount": item['totalAmount'],
+      });
+    }
+
+    Map<String, dynamic> requestBody = {
+
+      "deliveryId": widget.deliveryId,
+      "comments": ShippingAddress.text,
+      "contactNumber": ContactNumberContoller.text,
+      "contactPerson": ContactperController.text,
+      "deliveryAddress": DelAddController.text,
+      "deliveryLocation": EmailIdController.text,
+      "items": items1,
+      "customerId" :CustomerIdcontroller.text,
+      "invoiceNo": InvNoController.text,
+      "deliveredDate": _dateController.text,
+      "orderId": _controller.text,
+      "total": TotalController.text,
+    };
+    print(requestBody);
+    final response = await http.put(
+      Uri.parse(apiUrl),
+      headers: headers,
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200) {
+      final url = '$apicall/invoice_master/add_invoice_master';
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${token}',
+      };
+      final body = {
+        "deliveryId": widget.deliveryId,
+        "comments": ShippingAddress.text,
+        "contactNumber": ContactNumberContoller.text,
+        "contactPerson": ContactperController.text,
+        "deliveryAddress": DelAddController.text,
+        "deliveryLocation": EmailIdController.text,
+        "items": items1,
+        "customerId" :CustomerIdcontroller.text,
+        "invoiceNo": InvNoController.text,
+        "deliveredDate": _dateController.text,
+        "orderId": _controller.text,
+        "status": "Delivered",
+        "total": TotalController.text,
+      };
+
+      final response = await http.post(Uri.parse(url), headers: headers, body: json.encode(body));
+
+      if (response.statusCode == 200) {
+
+        print('Return Master added successfully');
+        final responseBody = jsonDecode(response.body);
+        print(responseBody);
+        await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              icon: const Icon(
+                Icons.check_circle_rounded,
+                color: Colors.green,
+                size: 25,
+              ),
+              title: const Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: Text('Delivery Confirmed Successfully', style: TextStyle(fontSize: 15),),
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: const Text('OK',style: TextStyle(color: Colors.white),),
+                  onPressed: () {
+                    // context.go('/Return_List');
+                    Navigator.of(context
+                    ).pop(); // close the alert dialog
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                        const DeliveryList(),
+                        transitionDuration: const Duration(milliseconds: 200),
+                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    side: const BorderSide(color: Colors.blue),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        print('API call failed with status code ${response.statusCode}');
+      }
     } else {
       print('Error: ${response.statusCode}');
     }
@@ -349,7 +524,10 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
             'qty': item['qty'],
             'totalAmount': item['totalAmount'],
             'price': item['price'],
+            'tax': item['tax'],
+            'discount': item['discount'],
             'category': item['category'],
+            'actualAmount': item['price'] * item['qty'],
             'subCategory': item['subCategory']
           }).toList();
         });
@@ -400,8 +578,7 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
   void initState() {
     super.initState();
     print('delivery id this is');
-   // widget.deliveryId ??'';
-    //print(widget.deliverymasterId);
+
     print(widget.deliverystatus);
     deliveryStatusController.text =
         widget.deliverystatus ?? '';
@@ -454,14 +631,14 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
 
         setState(() {
           print('hi2342');
-          ShippingAddress.text = deliveryData['comments'];
-          ContactNumberContoller.text = deliveryData['contactNumber'];
-          ContactperController.text = deliveryData['contactPerson'];
-          DelAddController.text = deliveryData['deliveryAddress'];
-          EmailIdController.text = deliveryData['deliveryLocation'];
-          _dateController.text = deliveryData['modifiedAt'];
-          _controller.text = deliveryData['orderId'];
-          CustomerIdcontroller.text = deliveryData['customerId'];
+          ShippingAddress.text = deliveryData['comments'] ?? '';
+          ContactNumberContoller.text = deliveryData['contactNumber'] ?? '' ;
+          ContactperController.text = deliveryData['contactPerson'] ?? '';
+          DelAddController.text = deliveryData['deliveryAddress'] ?? '';
+          EmailIdController.text = deliveryData['deliveryLocation'] ?? '';
+          // _dateController.text = deliveryData['createdDate'] ?? '';
+          _controller.text = deliveryData['orderId'] ?? '';
+          CustomerIdcontroller.text = deliveryData['customerId'] ?? '';
 
           TotalController.text = deliveryData['total'].toString();
           print(deliveryData['items']);
@@ -472,6 +649,9 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
               "price": item['price'],
               "productName": item['productName'],
               "qty": item['qty'],
+              "tax": item['tax'],
+              "discount": item['discount'],
+              "actualAmount": item['actualAmount'],
               "subCategory": item['subCategory'],
               "totalAmount": item['totalAmount'],
             });
@@ -847,20 +1027,37 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
             return Stack(
               //   crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  // Added Align widget for the left side menu
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    height: 1400,
-                    width: 200,
-                    color: const Color(0xFFF7F6FA),
-                    padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _buildMenuItems(context),
+                if(constraints.maxHeight <= 500)...{
+                  SingleChildScrollView(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
+                      ),
+                    ),
+                  )
+
+                }
+                else...{
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      width: 200,
+                      color: const Color(0xFFF7F6FA),
+                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _buildMenuItems(context),
+                      ),
                     ),
                   ),
-                ),
+                },
                 Padding(
                   padding: const EdgeInsets.only(left: 200,top: 0),
                   child: Container(
@@ -893,93 +1090,189 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
                                   context.go('/Delivery_List');
                                 },
                               ),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 30,top: 5),
-                                child: Text(
-                                  'Confirm Delivery',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                              if(widget.deliverystatus == 'Created')...{
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 30,top: 5),
+                                  child: Text(
+                                    'Item Picking',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
-                              ),
-                              const Spacer(),
-
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 10, right: 90),
-                                  child:
-                                  widget.deliverystatus == 'Delivered' ? Container() :
-                                  OutlinedButton(
-                                    onPressed: () async {
-                                       if(ContactperController.text.isEmpty || ContactperController.text.length <=2){
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Please enter a contact person name'),
-                                          ),
-                                        );
-                                      }
-                                       else if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                                         ScaffoldMessenger.of(context).showSnackBar(
-                                           const SnackBar(
-                                             content: Text('Please fill Email Address Format @gmail.com'),
-                                           ),
-                                         );
-                                       }
-                                       else if (ShippingAddress.text.isEmpty){
-                                         ScaffoldMessenger.of(context).showSnackBar(
-                                           const SnackBar(
-                                             content: Text('Please Enter Shipping Address'),
-                                             //  backgroundColor: Colors.red,
-                                           ),
-                                         );
-                                       }
-                                      else if (DelAddController.text.isEmpty){
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Please Enter Delivery Address'),
-                                            //  backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                      else if(ContactNumberContoller.text.isEmpty || ContactNumberContoller.text.length !=10){
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Please enter a valid phone number.'),
-                                          ),
-                                        );
-                                      }
-                                      else{
-                                        await addReturnMaster();
-                                      }
-                                       // await addReturnMaster();
-
-                                    },
-                                    style: OutlinedButton.styleFrom(
-                                      backgroundColor:
-                                      Colors.blue[800],
-                                      // Button background color
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(
-                                            5), // Rounded corners
-                                      ),
-                                      side: BorderSide.none, // No outline
+                              }
+                              else if(widget.deliverystatus == 'Picked')...{
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 30,top: 5),
+                                  child: Text(
+                                    'Confirm Delivery',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    child: const Text(
-                                      'Confirm Delivery',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              }
+                              else...{
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 30,top: 5),
+                                    child: Text(
+                                      'Delivery View',
                                       style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w100,
-                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
                                       ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                  ) ,
-                                ),
-                              ),
+                                  ),
+                                },
+
+                              const Spacer(),
+if(widget.deliverystatus == 'Picked')...{
+  Align(
+    alignment: Alignment.topRight,
+    child: Padding(
+      padding: const EdgeInsets.only(
+          top: 10, right: 90),
+      child:OutlinedButton(
+        onPressed: () async {
+          if(ContactperController.text.isEmpty || ContactperController.text.length <=2){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please enter a contact person name'),
+              ),
+            );
+          }
+          else if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
+          else if (ShippingAddress.text.isEmpty){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please Enter Shipping Address'),
+                //  backgroundColor: Colors.red,
+              ),
+            );
+          }
+          else if (DelAddController.text.isEmpty){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please Enter Delivery Address'),
+                //  backgroundColor: Colors.red,
+              ),
+            );
+          }
+          else if(ContactNumberContoller.text.isEmpty || ContactNumberContoller.text.length !=10){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please enter a valid phone number.'),
+              ),
+            );
+          }
+          else{
+            await addReturnMaster();
+          }
+          // await addReturnMaster();
+
+        },
+        style: OutlinedButton.styleFrom(
+          backgroundColor:
+          Colors.blue[800],
+          // Button background color
+          shape: RoundedRectangleBorder(
+            borderRadius:
+            BorderRadius.circular(
+                5), // Rounded corners
+          ),
+          side: BorderSide.none, // No outline
+        ),
+        child: const Text(
+          'Confirm Delivery',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w100,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    ),
+  ),
+}
+            else if(widget.deliverystatus == 'Created')...{
+  Align(
+    alignment: Alignment.topRight,
+    child: Padding(
+      padding: const EdgeInsets.only(
+          top: 10, right: 90),
+      child:
+      OutlinedButton(
+        onPressed: () async {
+          if(ContactperController.text.isEmpty || ContactperController.text.length <=2){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please enter a contact person name'),
+              ),
+            );
+          }
+          else if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
+          else if (ShippingAddress.text.isEmpty){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please Enter Shipping Address'),
+                //  backgroundColor: Colors.red,
+              ),
+            );
+          }
+          else if (DelAddController.text.isEmpty){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please Enter Delivery Address'),
+                //  backgroundColor: Colors.red,
+              ),
+            );
+          }
+          else if(ContactNumberContoller.text.isEmpty || ContactNumberContoller.text.length !=10){
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please enter a valid phone number.'),
+              ),
+            );
+          }
+          else{
+            await addReturnMaster1();
+          }
+          // await addReturnMaster();
+
+        },
+        style: OutlinedButton.styleFrom(
+          backgroundColor:
+          Colors.blue[800],
+          // Button background color
+          shape: RoundedRectangleBorder(
+            borderRadius:
+            BorderRadius.circular(
+                5), // Rounded corners
+          ),
+          side: BorderSide.none, // No outline
+        ),
+        child: const Text(
+          'Pick Items',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w100,
+            color: Colors.white,
+          ),
+        ),
+      ) ,
+    ),
+  ),
+            }
+            else...{
+              Container(),
+
+  },
+
                             ],
                           ),
                         ),
@@ -1132,7 +1425,7 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
                                               color: Colors.green,
                                             ),
                                             Text(
-                                              'Order Placed',
+                                              'Order Created',
                                               style: TextStyle(
                                                 color: Colors.black,
                                               ),
@@ -1146,18 +1439,18 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
                                           children: [
                                             Icon(
                                               Icons.check_box,
-                                              color:  deliveryStatusController.text == 'Not Started'
+                                              color:  deliveryStatusController.text == 'Created'
                                                   ? Colors.grey
-                                                  :  deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered'
+                                                  :  deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Delivered'
                                                   ? Colors.green
                                                   : Colors.grey,// default color
                                             ),
                                             Text(
-                                              'Shipped',
+                                              'Picked',
                                               style: TextStyle(
-                                                color: deliveryStatusController.text.toLowerCase() == 'Not Started'
+                                                color: deliveryStatusController.text.toLowerCase() == 'Created'
                                                     ? Colors.grey
-                                                    : deliveryStatusController.text.toLowerCase() == 'In Progress' || deliveryStatusController.text.toLowerCase() == 'Delivered'
+                                                    : deliveryStatusController.text.toLowerCase() == 'Picked' || deliveryStatusController.text.toLowerCase() == 'Delivered'
                                                     ? Colors.grey
                                                     : Colors.black,
                                               ),
@@ -1171,7 +1464,7 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
                                           children: [
                                             Icon(
                                               Icons.check_box,
-                                              color: deliveryStatusController.text == 'Not Started'
+                                              color: deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked'
                                                   ? Colors.grey
                                                   :  deliveryStatusController.text == 'Delivered'
                                                   ? Colors.green
@@ -1723,7 +2016,7 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
                                                                           color: Colors.green,
                                                                         ),
                                                                         Text(
-                                                                          'Order Placed',
+                                                                          'Order Created',
                                                                           style: TextStyle(
                                                                             color: Colors.black,
                                                                           ),
@@ -1737,18 +2030,18 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
                                                                       children: [
                                                                         Icon(
                                                                           Icons.check_box,
-                                                                          color:  deliveryStatusController.text == 'Not Started'
+                                                                          color:  deliveryStatusController.text == 'Created'
                                                                               ? Colors.grey
-                                                                              :  deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered'
+                                                                              :  deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Delivered'
                                                                               ? Colors.green
                                                                               : Colors.grey,// default color
                                                                         ),
                                                                         Text(
-                                                                          'Shipped',
+                                                                          'Picked',
                                                                           style: TextStyle(
-                                                                            color: deliveryStatusController.text.toLowerCase() == 'Not Started'
+                                                                            color: deliveryStatusController.text.toLowerCase() == 'Created'
                                                                                 ? Colors.grey
-                                                                                : deliveryStatusController.text.toLowerCase() == 'In Progress' || deliveryStatusController.text.toLowerCase() == 'Delivered'
+                                                                                : deliveryStatusController.text.toLowerCase() == 'Picked' || deliveryStatusController.text.toLowerCase() == 'Delivered'
                                                                                 ? Colors.grey
                                                                                 : Colors.black,
                                                                           ),
@@ -1762,7 +2055,7 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
                                                                       children: [
                                                                         Icon(
                                                                           Icons.check_box,
-                                                                          color: deliveryStatusController.text == 'Not Started'
+                                                                          color: deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked'
                                                                               ? Colors.grey
                                                                               :  deliveryStatusController.text == 'Delivered'
                                                                               ? Colors.green

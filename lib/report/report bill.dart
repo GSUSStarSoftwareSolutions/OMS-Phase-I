@@ -702,11 +702,11 @@ class _ReportspageState extends State<Reportspage> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
       _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       Container(
@@ -1632,8 +1632,7 @@ class _ReportspageState extends State<Reportspage> {
                                       ),
                                     ),
                                     items: <String>[
-                                      'Order',
-                                      'Invoice'
+                                      'Order'
                                     ].map<DropdownMenuItem<String>>((String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
@@ -1656,10 +1655,6 @@ class _ReportspageState extends State<Reportspage> {
                                       if (newValue == 'Order') {
                                         await downloadPdf(
                                             filteredData[actualIndex].orderId!); // Download order PDF
-                                      } else if (newValue == 'Invoice') {
-                                        await downloadinvoicePdf(
-                                            filteredData[actualIndex].orderId!
-                                        ); // Download invoice PDF
                                       }
                                     },
                                     buttonStyleData: ButtonStyleData(
@@ -1691,45 +1686,7 @@ class _ReportspageState extends State<Reportspage> {
                               ),
                             ),
 
-                            // DataCell(
-                            //   Padding(
-                            //     padding: const EdgeInsets.all(8.0),
-                            //     child: Container(
-                            //       decoration: BoxDecoration(
-                            //         border: Border.all(width: 1, color: Colors.grey), // Add a grey border
-                            //         borderRadius: BorderRadius.circular(5), // Add a slight rounded corner
-                            //       ),
-                            //       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), // Add equal padding
-                            //       child:
-                            //       DropdownButton<String>(
-                            //         value: detail.status.toString(), // Current selected value
-                            //         items: <String>['Download','Order', 'Invoice']
-                            //             .map<DropdownMenuItem<String>>((String value) {
-                            //           return DropdownMenuItem<String>(
-                            //             value: value,
-                            //             child: Text(value, style: TextStyle(color: value == 'Download' ? Colors.grey : Colors.black,fontSize: 13),),
-                            //           );
-                            //         }).toList(),
-                            //         onChanged: (String? newValue) async {
-                            //           setState(() {
-                            //             detail.status = newValue!; // Update the status based on the selected value
-                            //           });
-                            //           // Perform action based on the selected value
-                            //           if (newValue == 'Order') {
-                            //             await downloadPdf(detail.orderId!); // Download order PDF
-                            //           } else if (newValue == 'Invoice') {
-                            //             await downloadinvoicePdf(detail.orderId!); // Download invoice PDF
-                            //           }
-                            //         },
-                            //         // icon: Padding(
-                            //         //   padding: const EdgeInsets.only(bottom: 10,left: 5),
-                            //         //   child: Icon(Icons.arrow_drop_down,size: 20,),
-                            //         // ),
-                            //         //isExpanded: true,
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
+
                           } else if (detail.deliveryStatus == 'Delivered' &&
                               detail.paymentStatus == '-') ...{
                             DataCell(
@@ -2873,8 +2830,7 @@ class _ReportspageState extends State<Reportspage> {
                                   ),
                                 ),
                                 items: <String>[
-                                  'Order',
-                                  'Invoice'
+                                  'Order'
                                 ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
@@ -2897,10 +2853,6 @@ class _ReportspageState extends State<Reportspage> {
                                   if (newValue == 'Order') {
                                     await downloadPdf(
                                         filteredData[actualIndex].orderId!); // Download order PDF
-                                  } else if (newValue == 'Invoice') {
-                                    await downloadinvoicePdf(
-                                        filteredData[actualIndex].orderId!
-                                    ); // Download invoice PDF
                                   }
                                 },
                                 buttonStyleData: ButtonStyleData(
@@ -2931,46 +2883,6 @@ class _ReportspageState extends State<Reportspage> {
                             ),
                           ),
                         ),
-
-                        // DataCell(
-                        //   Padding(
-                        //     padding: const EdgeInsets.all(8.0),
-                        //     child: Container(
-                        //       decoration: BoxDecoration(
-                        //         border: Border.all(width: 1, color: Colors.grey), // Add a grey border
-                        //         borderRadius: BorderRadius.circular(5), // Add a slight rounded corner
-                        //       ),
-                        //       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), // Add equal padding
-                        //       child:
-                        //       DropdownButton<String>(
-                        //         value: detail.status.toString(), // Current selected value
-                        //         items: <String>['Download','Order', 'Invoice']
-                        //             .map<DropdownMenuItem<String>>((String value) {
-                        //           return DropdownMenuItem<String>(
-                        //             value: value,
-                        //             child: Text(value, style: TextStyle(color: value == 'Download' ? Colors.grey : Colors.black,fontSize: 13),),
-                        //           );
-                        //         }).toList(),
-                        //         onChanged: (String? newValue) async {
-                        //           setState(() {
-                        //             detail.status = newValue!; // Update the status based on the selected value
-                        //           });
-                        //           // Perform action based on the selected value
-                        //           if (newValue == 'Order') {
-                        //             await downloadPdf(detail.orderId!); // Download order PDF
-                        //           } else if (newValue == 'Invoice') {
-                        //             await downloadinvoicePdf(detail.orderId!); // Download invoice PDF
-                        //           }
-                        //         },
-                        //         // icon: Padding(
-                        //         //   padding: const EdgeInsets.only(bottom: 10,left: 5),
-                        //         //   child: Icon(Icons.arrow_drop_down,size: 20,),
-                        //         // ),
-                        //         //isExpanded: true,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                       } else if (detail.deliveryStatus == 'Delivered' &&
                           detail.paymentStatus == '-') ...{
                         DataCell(

@@ -160,7 +160,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Home', Icons.dashboard, Colors.blue[900]!, '/Home'),
+      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -173,14 +173,14 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               bottomRight: Radius.circular(8), // No radius for bottom-right corner
             ),
           ),
-          child: _buildMenuItem('Customer', Icons.account_circle, Colors.blueAccent, '/Customer')),
+          child: _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blueAccent, '/Customer')),
       _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
-      _buildMenuItem('Orders', Icons.warehouse, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_rounded, Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Payment', Icons.payment_outlined, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem('Return', Icons.backspace_sharp, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart, Colors.blue[900]!, '/Report_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
+      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
     ];
   }
 
@@ -448,7 +448,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                   children: [
                     if(constraints.maxHeight <= 500)...{
                       SingleChildScrollView(
-                        child: Align(
+                        child:  Align(
                           // Added Align widget for the left side menu
                           alignment: Alignment.topLeft,
                           child: Container(
@@ -459,6 +459,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: _buildMenuItems(context),
+
                             ),
                           ),
                         ),
@@ -476,6 +477,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: _buildMenuItems(context),
+
                           ),
                         ),
                       ),
