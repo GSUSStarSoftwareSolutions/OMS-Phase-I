@@ -32,6 +32,7 @@ class SeventhPage extends StatefulWidget {
 }
 
 class _SeventhPageState extends State<SeventhPage> {
+  bool _hasShownPopup = false;
   final _formKey = GlobalKey<FormState>();
   bool isSelected = false;
   int _selectedIndex = -1;
@@ -267,18 +268,95 @@ class _SeventhPageState extends State<SeventhPage> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        filteredData = (jsonData as List).map((item) => detail.fromJson(item)).toList();
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-        print('api response');
-        print(filteredData);
-        if (mounted) {
-          setState(() {});
-        }
-      } else {
-        throw Exception('Failed to load data');
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          filteredData = (jsonData as List).map((item) => detail.fromJson(item)).toList();
+
+          print('api response');
+          print(filteredData);
+          if (mounted) {
+            setState(() {});
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       print('Error decoding JSON: $e');
     }
@@ -295,20 +373,96 @@ class _SeventhPageState extends State<SeventhPage> {
           'Content-Type': 'application/json',
         },
       );
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        final jsonData = jsonDecode(responseBody);
-        if (jsonData is List<dynamic>) {
-          final jsonObject = jsonData.first;
-          final orderDetails = OrderDetail.fromJson(jsonObject);
-          _showProductDetails(orderDetails);
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
+      }
+else{
+        if (response.statusCode == 200) {
+          final responseBody = response.body;
+          final jsonData = jsonDecode(responseBody);
+          if (jsonData is List<dynamic>) {
+            final jsonObject = jsonData.first;
+            final orderDetails = OrderDetail.fromJson(jsonObject);
+            _showProductDetails(orderDetails);
+          } else {
+            print('Failed to load order details');
+          }
         } else {
           print('Failed to load order details');
         }
-      } else {
-        print('Failed to load order details');
       }
+
     } catch (e) {
       // print('Error: $e');
       setState(() {

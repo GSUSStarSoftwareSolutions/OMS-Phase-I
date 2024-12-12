@@ -1,18 +1,21 @@
-
 import 'dart:convert';
 import 'dart:html';
 
 import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/login/login.dart';
 import 'package:btb/main.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-void main() => runApp(MaterialApp(
-  home: createscr(),
-));
 
-class  createscr extends StatefulWidget {
+void main() => runApp(MaterialApp(
+      home: createscr(),
+    ));
+
+class createscr extends StatefulWidget {
   const createscr({super.key});
 
   @override
@@ -32,6 +35,7 @@ class _createscrState extends State<createscr> {
       _obscureText1 = !_obscureText1;
     });
   }
+
   void _togglePasswordVisibility() {
     setState(() {
       _obscureText = !_obscureText;
@@ -39,81 +43,89 @@ class _createscrState extends State<createscr> {
   }
 
   Future<String?> checkLogin(String Email, String password) async {
-    String url =
-       '$apicall/user_master/add_password/$Email/$password';
-      //   'https://mjl9lz64l7.execute-api.ap-south-1.amazonaws.com/stage1/api/user_master/add_password/$Email/$password';
-    final response = await http.put(Uri.parse(url),
-        headers: {
-          "Content-Type": "application/json",
-        });
+    String url = '$apicall/user_master/add_password/$Email/$password';
+    //   'https://mjl9lz64l7.execute-api.ap-south-1.amazonaws.com/stage1/api/user_master/add_password/$Email/$password';
+    final response = await http.put(Uri.parse(url), headers: {
+      "Content-Type": "application/json",
+    });
     if (response.statusCode == 200) {
-
-      showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            contentPadding: EdgeInsets.zero,
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      const Icon(Icons.warning,
-                          color: Colors.orange, size: 50),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Password set Successfully',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+      final addResponseBody = jsonDecode(response.body);
+      if (addResponseBody['status'] == 'failed' &&
+          addResponseBody['code'] == '404') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please entered register Mail ID.'),
+            duration: Duration(seconds: 2), // Optional duration
+          ),
+        );
+      } else if (addResponseBody['status'] == 'failed' &&
+          addResponseBody['code'] == '400') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please password must be strong.'),
+            duration: Duration(seconds: 2), // Optional duration
+          ),
+        );
+      }
+      else {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.check_circle,
+                            color: Colors.green, size: 40),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Password set Successfully',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.end,
-                        children: [
-
-                          ElevatedButton(
-                            onPressed: () {
-                              context.go('/');
-                            },
-                            style:
-                            ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              side: const BorderSide(
-                                  color: Colors.blue),
-                              shape:
-                              RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(
-                                    10.0),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                context.go('/');
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                side: const BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: const Text(
+                                'Go to Login',
+                                style: TextStyle(color: Colors.white),
                               ),
                             ),
-                            child: const Text(
-                              'Go to Login',
-                              style: TextStyle(
-                                  color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-
+                ],
+              ),
+            );
+          },
+        );
+      }
     } else {
       // Handle non-200 responses
       ScaffoldMessenger.of(context).showSnackBar(
@@ -147,7 +159,7 @@ class _createscrState extends State<createscr> {
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03),
                 Align(
-                  alignment:  Alignment(0.9, 0.4),
+                  alignment: Alignment(0.9, 0.4),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -160,7 +172,7 @@ class _createscrState extends State<createscr> {
                           )),
                       const SizedBox(height: 10),
                       Align(
-                        alignment:  Alignment(0.1, 0.0),
+                        alignment: Alignment(0.1, 0.0),
                         child: SizedBox(
                           height: 40,
                           width: constraints.maxWidth * 0.39,
@@ -175,10 +187,13 @@ class _createscrState extends State<createscr> {
                                 vertical: 8,
                               ),
                             ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9@._]')), // Allows lowercase, digits, and common email symbols
+                            ],
                           ),
+
                         ),
                       ),
-
                       const SizedBox(height: 10),
                       const Align(
                           alignment: Alignment(-0.32, 0.0),
@@ -188,15 +203,15 @@ class _createscrState extends State<createscr> {
                           )),
                       const SizedBox(height: 10),
                       Align(
-                        alignment:  Alignment(0.1, 0.0),
+                        alignment: Alignment(0.1, 0.0),
                         child: SizedBox(
                           height: 40,
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
                             controller: Password,
                             obscureText: _obscureText1,
-                            decoration:  InputDecoration(
-                              border:const  OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
                               hintText: 'Enter your new password',
                               hintStyle: TextStyle(fontSize: 13),
                               contentPadding: EdgeInsets.symmetric(
@@ -211,7 +226,7 @@ class _createscrState extends State<createscr> {
                                   size: 20,
                                 ),
                                 onPressed:
-                                _togglePasswordVisibility1, // Toggle password visibility
+                                    _togglePasswordVisibility1, // Toggle password visibility
                               ),
                             ),
                           ),
@@ -249,7 +264,7 @@ class _createscrState extends State<createscr> {
                                   size: 20,
                                 ),
                                 onPressed:
-                                _togglePasswordVisibility, // Toggle password visibility
+                                    _togglePasswordVisibility, // Toggle password visibility
                               ),
                             ),
                           ),
@@ -264,29 +279,40 @@ class _createscrState extends State<createscr> {
                           width: constraints.maxWidth * 0.25,
                           child: ElevatedButton(
                             onPressed: () async {
-                              if(Password.text.isEmpty && ConfirmPassword.text.isEmpty){
+                              if (Password.text.isEmpty &&
+                                  ConfirmPassword.text.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Password & Confirm Password can't be empty")),
+                                  const SnackBar(
+                                      content: Text(
+                                          "Password & Confirm Password can't be empty")),
                                 );
-                              }else if(Password.text.isEmpty && ConfirmPassword.text.isNotEmpty){
+                              } else if (Password.text.isEmpty &&
+                                  ConfirmPassword.text.isNotEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please Enter Password")),
+                                  const SnackBar(
+                                      content: Text("Please Enter Password")),
                                 );
-                              }else if(Password.text.isNotEmpty && ConfirmPassword.text.isEmpty){
+                              } else if (Password.text.isNotEmpty &&
+                                  ConfirmPassword.text.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please Enter Confirm Password")),
+                                  const SnackBar(
+                                      content: Text(
+                                          "Please Enter Confirm Password")),
                                 );
-                              }else if(Password.text != ConfirmPassword.text){
+                              } else if (Password.text !=
+                                  ConfirmPassword.text) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Password doesn't match")),
+                                  const SnackBar(
+                                      content: Text("Password doesn't match")),
                                 );
-                              }
-                              else if(Email.text.isEmpty && Password.text == ConfirmPassword.text){
+                              } else if (Email.text.isEmpty &&
+                                  Password.text == ConfirmPassword.text) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please Enter Email Address")),
+                                  const SnackBar(
+                                      content:
+                                          Text("Please Enter Email Address")),
                                 );
-                              }
-                              else{
+                              } else {
                                 await checkLogin(Email.text, Password.text);
                               }
                               // bool isValid = await checkLogin(userName.text, Password.text);
@@ -296,7 +322,6 @@ class _createscrState extends State<createscr> {
                               //     const SnackBar(content: Text("Something went wrong")),
                               //   );
                               // }
-
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[800],
@@ -318,7 +343,7 @@ class _createscrState extends State<createscr> {
                         alignment: const Alignment(0.1, 0.0),
                         child: RichText(
                           textAlign: TextAlign.center,
-                          text: const TextSpan(
+                          text: TextSpan(
                             children: [
                               TextSpan(
                                 text: 'Already have an account ? ',
@@ -330,7 +355,16 @@ class _createscrState extends State<createscr> {
                                 text: 'Log in',
                                 style: TextStyle(
                                   color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
                                 ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginScr()),
+                                    );
+                                  },
                               ),
                             ],
                           ),
@@ -350,6 +384,7 @@ class _createscrState extends State<createscr> {
 
 class ImageContainer1 extends StatelessWidget {
   const ImageContainer1({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -380,5 +415,3 @@ class ImageContainer1 extends StatelessWidget {
     );
   }
 }
-
-

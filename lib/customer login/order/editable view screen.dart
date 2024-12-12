@@ -34,6 +34,7 @@ class CusEditViewScreen extends StatefulWidget {
 class _CusEditViewScreenState extends State<CusEditViewScreen> {
   final _formKey = GlobalKey<FormState>();
   bool isSelected = false;
+
   int _selectedIndex = -1;
   Map<String, dynamic> data2 = {};
   DateTime? _selectedDate;
@@ -68,6 +69,7 @@ class _CusEditViewScreenState extends State<CusEditViewScreen> {
   late TextEditingController _dateController;
   bool? _isChecked3 = false;
   bool? _isChecked4 = false;
+  bool _hasShownPopup = false;
   Timer? _timer;
   final TextEditingController totalAmountController = TextEditingController();
   bool isOrdersSelected = false;
@@ -271,17 +273,94 @@ class _CusEditViewScreenState extends State<CusEditViewScreen> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        filteredData = (jsonData as List).map((item) => detail.fromJson(item)).toList();
+      if (token == " ") {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            "Please log in again to continue", style: TextStyle(
+                            fontSize: 12,
 
-        print('api response');
-        print(filteredData);
-        if (mounted) {
-          setState(() {});
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+      }
+      else {
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          filteredData =
+              (jsonData as List).map((item) => detail.fromJson(item)).toList();
+
+          print('api response');
+          print(filteredData);
+          if (mounted) {
+            setState(() {});
+          }
+        } else {
+          throw Exception('Failed to load data');
         }
-      } else {
-        throw Exception('Failed to load data');
       }
     } catch (e) {
       print('Error decoding JSON: $e');
@@ -299,19 +378,94 @@ class _CusEditViewScreenState extends State<CusEditViewScreen> {
           'Content-Type': 'application/json',
         },
       );
+      if (token == " ") {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            "Please log in again to continue", style: TextStyle(
+                            fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        final jsonData = jsonDecode(responseBody);
-        if (jsonData is List<dynamic>) {
-          final jsonObject = jsonData.first;
-          final orderDetails = OrderDetail.fromJson(jsonObject);
-          _showProductDetails(orderDetails);
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+      }
+      else {
+        if (response.statusCode == 200) {
+          final responseBody = response.body;
+          final jsonData = jsonDecode(responseBody);
+          if (jsonData is List<dynamic>) {
+            final jsonObject = jsonData.first;
+            final orderDetails = OrderDetail.fromJson(jsonObject);
+            _showProductDetails(orderDetails);
+          } else {
+            print('Failed to load order details');
+          }
         } else {
           print('Failed to load order details');
         }
-      } else {
-        print('Failed to load order details');
       }
     } catch (e) {
       // print('Error: $e');
@@ -947,18 +1101,24 @@ class _CusEditViewScreenState extends State<CusEditViewScreen> {
                                       ],
                                     ),
                                   ),
-                                  const Expanded(
+
+                                  Expanded(
                                     flex: 1,
                                     child: Column(
                                       children: [
                                         Icon(
                                           Icons.check_box,
-                                          color: Colors.grey,
+                                          color:  deliveryStatusController.text == 'Not Started' ||deliveryStatusController.text == 'Picked' ||deliveryStatusController.text == 'Created'
+                                              ? Colors.grey
+                                              : Colors.green
+                                               // default color
                                         ),
                                         Text(
-                                          'Invoice',
+                                          'Delivery',
                                           style: TextStyle(
-                                            color: Colors.grey,
+                                            color: deliveryStatusController.text == 'Not Started' ||deliveryStatusController.text == 'Picked' ||deliveryStatusController.text == 'Created'
+                                                ? Colors.grey
+                                                : Colors.black,
                                           ),
                                         ),
                                       ],
@@ -969,19 +1129,16 @@ class _CusEditViewScreenState extends State<CusEditViewScreen> {
                                     child: Column(
                                       children: [
                                         Icon(
-                                          Icons.check_box,
-                                          color: deliveryStatusController.text == 'Not Started'
-                                              ? Colors.grey
-                                              : deliveryStatusController.text == 'Delivered'
-                                              ? Colors.green
-                                              : Colors.grey, // default color
+                                            Icons.check_box,
+                                            color:  deliveryStatusController.text == 'Not Started' ||deliveryStatusController.text == 'Picked' ||deliveryStatusController.text == 'Created'
+                                                ? Colors.grey
+                                                : Colors.green
+                                          // default color
                                         ),
                                         Text(
-                                          'Delivery',
+                                          'Invoice',
                                           style: TextStyle(
-                                            color: deliveryStatusController.text.toLowerCase() == 'Not Started'
-                                                ? Colors.grey
-                                                : deliveryStatusController.text.toLowerCase() == 'In Progress'
+                                            color: deliveryStatusController.text == 'Not Started' ||deliveryStatusController.text == 'Picked' ||deliveryStatusController.text == 'Created'
                                                 ? Colors.grey
                                                 : Colors.black,
                                           ),
@@ -1884,18 +2041,23 @@ class _CusEditViewScreenState extends State<CusEditViewScreen> {
                                                   ],
                                                 ),
                                               ),
-                                              const Expanded(
+
+                                              Expanded(
                                                 flex: 1,
                                                 child: Column(
                                                   children: [
                                                     Icon(
                                                       Icons.check_box,
-                                                      color: Colors.grey,
+                                                      color:  deliveryStatusController.text == 'Not Started' ||deliveryStatusController.text == 'Picked' ||deliveryStatusController.text == 'Created'
+                                                          ? Colors.grey
+                                                          : Colors.green, // default color
                                                     ),
                                                     Text(
-                                                      'Invoice',
+                                                      'Delivery',
                                                       style: TextStyle(
-                                                        color: Colors.grey,
+                                                        color:  deliveryStatusController.text == 'Not Started' ||deliveryStatusController.text == 'Picked' ||deliveryStatusController.text == 'Created'
+                                                            ? Colors.grey
+                                                            : Colors.black,
                                                       ),
                                                     ),
                                                   ],
@@ -1907,18 +2069,14 @@ class _CusEditViewScreenState extends State<CusEditViewScreen> {
                                                   children: [
                                                     Icon(
                                                       Icons.check_box,
-                                                      color: deliveryStatusController.text == 'Not Started'
+                                                      color:  deliveryStatusController.text == 'Not Started' ||deliveryStatusController.text == 'Picked' ||deliveryStatusController.text == 'Created'
                                                           ? Colors.grey
-                                                          : deliveryStatusController.text == 'Delivered'
-                                                          ? Colors.green
-                                                          : Colors.grey, // default color
+                                                          : Colors.green, // default color
                                                     ),
                                                     Text(
-                                                      'Delivery',
+                                                      'Invoice',
                                                       style: TextStyle(
-                                                        color: deliveryStatusController.text.toLowerCase() == 'Not Started'
-                                                            ? Colors.grey
-                                                            : deliveryStatusController.text.toLowerCase() == 'In Progress'
+                                                        color:  deliveryStatusController.text == 'Not Started' ||deliveryStatusController.text == 'Picked' ||deliveryStatusController.text == 'Created'
                                                             ? Colors.grey
                                                             : Colors.black,
                                                       ),

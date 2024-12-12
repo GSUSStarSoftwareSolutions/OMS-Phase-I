@@ -46,7 +46,7 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
   final List<String> list = ['  Name 1', '  Name 2', '  Name3'];
   Map<String, dynamic> data2 = {};
   List<Map> _orders = [];
-
+  bool _hasShownPopup = false;
   String _searchText = '';
   bool _isFirstLoad = true;
   bool _loading = false;
@@ -273,10 +273,8 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
 
     orderIdController.text = widget.product!.orderId ?? '';
 
-// Assuming widget.product!.items is a list of items
     List<dynamic> items = widget.product!.items;
 
-// Iterate over the items list
 
 
     if (widget.product != null) {
@@ -477,32 +475,110 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
           'Content-Type': 'application/json',
         },
       );
+if(token == " "){
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return
+        AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Warning Icon
+                    Icon(Icons.warning, color: Colors.orange, size: 50),
+                    SizedBox(height: 16),
+                    // Confirmation Message
+                    Text(
+                      'Session Expired',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text("Please log in again to continue",style: TextStyle(
+                      fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        print('-res--');
-        print(responseBody);
-        if (responseBody != null) {
-          final jsonData = jsonDecode(responseBody).cast<
-              Map<dynamic, dynamic>>();
-          setState(() {
-            _orders =
-                jsonData; // update _orders with all orders or search results
-            _errorMessage = ''; // clear the error message
-          });
-        } else {
-          setState(() {
-            _orders = []; // clear the orders list
-            _errorMessage = 'Failed to load orders';
-          });
-        }
-      } else {
-        setState(() {
-          _orders = []; // clear the orders list
-          _errorMessage = 'Failed to load orders';
-        });
-      }
-    } catch (e) {
+                      color: Colors.black,
+                    ),),
+                    SizedBox(height: 20),
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            // Handle Yes action
+                            context.go('/');
+                            // Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: BorderSide(color: Colors.blue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text(
+                            'ok',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+    },
+  ).whenComplete(() {
+    _hasShownPopup = false;
+  });
+
+}
+else{
+  if (response.statusCode == 200) {
+    final responseBody = response.body;
+    print('-res--');
+    print(responseBody);
+    if (responseBody != null) {
+      final jsonData = jsonDecode(responseBody).cast<
+          Map<dynamic, dynamic>>();
+      setState(() {
+        _orders =
+            jsonData; // update _orders with all orders or search results
+        _errorMessage = ''; // clear the error message
+      });
+    } else {
+      setState(() {
+        _orders = []; // clear the orders list
+        _errorMessage = 'Failed to load orders';
+      });
+    }
+  }
+  else {
+    setState(() {
+      _orders = []; // clear the orders list
+      _errorMessage = 'Failed to load orders';
+    });
+  }
+}
+
+    }
+    catch (e) {
       setState(() {
         _orders = []; // clear the orders list
         _errorMessage = 'Error: $e';
@@ -525,28 +601,105 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
           'Content-Type': 'application/json',
         },
       );
+     if(token == " "){
+       showDialog(
+         barrierDismissible: false,
+         context: context,
+         builder: (BuildContext context) {
+           return
+             AlertDialog(
+               shape: RoundedRectangleBorder(
+                 borderRadius: BorderRadius.circular(15.0),
+               ),
+               contentPadding: EdgeInsets.zero,
+               content: Column(
+                 mainAxisSize: MainAxisSize.min,
+                 children: [
+                   Padding(
+                     padding: const EdgeInsets.all(16.0),
+                     child: Column(
+                       children: [
+                         // Warning Icon
+                         Icon(Icons.warning, color: Colors.orange, size: 50),
+                         SizedBox(height: 16),
+                         // Confirmation Message
+                         Text(
+                           'Session Expired',
+                           style: TextStyle(
+                             fontSize: 16,
+                             fontWeight: FontWeight.bold,
+                             color: Colors.black,
+                           ),
+                         ),
+                         Text("Please log in again to continue",style: TextStyle(
+                           fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        print('search');
-        print(responseBody);
-        // print(responseBody['status' as int]);
-        final jsonData = jsonDecode(responseBody);
-        if (jsonData is List<dynamic>) {
-          final jsonObject = jsonData.first;
+                           color: Colors.black,
+                         ),),
+                         SizedBox(height: 20),
+                         // Buttons
+                         Row(
+                           mainAxisAlignment: MainAxisAlignment.center,
+                           children: [
+                             ElevatedButton(
+                               onPressed: () {
+                                 // Handle Yes action
+                                 context.go('/');
+                                 // Navigator.of(context).pop();
+                               },
+                               style: ElevatedButton.styleFrom(
+                                 backgroundColor: Colors.white,
+                                 side: BorderSide(color: Colors.blue),
+                                 shape: RoundedRectangleBorder(
+                                   borderRadius: BorderRadius.circular(10.0),
+                                 ),
+                               ),
+                               child: Text(
+                                 'ok',
+                                 style: TextStyle(
+                                   color: Colors.blue,
+                                 ),
+                               ),
+                             ),
+                           ],
+                         ),
+                       ],
+                     ),
+                   ),
+                 ],
+               ),
+             );
+         },
+       ).whenComplete(() {
+         _hasShownPopup = false;
+       });
+
+     }
+     else{
+       if (response.statusCode == 200) {
+         final responseBody = response.body;
+         print('search');
+         print(responseBody);
+         // print(responseBody['status' as int]);
+         final jsonData = jsonDecode(responseBody);
+         if (jsonData is List<dynamic>) {
+           final jsonObject = jsonData.first;
 
 
-          print(jsonObject);
-          final orderDetails = OrderDetail.fromJson(jsonObject);
-          print('orderDetails');
-          //  print(orderDetails);
-          _showProductDetails(orderDetails);
-        } else {
-          print('Failed to load order details');
-        }
-      } else {
-        print('Failed to load order details');
-      }
+           print(jsonObject);
+           final orderDetails = OrderDetail.fromJson(jsonObject);
+           print('orderDetails');
+           //  print(orderDetails);
+           _showProductDetails(orderDetails);
+         } else {
+           print('Failed to load order details');
+         }
+       } else {
+         print('Failed to load order details');
+       }
+     }
+
+
     } catch (e) {
       // print('Error: $e');
       setState(() {
@@ -580,18 +733,95 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        filteredData = (jsonData as List).map((item) => detail.fromJson(item)).toList();
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-        print('api response');
-        print(filteredData);
-        if (mounted) {
-          setState(() {});
-        }
-      } else {
-        throw Exception('Failed to load data');
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          filteredData = (jsonData as List).map((item) => detail.fromJson(item)).toList();
+
+          print('api response');
+          print(filteredData);
+          if (mounted) {
+            setState(() {});
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       print('Error decoding JSON: $e');
     }
@@ -2051,572 +2281,6 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                 ),
                               ),
 
-
-                              // if(_isLoading)...{
-                              //   // Expanded(
-                              //   //   child: SingleChildScrollView(
-                              //   //     child: Stack(
-                              //   //       children: [
-                              //   Padding(
-                              //     padding: const EdgeInsets.only(left: 90, top: 100,right: 120),
-                              //     child: Container(
-                              //       height: 100,
-                              //       width: maxWidth,
-                              //       decoration: BoxDecoration(
-                              //         color: Color(0xFFFFFFFF), // background: #FFFFFF
-                              //         boxShadow: [BoxShadow(
-                              //           offset: Offset(0, 3),
-                              //           blurRadius: 6,
-                              //           color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                              //         )],
-                              //         border: Border.all(
-                              //           // border: 2px
-                              //           color: Color(0xFFB2C2D3), // border: #B2C2D3
-                              //         ),
-                              //         borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
-                              //       ),
-                              //       child: const Padding(
-                              //         padding: EdgeInsets.only(top: 30),
-                              //         child: Row(
-                              //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              //           children: [
-                              //             Expanded(
-                              //               flex: 1,
-                              //               child: Column(
-                              //                 children: [
-                              //                   Icon(
-                              //                     Icons.check_box,
-                              //                     color: Colors.green,
-                              //                   ),
-                              //                   Text(
-                              //                     'Order Placed',
-                              //                     style: TextStyle(
-                              //                       color: Colors.black,
-                              //                     ),
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //             Expanded(
-                              //               flex: 1,
-                              //               child: Column(
-                              //                 children: [
-                              //                   Icon(
-                              //                     Icons.check_box,
-                              //                     color: Colors.grey,
-                              //                   ),
-                              //                   Text(
-                              //                     'Invoice',
-                              //                     style: TextStyle(
-                              //                       color: Colors.grey,
-                              //                     ),
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //             Expanded(
-                              //               flex: 1,
-                              //               child: Column(
-                              //                 children: [
-                              //                   Icon(
-                              //                     Icons.check_box,
-                              //                     color: Colors.grey,
-                              //                   ),
-                              //                   Text(
-                              //                     'Payments',
-                              //                     style: TextStyle(
-                              //                       color: Colors.grey,
-                              //                     ),
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //             Expanded(
-                              //               flex: 1,
-                              //               child: Column(
-                              //                 children: [
-                              //                   Icon(
-                              //                     Icons.check_box,
-                              //                     color: Colors.grey,
-                              //                   ),
-                              //                   Text(
-                              //                     'Delivery',
-                              //                     style: TextStyle(
-                              //                       color: Colors.grey,
-                              //                     ),
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //           ],
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ),
-                              //   Padding(
-                              //     padding: const EdgeInsets.only(left: 90,right: 120,top: 250),
-                              //     child: Container(
-                              //       decoration: BoxDecoration(
-                              //         color: Color(0xFFFFFFFF), // background: #FFFFFF
-                              //         boxShadow: [BoxShadow(
-                              //           offset: Offset(0, 3),
-                              //           blurRadius: 6,
-                              //           color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                              //         )],
-                              //         border: Border.all(
-                              //           // border: 2px
-                              //           color: Color(0xFFB2C2D3), // border: #B2C2D3
-                              //         ),
-                              //         borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
-                              //       ),
-                              //       // decoration: BoxDecoration(
-                              //       //   border: Border.all(color: const Color(0xFFB2C2D3)),
-                              //       //   borderRadius: BorderRadius.circular(3.5), // Set border radius here
-                              //       // ),
-                              //       child: Table(
-                              //         border: TableBorder.all(color: const Color(0xFFB2C2D3)),
-                              //
-                              //         columnWidths: const {
-                              //           0: FlexColumnWidth(2),
-                              //           1: FlexColumnWidth(1.4),
-                              //         },
-                              //         children: [
-                              //           row1,
-                              //           row2,
-                              //           row3,
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   ),
-                              //   Padding(
-                              //     padding:  const EdgeInsets.only(left: 90, top: 650,right: 120),
-                              //     child: Container(
-                              //       // height: 150,
-                              //       width: maxWidth,
-                              //       //   padding: const EdgeInsets.all(0.0),
-                              //       decoration: BoxDecoration(
-                              //         color: Color(0xFFFFFFFF), // background: #FFFFFF
-                              //         boxShadow: [BoxShadow(
-                              //           offset: Offset(0, 3),
-                              //           blurRadius: 6,
-                              //           color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                              //         )],
-                              //         border: Border.all(
-                              //           // border: 2px
-                              //           color: Color(0xFFB2C2D3), // border: #B2C2D3
-                              //         ),
-                              //         borderRadius: BorderRadius.all(Radius.circular(8)), // border-radius: 8px
-                              //       ),
-                              //       // decoration: BoxDecoration(
-                              //       //   border: Border.all(color: const Color(0xFFB2C2D3), width:
-                              //       //   2),
-                              //       //   borderRadius: BorderRadius.circular(5.0),
-                              //       // ),
-                              //       child: Column(
-                              //         crossAxisAlignment: CrossAxisAlignment.start,
-                              //         children: [
-                              //           Padding(
-                              //             padding: const EdgeInsets.only(left: 30, top: 10),
-                              //             child: Text(
-                              //               'Add Products',
-                              //               style: TextStyle(
-                              //                 fontSize: 16,
-                              //                 fontWeight: FontWeight.bold,
-                              //                 color: Colors.grey[600],
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           Container(
-                              //             width: maxWidth,
-                              //             decoration: BoxDecoration(
-                              //               border: Border(
-                              //                 top: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
-                              //                 bottom: BorderSide(color: const Color(0xFFB2C2D3), width: 1.2),
-                              //               ),
-                              //             ),
-                              //             child: Padding(
-                              //               padding: const EdgeInsets.only(top: 5, bottom: 5),
-                              //               child: Table(
-                              //                 columnWidths: const {
-                              //                   0: FlexColumnWidth(1),
-                              //                   1: FlexColumnWidth(2.7),
-                              //                   2: FlexColumnWidth(2),
-                              //                   3: FlexColumnWidth(1.8),
-                              //                   4: FlexColumnWidth(2),
-                              //                   5: FlexColumnWidth(1),
-                              //                   6: FlexColumnWidth(2),
-                              //                 },
-                              //                 children: const [
-                              //                   TableRow(
-                              //                     children: [
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: EdgeInsets.only(top: 10, bottom: 10),
-                              //                           child: Center(
-                              //                             child: Text(
-                              //                               'SN',
-                              //                               style: TextStyle(fontWeight: FontWeight.bold),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: EdgeInsets.only(top: 10, bottom: 10),
-                              //                           child: Center(
-                              //                             child: Text(
-                              //                               'Product Name',
-                              //                               style: TextStyle(fontWeight: FontWeight.bold),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: EdgeInsets.only(top: 10, bottom: 10),
-                              //                           child: Center(
-                              //                             child: Text(
-                              //                               'Category',
-                              //                               style: TextStyle(fontWeight: FontWeight.bold),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: EdgeInsets.only(top: 10, bottom: 10),
-                              //                           child: Center(
-                              //                             child: Text(
-                              //                               'Sub Category',
-                              //                               style: TextStyle(fontWeight: FontWeight.bold),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: EdgeInsets.only(top: 10, bottom: 10),
-                              //                           child: Center(
-                              //                             child: Text(
-                              //                               'Price',
-                              //                               style: TextStyle(fontWeight: FontWeight.bold),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: EdgeInsets.only(top: 10, bottom: 10),
-                              //                           child: Center(
-                              //                             child: Text(
-                              //                               'QTY',
-                              //                               style: TextStyle(fontWeight: FontWeight.bold),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: EdgeInsets.only(top: 10, bottom: 10),
-                              //                           child: Center(
-                              //                             child: Text(
-                              //                               'Total Amount',
-                              //                               style: TextStyle(fontWeight: FontWeight.bold),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                     ],
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           ListView.builder(
-                              //             shrinkWrap: true,
-                              //             physics: const NeverScrollableScrollPhysics(),
-                              //             itemCount: selectedItems.length,
-                              //             itemBuilder: (context, index) {
-                              //               var item = selectedItems[index];
-                              //               // int index = selectedItems.indexOf(item) + 1;
-                              //               return Table(
-                              //                 border: TableBorder(
-                              //                   bottom: BorderSide(width:1 ,color: Colors.grey),
-                              //                   //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
-                              //                   verticalInside: BorderSide(width: 1,color: Colors.grey),
-                              //                 ),
-                              //                 // border: TableBorder.all(
-                              //                 //     color: const Color(0xFFB2C2D3)),
-                              //                 // Add this line
-                              //                 columnWidths: const {
-                              //                   0: FlexColumnWidth(1),
-                              //                   1: FlexColumnWidth(2.7),
-                              //                   2: FlexColumnWidth(2),
-                              //                   3: FlexColumnWidth(1.8),
-                              //                   4: FlexColumnWidth(2),
-                              //                   5: FlexColumnWidth(1),
-                              //                   6: FlexColumnWidth(2),
-                              //                 },
-                              //
-                              //                 children: [
-                              //                   TableRow(
-                              //                     children: [
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: const EdgeInsets.only(
-                              //                               left: 10,
-                              //                               right: 10,
-                              //                               top: 15,
-                              //                               bottom: 15),
-                              //                           child: Center(
-                              //                             child: Text(
-                              //                               ' ${index + 1}',
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: const EdgeInsets.only(
-                              //                               left: 10,
-                              //                               right: 10,
-                              //                               top: 10,
-                              //                               bottom: 10),
-                              //                           child: Container(
-                              //                             height: 35,
-                              //                             decoration: BoxDecoration(
-                              //                               color: Colors.grey.shade200,
-                              //                               borderRadius: BorderRadius
-                              //                                   .circular(4.0),
-                              //                             ),
-                              //                             child: Center(
-                              //                               child: Text(
-                              //                                 item['productName'],
-                              //                                 textAlign: TextAlign
-                              //                                     .center,
-                              //                               ),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: const EdgeInsets.only(
-                              //                               left: 10,
-                              //                               right: 10,
-                              //                               top: 10,
-                              //                               bottom: 10),
-                              //                           child: Container(
-                              //                             height: 35,
-                              //                             decoration: BoxDecoration(
-                              //                               color: Colors.grey.shade200,
-                              //                               borderRadius: BorderRadius
-                              //                                   .circular(4.0),
-                              //                             ),
-                              //                             child: Center(
-                              //                               child: Text(
-                              //                                 item['category'],
-                              //                                 textAlign: TextAlign
-                              //                                     .center,
-                              //                               ),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: const EdgeInsets.only(
-                              //                               left: 10,
-                              //                               right: 10,
-                              //                               top: 10,
-                              //                               bottom: 10),
-                              //                           child: Container(
-                              //                             height: 35,
-                              //                             decoration: BoxDecoration(
-                              //                               color: Colors.grey.shade200,
-                              //                               borderRadius: BorderRadius
-                              //                                   .circular(4.0),
-                              //                             ),
-                              //                             child: Center(
-                              //                               child: Text(
-                              //                                 item['subCategory'],
-                              //                                 textAlign: TextAlign
-                              //                                     .center,
-                              //                               ),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: const EdgeInsets.only(
-                              //                               left: 10,
-                              //                               right: 10,
-                              //                               top: 10,
-                              //                               bottom: 10),
-                              //                           child: Container(
-                              //                             height: 35,
-                              //                             decoration: BoxDecoration(
-                              //                               color: Colors.grey.shade200,
-                              //                               borderRadius: BorderRadius
-                              //                                   .circular(4.0),
-                              //                             ),
-                              //                             child: Center(
-                              //                               child: Text(
-                              //                                 item['price'].toString(),
-                              //                                 textAlign: TextAlign
-                              //                                     .center,
-                              //                               ),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: const EdgeInsets.only(
-                              //                               left: 10,
-                              //                               right: 10,
-                              //                               top: 10,
-                              //                               bottom: 10
-                              //                           ),
-                              //                           child: Container(
-                              //                             height: 35,
-                              //                             decoration: BoxDecoration(
-                              //                               color: Colors.grey.shade200,
-                              //                               borderRadius: BorderRadius
-                              //                                   .circular(4.0),
-                              //                             ),
-                              //                             child: Center(
-                              //                               child: Text(
-                              //                                 item['qty'].toString(),
-                              //                                 textAlign: TextAlign
-                              //                                     .center,
-                              //                               ),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                       TableCell(
-                              //                         child: Padding(
-                              //                           padding: const EdgeInsets.only(
-                              //                               left: 10,
-                              //                               right: 10,
-                              //                               top: 10,
-                              //                               bottom: 10
-                              //                           ),
-                              //                           child: Container(
-                              //                             height: 35,
-                              //                             decoration: BoxDecoration(
-                              //                               color: Colors.grey.shade200,
-                              //                               borderRadius: BorderRadius
-                              //                                   .circular(4.0),
-                              //                             ),
-                              //                             child: Center(
-                              //                               child: Text(
-                              //                                 item['totalAmount']
-                              //                                     .toString(),
-                              //                                 textAlign: TextAlign
-                              //                                     .center,
-                              //                               ),
-                              //                             ),
-                              //                           ),
-                              //                         ),
-                              //                       ),
-                              //                     ],
-                              //                   ),
-                              //                 ],
-                              //               );
-                              //             },
-                              //           ),
-                              //           Padding(
-                              //             padding: const EdgeInsets.only(top: 9,bottom: 9),
-                              //             child: Align(
-                              //               alignment: const Alignment(0.9,0.8),
-                              //               child: Container(
-                              //                 height: 40,
-                              //                 padding: const EdgeInsets.only(left: 15,right: 10,top: 2,bottom: 2),
-                              //                 decoration: BoxDecoration(
-                              //                   border: Border.all(color: Colors.blue),
-                              //                   borderRadius: BorderRadius.circular(2.0),
-                              //                   color: Colors.white,
-                              //                 ),
-                              //                 child: Padding(
-                              //                   padding: const EdgeInsets.only(bottom: 2),
-                              //                   child: Row(
-                              //                     mainAxisSize: MainAxisSize.min,
-                              //                     children: [
-                              //                       RichText(text:
-                              //                       TextSpan(
-                              //                         children: [
-                              //                           const TextSpan(
-                              //                             text:  'Total',
-                              //                             style: TextStyle(
-                              //                                 fontSize: 14,
-                              //                                 color: Colors.blue
-                              //                               // fontWeight: FontWeight.bold,
-                              //                             ),
-                              //                           ),
-                              //                           const TextSpan(
-                              //                             text: '  ₹',
-                              //                             style: TextStyle(
-                              //                               color: Colors.black,
-                              //                             ),
-                              //                           ),
-                              //                           TextSpan(
-                              //                             text:
-                              //                             totalController.text,
-                              //                             style: const TextStyle(
-                              //                               color: Colors.black,
-                              //                             ),
-                              //                           ),
-                              //                         ],
-                              //                       ),
-                              //                       )
-                              //                     ],
-                              //                   ),
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   ),
-                              //   //       ],
-                              //   //     ),
-                              //   //   ),
-                              //   // )
-                              //
-                              // }else if(_hasError)...{
-                              //
-                              //   NetworkIssue(),
-                              //   // Padding(
-                              //   // padding: EdgeInsets.only(top:400),
-                              //   // child:Center(
-                              //   // child:  SpinKitWave(
-                              //   //
-                              //   // color: Colors.blue,
-                              //   // size: 50.0,
-                              //   // ),
-                              //   // ),
-                              //   // ),
-                              // }
-                              // else...{
-                              //     Padding(
-                              //       padding: EdgeInsets.only(top:400),
-                              //       child:Center(
-                              //         child:  SpinKitWave(
-                              //           color: Colors.blue,
-                              //           size: 50.0,
-                              //         ),
-                              //       ),
-                              //     ),
-                              //
-                              //   }
-
-
-
-
                             ],
                           ),
                         )
@@ -3123,7 +2787,7 @@ class _SixthPageState extends State<SixthPage> with SingleTickerProviderStateMix
                                                           Text(
                                                             'Payments',
                                                             style: TextStyle(
-                                                              color: paymentStatusContoller.text == 'partial payment' || paymentStatusContoller.text=='cleared'? Colors.black: Colors.grey,
+                                                              color: paymentStatusContoller.text == 'partial payment' || paymentStatusContoller.text=='cleared'? Colors.grey: Colors.black,
                                                             ),
                                                           ),
                                                         ],

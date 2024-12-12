@@ -10,8 +10,6 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'customer list.dart';
 
-
-
 class CreateCustomer extends StatefulWidget {
   const CreateCustomer({
     super.key,
@@ -22,6 +20,7 @@ class CreateCustomer extends StatefulWidget {
 }
 
 class _CreateCustomerState extends State<CreateCustomer> {
+  bool _hasShownPopup = false;
   String? pickedImagePath;
   String token = window.sessionStorage["token"] ?? " ";
   String? imagePath;
@@ -57,8 +56,6 @@ class _CreateCustomerState extends State<CreateCustomer> {
   bool isHomeSelected = false;
   final _formKey = GlobalKey<FormState>();
 
-
-
   Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
@@ -70,7 +67,6 @@ class _CreateCustomerState extends State<CreateCustomer> {
     'Return': false,
     'Reports': false,
   };
-
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
@@ -84,24 +80,34 @@ class _CreateCustomerState extends State<CreateCustomer> {
               topLeft: Radius.circular(8), // Radius for top-left corner
               topRight: Radius.circular(8), // No radius for top-right corner
               bottomLeft: Radius.circular(8), // Radius for bottom-left corner
-              bottomRight: Radius.circular(8), // No radius for bottom-right corner
+              bottomRight:
+                  Radius.circular(8), // No radius for bottom-right corner
             ),
           ),
-          child: _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blueAccent, '/Customer')),
-      _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
-      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
-      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
+          child: _buildMenuItem('Customer', Icons.account_circle_outlined,
+              Colors.blueAccent, '/Customer')),
+      _buildMenuItem(
+          'Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
+      _buildMenuItem(
+          'Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
+      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!,
+          '/Delivery_List'),
+      _buildMenuItem('Invoice', Icons.document_scanner_outlined,
+          Colors.blue[900]!, '/Invoice'),
+      _buildMenuItem(
+          'Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
+      _buildMenuItem(
+          'Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
+      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!,
+          '/Report_List'),
     ];
   }
 
-  Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+  Widget _buildMenuItem(
+      String title, IconData icon, Color iconColor, String route) {
     iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
-    title == 'Customer'? _isHovered[title] = false :  _isHovered[title] = false;
-    title == 'Customer'? iconColor = Colors.white : Colors.black;
+    title == 'Customer' ? _isHovered[title] = false : _isHovered[title] = false;
+    title == 'Customer' ? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered[title] = true),
@@ -111,14 +117,14 @@ class _CreateCustomerState extends State<CreateCustomer> {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 5,right: 10),
+          margin: const EdgeInsets.only(bottom: 5, right: 10),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 5,top: 5),
+            padding: const EdgeInsets.only(left: 5, top: 5),
             child: Row(
               children: [
                 Icon(icon, color: iconColor),
@@ -143,8 +149,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
   Future<void> cusSave() async {
     print('hello');
 
-    String url =
-        "$apicall/customer_master/add_customer_master";
+    String url = "$apicall/customer_master/add_customer_master";
     Map<String, dynamic> data = {
       "contactNo": ContactnoController.text,
       "customerName": cusNameController.text,
@@ -162,92 +167,159 @@ class _CreateCustomerState extends State<CreateCustomer> {
 
     final response = await http.post(Uri.parse(url),
         headers: headers, body: jsonEncode(data));
-
-    if (response.statusCode == 200) {
-      // Parse response body
-      final addResponseBody = jsonDecode(response.body);
-
-      if (addResponseBody['status'] == 'success') {
-        // Payment successful
-        print('hello api');
-        final customerId = addResponseBody['id'];
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              icon: const Icon(
-                Icons.check_circle_rounded,
-                color: Colors.green,
-                size: 25,
-              ),
-              title: const Padding(
-                padding: EdgeInsets.only(left: 12),
-                child: Text(
-                  'Customer registered successfully!',
-                  style: TextStyle(fontSize: 15),
-                ),
-              ),
-              content: Padding(
-                  padding: const EdgeInsets.only(left: 25),
-                  child: Row(
+    if (token == " ") {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            contentPadding: EdgeInsets.zero,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
                     children: [
-                      const Text('Your Customer ID is: '),
-                      SelectableText('$customerId'),
+                      // Warning Icon
+                      Icon(Icons.warning, color: Colors.orange, size: 50),
+                      SizedBox(height: 16),
+                      // Confirmation Message
+                      Text(
+                        'Session Expired',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        "Please log in again to continue",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      // Buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // Handle Yes action
+                              context.go('/');
+                              // Navigator.of(context).pop();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: BorderSide(color: Colors.blue),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            child: Text(
+                              'ok',
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
-                  )),
-              actions: <Widget>[
-                ElevatedButton(
-                  onPressed: () {
-                    context.go('/Customer');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    side: const BorderSide(color: Colors.blue),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
-            );
-          },
-        );
-      }
-      else if(addResponseBody['status'] == 'failed' && addResponseBody['code'] == '508'){
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Customer name already exists'),
-          ),
-        );
-      }
-      else if(addResponseBody['status'] == 'failed' && addResponseBody['code'] == '509'){
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-          const SnackBar(
-            content: Text(
-                'This email id already exists'),
-          ),
-        );
-      }
-        else {
-        // Handle other cases
-        print('Unexpected response: $addResponseBody');
-      }
+            ),
+          );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
     } else {
-      // If the response code is not 200, print the error
-      print('Error: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        // Parse response body
+        final addResponseBody = jsonDecode(response.body);
+
+        if (addResponseBody['status'] == 'success') {
+          // Payment successful
+          print('hello api');
+          final customerId = addResponseBody['id'];
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                icon: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.green,
+                  size: 25,
+                ),
+                title: const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Text(
+                    'Customer registered successfully!',
+                    style: TextStyle(fontSize: 15),
+                  ),
+                ),
+                content: Padding(
+                    padding: const EdgeInsets.only(left: 25),
+                    child: Row(
+                      children: [
+                        const Text('Your Customer ID is: '),
+                        SelectableText('$customerId'),
+                      ],
+                    )),
+                actions: <Widget>[
+                  ElevatedButton(
+                    onPressed: () {
+                      context.go('/Customer');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      side: const BorderSide(color: Colors.blue),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    child: const Text(
+                      'OK',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        } else if (addResponseBody['status'] == 'failed' &&
+            addResponseBody['code'] == '508') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Customer name already exists'),
+            ),
+          );
+        } else if (addResponseBody['status'] == 'failed' &&
+            addResponseBody['code'] == '509') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('This email id already exists'),
+            ),
+          );
+        } else {
+          // Handle other cases
+          print('Unexpected response: $addResponseBody');
+        }
+      } else {
+        // If the response code is not 200, print the error
+        print('Error: ${response.statusCode}');
+      }
     }
   }
 
@@ -290,26 +362,25 @@ class _CreateCustomerState extends State<CreateCustomer> {
           double maxWidth = constraints.maxWidth;
           double maxHeight = constraints.maxHeight;
           return Stack(children: [
-            if(constraints.maxHeight <= 500)...{
+            if (constraints.maxHeight <= 500) ...{
               SingleChildScrollView(
-                child:  Align(
+                child: Align(
                   // Added Align widget for the left side menu
                   alignment: Alignment.topLeft,
                   child: Container(
                     height: 1400,
                     width: 200,
                     color: const Color(0xFFF7F6FA),
-                    padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                    padding:
+                        const EdgeInsets.only(left: 15, top: 10, right: 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: _buildMenuItems(context),
-
                     ),
                   ),
                 ),
               ),
-            }
-            else...{
+            } else ...{
               Align(
                 // Added Align widget for the left side menu
                 alignment: Alignment.topLeft,
@@ -317,11 +388,10 @@ class _CreateCustomerState extends State<CreateCustomer> {
                   height: 1400,
                   width: 200,
                   color: const Color(0xFFF7F6FA),
-                  padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                  padding: const EdgeInsets.only(left: 15, top: 10, right: 15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: _buildMenuItems(context),
-
                   ),
                 ),
               ),
@@ -358,10 +428,10 @@ class _CreateCustomerState extends State<CreateCustomer> {
                         child: Text(
                           'Create Customer',
                           style: TextStyle(
+                            color: Colors.black,
                             fontSize: 20,
-                            // fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],
@@ -378,19 +448,18 @@ class _CreateCustomerState extends State<CreateCustomer> {
                 color: Colors.grey, // Border color
               ),
             ),
-            if(constraints.maxWidth >= 1350)...{
+            if (constraints.maxWidth >= 1350) ...{
               Row(
                 children: [
-
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 350,right: 120,top: 80),
+                      padding:
+                          const EdgeInsets.only(left: 350, right: 120, top: 80),
                       child: Container(
                         color: Colors.white,
                         width: 800,
                         height: 800,
                         child: SingleChildScrollView(
-
                           child: Container(
                             width: 1200,
                             margin: EdgeInsets.only(
@@ -405,7 +474,6 @@ class _CreateCustomerState extends State<CreateCustomer> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-
                                   TextFormField(
                                     controller: cusNameController,
                                     decoration: const InputDecoration(
@@ -429,7 +497,9 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                     ],
                                     validator: (value) {
                                       if (cusNameController.text != null &&
-                                          cusNameController.text.trim().isEmpty) {
+                                          cusNameController.text
+                                              .trim()
+                                              .isEmpty) {
                                         return 'Please enter a customer name';
                                       }
                                       return null;
@@ -449,14 +519,21 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                     ),
                                     inputFormatters: [
                                       FilteringTextInputFormatter.allow(
-                                          RegExp("[a-zA-Z,0-9,@.]")),
+                                          RegExp("[a-zA-Z,0-9,@.-]")),
                                       FilteringTextInputFormatter.deny(
                                           RegExp(r'^\s')),
                                       FilteringTextInputFormatter.deny(
                                           RegExp(r'\s\s')),
                                     ],
+                                    onChanged: (value) {
+                                      EmailController.value = TextEditingValue(
+                                        text: value.toLowerCase(),
+                                        selection: EmailController.selection,
+                                      );
+                                    },
                                     validator: (value) {
-                                      if (value != null && value.trim().isEmpty) {
+                                      if (value != null &&
+                                          value.trim().isEmpty) {
                                         return 'Please enter an email';
                                       }
                                       return null;
@@ -465,28 +542,57 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                   const SizedBox(height: 16),
 
                                   // Contact Number
-                                  TextFormField(
-                                    controller: ContactnoController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      LengthLimitingTextInputFormatter(10),
-                                    ],
-                                    decoration: const InputDecoration(
-                                      labelText: 'Contact Number *',
-                                      labelStyle: TextStyle(
-                                          fontSize: 16, color: Colors.black87),
-                                      border: OutlineInputBorder(),
-                                      hintText: 'Enter Contact Number',
-                                      hintStyle: TextStyle(color: Colors.grey),
-                                    ),
-                                    validator: (value) {
-                                      if (value != null && value.trim().isEmpty) {
-                                        return 'Please enter a contact number';
-                                      }
-                                      return null;
-                                    },
-                                  ),
+          TextFormField(
+          controller: ContactnoController,
+          decoration: const InputDecoration(
+          labelText: 'Mobile Number *',
+          labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
+          border: OutlineInputBorder(),
+          hintText: 'Enter Mobile Number',
+          hintStyle: TextStyle(color: Colors.grey),
+          prefixText: '+91 ',
+          prefixStyle: TextStyle(color: Colors.black87, fontSize: 16),
+          ),
+          keyboardType: TextInputType.phone,
+          inputFormatters: [LengthLimitingTextInputFormatter(10),
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+          FilteringTextInputFormatter.deny(RegExp(r'^\s')), // Disallow starting with a space
+          FilteringTextInputFormatter.deny(RegExp(r'\s\s')), // Disallow multiple spaces
+          ],
+          validator: (value) {
+          if (value == null || value.trim().isEmpty) {
+          return 'Please enter a mobile number';
+          }
+          if (value.trim().length != 10) {
+          return 'Please enter a valid 10-digit mobile number';
+          }
+          return null;
+          },
+          ),
+
+          // TextFormField(
+                                  //   controller: ContactnoController,
+                                  //   keyboardType: TextInputType.number,
+                                  //   inputFormatters: [
+                                  //     FilteringTextInputFormatter.digitsOnly,
+                                  //     LengthLimitingTextInputFormatter(10),
+                                  //   ],
+                                  //   decoration: const InputDecoration(
+                                  //     labelText: 'Contact Number *',
+                                  //     labelStyle: TextStyle(
+                                  //         fontSize: 16, color: Colors.black87),
+                                  //     border: OutlineInputBorder(),
+                                  //     hintText: 'Enter Contact Number',
+                                  //     hintStyle: TextStyle(color: Colors.grey),
+                                  //   ),
+                                  //   validator: (value) {
+                                  //     if (value != null &&
+                                  //         value.trim().isEmpty) {
+                                  //       return 'Please enter a contact number';
+                                  //     }
+                                  //     return null;
+                                  //   },
+                                  // ),
                                   const SizedBox(height: 16),
                                   // Address
                                   TextFormField(
@@ -501,7 +607,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                       hintStyle: TextStyle(color: Colors.grey),
                                     ),
                                     validator: (value) {
-                                      if (value != null && value.trim().isEmpty) {
+                                      if (value != null &&
+                                          value.trim().isEmpty) {
                                         return 'Please enter an address';
                                       }
                                       return null;
@@ -516,13 +623,17 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                           maxLines: 3,
                                           decoration: const InputDecoration(
                                             labelText: 'Shipping Address 1 *',
-                                            labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
+                                            labelStyle: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black87),
                                             border: OutlineInputBorder(),
                                             hintText: 'Enter Address',
-                                            hintStyle: TextStyle(color: Colors.grey),
+                                            hintStyle:
+                                                TextStyle(color: Colors.grey),
                                           ),
                                           validator: (value) {
-                                            if (value != null && value.trim().isEmpty) {
+                                            if (value != null &&
+                                                value.trim().isEmpty) {
                                               return 'Please enter an address';
                                             }
                                             return null;
@@ -536,13 +647,17 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                           maxLines: 3,
                                           decoration: const InputDecoration(
                                             labelText: 'Shipping Address 2 *',
-                                            labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
+                                            labelStyle: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black87),
                                             border: OutlineInputBorder(),
                                             hintText: 'Enter Address',
-                                            hintStyle: TextStyle(color: Colors.grey),
+                                            hintStyle:
+                                                TextStyle(color: Colors.grey),
                                           ),
                                           validator: (value) {
-                                            if (value != null && value.trim().isEmpty) {
+                                            if (value != null &&
+                                                value.trim().isEmpty) {
                                               return 'Please enter an address';
                                             }
                                             return null;
@@ -570,7 +685,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                         style: OutlinedButton.styleFrom(
                                           backgroundColor: Colors.grey[300],
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(5),
+                                            borderRadius:
+                                                BorderRadius.circular(5),
                                           ),
                                           side: BorderSide.none,
                                         ),
@@ -586,7 +702,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                       OutlinedButton(
                                         onPressed: () async {
                                           if (cusNameController.text.isEmpty ||
-                                              cusNameController.text.length <= 2) {
+                                              cusNameController.text.length <=
+                                                  2) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -594,9 +711,21 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                                     'Please fill  Customer name'),
                                               ),
                                             );
-                                          } else if(EmailController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );} else if (ContactnoController
-                                              .text.isEmpty ||
-                                              ContactnoController.text.length != 10) {
+                                          } else if (EmailController
+                                                  .text.isEmpty ||
+                                              !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$')
+                                                  .hasMatch(
+                                                      EmailController.text)) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      'Enter Valid E-mail Address')),
+                                            );
+                                          } else if (ContactnoController
+                                                  .text.isEmpty ||
+                                              ContactnoController.text.length !=
+                                                  10) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -604,12 +733,13 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                                     'Please enter a valid phone number.'),
                                               ),
                                             );
-                                          } else if (addressController.text.isEmpty) {
+                                          } else if (addressController
+                                              .text.isEmpty) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
-                                                content:
-                                                Text('Please fill  address '),
+                                                content: Text(
+                                                    'Please fill  address '),
                                               ),
                                             );
                                           } else {
@@ -619,7 +749,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                         style: OutlinedButton.styleFrom(
                                           backgroundColor: Colors.blue[800],
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(5),
+                                            borderRadius:
+                                                BorderRadius.circular(5),
                                           ),
                                           side: BorderSide.none,
                                         ),
@@ -643,16 +774,15 @@ class _CreateCustomerState extends State<CreateCustomer> {
                   ),
                 ],
               ),
-            }else...{
+            } else ...{
               Padding(
-                  padding: const EdgeInsets.only(left: 450,right: 30,top: 100,bottom: 30),
-                  child:
-                  Container(
+                  padding: const EdgeInsets.only(
+                      left: 450, right: 30, top: 100, bottom: 30),
+                  child: Container(
                     color: Colors.white,
                     width: 900,
                     height: 800,
-                    child:
-                    AdaptiveScrollbar(
+                    child: AdaptiveScrollbar(
                       controller: horizontalScroll,
                       position: ScrollbarPosition.bottom,
                       child: SingleChildScrollView(
@@ -664,7 +794,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
                               Row(
                                 children: [
                                   Container(
-                                    width:600,
+                                    width: 600,
                                     height: 800,
                                     // margin: EdgeInsets.only(
                                     //     left: 350,
@@ -677,36 +807,43 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                     child: Form(
                                       key: _validate,
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           const SizedBox(
-                                            height: 40,),
+                                            height: 40,
+                                          ),
                                           SizedBox(
-                                            width: 600,
+                                            width: 300,
                                             child: TextFormField(
                                               controller: cusNameController,
                                               decoration: const InputDecoration(
                                                 labelText: 'Customer Name *',
                                                 labelStyle: TextStyle(
-                                                    fontSize: 16, color: Colors.black87),
+                                                    fontSize: 16,
+                                                    color: Colors.black87),
                                                 border: OutlineInputBorder(),
                                                 hintText: 'Enter Customer Name',
-                                                hintStyle: TextStyle(color: Colors.grey),
+                                                hintStyle: TextStyle(
+                                                    color: Colors.grey),
                                               ),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter.allow(
-                                                    RegExp("[a-zA-Z ]")),
+                                                FilteringTextInputFormatter
+                                                    .allow(RegExp("[a-zA-Z ]")),
                                                 // Allow only letters, numbers, and single space
-                                                FilteringTextInputFormatter.deny(
-                                                    RegExp(r'^\s')),
+                                                FilteringTextInputFormatter
+                                                    .deny(RegExp(r'^\s')),
                                                 // Disallow starting with a space
-                                                FilteringTextInputFormatter.deny(
-                                                    RegExp(r'\s\s')),
+                                                FilteringTextInputFormatter
+                                                    .deny(RegExp(r'\s\s')),
                                                 // Disallow multiple spaces
                                               ],
                                               validator: (value) {
-                                                if (cusNameController.text != null &&
-                                                    cusNameController.text.trim().isEmpty) {
+                                                if (cusNameController.text !=
+                                                        null &&
+                                                    cusNameController.text
+                                                        .trim()
+                                                        .isEmpty) {
                                                   return 'Please enter a customer name';
                                                 }
                                                 return null;
@@ -720,21 +857,30 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                             decoration: const InputDecoration(
                                               labelText: 'Email *',
                                               labelStyle: TextStyle(
-                                                  fontSize: 16, color: Colors.black87),
+                                                  fontSize: 16,
+                                                  color: Colors.black87),
                                               border: OutlineInputBorder(),
                                               hintText: 'Enter Email',
-                                              hintStyle: TextStyle(color: Colors.grey),
+                                              hintStyle:
+                                                  TextStyle(color: Colors.grey),
                                             ),
                                             inputFormatters: [
                                               FilteringTextInputFormatter.allow(
-                                                  RegExp("[a-zA-Z,0-9,@.]")),
+                                                  RegExp("[a-zA-Z,0-9,@.-]")),
                                               FilteringTextInputFormatter.deny(
                                                   RegExp(r'^\s')),
                                               FilteringTextInputFormatter.deny(
                                                   RegExp(r'\s\s')),
                                             ],
+                                            onChanged: (value) {
+                                              EmailController.value = TextEditingValue(
+                                                text: value.toLowerCase(),
+                                                selection: EmailController.selection,
+                                              );
+                                            },
                                             validator: (value) {
-                                              if (value != null && value.trim().isEmpty) {
+                                              if (value != null &&
+                                                  value.trim().isEmpty) {
                                                 return 'Please enter an email';
                                               }
                                               return null;
@@ -747,19 +893,24 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                             controller: ContactnoController,
                                             keyboardType: TextInputType.number,
                                             inputFormatters: [
-                                              FilteringTextInputFormatter.digitsOnly,
-                                              LengthLimitingTextInputFormatter(10),
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                              LengthLimitingTextInputFormatter(
+                                                  10),
                                             ],
                                             decoration: const InputDecoration(
                                               labelText: 'Contact Number *',
                                               labelStyle: TextStyle(
-                                                  fontSize: 16, color: Colors.black87),
+                                                  fontSize: 16,
+                                                  color: Colors.black87),
                                               border: OutlineInputBorder(),
                                               hintText: 'Enter Contact Number',
-                                              hintStyle: TextStyle(color: Colors.grey),
+                                              hintStyle:
+                                                  TextStyle(color: Colors.grey),
                                             ),
                                             validator: (value) {
-                                              if (value != null && value.trim().isEmpty) {
+                                              if (value != null &&
+                                                  value.trim().isEmpty) {
                                                 return 'Please enter a contact number';
                                               }
                                               return null;
@@ -773,13 +924,16 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                             decoration: const InputDecoration(
                                               labelText: ' Billing Address *',
                                               labelStyle: TextStyle(
-                                                  fontSize: 16, color: Colors.black87),
+                                                  fontSize: 16,
+                                                  color: Colors.black87),
                                               border: OutlineInputBorder(),
                                               hintText: 'Enter Address',
-                                              hintStyle: TextStyle(color: Colors.grey),
+                                              hintStyle:
+                                                  TextStyle(color: Colors.grey),
                                             ),
                                             validator: (value) {
-                                              if (value != null && value.trim().isEmpty) {
+                                              if (value != null &&
+                                                  value.trim().isEmpty) {
                                                 return 'Please enter an address';
                                               }
                                               return null;
@@ -792,15 +946,22 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                                 child: TextFormField(
                                                   controller: shippingAdd1,
                                                   maxLines: 3,
-                                                  decoration: const InputDecoration(
-                                                    labelText: 'Shipping Address 1 *',
-                                                    labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
-                                                    border: OutlineInputBorder(),
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    labelText:
+                                                        'Shipping Address 1 *',
+                                                    labelStyle: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors.black87),
+                                                    border:
+                                                        OutlineInputBorder(),
                                                     hintText: 'Enter Address',
-                                                    hintStyle: TextStyle(color: Colors.grey),
+                                                    hintStyle: TextStyle(
+                                                        color: Colors.grey),
                                                   ),
                                                   validator: (value) {
-                                                    if (value != null && value.trim().isEmpty) {
+                                                    if (value != null &&
+                                                        value.trim().isEmpty) {
                                                       return 'Please enter an address';
                                                     }
                                                     return null;
@@ -812,15 +973,22 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                                 child: TextFormField(
                                                   controller: shippingAdd2,
                                                   maxLines: 3,
-                                                  decoration: const InputDecoration(
-                                                    labelText: 'Shipping Address 2 *',
-                                                    labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
-                                                    border: OutlineInputBorder(),
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    labelText:
+                                                        'Shipping Address 2 *',
+                                                    labelStyle: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors.black87),
+                                                    border:
+                                                        OutlineInputBorder(),
                                                     hintText: 'Enter Address',
-                                                    hintStyle: TextStyle(color: Colors.grey),
+                                                    hintStyle: TextStyle(
+                                                        color: Colors.grey),
                                                   ),
                                                   validator: (value) {
-                                                    if (value != null && value.trim().isEmpty) {
+                                                    if (value != null &&
+                                                        value.trim().isEmpty) {
                                                       return 'Please enter an address';
                                                     }
                                                     return null;
@@ -833,7 +1001,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
 
                                           // Buttons
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
                                             children: [
                                               OutlinedButton(
                                                 onPressed: () {
@@ -844,9 +1013,12 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                                   // Clear form
                                                 },
                                                 style: OutlinedButton.styleFrom(
-                                                  backgroundColor: Colors.grey[300],
+                                                  backgroundColor:
+                                                      Colors.grey[300],
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(5),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
                                                   ),
                                                   side: BorderSide.none,
                                                 ),
@@ -861,31 +1033,53 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                               const SizedBox(width: 16),
                                               OutlinedButton(
                                                 onPressed: () async {
-                                                  if (cusNameController.text.isEmpty ||
-                                                      cusNameController.text.length <= 2) {
-                                                    ScaffoldMessenger.of(context)
+                                                  if (cusNameController
+                                                          .text.isEmpty ||
+                                                      cusNameController
+                                                              .text.length <=
+                                                          2) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
                                                         .showSnackBar(
                                                       const SnackBar(
                                                         content: Text(
                                                             'Please fill  Customer name'),
                                                       ),
                                                     );
-                                                  } else if(EmailController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}else if (ContactnoController
-                                                      .text.isEmpty ||
-                                                      ContactnoController.text.length != 10) {
-                                                    ScaffoldMessenger.of(context)
+                                                  } else if (EmailController
+                                                          .text.isEmpty ||
+                                                      !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$')
+                                                          .hasMatch(
+                                                              EmailController
+                                                                  .text)) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                          content: Text(
+                                                              'Enter Valid E-mail Address')),
+                                                    );
+                                                  } else if (ContactnoController
+                                                          .text.isEmpty ||
+                                                      ContactnoController
+                                                              .text.length !=
+                                                          10) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
                                                         .showSnackBar(
                                                       const SnackBar(
                                                         content: Text(
                                                             'Please enter a valid phone number.'),
                                                       ),
                                                     );
-                                                  } else if (addressController.text.isEmpty) {
-                                                    ScaffoldMessenger.of(context)
+                                                  } else if (addressController
+                                                      .text.isEmpty) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
                                                         .showSnackBar(
                                                       const SnackBar(
-                                                        content:
-                                                        Text('Please fill  address '),
+                                                        content: Text(
+                                                            'Please fill  address '),
                                                       ),
                                                     );
                                                   } else {
@@ -893,9 +1087,12 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                                   } // Save form
                                                 },
                                                 style: OutlinedButton.styleFrom(
-                                                  backgroundColor: Colors.blue[800],
+                                                  backgroundColor:
+                                                      Colors.blue[800],
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(5),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
                                                   ),
                                                   side: BorderSide.none,
                                                 ),
@@ -920,13 +1117,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
                         ),
                       ),
                     ),
-
-                  )
-              )
-
-
+                  ))
             }
-
           ]);
         })); // Use the ProductForm widget here
   }
@@ -943,14 +1135,12 @@ customerFieldDecoration(
     hintText: hintText,
     hintStyle: const TextStyle(fontSize: 11),
     border:
-    const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+        const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
     counterText: '',
     contentPadding: const EdgeInsets.fromLTRB(12, 00, 0, 0),
     enabledBorder: const OutlineInputBorder(
         borderSide: BorderSide(color: Color(0xff9FB3C8))),
     focusedBorder:
-    const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+        const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
   );
 }
-
-

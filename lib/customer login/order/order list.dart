@@ -42,6 +42,7 @@ class _CusOrderPageState extends State<CusOrderPage> {
   Timer? _searchDebounceTimer;
   String _searchText = '';
   bool isOrdersSelected = false;
+  bool _hasShownPopup = false;
   bool _loading = false;
   detail? _selectedProduct;
   DateTime? _selectedDate;
@@ -165,36 +166,110 @@ class _CusOrderPageState extends State<CusOrderPage> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+      if(token == " ") {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            "Please log in again to continue", style: TextStyle(
+                            fontSize: 12,
+
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+      }
+      else {
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
 // print('json data');
 // print(jsonData);
-        List<detail> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => detail.fromJson(item)).toList();
+          List<detail> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => detail.fromJson(item)).toList();
+            }
+            else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List)
+                  .map((item) => detail.fromJson(item))
+                  .toList();
+            }
+            List<detail> matchedCustomers = products.where((customer) {
+              return customer.CusId == userId;
+            }).toList();
+
+            if (matchedCustomers.isNotEmpty) {
+              setState(() {
+                print('pages');
+                itemCount = products.length;
+                print(itemCount);
+              });
+            }
           }
-          else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List)
-                .map((item) => detail.fromJson(item))
-                .toList();
-
-          }
-          List<detail> matchedCustomers = products.where((customer) {
-            return customer.CusId == userId;}).toList();
-
-          if (matchedCustomers.isNotEmpty) {
-            setState(() {
-
-              print('pages');
-              itemCount = products.length;
-              print(itemCount);
-
-            });
-          }
+        } else {
+          throw Exception('Failed to load data');
         }
-      } else {
-        throw Exception('Failed to load data');
       }
     } catch (e) {
       print('Error decoding JSON: $e');
@@ -223,48 +298,124 @@ class _CusOrderPageState extends State<CusOrderPage> {
           "Authorization": 'Bearer $token',
         },
       );
+      if(token == " ") {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            "Please log in again to continue", style: TextStyle(
+                            fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        List<detail> products = [];
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+      }
+      else {
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          List<detail> products = [];
 
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => detail.fromJson(item)).toList();
-          } else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List)
-                .map((item) => detail.fromJson(item))
-                .toList();
-            totalItems = jsonData['totalItems'] ?? 0;
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => detail.fromJson(item)).toList();
+            } else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List)
+                  .map((item) => detail.fromJson(item))
+                  .toList();
+              totalItems = jsonData['totalItems'] ?? 0;
+            }
+
+            print('user');
+            print(userId);
+
+            // Check the data structure
+            print('Product Customer IDs:');
+            products.forEach((product) => print(product.CusId));
+
+            // Apply filtering for CusId
+            List<detail> matchedCustomers = products.where((customer) {
+              return customer.CusId!.trim().toLowerCase() ==
+                  userId.trim().toLowerCase();
+            }).toList();
+
+            if (matchedCustomers.isNotEmpty) {
+              setState(() {
+                totalPages = (matchedCustomers.length / itemsPerPage).ceil();
+                print('pages');
+                print(totalPages);
+                productList = matchedCustomers; // Use matchedCustomers
+                print(productList);
+                _filterAndPaginateProducts();
+              });
+            } else {
+              print('No matching customers found for userId: $userId');
+            }
           }
-
-          print('user');
-          print(userId);
-
-          // Check the data structure
-          print('Product Customer IDs:');
-          products.forEach((product) => print(product.CusId));
-
-          // Apply filtering for CusId
-          List<detail> matchedCustomers = products.where((customer) {
-            return customer.CusId!.trim().toLowerCase() == userId.trim().toLowerCase();
-          }).toList();
-
-          if (matchedCustomers.isNotEmpty) {
-            setState(() {
-              totalPages = (matchedCustomers.length / itemsPerPage).ceil();
-              print('pages');
-              print(totalPages);
-              productList = matchedCustomers; // Use matchedCustomers
-              print(productList);
-              _filterAndPaginateProducts();
-            });
-          } else {
-            print('No matching customers found for userId: $userId');
-          }
+        } else {
+          throw Exception('Failed to load data');
         }
-      } else {
-        throw Exception('Failed to load data');
       }
     } catch (e) {
       print('Error decoding JSON: $e');
@@ -277,70 +428,6 @@ class _CusOrderPageState extends State<CusOrderPage> {
     }
   }
 
-  // old one
-//   Future<void> fetchProducts(int page, int itemsPerPage) async {
-//     if (isLoading) return;
-//     if (!mounted) return;
-//     setState(() {
-//       isLoading = true;
-//     });
-//     try {
-//       final response = await http.get(
-//         Uri.parse(
-//           '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
-//         ),
-//         headers: {
-//           "Content-type": "application/json",
-//           "Authorization": 'Bearer $token',
-//         },
-//       );
-//       if (response.statusCode == 200) {
-//         final jsonData = jsonDecode(response.body);
-// // print('json data');
-// // print(jsonData);
-//         List<detail> products = [];
-//         if (jsonData != null) {
-//           if (jsonData is List) {
-//             products = jsonData.map((item) => detail.fromJson(item)).toList();
-//           }
-//           else if (jsonData is Map && jsonData.containsKey('body')) {
-//             products = (jsonData['body'] as List)
-//                 .map((item) => detail.fromJson(item))
-//                 .toList();
-//             totalItems =
-//                 jsonData['totalItems'] ?? 0; // Get the total number of items
-//           }
-//           print('user');
-//           print(userId);
-//           List<detail> matchedCustomers = products.where((customer) {
-//             return customer.CusId!.trim().toLowerCase() == userId.trim().toLowerCase();}).toList();
-//
-//           if (matchedCustomers.isNotEmpty) {
-//             setState(() {
-//               totalPages = (products.length / itemsPerPage).ceil();
-//               print('pages');
-//
-//               print(totalPages);
-//               productList = products;
-//               print(productList);
-//               _filterAndPaginateProducts();
-//             });
-//           }
-//         }
-//       } else {
-//         throw Exception('Failed to load data');
-//       }
-//     } catch (e) {
-//       print('Error decoding JSON: $e');
-// // Optionally, show an error message to the user
-//     } finally {
-//       if (mounted) {
-//         setState(() {
-//           isLoading = false;
-//         });
-//       }
-//     }
-//   }
 
   void _updateSearch(String searchText) {
     setState(() {
@@ -859,7 +946,8 @@ class _CusOrderPageState extends State<CusOrderPage> {
                                 items: <String>[
                                   'Status',
                                   'Not Started',
-                                  'In Progress',
+                                  'Created',
+                                  'Picked',
                                   'Delivered',
                                 ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
@@ -881,7 +969,7 @@ class _CusOrderPageState extends State<CusOrderPage> {
                                   iconSize: 16,
                                 ),
                                 buttonStyleData: const ButtonStyleData(
-                                  height: 50, // Button height
+                                  height: 100, // Button height
                                   padding: EdgeInsets.only(left: 10, right: 10), // Button padding
                                 ),
                                 dropdownStyleData: DropdownStyleData(

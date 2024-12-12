@@ -36,6 +36,7 @@ class AdminList extends StatefulWidget {
 
 class _AdminListState extends State<AdminList> {
   String _Role = '';
+  bool _hasShownPopup = false;
   bool isHomeSelected = false;
   final ScrollController _scrollController = ScrollController();
   Timer? _searchDebounceTimer;
@@ -99,13 +100,90 @@ class _AdminListState extends State<AdminList> {
         Uri.parse(apiUri),
         headers: headers,
       );
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-      if (response.statusCode == 200) {
-        Navigator.pop(context);
-        fetchProducts(currentPage, itemsPerPage);
-      } else {
-        print('Failed to delete customer: ${response.statusCode}');
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+      else{
+        if (response.statusCode == 200) {
+          Navigator.pop(context);
+          fetchProducts(currentPage, itemsPerPage);
+        } else {
+          print('Failed to delete customer: ${response.statusCode}');
+        }
+      }
+
+
     } catch (e) {
       print('Error: $e');
     }
@@ -130,33 +208,109 @@ class _AdminListState extends State<AdminList> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        List<UserResponse> products = [];
-        if (jsonData is List) {
-          products =
-              jsonData.map((item) => UserResponse.fromJson(item)).toList();
-        } else if (jsonData is Map && jsonData.containsKey('body')) {
-          final body = jsonData['body'];
-          if (body != null) {
-            products = (body as List)
-                .map((item) => UserResponse.fromJson(item))
-                .toList();
-            totalItems =
-                jsonData['totalItems'] ?? 0; // Get the total number of items
-          } else {}
-        } else {}
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-        if (mounted) {
-          setState(() {
-            totalPages = (products.length / itemsPerPage).ceil();
-            productList = products;
-            _filterAndPaginateProducts();
-          });
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
+      }else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          List<UserResponse> products = [];
+          if (jsonData is List) {
+            products =
+                jsonData.map((item) => UserResponse.fromJson(item)).toList();
+          } else if (jsonData is Map && jsonData.containsKey('body')) {
+            final body = jsonData['body'];
+            if (body != null) {
+              products = (body as List)
+                  .map((item) => UserResponse.fromJson(item))
+                  .toList();
+              totalItems =
+                  jsonData['totalItems'] ?? 0; // Get the total number of items
+            } else {}
+          } else {}
+
+          if (mounted) {
+            setState(() {
+              totalPages = (products.length / itemsPerPage).ceil();
+              productList = products;
+              _filterAndPaginateProducts();
+            });
+          }
+        } else {
+          throw Exception('Failed to load data');
         }
-      } else {
-        throw Exception('Failed to load data');
       }
+
     } catch (e) {
       if (mounted) {
         if (context.findAncestorWidgetOfExactType<Scaffold>() != null) {
@@ -174,59 +328,6 @@ class _AdminListState extends State<AdminList> {
     }
   }
 
-  Future<void> fetchOrders() async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '$apicall/order_master/get_all_ordermaster',
-        ),
-        headers: {
-          "Content-type": "application/json",
-          "Authorization": 'Bearer $token',
-        },
-      );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        if (jsonData == null) {
-          return;
-        }
-        // List<detail> filteredData = [];
-        if (jsonData is List) {
-          filteredData =
-              jsonData.map((item) => ors.detail.fromJson(item)).toList();
-        } else if (jsonData is Map && jsonData.containsKey('body')) {
-          final body = jsonData['body'];
-          if (body != null) {
-            filteredData = (body as List)
-                .map((item) => ors.detail.fromJson(item))
-                .toList();
-          } else {}
-        } else {}
-
-        if (mounted) {
-          setState(() {
-            filteredData = filteredData; // Update the filteredData list
-          });
-        }
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      if (mounted) {
-        if (context.findAncestorWidgetOfExactType<Scaffold>() != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
-          );
-        } else {}
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
 
   void _updateSearch(String searchText) {
     setState(() {
@@ -258,14 +359,13 @@ class _AdminListState extends State<AdminList> {
       }
     }
   }
-
   Future<void> updateRequestStatus(String userId, String status) async {
     bool? isActive = (status == 'Active') ? true : (status == 'In Active') ? false : null;
   //  bool isActive = status == 'Active';
 
     //  String status = 'false';
     final String apiUrl =
-        'https://mjl9lz64l7.execute-api.ap-south-1.amazonaws.com/stage1/api/user_master/update_user_status/$userId/$isActive';
+        '$apicall/user_master/update_user_status/$userId/$isActive';
     try {
       final response = await http.put(
         Uri.parse(apiUrl),
@@ -274,11 +374,89 @@ class _AdminListState extends State<AdminList> {
           'Authorization': 'Bearer $token'
         },
       );
-      if (response.statusCode == 200) {
-        if (status == 'Completed') {
-          // _getCustomers(currentPage, itemsPerPage);
+      if(token == " "){
+
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return
+                AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  contentPadding: EdgeInsets.zero,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            // Warning Icon
+                            Icon(Icons.warning, color: Colors.orange, size: 50),
+                            SizedBox(height: 16),
+                            // Confirmation Message
+                            Text(
+                              'Session Expired',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text("Please log in again to continue",style: TextStyle(
+                              fontSize: 12,
+
+                              color: Colors.black,
+                            ),),
+                            SizedBox(height: 20),
+                            // Buttons
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    // Handle Yes action
+                                    context.go('/');
+                                    // Navigator.of(context).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    side: BorderSide(color: Colors.blue),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'ok',
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+            },
+          ).whenComplete(() {
+            _hasShownPopup = false;
+          });
+
         }
-      } else {}
+      else{
+        if (response.statusCode == 200) {
+          if (status == 'Completed') {
+            // _getCustomers(currentPage, itemsPerPage);
+          }
+        } else {}
+      }
+
     } catch (e) {
       print('Error: $e');
     }
@@ -310,8 +488,6 @@ class _AdminListState extends State<AdminList> {
   @override
   void initState() {
     super.initState();
-    _getDashboardCounts();
-    fetchOrders();
     _dateController = TextEditingController();
     _selectedDate = DateTime.now();
     String formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate!);
@@ -319,24 +495,6 @@ class _AdminListState extends State<AdminList> {
     fetchProducts(currentPage, itemsPerPage);
   }
 
-  Future<void> _getDashboardCounts() async {
-    final response = await http.get(
-      Uri.parse('$apicall/dashboard/get_dashboard_counts'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      setState(() {
-        _dashboardCounts = DashboardCounts.fromJson(jsonData);
-      });
-    } else {
-      throw Exception('Failed to load dashboard counts');
-    }
-  }
 
   @override
   void dispose() {
@@ -1009,7 +1167,7 @@ class _AdminListState extends State<AdminList> {
       return Column(
         children: [
           Container(
-            width: 1100,
+            width:1100,
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -1041,29 +1199,29 @@ class _AdminListState extends State<AdminList> {
                                 ),
                               ),
                               if (columns.indexOf(column) < columns.length - 1)
-                                // if (columns.indexOf(column) < 0)
+                              // if (columns.indexOf(column) < 0)
                                 IconButton(
                                   icon: _sortOrder[columns.indexOf(column)] ==
-                                          'asc'
+                                      'asc'
                                       ? SizedBox(
-                                          width: 12,
-                                          child: Image.asset(
-                                            "images/sort.png",
-                                            color: Colors.grey,
-                                          ))
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/sort.png",
+                                        color: Colors.grey,
+                                      ))
                                       : SizedBox(
-                                          width: 12,
-                                          child: Image.asset(
-                                            "images/sort.png",
-                                            color: Colors.blue,
-                                          )),
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/sort.png",
+                                        color: Colors.blue,
+                                      )),
                                   onPressed: () {
                                     setState(() {
                                       _sortOrder[columns.indexOf(column)] =
-                                          _sortOrder[columns.indexOf(column)] ==
-                                                  'asc'
-                                              ? 'desc'
-                                              : 'asc';
+                                      _sortOrder[columns.indexOf(column)] ==
+                                          'asc'
+                                          ? 'desc'
+                                          : 'asc';
                                       sortProducts(columns.indexOf(column),
                                           _sortOrder[columns.indexOf(column)]);
                                     });
@@ -1079,11 +1237,11 @@ class _AdminListState extends State<AdminList> {
                                         // Update column width dynamically as user drags
                                         setState(() {
                                           columnWidths[
-                                                  columns.indexOf(column)] +=
+                                          columns.indexOf(column)] +=
                                               details.delta.dx;
                                           columnWidths[columns
                                               .indexOf(column)] = columnWidths[
-                                                  columns.indexOf(column)]
+                                          columns.indexOf(column)]
                                               .clamp(161.0, 300.0);
                                         });
                                       },
@@ -1145,39 +1303,111 @@ class _AdminListState extends State<AdminList> {
                       DataCell(Text(
                         detail.userName,
                         style: const TextStyle(
-                            // fontSize: 16,
+                          // fontSize: 16,
                             color: Colors.grey),
                       )),
                       DataCell(
                         Text(detail.role,
                             style: const TextStyle(
-                                // fontSize: 16,
+                              // fontSize: 16,
                                 color: Colors.grey)),
                       ),
                       DataCell(
                         Text(detail.companyName.toString(),
                             style: const TextStyle(
-                                //fontSize: 16,
+                              //fontSize: 16,
                                 color: Colors.grey)),
                       ),
                       DataCell(
                         Text(detail.location.toString(),
                             style: const TextStyle(
-                                //fontSize: 16,
+                              //fontSize: 16,
                                 color: Colors.grey)),
                       ),
-                      DataCell(Text(
-                        detail.active.toString(),
-                        style: const TextStyle(
-                            // fontSize: 16,
-                            color: Colors.grey),
-                      )),
+                      DataCell(
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 7),
+                          child: Container(
+                            width: 98,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: DropdownButtonFormField2<String>(
+                              decoration: InputDecoration(
+                                contentPadding:
+                                EdgeInsets.only(bottom: 15, left: 9),
+                                hintText:
+                                detail.active == true  ? 'Active' : 'In Active',
+                                hintStyle: TextStyle(
+                                    color: Colors.black, fontSize: 15),
+                                border: OutlineInputBorder(),
+                              ),
+                              items: const [
+                                DropdownMenuItem<String>(
+                                  value: 'Active',
+                                  //  enabled: false,
+                                  // Disable selection of "Active"
+                                  child: Text(
+                                    'Active',
+                                    style: TextStyle(
+                                        color: Colors
+                                            .grey), // Style the disabled item
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value: 'In Active',
+                                  child: Text('In Active'),
+                                ),
+                              ],
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    detail.active = (newValue == 'Active'); // Convert String to bool
+                                    updateRequestStatus(
+                                        detail.userId, newValue);
+                                  });
+                                }
+                              },
+                              dropdownStyleData: DropdownStyleData(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(7),
+                                  color:
+                                  Colors.white, // Dropdown background color
+                                ),
+                                maxHeight: 200,
+                                width: 98,
+                                offset: const Offset(0, -10),
+                                padding: EdgeInsets.zero,
+                              ),
+                              iconStyleData: const IconStyleData(
+                                icon: Padding(
+                                  padding: EdgeInsets.only(right: 9, top: 5),
+                                  child: Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Colors.indigo,
+                                    size: 17,
+                                  ),
+                                ),
+                                iconSize: 17,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // DataCell(Text(
+                      //   detail.active.toString(),
+                      //   style: const TextStyle(
+                      //     // fontSize: 16,
+                      //       color: Colors.grey),
+                      // )),
                       DataCell(Row(children: [
                         IconButton(
                           icon: Icon(Icons.edit, color: Colors.green),
                           onPressed: () {
+
                             var selectedCustomer =
-                                filteredData1[customerIndex].toJson();
+                            filteredData1[customerIndex].toJson();
                             print('select');
                             print(selectedCustomer);
                             context.go('/Edit_User', extra: {
@@ -1222,23 +1452,23 @@ class _AdminListState extends State<AdminList> {
                                             const SizedBox(height: 20),
                                             Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
+                                              MainAxisAlignment.spaceEvenly,
                                               children: [
                                                 ElevatedButton(
                                                   onPressed: () {
                                                     deleteRowAPI(detail.userId);
                                                   },
                                                   style:
-                                                      ElevatedButton.styleFrom(
+                                                  ElevatedButton.styleFrom(
                                                     backgroundColor:
-                                                        Colors.green,
+                                                    Colors.green,
                                                     side: const BorderSide(
                                                         color: Colors.green),
                                                     shape:
-                                                        RoundedRectangleBorder(
+                                                    RoundedRectangleBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
+                                                      BorderRadius.circular(
+                                                          10.0),
                                                     ),
                                                   ),
                                                   child: const Text(
@@ -1252,15 +1482,15 @@ class _AdminListState extends State<AdminList> {
                                                     Navigator.of(context).pop();
                                                   },
                                                   style:
-                                                      ElevatedButton.styleFrom(
+                                                  ElevatedButton.styleFrom(
                                                     backgroundColor: Colors.red,
                                                     side: const BorderSide(
                                                         color: Colors.red),
                                                     shape:
-                                                        RoundedRectangleBorder(
+                                                    RoundedRectangleBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
+                                                      BorderRadius.circular(
+                                                          10.0),
                                                     ),
                                                   ),
                                                   child: const Text(

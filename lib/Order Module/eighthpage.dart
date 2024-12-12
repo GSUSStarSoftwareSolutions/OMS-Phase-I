@@ -960,70 +960,6 @@ class _EighthPageState extends State<EighthPage> {
                                   return const Divider();
                                 },
                               )
-                              // _loading
-                              //     ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
-                              //     : _errorMessage.isNotEmpty
-                              //     ? Center(child: Text(_errorMessage))
-                              //     : widget.orderDetails!.isEmpty
-                              //     ? const Center(child: Text('No product found'))
-                              //     : ListView.separated(
-                              //   shrinkWrap: true,
-                              //   itemCount: _searchText.isNotEmpty
-                              //       ? widget.orderDetails!.where((orderDetail) =>
-                              //   orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                              //       orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                              //   ).length
-                              //       : widget.orderDetails!.length,
-                              //   itemBuilder: (context, index) {
-                              //     final isSelected = _isSelected[index];
-                              //     final orderDetail = _searchText.isNotEmpty
-                              //         ? widget.orderDetails!.where((orderDetail) =>
-                              //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                              //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                              //     ).toList().isEmpty ? null : widget.orderDetails!.where((orderDetail) =>
-                              //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                              //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                              //     ).elementAt(index)
-                              //         : widget.orderDetails![index];
-                              //
-                              //
-                              //     return GestureDetector(
-                              //       onTap: ()  {
-                              //
-                              //         _timer = Timer(Duration(seconds: 1), () {
-                              //           setState(() {
-                              //             _isLoading = false;
-                              //           });
-                              //         });
-                              //         setState(() {
-                              //           _isLoading = false;
-                              //           for (int i = 0; i < _isSelected.length; i++) {
-                              //             _isSelected[i] = i == index;
-                              //           }
-                              //           orderIdController.text = orderDetail.orderId;
-                              //         });
-                              //       },
-                              //       child: AnimatedContainer(
-                              //         duration: const Duration(milliseconds: 200),
-                              //         decoration: BoxDecoration(
-                              //           color: isSelected ? Colors.lightBlue[100] : Colors.white,
-                              //         ),
-                              //         child: ListTile(
-                              //           title: Text('Order ID: ${orderDetail?.orderId}'),
-                              //           subtitle: Column(
-                              //             crossAxisAlignment: CrossAxisAlignment.start,
-                              //             children: [
-                              //               Text('Order Date: ${orderDetail?.orderDate}'),
-                              //             ],
-                              //           ),
-                              //         ),
-                              //       ),
-                              //     );
-                              //   },
-                              //   separatorBuilder: (context, index) {
-                              //     return const Divider();
-                              //   },
-                              // )
                             ],),))
 
                           ],
@@ -1112,18 +1048,27 @@ class _EighthPageState extends State<EighthPage> {
                                     ],
                                   ),
                                 ),
+
                                 Expanded(
                                   flex: 1,
                                   child: Column(
                                     children: [
                                       Icon(
                                         Icons.check_box,
-                                        color: Colors.green,
+                                        color: deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Not Started'
+                                            ? Colors.grey
+                                            :deliveryStatusController.text == 'Delivered'
+                                            ? Colors.green
+                                            : Colors.grey, // default color
                                       ),
                                       Text(
-                                        'Invoice',
+                                        'Delivered',
                                         style: TextStyle(
-                                            color: Colors.black,fontWeight: FontWeight.bold
+                                          color: deliveryStatusController.text == 'Not Started' || deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked'
+                                              ? Colors.grey
+                                              : deliveryStatusController.text == 'Delivered'
+                                              ? Colors.grey
+                                              : Colors.black,
                                         ),
                                       ),
                                     ],
@@ -1135,18 +1080,18 @@ class _EighthPageState extends State<EighthPage> {
                                     children: [
                                       Icon(
                                         Icons.check_box,
-                                        color: deliveryStatusController.text == 'Not Started'
+                                        color: deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Not Started'
                                             ? Colors.grey
                                             :deliveryStatusController.text == 'Delivered'
                                             ? Colors.green
                                             : Colors.grey, // default color
                                       ),
                                       Text(
-                                        deliveryStatusController.text == 'In Progress' ? '    Delivery\n(In Progress)' : 'Delivered',
+                                        'Invoice',
                                         style: TextStyle(
-                                          color: deliveryStatusController.text == 'Not Started'
+                                          color: deliveryStatusController.text == 'Not Started' || deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked'
                                               ? Colors.grey
-                                              : deliveryStatusController.text == 'In Progress'
+                                              : deliveryStatusController.text == 'Delivered'
                                               ? Colors.grey
                                               : Colors.black,
                                         ),
@@ -1260,6 +1205,195 @@ class _EighthPageState extends State<EighthPage> {
                           ),
                         ),
                       ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(left: 80, top: 440,right: 60),
+                        child: Container(
+                          height: 115,
+                          width: constraints.maxWidth * 0.7,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding:const EdgeInsets.only(top: 2,bottom: 3),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 30),
+                                      child: Text('Delivery',style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Spacer(),
+                                    Text('Available for Download'),
+                                    SizedBox(width: 5,),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child: IconButton(
+                                        onPressed:(){
+                                          deliveryStatusController.text == 'Delivered'
+                                              ? downloadDeliverypdf()
+                                              : null;
+                                        },
+                                        color: deliveryStatusController.text == 'Not Started' || deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Created'
+                                            ? Colors.grey
+                                            :  deliveryStatusController.text == 'Delivered'
+                                            ? Colors.green
+                                            : Colors.grey,
+                                        icon: Icon(Icons.download_for_offline),
+                                        // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Container(
+                                height: 1, // 1 pixel height
+                                width: double.infinity, // match parent width
+                                color: Colors.grey, // adjust the color to your liking
+                              ),
+                              const SizedBox(height: 20,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child:Column(
+                                      children: [
+                                        Text('Delivery ID'),
+                                        Text('${DeliveryId.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Delivery Date'),
+                                        Text(deliveryStatusController.text == 'Delivered'?'${Deliverydate.text}': '-'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Mobile No'),
+                                        Text('${DeliveryAddress.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Delivery Status'),
+                                        Text('${DeliveryStatus.text}'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 80, top: 610,right: 60),
+                        child: Container(
+                          height: 115,
+                          width: constraints.maxWidth * 0.7,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding:const EdgeInsets.only(top: 2,bottom: 3),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 30),
+                                      child: Text('Invoice',style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Spacer(),
+                                    Text('Available for Download'),
+                                    SizedBox(width: 5,),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child: IconButton(
+                                        onPressed:(){
+                                          deliveryStatusController.text == 'Delivered'
+                                              ? downloadInvoicePdf()
+                                              : null;
+                                        },
+                                        color: deliveryStatusController.text == 'Not Started' || deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Created'
+                                            ? Colors.grey
+                                            :  deliveryStatusController.text == 'Delivered'
+                                            ? Colors.green
+                                            : Colors.grey,
+                                        icon: Icon(Icons.download_for_offline),
+                                        // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Container(
+                                height: 1, // 1 pixel height
+                                width: double.infinity, // match parent width
+                                color: Colors.grey, // adjust the color to your liking
+                              ),
+                              const SizedBox(height: 20,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child:Column(
+                                      children: [
+                                        Text('INV_NO'),
+                                        Text(deliveryStatusController.text == 'Delivered' ? '${InvNoController.text}': '-'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Date'),
+                                        Text(deliveryStatusController.text == 'Delivered' ?'${CreatedDateController.text}': '-'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Email'),
+                                         Text(deliveryStatusController.text == 'Delivered' ?'${deliveryLocationController.text}':'-'),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: [
+                                        Text('Gross Amount'),
+                                        Text(deliveryStatusController.text == 'Delivered'?'${totalAmountController.text}': '-'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.only(left: 80, top: 780,right: 60),
                         child: Container(
@@ -1357,186 +1491,7 @@ class _EighthPageState extends State<EighthPage> {
                           ),
                         ),
                       ),
-                      Padding(
 
-                        padding: const EdgeInsets.only(left: 80, top: 440,right: 60),
-                        child: Container(
-                          height: 115,
-                          width: constraints.maxWidth * 0.7,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(top: 2,bottom: 3),
-                                child: Row(
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 30),
-                                      child: Text('Invoice',style: TextStyle(fontWeight: FontWeight.bold),),
-                                    ),
-                                    Spacer(),
-                                    Text('Available for Download'),
-                                    SizedBox(width: 5,),
-                                    Padding(
-                                      padding: EdgeInsets.only(right: 10),
-                                      child:IconButton(
-                                        onPressed: (){
-                                          downloadInvoicePdf();
-                                        },
-                                        color: Colors.green, icon: Icon(Icons.download_for_offline),),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              Container(
-                                height: 1, // 1 pixel height
-                                width: double.infinity, // match parent width
-                                color: Colors.grey, // adjust the color to your liking
-                              ),
-                              const SizedBox(height: 20,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child:Column(
-                                      children: [
-                                        Text('INV_NO'),
-                                        Text('${InvNoController.text}'),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Column(
-                                      children: [
-                                        Text('Date'),
-                                        Text('${CreatedDateController.text}'),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Column(
-                                      children: [
-                                        Text('Email'),
-                                        Text('${deliveryLocationController.text}'),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Column(
-                                      children: [
-                                        Text('Gross Amount'),
-                                        Text('${totalAmountController.text}'),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 80, top: 610,right: 60),
-                        child: Container(
-                          height: 115,
-                          width: constraints.maxWidth * 0.7,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding:const EdgeInsets.only(top: 2,bottom: 3),
-                                child: Row(
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 30),
-                                      child: Text('Delivery',style: TextStyle(fontWeight: FontWeight.bold),),
-                                    ),
-                                    Spacer(),
-                                    Text('Available for Download'),
-                                    SizedBox(width: 5,),
-                                    Padding(
-                                      padding: EdgeInsets.only(right: 10),
-                                      child: IconButton(
-                                        onPressed:(){
-                                          deliveryStatusController.text == 'Delivered'
-                                              ? downloadDeliverypdf()
-                                              : null;
-                                        },
-                                        color: deliveryStatusController.text == 'Not Started'
-                                            ? Colors.grey
-                                            :  deliveryStatusController.text == 'Delivered'
-                                            ? Colors.green
-                                            : Colors.grey,
-                                        icon: Icon(Icons.download_for_offline),
-                                        // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              Container(
-                                height: 1, // 1 pixel height
-                                width: double.infinity, // match parent width
-                                color: Colors.grey, // adjust the color to your liking
-                              ),
-                              const SizedBox(height: 20,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child:Column(
-                                      children: [
-                                        Text('Delivery ID'),
-                                        Text('${DeliveryId.text}'),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Column(
-                                      children: [
-                                        Text('Delivery Date'),
-                                        Text('${Deliverydate.text}'),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Column(
-                                      children: [
-                                        Text('Mobile No'),
-                                        Text('${DeliveryAddress.text}'),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Column(
-                                      children: [
-                                        Text('Delivery Status'),
-                                        Text('${DeliveryStatus.text}'),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
                     ],),))
                   ],
                 );
@@ -1745,70 +1700,6 @@ class _EighthPageState extends State<EighthPage> {
                                               return const Divider();
                                             },
                                           )
-                                          // _loading
-                                          //     ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
-                                          //     : _errorMessage.isNotEmpty
-                                          //     ? Center(child: Text(_errorMessage))
-                                          //     : widget.orderDetails!.isEmpty
-                                          //     ? const Center(child: Text('No product found'))
-                                          //     : ListView.separated(
-                                          //   shrinkWrap: true,
-                                          //   itemCount: _searchText.isNotEmpty
-                                          //       ? widget.orderDetails!.where((orderDetail) =>
-                                          //   orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                                          //       orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                                          //   ).length
-                                          //       : widget.orderDetails!.length,
-                                          //   itemBuilder: (context, index) {
-                                          //     final isSelected = _isSelected[index];
-                                          //     final orderDetail = _searchText.isNotEmpty
-                                          //         ? widget.orderDetails!.where((orderDetail) =>
-                                          //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                                          //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                                          //     ).toList().isEmpty ? null : widget.orderDetails!.where((orderDetail) =>
-                                          //     orderDetail.orderId.toLowerCase().contains(_searchText.toLowerCase()) ||
-                                          //         orderDetail.orderDate.toLowerCase().contains(_searchText.toLowerCase())
-                                          //     ).elementAt(index)
-                                          //         : widget.orderDetails![index];
-                                          //
-                                          //
-                                          //     return GestureDetector(
-                                          //       onTap: ()  {
-                                          //
-                                          //         _timer = Timer(Duration(seconds: 1), () {
-                                          //           setState(() {
-                                          //             _isLoading = false;
-                                          //           });
-                                          //         });
-                                          //         setState(() {
-                                          //           _isLoading = false;
-                                          //           for (int i = 0; i < _isSelected.length; i++) {
-                                          //             _isSelected[i] = i == index;
-                                          //           }
-                                          //           orderIdController.text = orderDetail.orderId;
-                                          //         });
-                                          //       },
-                                          //       child: AnimatedContainer(
-                                          //         duration: const Duration(milliseconds: 200),
-                                          //         decoration: BoxDecoration(
-                                          //           color: isSelected ? Colors.lightBlue[100] : Colors.white,
-                                          //         ),
-                                          //         child: ListTile(
-                                          //           title: Text('Order ID: ${orderDetail?.orderId}'),
-                                          //           subtitle: Column(
-                                          //             crossAxisAlignment: CrossAxisAlignment.start,
-                                          //             children: [
-                                          //               Text('Order Date: ${orderDetail?.orderDate}'),
-                                          //             ],
-                                          //           ),
-                                          //         ),
-                                          //       ),
-                                          //     );
-                                          //   },
-                                          //   separatorBuilder: (context, index) {
-                                          //     return const Divider();
-                                          //   },
-                                          // )
                                         ],),))
 
                                       ],
@@ -1897,18 +1788,27 @@ class _EighthPageState extends State<EighthPage> {
                                                 ],
                                               ),
                                             ),
+
                                             Expanded(
                                               flex: 1,
                                               child: Column(
                                                 children: [
                                                   Icon(
                                                     Icons.check_box,
-                                                    color: Colors.green,
+                                                    color: deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Not Started'
+                                                        ? Colors.grey
+                                                        :deliveryStatusController.text == 'Delivered'
+                                                        ? Colors.green
+                                                        : Colors.grey, // default color
                                                   ),
                                                   Text(
-                                                    'Invoice',
+                                                    'Delivered',
                                                     style: TextStyle(
-                                                        color: Colors.black,fontWeight: FontWeight.bold
+                                                      color: deliveryStatusController.text == 'Not Started' || deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked'
+                                                          ? Colors.grey
+                                                          : deliveryStatusController.text == 'Delivered'
+                                                          ? Colors.grey
+                                                          : Colors.black,
                                                     ),
                                                   ),
                                                 ],
@@ -1920,18 +1820,18 @@ class _EighthPageState extends State<EighthPage> {
                                                 children: [
                                                   Icon(
                                                     Icons.check_box,
-                                                    color: deliveryStatusController.text == 'Not Started'
+                                                    color: deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Not Started'
                                                         ? Colors.grey
                                                         :deliveryStatusController.text == 'Delivered'
                                                         ? Colors.green
                                                         : Colors.grey, // default color
                                                   ),
                                                   Text(
-                                                    deliveryStatusController.text == 'In Progress' ? '    Delivery\n(In Progress)' : 'Delivered',
+                                                    'Invoice',
                                                     style: TextStyle(
-                                                      color: deliveryStatusController.text == 'Not Started'
+                                                      color: deliveryStatusController.text == 'Not Started' || deliveryStatusController.text == 'Created' || deliveryStatusController.text == 'Picked'
                                                           ? Colors.grey
-                                                          : deliveryStatusController.text == 'In Progress'
+                                                          : deliveryStatusController.text == 'Delivered'
                                                           ? Colors.grey
                                                           : Colors.black,
                                                     ),
@@ -2143,93 +2043,7 @@ class _EighthPageState extends State<EighthPage> {
                                     ),
                                   ),
                                   Padding(
-
                                     padding: const EdgeInsets.only(left: 80, top: 440,right: 60),
-                                    child: Container(
-                                      height: 115,
-                                      width:maxWidth,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 2,bottom: 3),
-                                            child: Row(
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.only(left: 30),
-                                                  child: Text('Invoice',style: TextStyle(fontWeight: FontWeight.bold),),
-                                                ),
-                                                Spacer(),
-                                                Text('Available for Download'),
-                                                SizedBox(width: 5,),
-                                                Padding(
-                                                  padding: EdgeInsets.only(right: 10),
-                                                  child:IconButton(
-                                                    onPressed: (){
-                                                      downloadInvoicePdf();
-                                                    },
-                                                    color: Colors.green, icon: Icon(Icons.download_for_offline),),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-
-                                          Container(
-                                            height: 1, // 1 pixel height
-                                            width: double.infinity, // match parent width
-                                            color: Colors.grey, // adjust the color to your liking
-                                          ),
-                                          const SizedBox(height: 20,),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child:Column(
-                                                  children: [
-                                                    Text('INV_NO'),
-                                                    Text('${InvNoController.text}'),
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Column(
-                                                  children: [
-                                                    Text('Date'),
-                                                    Text('${CreatedDateController.text}'),
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Column(
-                                                  children: [
-                                                    Text('Email'),
-                                                    Text('${deliveryLocationController.text}'),
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Column(
-                                                  children: [
-                                                    Text('Gross Amount'),
-                                                    Text('${totalAmountController.text}'),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 80, top: 610,right: 60),
                                     child: Container(
                                       height: 115,
                                       width: maxWidth,
@@ -2258,7 +2072,7 @@ class _EighthPageState extends State<EighthPage> {
                                                           ? downloadDeliverypdf()
                                                           : null;
                                                     },
-                                                    color: deliveryStatusController.text == 'Not Started'
+                                                    color: deliveryStatusController.text == 'Not Started' || deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Created'
                                                         ? Colors.grey
                                                         :  deliveryStatusController.text == 'Delivered'
                                                         ? Colors.green
@@ -2294,7 +2108,7 @@ class _EighthPageState extends State<EighthPage> {
                                                 child: Column(
                                                   children: [
                                                     Text('Delivery Date'),
-                                                    Text('${Deliverydate.text}'),
+                                                    Text(deliveryStatusController.text == 'Delivered'?'${Deliverydate.text}': '-'),
                                                   ],
                                                 ),
                                               ),
@@ -2313,6 +2127,100 @@ class _EighthPageState extends State<EighthPage> {
                                                   children: [
                                                     Text('Delivery Status'),
                                                     Text('${DeliveryStatus.text}'),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 80, top: 610,right: 60),
+                                    child: Container(
+                                      height: 115,
+                                      width: maxWidth,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: const Color(0xFFB2C2D3), width: 2),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding:const EdgeInsets.only(top: 2,bottom: 3),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(left: 30),
+                                                  child: Text('Invoice',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                ),
+                                                Spacer(),
+                                                Text('Available for Download'),
+                                                SizedBox(width: 5,),
+                                                Padding(
+                                                  padding: EdgeInsets.only(right: 10),
+                                                  child: IconButton(
+                                                    onPressed:(){
+                                                      deliveryStatusController.text == 'Delivered'
+                                                          ? downloadInvoicePdf()
+                                                          : null;
+                                                    },
+                                                    color: deliveryStatusController.text == 'Not Started' || deliveryStatusController.text == 'Picked' || deliveryStatusController.text == 'Created'
+                                                        ? Colors.grey
+                                                        :  deliveryStatusController.text == 'Delivered'
+                                                        ? Colors.green
+                                                        : Colors.grey,
+                                                    icon: Icon(Icons.download_for_offline),
+                                                    // enabled: deliveryStatusController.text == 'In Progress' || deliveryStatusController.text == 'Delivered',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          Container(
+                                            height: 1, // 1 pixel height
+                                            width: double.infinity, // match parent width
+                                            color: Colors.grey, // adjust the color to your liking
+                                          ),
+                                          const SizedBox(height: 20,),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child:Column(
+                                                  children: [
+                                                    Text('INV_NO'),
+                                                    Text(deliveryStatusController.text == 'Delivered' ? '${InvNoController.text}': '-'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Date'),
+                                                    Text(deliveryStatusController.text == 'Delivered' ?'${CreatedDateController.text}': '-'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Email'),
+                                                    Text(deliveryStatusController.text == 'Delivered' ?'${deliveryLocationController.text}':'-'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Column(
+                                                  children: [
+                                                    Text('Gross Amount'),
+                                                    Text(deliveryStatusController.text == 'Delivered'?'${totalAmountController.text}': '-'),
                                                   ],
                                                 ),
                                               ),

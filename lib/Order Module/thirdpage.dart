@@ -27,6 +27,7 @@ class OrderPage3 extends StatefulWidget {
 
 class OrderPage3State extends State<OrderPage3> {
   List<Product> products = [];
+  bool _hasShownPopup = false;
   double _total = 0;
   String? dropdownValue1 = 'Filter I';
   bool isOrdersSelected = false;
@@ -235,31 +236,108 @@ class OrderPage3State extends State<OrderPage3> {
           "Authorization": 'Bearer $token',
         },
       );
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        List<ord.Product> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => ord.Product.fromJson(item)).toList();
-          } else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List).map((item) => ord.Product.fromJson(item)).toList();
-            //  totalItems = jsonData['totalItems'] ?? 0;
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
 
-            print('pages');
-            print(totalPages);// Changed itemsPerPage to 10
-          }
-
-          setState(() {
-            productList = products;
-            totalPages = (products.length / itemsPerPage).ceil();
-            print(totalPages);
-            _filterAndPaginateProducts();
-          });
-        }
-      } else {
-        throw Exception('Failed to load data');
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          List<ord.Product> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => ord.Product.fromJson(item)).toList();
+            } else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List).map((item) => ord.Product.fromJson(item)).toList();
+              //  totalItems = jsonData['totalItems'] ?? 0;
+
+              print('pages');
+              print(totalPages);// Changed itemsPerPage to 10
+            }
+
+            setState(() {
+              productList = products;
+              totalPages = (products.length / itemsPerPage).ceil();
+              print(totalPages);
+              _filterAndPaginateProducts();
+            });
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
+
     } catch (e) {
       print('Error decoding JSON: $e');
       // Optionally, show an error message to the user

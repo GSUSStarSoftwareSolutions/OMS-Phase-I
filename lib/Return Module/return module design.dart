@@ -12,7 +12,6 @@ import '../delivery module/delivery detail.dart';
 import 'package:http/http.dart' as http;
 
 import '../widgets/confirmdialog.dart';
-
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -52,7 +51,6 @@ class CreateReturn extends StatefulWidget {
     return _CreateReturnState();
   }
 }
-
 class _CreateReturnState extends State<CreateReturn> {
   // FocusNode _focusNode = FocusNode();
   String? _selectedReason = 'Reason for return';
@@ -65,7 +63,7 @@ class _CreateReturnState extends State<CreateReturn> {
   String _enteredValues = '';
   final List<String> list = ['Reason for return', ' Option 1', '  Option 2'];
   int Index = 1;
-
+  bool _hasShownPopup = false;
   bool isOrdersSelected = false;
   double totalAmount = 0.0;
   final ScrollController horizontalScroll = ScrollController();
@@ -179,6 +177,7 @@ class _CreateReturnState extends State<CreateReturn> {
   final FocusNode _focusNode = FocusNode();
 
   Future<void> addReturnMaster() async {
+
     final orderId = _controller.text.trim();
     print('Order ID: $orderId');
 
@@ -192,38 +191,113 @@ class _CreateReturnState extends State<CreateReturn> {
         'Content-Type': 'application/json',
       },
     );
-    if (returnMasterResponse.statusCode == 200) {
-      final returnData = jsonDecode(returnMasterResponse.body);
-      print('Return Data: $returnData');
-      // Step 2: Check if the entered orderId matches any invoice number
-      bool isMatched =
-          returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
-      if (isMatched) {
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
+
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
+
+    }else {
+      if (returnMasterResponse.statusCode == 200) {
+        final returnData = jsonDecode(returnMasterResponse.body);
+        print('Return Data: $returnData');
+        // Step 2: Check if the entered orderId matches any invoice number
+        bool isMatched =
+        returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
+        if (isMatched) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('This Product Already Used Return Policy'),
+            ),
+          );
+          // setState(() {
+          //   _selectedReason = 'Reason for return';
+          //   _reasonController.text = 'Reason for return';
+          //   ContactpersonController.text ='';
+          //   EmailAddressController.text ='';
+          //   _controller.text = '';
+          //   _orderDetails = [];
+          //   totalController.text = '';
+          //   widget.storeImages = []; // Clear the storeImages list
+          //    widget.imageSizeStrings = [];
+          // });
+          return; // Exit the function if a match is found
+        }
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('This Product Already Used Return Policy'),
+            content: Text('Error fetching return master data'),
           ),
         );
-        // setState(() {
-        //   _selectedReason = 'Reason for return';
-        //   _reasonController.text = 'Reason for return';
-        //   ContactpersonController.text ='';
-        //   EmailAddressController.text ='';
-        //   _controller.text = '';
-        //   _orderDetails = [];
-        //   totalController.text = '';
-        //   widget.storeImages = []; // Clear the storeImages list
-        //    widget.imageSizeStrings = [];
-        // });
-        return; // Exit the function if a match is found
+        return; // Exit the function if there's an error fetching the return data
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error fetching return master data'),
-        ),
-      );
-      return; // Exit the function if there's an error fetching the return data
     }
 
     final apiUrl = '$apicall/return_master/add_return_master';
@@ -280,79 +354,153 @@ class _CreateReturnState extends State<CreateReturn> {
       headers: headers,
       body: jsonEncode(requestBody),
     );
-
-    if (response.statusCode == 200) {
-      print('Return Master added successfully');
-      final responseBody = jsonDecode(response.body);
-      final returnId = responseBody['id'];
-
-      await showDialog(
+    if(token == " "){
+      showDialog(
         barrierDismissible: false,
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-            ),
-            icon: const Icon(
-              Icons.check_circle_rounded,
-              color: Colors.green,
-              size: 25,
-            ),
-            title: const Padding(
-              padding: EdgeInsets.only(left: 12),
-              child: Text(
-                'Return Created Successfully',
-                style: TextStyle(fontSize: 15),
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
               ),
-            ),
-            content: Padding(
-                padding: const EdgeInsets.only(left: 25),
-                child: Row(
-                  children: [
-                    const Text('Your return ID is: '),
-                    SelectableText('$returnId'),
-                  ],
-                )),
-            actions: <Widget>[
-              ElevatedButton(
-                child: const Text(
-                  'OK',
-                  style: TextStyle(color: Colors.white),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
+
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
+
+    }else {
+      if (response.statusCode == 200) {
+        print('Return Master added successfully');
+        final responseBody = jsonDecode(response.body);
+        final returnId = responseBody['id'];
+
+        await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              icon: const Icon(
+                Icons.check_circle_rounded,
+                color: Colors.green,
+                size: 25,
+              ),
+              title: const Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: Text(
+                  'Return Created Successfully',
+                  style: TextStyle(fontSize: 15),
                 ),
-                onPressed: () {
-                  context.go('/Return_List');
-                  // Navigator.of(context
-                  //).pop(); // close the alert dialog
-                  // Navigator.push(
-                  //   context,
-                  //   PageRouteBuilder(
-                  //     pageBuilder: (context, animation, secondaryAnimation) =>
-                  //     const Returnpage(),
-                  //     transitionDuration: const Duration(milliseconds: 200),
-                  //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  //       return FadeTransition(
-                  //         opacity: animation,
-                  //         child: child,
-                  //       );
-                  //     },
-                  //   ),
-                  // );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  side: const BorderSide(color: Colors.blue),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              ),
+              content: Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Row(
+                    children: [
+                      const Text('Your return ID is: '),
+                      SelectableText('$returnId'),
+                    ],
+                  )),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    context.go('/Return_List');
+                    // Navigator.of(context
+                    //).pop(); // close the alert dialog
+                    // Navigator.push(
+                    //   context,
+                    //   PageRouteBuilder(
+                    //     pageBuilder: (context, animation, secondaryAnimation) =>
+                    //     const Returnpage(),
+                    //     transitionDuration: const Duration(milliseconds: 200),
+                    //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    //       return FadeTransition(
+                    //         opacity: animation,
+                    //         child: child,
+                    //       );
+                    //     },
+                    //   ),
+                    // );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    side: const BorderSide(color: Colors.blue),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      print('Error: ${response.statusCode}');
+              ],
+            );
+          },
+        );
+      } else {
+        print('Error: ${response.statusCode}');
+      }
     }
   }
 
@@ -390,106 +538,182 @@ class _CreateReturnState extends State<CreateReturn> {
           'Content-Type': 'application/json',
         },
       );
-      if (returnMasterResponse.statusCode == 200 &&
-          orderMasterResponse.statusCode == 200) {
-        final returnData = jsonDecode(returnMasterResponse.body);
-        final orderData = jsonDecode(orderMasterResponse.body);
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-        // Step 3: Match conditions
-        bool isMatchedReturn =
-            returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
-        bool isMatchedInProgress = orderData.any((order) =>
-            order['status'] == 'In Progress' && order['invoiceNo'] == orderId);
-        bool isMatchedNotStarted = orderData.any((order) =>
-            order['status'] == 'Not Started' && order['invoiceNo'] == orderId);
-
-        if (isMatchedReturn) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('This Product Already Used Return Policy'),
-            ),
-          );
-          setState(() {
-            _orderDetails = [];
-          });
-          return;
-        }
-
-        if (isMatchedInProgress) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  'This Product is In Progress So You Should Not Be Able to Return'),
-            ),
-          );
-          setState(() {
-            _orderDetails = [];
-          });
-          return;
-        }
-
-        if (isMatchedNotStarted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  'This Order Delivery Status Is Not Started, So You Cannot Make a Return'),
-            ),
-          );
-          setState(() {
-            _orderDetails = [];
-          });
-          return;
-        }
-
-        // Step 4: Fetch delivery data if no matches found
-        final deliveryUrl = '$apicall/delivery_master/get_all_deliverymaster';
-        final deliveryResponse = await http.get(
-          Uri.parse(deliveryUrl),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
           },
-        );
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
 
-        if (deliveryResponse.statusCode == 200) {
-          final deliveryData = jsonDecode(deliveryResponse.body);
-          final orderDetails = deliveryData.firstWhere(
-            (order) => order['invoiceNo'] == orderId,
-            orElse: () => null,
-          );
+      }else {
+        if (returnMasterResponse.statusCode == 200 &&
+            orderMasterResponse.statusCode == 200) {
+          final returnData = jsonDecode(returnMasterResponse.body);
+          final orderData = jsonDecode(orderMasterResponse.body);
 
-          if (orderDetails != null) {
-            setState(() {
-              ContactPerson.text = orderDetails['contactNumber'];
-              ShippingAddressController.text = orderDetails['comments'];
-              OrderIDController.text = orderDetails['orderId'];
-              customerIdController.text = orderDetails['customerId'];
-              _orderDetails = orderDetails['items']
-                  .map((item) => {
-                        'productName': item['productName'],
-                        'qty': item['qty'],
-                        'totalAmount': item['totalAmount'],
-                        'price': item['price'],
-                        'category': item['category'],
-                        'subCategory': item['subCategory'],
-                      })
-                  .toList();
-            });
-          } else {
+          // Step 3: Match conditions
+          bool isMatchedReturn =
+          returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
+          bool isMatchedInProgress = orderData.any((order) =>
+          order['status'] == 'In Progress' && order['invoiceNo'] == orderId);
+          bool isMatchedNotStarted = orderData.any((order) =>
+          order['status'] == 'Not Started' && order['invoiceNo'] == orderId);
+
+          if (isMatchedReturn) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Enter the Valid Invoice No'),
+                content: Text('This Product Already Used Return Policy'),
               ),
             );
             setState(() {
               _orderDetails = [];
             });
+            return;
+          }
+
+          if (isMatchedInProgress) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'This Product is In Progress So You Should Not Be Able to Return'),
+              ),
+            );
+            setState(() {
+              _orderDetails = [];
+            });
+            return;
+          }
+
+          if (isMatchedNotStarted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'This Order Delivery Status Is Not Started, So You Cannot Make a Return'),
+              ),
+            );
+            setState(() {
+              _orderDetails = [];
+            });
+            return;
+          }
+
+          // Step 4: Fetch delivery data if no matches found
+          final deliveryUrl = '$apicall/delivery_master/get_all_deliverymaster';
+          final deliveryResponse = await http.get(
+            Uri.parse(deliveryUrl),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          );
+
+          if (deliveryResponse.statusCode == 200) {
+            final deliveryData = jsonDecode(deliveryResponse.body);
+            final orderDetails = deliveryData.firstWhere(
+                  (order) => order['invoiceNo'] == orderId,
+              orElse: () => null,
+            );
+
+            if (orderDetails != null) {
+              setState(() {
+                ContactPerson.text = orderDetails['contactNumber'];
+                ShippingAddressController.text = orderDetails['comments'];
+                OrderIDController.text = orderDetails['orderId'];
+                customerIdController.text = orderDetails['customerId'];
+                _orderDetails = orderDetails['items']
+                    .map((item) =>
+                {
+                  'productName': item['productName'],
+                  'qty': item['qty'],
+                  'totalAmount': item['totalAmount'],
+                  'price': item['price'],
+                  'category': item['category'],
+                  'subCategory': item['subCategory'],
+                })
+                    .toList();
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Enter the Valid Invoice No'),
+                ),
+              );
+              setState(() {
+                _orderDetails = [];
+              });
+            }
+          } else {
+            throw Exception('Error fetching delivery data');
           }
         } else {
-          throw Exception('Error fetching delivery data');
+          throw Exception('Error fetching return or order master data');
         }
-      } else {
-        throw Exception('Error fetching return or order master data');
       }
     } catch (e) {
       print(e);
@@ -506,209 +730,6 @@ class _CreateReturnState extends State<CreateReturn> {
     }
   }
 
-  // old fecthorder
-  // Future<void> _fetchOrderDetails() async {
-  //   final orderId = _controller.text.trim();
-  //   if (!orderId.startsWith("INV_")) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('Order ID must start with "INV_"'),
-  //       ),
-  //     );
-  //     return;
-  //   }
-  //
-  //   print('Order ID: $orderId');
-  //
-  //   // Step 1: Fetch all return master data to get invoice numbers
-  //   final returnMasterUrl = '$apicall/return_master/get_all_returnmaster';
-  //
-  //   final returnMasterResponse = await http.get(
-  //     Uri.parse(returnMasterUrl),
-  //     headers: {
-  //       'Authorization': 'Bearer $token',
-  //       'Content-Type': 'application/json',
-  //     },
-  //   );
-  //
-  //   final orderMasterUrl = '$apicall/order_master/get_all_ordermaster';
-  //
-  //   final orderMasterResponse =
-  //       await http.get(Uri.parse(orderMasterUrl), headers: {
-  //     'Authorization': 'Bearer $token',
-  //     'Content-Type': 'application/json',
-  //   });
-  //
-  //   if (orderMasterResponse.statusCode == 200) {
-  //     final orderData = jsonDecode(orderMasterResponse.body);
-  //     print('Order Data: $orderData');
-  //
-  //     bool isMatched2 = orderData.any((order) => order['invoiceNo'] == orderId);
-  //
-  //     if (returnMasterResponse.statusCode == 200) {
-  //       final returnData = jsonDecode(returnMasterResponse.body);
-  //       print('Return Data: $returnData');
-  //
-  //       // Step 2: Check if the entered orderId matches any invoice number
-  //       bool isMatched =
-  //           returnData.any((invoice) => invoice['invoiceNumber'] == orderId);
-  //       final deliveryUrl = '$apicall/delivery_master/get_all_deliverymaster';
-  //
-  //       final deliveryMasterResponse = await http.get(
-  //         Uri.parse(deliveryUrl),
-  //         headers: {
-  //           'Authorization': 'Bearer $token',
-  //           'Content-Type': 'application/json',
-  //         },
-  //       );
-  //       if (deliveryMasterResponse.statusCode == 200) {
-  //         final returnData1 = jsonDecode(deliveryMasterResponse.body);
-  //         print('Return Data: $returnData1');
-  //
-  //         // Step 2: Check if the entered orderId matches any invoice number
-  //         bool isMatched1 = returnData1.any((invoice) =>
-  //             invoice['status'] == 'In Progress' &&
-  //             invoice['invoiceNo'] == orderId);
-  //
-  //         bool isMatched2 = orderData.any((invoice) =>
-  //             invoice['status'] == 'Not Started' &&
-  //             invoice['invoiceNo'] == orderId);
-  //         print('details');
-  //         print(isMatched);
-  //         print(isMatched1);
-  //
-  //         if (isMatched) {
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             const SnackBar(
-  //               content: Text('This Product Already Used Return Policy'),
-  //             ),
-  //           );
-  //           setState(() {
-  //             _orderDetails = [];
-  //           });
-  //           return; // Exit the function if a match is found
-  //         }
-  //         if (isMatched1) {
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             const SnackBar(
-  //               content: Text(
-  //                   'This Product is In Progress So You Should Not Able to Return'),
-  //             ),
-  //           );
-  //           setState(() {
-  //             _orderDetails = [];
-  //           });
-  //           return;
-  //         }
-  //         if (isMatched2) {
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             const SnackBar(
-  //               content: Text(
-  //                   'This Order Delivery Status Is Not Started So You can\'t make a Return'),
-  //             ),
-  //           );
-  //           setState(() {
-  //             _orderDetails = [];
-  //           });
-  //           return;
-  //         }
-  //       }
-  //     }
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('Error fetching return master data'),
-  //       ),
-  //     );
-  //     return; // Exit the function if there's an error fetching the return data
-  //   }
-  //
-  //   // Step 3: Proceed with fetching order details if no match found
-  //   final url = '$apicall/delivery_master/get_all_deliverymaster';
-  //
-  //   final response = await http.get(
-  //     Uri.parse(url),
-  //     headers: {
-  //       'Authorization': 'Bearer $token',
-  //       'Content-Type': 'application/json',
-  //     },
-  //   );
-  //
-  //   if (response.statusCode == 200) {
-  //     final jsonData = jsonDecode(response.body);
-  //     print('Response: $jsonData');
-  //
-  //     final orderData = jsonData.firstWhere(
-  //       (order) => order['invoiceNo'] == orderId,
-  //       orElse: () => null,
-  //     );
-  //     // final orderData = jsonData.firstWhere(
-  //     //       (order) => order['deliveryId'] == orderId,
-  //     //   orElse: () => null,
-  //     // );
-  //
-  //     // final orderMaster = '$apicall/order_master/get_all_ordermaster';
-  //     //
-  //     // final orderMasterResponse = await http.get(Uri.parse(orderMaster),
-  //     // headers: {
-  //     //   'Authorization': 'Bearer $token',
-  //     //   'Content-Type': 'application/json',
-  //     // }
-  //     // );
-  //     //
-  //     // if(orderMasterResponse.statusCode == 200){
-  //     //
-  //     // }
-  //
-  //     if (orderData != null) {
-  //       setState(() {
-  //         print('customerid');
-  //         print(orderData['customerId']);
-  //         print(orderData['tax']);
-  //         print(orderData['contactNumber']);
-  //         print(orderData['orderId']);
-  //         print(orderData['comments']);
-  //         print(orderData['discount']);
-  //
-  //         ContactPerson.text = orderData['contactNumber'];
-  //         ShippingAddressController.text = orderData['comments'];
-  //         OrderIDController.text = orderData['orderId'];
-  //         // contactNumber
-  //         // orderId
-  //         // shippingAddress
-  //         customerIdController.text = orderData['customerId'];
-  //         print(customerIdController.text);
-  //         _orderDetails = orderData['items']
-  //             .map((item) => {
-  //                   'productName': item['productName'],
-  //                   'qty': item['qty'],
-  //                   'totalAmount': item['totalAmount'],
-  //                   'price': item['price'],
-  //                   'category': item['category'],
-  //                   'subCategory': item['subCategory'],
-  //                 })
-  //             .toList();
-  //       });
-  //     } else {
-  //       setState(() {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(
-  //             content: Text('Enter the Valid Invoice No'),
-  //           ),
-  //         );
-  //         _orderDetails = [
-  //           {'productName': 'Order not found'}
-  //         ];
-  //       });
-  //     }
-  //   } else {
-  //     setState(() {
-  //       _orderDetails = [
-  //         {'productName': 'Error fetching order details'}
-  //       ];
-  //     });
-  //   }
-  // }
 
   void _onFocusChange() {
     if (!_focusNode.hasFocus) {

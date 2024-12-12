@@ -36,6 +36,7 @@ class Returnpage extends StatefulWidget {
 
 class _ReturnpageState extends State<Returnpage> with SingleTickerProviderStateMixin {
   Timer? _searchDebounceTimer;
+  bool _hasShownPopup = false;
   String _searchText = '';
   String status = '';
   String selectDate = '';
@@ -192,68 +193,6 @@ class _ReturnpageState extends State<Returnpage> with SingleTickerProviderStateM
   int totalPages = 0;
   bool isLoading = false;
 
-  Future<List<dynamic>> _fetchAllProductMaster() async {
-    //final String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzIzMTE0OTQ0LCJpYXQiOjE3MjMxMDc3NDR9.1UxLslHM3GivBHoBr8pS02OxD6dC5IRG4ryxiUdgzIJmFjSCwftf6Kme4rPLb-ZOjzOoAaxueSzKxiLmjnmSFg';
-    try {
-      final response = await http.get(
-        Uri.parse(
-            '$apicall/productmaster/get_all_productmaster'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print('Product Master Data:');
-        print(data);
-        // print('discount');
-        // print(data['discount']);
-        return data;
-      } else {
-        print('Failed to fetch product master data.');
-        return [];
-      }
-    } catch (e) {
-      print('Error fetching product master data: $e');
-      return [];
-    }
-  }
-
-  Future<OrderDetail?> _fetchOrderDetails(String orderId) async {
-    //String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzI1NjA2NjA5LCJpYXQiOjE3MjU1OTk0MDl9.a0XS5AykjKk62PBbfGessANRveTtU5wawjPRnHj73Zi1t-Xh3b2-2G_CksANLOaANHiy-4AlsCYwOZFY8GmExA';
-    try {
-      final url =
-          '$apicall/order_master/search_by_orderid/$orderId';
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        print('onTap');
-        print(responseBody);
-        if (responseBody != null) {
-          final jsonData = jsonDecode(responseBody);
-          if (jsonData is List<dynamic>) {
-            final jsonObject = jsonData.first;
-            return OrderDetail.fromJson(jsonObject);
-          } else {
-            print('Failed to load order details');
-          }
-        } else {
-          print('Failed to load order details');
-        }
-      } else {
-        print('Failed to load order details');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-    return null;
-  }
 
   Future<List<ReturnMaster>> _fetchAllReturnMaster(String orderId) async {
     String orderId1 = orderId;
@@ -340,37 +279,115 @@ class _ReturnpageState extends State<Returnpage> with SingleTickerProviderStateM
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        print('json data');
-        print(jsonData);
-        List<ReturnMaster> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products =
-                jsonData.map((item) => ReturnMaster.fromJson(item)).toList();
-          } else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List)
-                .map((item) => ReturnMaster.fromJson(item))
-                .toList();
-            totalItems =
-                jsonData['totalItems'] ?? 0; // Get the total number of items
-          }
+      if(token == " ")
+      {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-          if (mounted) {
-            setState(() {
-              totalPages = (products.length / itemsPerPage).ceil();
-              print('pages');
-              print(totalPages);
-              productList = products;
-              print(productList);
-              _filterAndPaginateProducts();
-            });
-          }
-        }
-      } else {
-        throw Exception('Failed to load data');
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          print('json data');
+          print(jsonData);
+          List<ReturnMaster> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products =
+                  jsonData.map((item) => ReturnMaster.fromJson(item)).toList();
+            } else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List)
+                  .map((item) => ReturnMaster.fromJson(item))
+                  .toList();
+              totalItems =
+                  jsonData['totalItems'] ?? 0; // Get the total number of items
+            }
+
+            if (mounted) {
+              setState(() {
+                totalPages = (products.length / itemsPerPage).ceil();
+                print('pages');
+                print(totalPages);
+                productList = products;
+                print(productList);
+                _filterAndPaginateProducts();
+              });
+            }
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       print('Error decoding JSON: $e');
       // Optionally, show an error message to the user

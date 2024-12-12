@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import '../widgets/confirmdialog.dart';
 
+
 void main() {
   runApp(
       MaterialApp(
@@ -35,6 +36,7 @@ class DeliveryDetail extends StatefulWidget {
 class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProviderStateMixin{
   final ScrollController horizontalScroll = ScrollController();
   String? _selectedReason = 'Reason for return';
+  bool _hasShownPopup = false;
   final _controller = TextEditingController();
   final TextEditingController InvNoController = TextEditingController();
   List<dynamic> _orderDetails = [];
@@ -219,6 +221,7 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
           ShippingAddress.clear();
           ContactperController.clear();
           ContactNumberContoller.clear();
+          EmailIdController.clear();
           TotalController.clear();
           _orderDetails = [];
         });
@@ -231,9 +234,6 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
     String formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate!);
     _dateController.text = formattedDate;
   }
-
-
-
 
   Future<void> addReturnMaster() async {
     final orderId = _controller.text.trim().toUpperCase();
@@ -250,33 +250,111 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
         'Content-Type': 'application/json',
       },
     );
+    if(token == " "){
+      {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-    if (returnMasterResponse.statusCode == 200) {
-      final returnData = jsonDecode(returnMasterResponse.body);
-      print('Return Data: $returnData');
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
 
-      // Step 2: Check if the entered orderId matches any invoice number
-      bool isMatched = returnData.any((invoice) => invoice['orderId'] == orderId);
+      }
+    }else{
+      if (returnMasterResponse.statusCode == 200) {
+        final returnData = jsonDecode(returnMasterResponse.body);
+        print('Return Data: $returnData');
 
-      if (isMatched) {
+        // Step 2: Check if the entered orderId matches any invoice number
+        bool isMatched = returnData.any((invoice) => invoice['orderId'] == orderId);
+
+        if (isMatched) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('This product Move on to Delivery'),
+            ),
+          );
+          setState(() {
+            _orderDetails = [];
+          });
+          return; // Exit the function if a match is found
+        }
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('This product Move on to Delivery'),
+            content: Text('Error fetching return master data'),
           ),
         );
-        setState(() {
-          _orderDetails = [];
-        });
-        return; // Exit the function if a match is found
+        return; // Exit the function if there's an error fetching the return data
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error fetching return master data'),
-        ),
-      );
-      return; // Exit the function if there's an error fetching the return data
     }
+
+
     final url = orderId.isEmpty
         ? '$apicall/order_master/get_all_ordermaster/'
         : '$apicall/order_master/search_by_orderid/$orderId';
@@ -288,101 +366,178 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
         'Content-Type': 'application/json',
       },
     );
+if(token == " "){
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return
+        AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Warning Icon
+                    Icon(Icons.warning, color: Colors.orange, size: 50),
+                    SizedBox(height: 16),
+                    // Confirmation Message
+                    Text(
+                      'Session Expired',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text("Please log in again to continue",style: TextStyle(
+                      fontSize: 12,
 
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      print('Response: $jsonData');
-      final orderData = jsonData.firstWhere(
-              (order) => order['orderId'] == orderId, orElse: () => null
-
-      );
-      if (orderData == null) {
-        // Show the ScaffoldMessenger with a SnackBar
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please Enter a valid Order ID'),
+                      color: Colors.black,
+                    ),),
+                    SizedBox(height: 20),
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            // Handle Yes action
+                            context.go('/');
+                            // Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: BorderSide(color: Colors.blue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text(
+                            'ok',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
-        // Handle the case when orderData is null (if needed)
-      }
+    },
+  ).whenComplete(() {
+    _hasShownPopup = false;
+  });
 
-      print('details');
-      print(orderData);
-      if (orderData != null) {
-        print('enter');
+}
+else{
+  if (response.statusCode == 200) {
+    final jsonData = jsonDecode(response.body);
+    print('Response: $jsonData');
+    final orderData = jsonData.firstWhere(
+            (order) => order['orderId'] == orderId, orElse: () => null
 
-        final apiUrl = '$apicall/delivery_master/add_delivery_master';
+    );
+    if (orderData == null) {
+      // Show the ScaffoldMessenger with a SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please Enter a valid Order ID'),
+        ),
+      );
+      // Handle the case when orderData is null (if needed)
+    }
 
-        final headers = {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json'
-        };
+    print('details');
+    print(orderData);
+    if (orderData != null) {
+      print('enter');
 
-        List<Map<String, dynamic>> items = [];
+      final apiUrl = '$apicall/delivery_master/add_delivery_master';
 
-        for (var item in _orderDetails) {
-          items.add({
-            "category": item['category'],
-            "price": item['price'],
-            "productName": item['productName'],
-            "qty": item['qty'],
-            "discount": item['discount'],
-            "tax": item['tax'],
-            "actualAmount":item['price'] * item['qty'],
-            "subCategory": item['subCategory'],
-            "totalAmount": item['totalAmount'],
-          });
-        }
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      };
 
-        Map<String, dynamic> requestBody = {
-            "comments": ShippingAddress.text,
-            "contactNumber": ContactNumberContoller.text,
-            "contactPerson": ContactperController.text,
-            "customerId":  CustomerIdController.text,
-            "deliveryAddress":  DelAddController.text,
-            "deliveryLocation":  EmailIdController.text,
-            "invoiceNo": InvNoController.text,
-            "items": items,
-            "createdDate": _dateController.text,
-            "orderId":  _controller.text,
-            "total":TotalController.text,
-        };
+      List<Map<String, dynamic>> items = [];
 
-        print(requestBody);
-
-        final response = await http.post(
-          Uri.parse(apiUrl),
-          headers: headers,
-          body: jsonEncode(requestBody),
-        );
-
-        if (response.statusCode == 200) {
-          print('Return Master added successfully');
-          final responseBody = jsonDecode(response.body);
-          print(responseBody);
-           final DeliveryId = responseBody['id'];
-
-          await showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (BuildContext context) {
-              return
-                AlertDialog(  shape: const RoundedRectangleBorder(    side: BorderSide(color: Colors.blue, width: 1),     borderRadius: BorderRadius.all(Radius.circular(4)),  ),  backgroundColor: Colors.white,  content: Padding(      padding: const EdgeInsets.only(left: 25),      child: Row(        children: [          const Text('Your Delivery ID is: ',style: TextStyle(color: Colors.black),),          SelectableText('$DeliveryId',style: const TextStyle(color: Colors.black),),        ],      )  ),  actions: <Widget>[    ElevatedButton(      child: const Text('OK',style: TextStyle(color: Colors.white),),      onPressed: () {                     context.go('/Delivery_List');      },      style: ElevatedButton.styleFrom(        backgroundColor: Colors.blue,        side: const BorderSide(color: Colors.blue),        shape: RoundedRectangleBorder(          borderRadius: BorderRadius.circular(10.0),        ),      ),    ),  ],);
-            },
-          );
-        } else {
-          print('Error: ${response.statusCode}');
-        }
-      } else {
-        setState(() {
-          _orderDetails = [{'productName': 'not found'}];
+      for (var item in _orderDetails) {
+        items.add({
+          "category": item['category'],
+          "price": item['price'],
+          "productName": item['productName'],
+          "qty": item['qty'],
+          "discount": item['discount'],
+          "tax": item['tax'],
+          "actualAmount":item['price'] * item['qty'],
+          "subCategory": item['subCategory'],
+          "totalAmount": item['totalAmount'],
         });
       }
-    }else {
+
+      Map<String, dynamic> requestBody = {
+        "comments": ShippingAddress.text,
+        "contactNumber": ContactNumberContoller.text,
+        "contactPerson": ContactperController.text,
+        "customerId":  CustomerIdController.text,
+        "deliveryAddress":  DelAddController.text,
+        "deliveryLocation":  EmailIdController.text,
+        "invoiceNo": InvNoController.text,
+        "items": items,
+        "createdDate": _dateController.text,
+        "orderId":  _controller.text,
+        "total":TotalController.text,
+      };
+
+      print(requestBody);
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: headers,
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        print('Return Master added successfully');
+        final responseBody = jsonDecode(response.body);
+        print(responseBody);
+        final DeliveryId = responseBody['id'];
+
+        await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(  shape: const RoundedRectangleBorder(    side: BorderSide(color: Colors.blue, width: 1),     borderRadius: BorderRadius.all(Radius.circular(4)),  ),  backgroundColor: Colors.white,  content: Padding(      padding: const EdgeInsets.only(left: 25),      child: Row(        children: [          const Text('Your Delivery ID is: ',style: TextStyle(color: Colors.black),),          SelectableText('$DeliveryId',style: const TextStyle(color: Colors.black),),        ],      )  ),  actions: <Widget>[    ElevatedButton(      child: const Text('OK',style: TextStyle(color: Colors.white),),      onPressed: () {                     context.go('/Delivery_List');      },      style: ElevatedButton.styleFrom(        backgroundColor: Colors.blue,        side: const BorderSide(color: Colors.blue),        shape: RoundedRectangleBorder(          borderRadius: BorderRadius.circular(10.0),        ),      ),    ),  ],);
+          },
+        );
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } else {
       setState(() {
-        _orderDetails = [{'productName': 'Error fetching order details'}];
+        _orderDetails = [{'productName': 'not found'}];
       });
     }
+  }
+  else {
+    setState(() {
+      _orderDetails = [{'productName': 'Error fetching order details'}];
+    });
+  }
+}
+
   }
 
   Future<void> _fetchOrderDetails() async {
@@ -400,97 +555,247 @@ class _DeliveryDetailState extends State<DeliveryDetail> with SingleTickerProvid
         'Content-Type': 'application/json',
       },
     );
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
 
-    if (returnMasterResponse.statusCode == 200) {
-      final returnData = jsonDecode(returnMasterResponse.body);
-      print('Return Data: $returnData');
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
 
-      // Step 2: Check if the entered orderId matches any invoice number
-      bool isMatched = returnData.any((invoice) => invoice['orderId'] == orderId);
+    }else{
+      if (returnMasterResponse.statusCode == 200) {
+        final returnData = jsonDecode(returnMasterResponse.body);
+        print('Return Data: $returnData');
+        // Step 2: Check if the entered orderId matches any invoice number
+        bool isMatched = returnData.any((invoice) => invoice['orderId'] == orderId);
 
-      if (isMatched) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('This product Move on to Delivery'),
-          ),
-        );
-        setState(() {
-          _orderDetails = [];
-        });
-        return; // Exit the function if a match is found
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error fetching return master data'),
-        ),
-      );
-      return; // Exit the function if there's an error fetching the return data
-    }
-    final url = orderId.isEmpty
-        ? '$apicall/order_master/get_all_ordermaster/'
-        : '$apicall/order_master/search_by_orderid/$orderId';
-
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      print('Response: $jsonData');
-      Status ='';
-
-      final orderData = jsonData.firstWhere(
-            (order) => order['orderId'] == orderId, orElse: () =>
+        if (isMatched) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Please Enter valid Order Id'),
+              content: Text('This product Move on to Delivery'),
             ),
-          ),
-      );
-      Status = orderData['status'];
-      print('details');
-      print(orderData);
-      if (orderData != null) {
-        setState(() {
-
-          CustomerIdController.text = orderData['customerId'];
-          EmailIdController.text = orderData['deliveryLocation'];
-          DelAddController.text = orderData['deliveryAddress'];
-          InvNoController.text = orderData['invoiceNo'];
-          print('eel');
-          print(DelAddController.text);
-          ShippingAddress.text = orderData['comments'];
-          ContactperController.text = orderData['contactPerson'];
-          ContactNumberContoller.text =  orderData['contactNumber'];
-          print(orderData['total']);
-          TotalController.text = orderData['total'].toString();
-          _orderDetails = orderData['items'].map((item) => {
-            'productName': item['productName'],
-            'qty': item['qty'],
-            'discount': item['discount'],
-            'tax': item['tax'],
-            'ActualTotalAmount':item['ActualTotalAmount'],
-            'totalAmount': item['totalAmount'],
-            'price': item['price'],
-            'category': item['category'],
-            'subCategory': item['subCategory']
-          }).toList();
-        });
+          );
+          setState(() {
+            _orderDetails = [];
+          });
+          return; // Exit the function if a match is found
+        }
       } else {
-        setState(() {
-          _orderDetails = [{'productName': 'not found'}];
-        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error fetching return master data'),
+          ),
+        );
+        return; // Exit the function if there's an error fetching the return data
       }
-    }else {
-      setState(() {
-        _orderDetails = [{'productName': 'Error fetching order details'}];
-      });
+      final url = orderId.isEmpty
+          ? '$apicall/order_master/get_all_ordermaster/'
+          : '$apicall/order_master/search_by_orderid/$orderId';
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
+
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
+      }else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          print('Response: $jsonData');
+          Status ='';
+
+          final orderData = jsonData.firstWhere(
+                (order) => order['orderId'] == orderId, orElse: () =>
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please Enter valid Order Id'),
+                ),
+              ),
+          );
+          Status = orderData['status'];
+          print('details');
+          print(orderData);
+          if (orderData != null) {
+            setState(() {
+
+              CustomerIdController.text = orderData['customerId'];
+              EmailIdController.text = orderData['deliveryLocation'];
+              DelAddController.text = orderData['deliveryAddress'];
+              InvNoController.text = orderData['invoiceNo'];
+              print('eel');
+              print(DelAddController.text);
+              ShippingAddress.text = orderData['comments'];
+              ContactperController.text = orderData['contactPerson'];
+              ContactNumberContoller.text =  orderData['contactNumber'];
+              print(orderData['total']);
+              TotalController.text = orderData['total'].toString();
+              _orderDetails = orderData['items'].map((item) => {
+                'productName': item['productName'],
+                'qty': item['qty'],
+                'discount': item['discount'],
+                'tax': item['tax'],
+                'ActualTotalAmount':item['ActualTotalAmount'],
+                'totalAmount': item['totalAmount'],
+                'price': item['price'],
+                'category': item['category'],
+                'subCategory': item['subCategory']
+              }).toList();
+            });
+          } else {
+            setState(() {
+              _orderDetails = [{'productName': 'not found'}];
+            });
+          }
+        }else {
+          setState(() {
+            _orderDetails = [{'productName': 'Error fetching order details'}];
+          });
+        }
+      }
+
+
     }
+
   }
 
 

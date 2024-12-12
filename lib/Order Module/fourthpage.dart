@@ -94,6 +94,7 @@ class _NextPageState extends State<NextPage> {
   Map<String, dynamic> data2 = {};
   bool _loading = false;
   bool isLoading = false;
+  bool _hasShownPopup = false;
   String? dropdownValue2 = 'Filter II';
   String token = window.sessionStorage["token"] ?? " ";
   String _searchText = '';
@@ -218,31 +219,108 @@ class _NextPageState extends State<NextPage> {
           "Authorization": 'Bearer $token',
         },
       );
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        List<Product> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => Product.fromJson(item)).toList();
-          } else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List).map((item) => Product.fromJson(item)).toList();
-            //  totalItems = jsonData['totalItems'] ?? 0;
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
 
-            print('pages');
-            print(totalPages);// Changed itemsPerPage to 10
-          }
-
-          setState(() {
-            productList = products;
-            totalPages = (products.length / itemsPerPage).ceil();
-            print(totalPages);
-            _filterAndPaginateProducts();
-          });
-        }
-      } else {
-        throw Exception('Failed to load data');
       }
+        else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          List<Product> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => Product.fromJson(item)).toList();
+            } else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List).map((item) => Product.fromJson(item)).toList();
+              //  totalItems = jsonData['totalItems'] ?? 0;
+
+              print('pages');
+              print(totalPages);// Changed itemsPerPage to 10
+            }
+
+            setState(() {
+              productList = products;
+              totalPages = (products.length / itemsPerPage).ceil();
+              print(totalPages);
+              _filterAndPaginateProducts();
+            });
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
+
     } catch (e) {
       print('Error decoding JSON: $e');
       // Optionally, show an error message to the user
@@ -298,43 +376,7 @@ class _NextPageState extends State<NextPage> {
     });
 
   }
-  // Future<void> fetchProducts(int page, int pageSize) async {
-  //   final response = await http.get(
-  //     Uri.parse(
-  //       '$apicall/productmaster/get_all_productmaster?page=$page&pageSize=$pageSize',
-  //     ),
-  //     headers: {
-  //       "Content-type": "application/json",
-  //       "Authorization": 'Bearer $token'
-  //     },
-  //   );
-  //
-  //   if (response.statusCode == 200) {
-  //     try {
-  //       final jsonData = jsonDecode(response.body);
-  //       if (jsonData is List) {
-  //         final products = jsonData.map((item) => Product.fromJson(item)).toList();
-  //         setState(() {
-  //           _allProducts = products;
-  //           _totalPages = (jsonData.length / pageSize).ceil();
-  //           _updateProductList(); // Update the initial product list
-  //         });
-  //       } else {
-  //         if (mounted) {
-  //           setState(() {
-  //             _allProducts = [];
-  //             productList = [];
-  //             _totalPages = 1;
-  //           });
-  //         }
-  //       }
-  //     } catch (e) {
-  //       print('Error decoding JSON: $e');
-  //     }
-  //   } else {
-  //     throw Exception('Failed to load data');
-  //   }
-  // }
+
 
 
   void _updateProductList() {
@@ -359,30 +401,14 @@ class _NextPageState extends State<NextPage> {
     setState(() {
       _searchText = searchText;
       _currentPage = 1;  // Reset to first page when searching
-      // _updateProductList();
+
       _filterAndPaginateProducts();
-     // _clearSearch();
+
     });
   }
 
 
-  void _nextPage() {
-    if (_currentPage < _totalPages) {
-      setState(() {
-        _currentPage++;
-        _updateProductList();
-      });
-    }
-  }
 
-  void _prevPage() {
-    if (_currentPage > 1) {
-      setState(() {
-        _currentPage--;
-        _updateProductList();
-      });
-    }
-  }
 
 
 
@@ -520,26 +546,7 @@ class _NextPageState extends State<NextPage> {
     setState(() {});
   }
 
-  //original code
-  // void _handleAddButtonPress(Product products) {
-  //   Product newProduct = Product(
-  //     productName: products.productName,
-  //     category: products.category,
-  //     subCategory: products.subCategory,
-  //     selectedUOM: products.selectedUOM,
-  //     selectedVariation: products.selectedVariation,
-  //     discount: products.discount,
-  //     proId: products.proId,
-  //     price: products.price,
-  //     tax: products.tax,
-  //     unit: products.unit,
-  //     quantity: products.quantity,
-  //     total: products.total,
-  //     totalamount: products.totalamount, prodId: '', imageId: '', totalAmount: products.totalAmount,
-  //     qty: products.qty,
-  //   );
-  //   _addProduct(newProduct);
-  // }
+
 
   void _deleteProduct(int index) {
     setState(() {

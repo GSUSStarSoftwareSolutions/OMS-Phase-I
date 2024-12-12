@@ -86,9 +86,12 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
               return AlertDialog(
                 icon: Icon(
                     Icons.warning_rounded, color: Colors.orange, size: 25),
-                content: const Padding(    padding: EdgeInsets.only(left: 75),
-                    child: Text(
-                        'email not found')
+                content: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                        'Email address not found'),
+                  ],
                 ),
                 actions: [
                   TextButton(

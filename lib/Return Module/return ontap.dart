@@ -61,7 +61,7 @@ class _ReturnViewState extends State<ReturnView> {
 
   String token = window.sessionStorage["token"] ?? " ";
   double _totalAmount = 0;
-
+  bool _hasShownPopup = false;
 
   Map<String, bool> _isHovered = {
     'Home': false,
@@ -156,33 +156,108 @@ class _ReturnViewState extends State<ReturnView> {
         'Content-Type': 'application/json',
       },
     );
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
 
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      print('Response: $jsonData');
-      final orderData = jsonData.firstWhere(
-              (order) => order['orderId'] == orderId, orElse: () => null);
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
 
-      if (orderData != null) {
-        setState(() {
-          _orderDetails = orderData['items'].map((item) => {
-            'productName': item['productName'],
-            'qty': item['qty'],
-            'totalAmount': item['totalAmount'],
-            'price': item['price'],
-            'category': item['category'],
-            'subCategory': item['subCategory']
-          }).toList();
-        });
+    }else {
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        print('Response: $jsonData');
+        final orderData = jsonData.firstWhere(
+                (order) => order['orderId'] == orderId, orElse: () => null);
+
+        if (orderData != null) {
+          setState(() {
+            _orderDetails = orderData['items'].map((item) =>
+            {
+              'productName': item['productName'],
+              'qty': item['qty'],
+              'totalAmount': item['totalAmount'],
+              'price': item['price'],
+              'category': item['category'],
+              'subCategory': item['subCategory']
+            }).toList();
+          });
+        } else {
+          setState(() {
+            _orderDetails = [{'productName': 'not found'}];
+          });
+        }
       } else {
         setState(() {
-          _orderDetails = [{'productName': 'not found'}];
+          _orderDetails = [{'productName': 'Error fetching order details'}];
         });
       }
-    } else {
-      setState(() {
-        _orderDetails = [{'productName': 'Error fetching order details'}];
-      });
     }
   }
 
@@ -236,20 +311,95 @@ class _ReturnViewState extends State<ReturnView> {
     final response = await http.get(
       Uri.parse(url),
     );
-    if (response.statusCode == 200) {
-      try {
-        setState(() {
-          print('------type-----');
-          _imageBytes = response.bodyBytes;
-          print('--_imageBytes--');
-          print(_imageBytes);
-        });
-      } catch (e) {
-        print('-------------');
-        print('Error:$e');
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
+
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
+
+    }else {
+      if (response.statusCode == 200) {
+        try {
+          setState(() {
+            print('------type-----');
+            _imageBytes = response.bodyBytes;
+            print('--_imageBytes--');
+            print(_imageBytes);
+          });
+        } catch (e) {
+          print('-------------');
+          print('Error:$e');
+        }
+      } else {
+        print('Failed to load image');
       }
-    } else {
-      print('Failed to load image');
     }
   }
 

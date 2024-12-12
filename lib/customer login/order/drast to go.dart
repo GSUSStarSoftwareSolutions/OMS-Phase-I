@@ -27,6 +27,7 @@ class CusDraftScreen extends StatefulWidget {
   final String? InvNo;
   final List<dynamic>? orderDetails;
   final Map<String, dynamic>? paymentStatus;
+
   final List<Map<String, dynamic>>? item;
   final Map<String, dynamic>? body;
   final List<Map<String, dynamic>>? itemsList;
@@ -39,6 +40,7 @@ class CusDraftScreen extends StatefulWidget {
 class _CusDraftScreenState extends State<CusDraftScreen> with SingleTickerProviderStateMixin{
   final _formKey = GlobalKey<FormState>();
   DateTime? _selectedDate;
+  bool _hasShownPopup = false;
   final ScrollController horizontalScroll = ScrollController();
   Map<String, dynamic> _selectedProductMap = {};
   String token = window.sessionStorage["token"] ?? " ";
@@ -388,30 +390,106 @@ class _CusDraftScreenState extends State<CusDraftScreen> with SingleTickerProvid
           'Content-Type': 'application/json',
         },
       );
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        print('-res--');
-        print(responseBody);
-        if (responseBody != null) {
-          final jsonData = jsonDecode(responseBody).cast<
-              Map<dynamic, dynamic>>();
-          setState(() {
-            _orders =
-                jsonData; // update _orders with all orders or search results
-            _errorMessage = ''; // clear the error message
-          });
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
+      }
+
+     else{
+        if (response.statusCode == 200) {
+          final responseBody = response.body;
+          print('-res--');
+          print(responseBody);
+          if (responseBody != null) {
+            final jsonData = jsonDecode(responseBody).cast<
+                Map<dynamic, dynamic>>();
+            setState(() {
+              _orders =
+                  jsonData; // update _orders with all orders or search results
+              _errorMessage = ''; // clear the error message
+            });
+          } else {
+            setState(() {
+              _orders = []; // clear the orders list
+              _errorMessage = 'Failed to load orders';
+            });
+          }
         } else {
           setState(() {
             _orders = []; // clear the orders list
             _errorMessage = 'Failed to load orders';
           });
         }
-      } else {
-        setState(() {
-          _orders = []; // clear the orders list
-          _errorMessage = 'Failed to load orders';
-        });
       }
     } catch (e) {
       setState(() {
@@ -436,26 +514,102 @@ class _CusDraftScreenState extends State<CusDraftScreen> with SingleTickerProvid
           'Content-Type': 'application/json',
         },
       );
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        print('search');
-        print(responseBody);
-        // print(responseBody['status' as int]);
-        final jsonData = jsonDecode(responseBody);
-        if (jsonData is List<dynamic>) {
-          final jsonObject = jsonData.first;
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
+
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
+      }
+      else{
+        if (response.statusCode == 200) {
+          final responseBody = response.body;
+          print('search');
+          print(responseBody);
+          // print(responseBody['status' as int]);
+          final jsonData = jsonDecode(responseBody);
+          if (jsonData is List<dynamic>) {
+            final jsonObject = jsonData.first;
 
 
-          print(jsonObject);
-          final orderDetails = OrderDetail.fromJson(jsonObject);
-          print('orderDetails');
-          //  print(orderDetails);
-          _showProductDetails(orderDetails);
+            print(jsonObject);
+            final orderDetails = OrderDetail.fromJson(jsonObject);
+            print('orderDetails');
+            //  print(orderDetails);
+            _showProductDetails(orderDetails);
+          } else {
+            print('Failed to load order details');
+          }
         } else {
           print('Failed to load order details');
         }
-      } else {
-        print('Failed to load order details');
       }
     } catch (e) {
       // print('Error: $e');
@@ -484,35 +638,112 @@ class _CusDraftScreenState extends State<CusDraftScreen> with SingleTickerProvid
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
+
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
+      }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
 // print('json data');
 // print(jsonData);
-        List<detail> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => detail.fromJson(item)).toList();
+          List<detail> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => detail.fromJson(item)).toList();
+            }
+            else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List)
+                  .map((item) => detail.fromJson(item))
+                  .toList();
+
+            }
+            List<detail> matchedCustomers = products.where((customer) {  return customer.CusId == userId;}).toList();
+
+            if (matchedCustomers.isNotEmpty) {
+              setState(() {
+
+                print('pages');
+                itemCount = products.length;
+
+              });
+            }
           }
-          else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List)
-                .map((item) => detail.fromJson(item))
-                .toList();
-
-          }
-          List<detail> matchedCustomers = products.where((customer) {  return customer.CusId == userId;}).toList();
-
-          if (matchedCustomers.isNotEmpty) {
-            setState(() {
-
-              print('pages');
-              itemCount = products.length;
-
-            });
-          }
+        } else {
+          throw Exception('Failed to load data');
         }
-      } else {
-        throw Exception('Failed to load data');
       }
+
     } catch (e) {
       print('Error decoding JSON: $e');
 // Optionally, show an error message to the user
@@ -533,19 +764,96 @@ class _CusDraftScreenState extends State<CusDraftScreen> with SingleTickerProvid
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        filteredData = (jsonData as List).map((item) => detail.fromJson(item)).toList();
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-        print('api response');
-        print(filteredData);
-        if (mounted) {
-          setState(() {
-          });
-        }
-      } else {
-        throw Exception('Failed to load data');
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          filteredData = (jsonData as List).map((item) => detail.fromJson(item)).toList();
+
+          print('api response');
+          print(filteredData);
+          if (mounted) {
+            setState(() {
+            });
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       print('Error decoding JSON: $e');
     }

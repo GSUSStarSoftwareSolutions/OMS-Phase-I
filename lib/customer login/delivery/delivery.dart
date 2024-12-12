@@ -39,6 +39,7 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
   Timer? _searchDebounceTimer;
   String _searchText = '';
   bool isOrdersSelected = false;
+  bool _hasShownPopup = false;
   bool _loading = false;
   detail? _selectedProduct;
   DateTime? _selectedDate;
@@ -169,52 +170,129 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        print('json data');
-        print(jsonData);
-        List<detail> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => detail.fromJson(item)).toList();
-          }
-          else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List)
-                .map((item) => detail.fromJson(item))
-                .toList();
-            totalItems =
-                jsonData['totalItems'] ?? 0; // Get the total number of items
-          }
-          print('user');
-          print(userId);
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-          // Check the data structure
-          print('Product Customer IDs:');
-          products.forEach((product) => print(product.CusId));
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
 
-
-          // Apply filtering for CusId
-          List<detail> matchedCustomers = products.where((customer) {
-            return customer.CusId!.trim().toLowerCase() == userId.trim().toLowerCase();
-          }).toList();
-
-          if (matchedCustomers.isNotEmpty) {
-            setState(() {
-              totalPages = (matchedCustomers.length / itemsPerPage).ceil();
-              print('pages');
-              print(totalPages);
-              productList = matchedCustomers;
-              print(productList);
-              _filterAndPaginateProducts();
-            });
-          }
-          else {
-            print('No matching customers found for userId: $userId');
-          }
-        }
-      } else {
-        throw Exception('Failed to load data');
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          print('json data');
+          print(jsonData);
+          List<detail> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => detail.fromJson(item)).toList();
+            }
+            else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List)
+                  .map((item) => detail.fromJson(item))
+                  .toList();
+              totalItems =
+                  jsonData['totalItems'] ?? 0; // Get the total number of items
+            }
+            print('user');
+            print(userId);
+
+            // Check the data structure
+            print('Product Customer IDs:');
+            products.forEach((product) => print(product.CusId));
+
+
+            // Apply filtering for CusId
+            List<detail> matchedCustomers = products.where((customer) {
+              return customer.CusId!.trim().toLowerCase() == userId.trim().toLowerCase();
+            }).toList();
+
+            if (matchedCustomers.isNotEmpty) {
+              setState(() {
+                totalPages = (matchedCustomers.length / itemsPerPage).ceil();
+                print('pages');
+                print(totalPages);
+                productList = matchedCustomers;
+                print(productList);
+                _filterAndPaginateProducts();
+              });
+            }
+            else {
+              print('No matching customers found for userId: $userId');
+            }
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       print('Error decoding JSON: $e');
 // Optionally, show an error message to the user
@@ -272,35 +350,110 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-// print('json data');
-// print(jsonData);
-        List<detail> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => detail.fromJson(item)).toList();
-          }
-          else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List)
-                .map((item) => detail.fromJson(item))
-                .toList();
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-          }
-          List<detail> matchedCustomers = products.where((customer) {  return customer.CusId == userId;}).toList();
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
 
-          if (matchedCustomers.isNotEmpty) {
-            setState(() {
-
-              print('pages');
-              itemCount = products.length;
-
-            });
-          }
-        }
-      } else {
-        throw Exception('Failed to load data');
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          List<detail> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => detail.fromJson(item)).toList();
+            }
+            else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List)
+                  .map((item) => detail.fromJson(item))
+                  .toList();
+
+            }
+            List<detail> matchedCustomers = products.where((customer) {  return customer.CusId == userId;}).toList();
+
+            if (matchedCustomers.isNotEmpty) {
+              setState(() {
+
+                print('pages');
+                itemCount = products.length;
+
+              });
+            }
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       print('Error decoding JSON: $e');
 // Optionally, show an error message to the user
@@ -764,7 +917,8 @@ class _CusDeliveryListState extends State<CusDeliveryList> {
                                 },
                                 items: <String>[
                                   'Status',
-                                  'In Progress',
+                                  'Created',
+                                  'Picked',
                                   'Delivered',
                                 ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(

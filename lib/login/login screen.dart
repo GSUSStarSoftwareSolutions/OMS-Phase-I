@@ -27,7 +27,6 @@ class _LoginContainer2State extends State<LoginContainer2> {
       _obscureText = !_obscureText;
     });
   }
-
   Future<String?> checkLogin(String username, String password) async {
     Map tempJson = {"userName": username, "password": password};
     String url =
@@ -53,7 +52,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("User name not found")));
       }
-
+      else if (tempData['code'] == '403' &&    tempData['status'] == 'failed') {  ScaffoldMessenger.of(context).showSnackBar(      const SnackBar(content: Text("Your account is inactive. Please contact the administrator for assistance")));}
       } else {
         window.sessionStorage["userId"] = tempData['userId'];
         // Check the role and handle accordingly
@@ -91,7 +90,6 @@ class _LoginContainer2State extends State<LoginContainer2> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(

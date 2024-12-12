@@ -108,6 +108,7 @@ class _CusSelectedProductsState extends State<CusSelectedProducts> {
   // int startIndex = 0;
   String? _selectedValue;
   int currentPage = 1;
+  bool _hasShownPopup = false;
   Timer? _searchDebounceTimer;
   List<Product> filteredProducts = [];
   List<Product> selectedProducts = [];
@@ -205,34 +206,109 @@ class _CusSelectedProductsState extends State<CusSelectedProducts> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+      if(token == " ") {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            "Please log in again to continue", style: TextStyle(
+                            fontSize: 12,
+
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+      }
+      else {
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
 // print('json data');
 // print(jsonData);
-        List<detail> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => detail.fromJson(item)).toList();
+          List<detail> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => detail.fromJson(item)).toList();
+            }
+            else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List)
+                  .map((item) => detail.fromJson(item))
+                  .toList();
+            }
+            List<detail> matchedCustomers = products.where((customer) {
+              return customer.CusId == userId;
+            }).toList();
+
+            if (matchedCustomers.isNotEmpty) {
+              setState(() {
+                print('pages');
+                itemCount = products.length;
+              });
+            }
           }
-          else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List)
-                .map((item) => detail.fromJson(item))
-                .toList();
-
-          }
-          List<detail> matchedCustomers = products.where((customer) {  return customer.CusId == userId;}).toList();
-
-          if (matchedCustomers.isNotEmpty) {
-            setState(() {
-
-              print('pages');
-              itemCount = products.length;
-
-            });
-          }
+        } else {
+          throw Exception('Failed to load data');
         }
-      } else {
-        throw Exception('Failed to load data');
       }
     } catch (e) {
       print('Error decoding JSON: $e');
@@ -262,30 +338,107 @@ class _CusSelectedProductsState extends State<CusSelectedProducts> {
           "Authorization": 'Bearer $token',
         },
       );
+      if (token == " ") {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            "Please log in again to continue", style: TextStyle(
+                            fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        List<Product> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => Product.fromJson(item)).toList();
-          } else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List).map((item) => Product.fromJson(item)).toList();
-            //  totalItems = jsonData['totalItems'] ?? 0;
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+      }
+      else {
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          List<Product> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products =
+                  jsonData.map((item) => Product.fromJson(item)).toList();
+            } else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List).map((item) =>
+                  Product.fromJson(item)).toList();
+              //  totalItems = jsonData['totalItems'] ?? 0;
 
-            print('pages');
-            print(totalPages);// Changed itemsPerPage to 10
+              print('pages');
+              print(totalPages); // Changed itemsPerPage to 10
+            }
+
+            setState(() {
+              productList = products;
+              totalPages = (products.length / itemsPerPage).ceil();
+              print(totalPages);
+              _filterAndPaginateProducts();
+            });
           }
-
-          setState(() {
-            productList = products;
-            totalPages = (products.length / itemsPerPage).ceil();
-            print(totalPages);
-            _filterAndPaginateProducts();
-          });
+        } else {
+          throw Exception('Failed to load data');
         }
-      } else {
-        throw Exception('Failed to load data');
       }
     } catch (e) {
       print('Error decoding JSON: $e');
@@ -344,21 +497,6 @@ class _CusSelectedProductsState extends State<CusSelectedProducts> {
   }
 
 
-  void _updateProductList() {
-    final filteredProducts = _allProducts
-        .where((product) => product.productName
-        .toLowerCase()
-        .contains(_searchText.toLowerCase()))
-        .toList();
-
-    final startIndex = (_currentPage - 1) * _pageSize;
-    final endIndex = startIndex + _pageSize;
-
-    setState(() {
-      productList = filteredProducts
-          .sublist(startIndex, endIndex > filteredProducts.length ? filteredProducts.length : endIndex);
-    });
-  }
 
 
 
@@ -383,16 +521,7 @@ class _CusSelectedProductsState extends State<CusSelectedProducts> {
     super.dispose();
   }
 
-  void _onSearchTextChanged(String text) {
-    if (_searchDebounceTimer != null) {
-      _searchDebounceTimer!.cancel(); // Cancel the previous timer
-    }
-    _searchDebounceTimer = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _searchText = text;
-      });
-    });
-  }
+
   @override
 
   void initState() {

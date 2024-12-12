@@ -76,6 +76,7 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
   String token = window.sessionStorage["token"] ?? " ";
   double _totalAmount = 0;
   bool _isLoading= false;
+  bool _hasShownPopup = false;
   final TextEditingController EmailIdController = TextEditingController();
   final TextEditingController DelAddController = TextEditingController();
   final TextEditingController ShippingAddress = TextEditingController();
@@ -324,40 +325,117 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
         'Content-Type': 'application/json',
       },
     );
-    if (returnMasterResponse.statusCode == 200) {
-      final returnData = jsonDecode(returnMasterResponse.body);
-      print('Return Data: $returnData');
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
 
-      // Step 2: Check if the entered orderId matches any invoice number
-      bool isMatched = returnData.any((invoice) => invoice['deliveryId'] == orderId && invoice['status'] == "Delivered");
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
 
-      if (isMatched) {
+    }else {
+      if (returnMasterResponse.statusCode == 200) {
+        final returnData = jsonDecode(returnMasterResponse.body);
+        print('Return Data: $returnData');
+
+        // Step 2: Check if the entered orderId matches any invoice number
+        bool isMatched = returnData.any((invoice) =>
+        invoice['deliveryId'] == orderId && invoice['status'] == "Delivered");
+
+        if (isMatched) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('This Product Already Used Return Policy'),
+            ),
+          );
+
+
+          setState(() {
+            // _selectedReason = 'Reason for return';
+            // _reasonController.text = 'Reason for return';
+            ContactpersonController.text = '';
+            EmailAddressController.text = '';
+            _controller.text = '';
+            _orderDetails = [];
+            totalController.text = '';
+          });
+          return; // Exit the function if a match is found
+        }
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('This Product Already Used Return Policy'),
+            content: Text('Error fetching return master data'),
           ),
         );
-
-
-        setState(() {
-          // _selectedReason = 'Reason for return';
-          // _reasonController.text = 'Reason for return';
-          ContactpersonController.text ='';
-          EmailAddressController.text ='';
-          _controller.text = '';
-          _orderDetails = [];
-          totalController.text = '';
-        });
-        return; // Exit the function if a match is found
+        return; // Exit the function if there's an error fetching the return data
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error fetching return master data'),
-        ),
-      );
-      return; // Exit the function if there's an error fetching the return data
     }
+
     print('enter');
 
     final apiUrl = '$apicall/delivery_master/update_delivered';
@@ -406,92 +484,170 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
       headers: headers,
       body: jsonEncode(requestBody),
     );
-
-    if (response.statusCode == 200) {
-      final url = '$apicall/invoice_master/add_invoice_master';
-      final headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${token}',
-      };
-      final body = {
-        "deliveryId": widget.deliveryId,
-        "comments": ShippingAddress.text,
-        "contactNumber": ContactNumberContoller.text,
-        "contactPerson": ContactperController.text,
-        "deliveryAddress": DelAddController.text,
-        "deliveryLocation": EmailIdController.text,
-        "items": items1,
-        "customerId" :CustomerIdcontroller.text,
-        "invoiceNo": InvNoController.text,
-        "deliveredDate": _dateController.text,
-        "orderId": _controller.text,
-        "status": "Delivered",
-        "total": TotalController.text,
-      };
-
-      final response = await http.post(Uri.parse(url), headers: headers, body: json.encode(body));
-
-      if (response.statusCode == 200) {
-
-        print('Return Master added successfully');
-        final responseBody = jsonDecode(response.body);
-        print(responseBody);
-        await showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
               ),
-              icon: const Icon(
-                Icons.check_circle_rounded,
-                color: Colors.green,
-                size: 25,
-              ),
-              title: const Padding(
-                padding: EdgeInsets.only(left: 12),
-                child: Text('Delivery Confirmed Successfully', style: TextStyle(fontSize: 15),),
-              ),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: const Text('OK',style: TextStyle(color: Colors.white),),
-                  onPressed: () {
-                    // context.go('/Return_List');
-                    Navigator.of(context
-                    ).pop(); // close the alert dialog
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                        const DeliveryList(),
-                        transitionDuration: const Duration(milliseconds: 200),
-                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    side: const BorderSide(color: Colors.blue),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
+
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
-          },
-        );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
+
+    }else {
+      if (response.statusCode == 200) {
+        final url = '$apicall/invoice_master/add_invoice_master';
+        final headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${token}',
+        };
+        final body = {
+          "deliveryId": widget.deliveryId,
+          "comments": ShippingAddress.text,
+          "contactNumber": ContactNumberContoller.text,
+          "contactPerson": ContactperController.text,
+          "deliveryAddress": DelAddController.text,
+          "deliveryLocation": EmailIdController.text,
+          "items": items1,
+          "customerId": CustomerIdcontroller.text,
+          "invoiceNo": InvNoController.text,
+          "deliveredDate": _dateController.text,
+          "orderId": _controller.text,
+          "status": "Delivered",
+          "total": TotalController.text,
+        };
+
+        final response = await http.post(
+            Uri.parse(url), headers: headers, body: json.encode(body));
+
+        if (response.statusCode == 200) {
+          print('Return Master added successfully');
+          final responseBody = jsonDecode(response.body);
+          print(responseBody);
+          await showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                ),
+                icon: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.green,
+                  size: 25,
+                ),
+                title: const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Text('Delivery Confirmed Successfully',
+                    style: TextStyle(fontSize: 15),),
+                ),
+                actions: <Widget>[
+                  ElevatedButton(
+                    child: const Text(
+                      'OK', style: TextStyle(color: Colors.white),),
+                    onPressed: () {
+                      // context.go('/Return_List');
+                      Navigator.of(context
+                      ).pop(); // close the alert dialog
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation,
+                              secondaryAnimation) =>
+                          const DeliveryList(),
+                          transitionDuration: const Duration(milliseconds: 200),
+                          transitionsBuilder: (context, animation,
+                              secondaryAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      side: const BorderSide(color: Colors.blue),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          print('API call failed with status code ${response.statusCode}');
+        }
       } else {
-        print('API call failed with status code ${response.statusCode}');
+        print('Error: ${response.statusCode}');
       }
-    } else {
-      print('Error: ${response.statusCode}');
     }
   }
 
@@ -510,36 +666,111 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
         'Content-Type': 'application/json',
       },
     );
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
 
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      print('Response: $jsonData');
-      final orderData = jsonData.firstWhere(
-              (order) => order['orderId'] == orderId, orElse: () => null);
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
 
-      if (orderData != null) {
-        setState(() {
-          _orderDetails = orderData['items'].map((item) => {
-            'productName': item['productName'],
-            'qty': item['qty'],
-            'totalAmount': item['totalAmount'],
-            'price': item['price'],
-            'tax': item['tax'],
-            'discount': item['discount'],
-            'category': item['category'],
-            'actualAmount': item['price'] * item['qty'],
-            'subCategory': item['subCategory']
-          }).toList();
-        });
+    }else {
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        print('Response: $jsonData');
+        final orderData = jsonData.firstWhere(
+                (order) => order['orderId'] == orderId, orElse: () => null);
+
+        if (orderData != null) {
+          setState(() {
+            _orderDetails = orderData['items'].map((item) =>
+            {
+              'productName': item['productName'],
+              'qty': item['qty'],
+              'totalAmount': item['totalAmount'],
+              'price': item['price'],
+              'tax': item['tax'],
+              'discount': item['discount'],
+              'category': item['category'],
+              'actualAmount': item['price'] * item['qty'],
+              'subCategory': item['subCategory']
+            }).toList();
+          });
+        } else {
+          setState(() {
+            _orderDetails = [{'productName': 'not found'}];
+          });
+        }
       } else {
         setState(() {
-          _orderDetails = [{'productName': 'not found'}];
+          _orderDetails = [{'productName': 'Error fetching order details'}];
         });
       }
-    } else {
-      setState(() {
-        _orderDetails = [{'productName': 'Error fetching order details'}];
-      });
     }
   }
 
@@ -615,53 +846,126 @@ class _DeliveryDetailState extends State<DeliveryConfirm> {
           '$apicall/delivery_master/get_all_deliverymaster'),
       headers: headers,
     );
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
 
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      dynamic deliveryData;
-      // Find the delivery data that matches the orderId
-      for (var data in jsonData) {
-        if (data['deliveryId'] == orderId) {
-          deliveryData = data;
-          break;
-        }
-      }
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
 
-      if (deliveryData != null) {
-
-        setState(() {
-          print('hi2342');
-          ShippingAddress.text = deliveryData['comments'] ?? '';
-          ContactNumberContoller.text = deliveryData['contactNumber'] ?? '' ;
-          ContactperController.text = deliveryData['contactPerson'] ?? '';
-          DelAddController.text = deliveryData['deliveryAddress'] ?? '';
-          EmailIdController.text = deliveryData['deliveryLocation'] ?? '';
-          // _dateController.text = deliveryData['createdDate'] ?? '';
-          _controller.text = deliveryData['orderId'] ?? '';
-          CustomerIdcontroller.text = deliveryData['customerId'] ?? '';
-
-          TotalController.text = deliveryData['total'].toString();
-          print(deliveryData['items']);
-          items.clear();
-          for (var item in deliveryData['items']) {
-            items.add({
-              "category": item['category'],
-              "price": item['price'],
-              "productName": item['productName'],
-              "qty": item['qty'],
-              "tax": item['tax'],
-              "discount": item['discount'],
-              "actualAmount": item['actualAmount'],
-              "subCategory": item['subCategory'],
-              "totalAmount": item['totalAmount'],
-            });
+    }else {
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        dynamic deliveryData;
+        // Find the delivery data that matches the orderId
+        for (var data in jsonData) {
+          if (data['deliveryId'] == orderId) {
+            deliveryData = data;
+            break;
           }
-        });
+        }
+
+        if (deliveryData != null) {
+          setState(() {
+            print('hi2342');
+            ShippingAddress.text = deliveryData['comments'] ?? '';
+            ContactNumberContoller.text = deliveryData['contactNumber'] ?? '';
+            ContactperController.text = deliveryData['contactPerson'] ?? '';
+            DelAddController.text = deliveryData['deliveryAddress'] ?? '';
+            EmailIdController.text = deliveryData['deliveryLocation'] ?? '';
+            // _dateController.text = deliveryData['createdDate'] ?? '';
+            _controller.text = deliveryData['orderId'] ?? '';
+            CustomerIdcontroller.text = deliveryData['customerId'] ?? '';
+
+            TotalController.text = deliveryData['total'].toString();
+            print(deliveryData['items']);
+            items.clear();
+            for (var item in deliveryData['items']) {
+              items.add({
+                "category": item['category'],
+                "price": item['price'],
+                "productName": item['productName'],
+                "qty": item['qty'],
+                "tax": item['tax'],
+                "discount": item['discount'],
+                "actualAmount": item['actualAmount'],
+                "subCategory": item['subCategory'],
+                "totalAmount": item['totalAmount'],
+              });
+            }
+          });
+        } else {
+          throw Exception('Delivery data not found for orderId $orderId');
+        }
       } else {
-        throw Exception('Delivery data not found for orderId $orderId');
+        throw Exception('Failed to load delivery details');
       }
-    } else {
-      throw Exception('Failed to load delivery details');
     }
   }
 

@@ -32,6 +32,7 @@ class _CusDraftPageState extends State<CusDraftPage> {
     'Total Amount',
     '',
   ];
+  bool _hasShownPopup = false;
   final ScrollController horizontalScroll = ScrollController();
   int itemCount = 0;
   String userId = window.sessionStorage['userId'] ?? '';
@@ -147,16 +148,89 @@ class _CusDraftPageState extends State<CusDraftPage> {
         Uri.parse(apiUri),
         headers: headers,
       );
-      if (response.statusCode == 200) {
-        // Navigator.pop(context);
-        // context.go('Customer_Draft_List');
-       Navigator.push(
-         context,
-         MaterialPageRoute(builder: (context) => const CusDraftPage()),  // Navigate to SuccessPage
-       );
-      } else {
-        print('Failed to delete customer: ${response.statusCode}');
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
+
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+      else{
+        if (response.statusCode == 200) {
+         Navigator.pop(context);
+         fetchProducts(currentPage, itemsPerPage);
+        } else {
+          print('Failed to delete customer: ${response.statusCode}');
+        }
+      }
+
     } catch (e) {
       print('Error: $e');
     }
@@ -177,40 +251,118 @@ class _CusDraftPageState extends State<CusDraftPage> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
+      if(token == " ")
+      {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-        final jsonData = jsonDecode(response.body);
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
 
-        List<detail> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => detail.fromJson(item)).toList();
-          }
-          else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List)
-                .map((item) => detail.fromJson(item))
-                .toList();
-            totalItems =
-                jsonData['totalItems'] ?? 0;
-
-          }
-          List<detail> matchedCustomers = products.where((customer) {  return customer.CusId == userId;}).toList();
-
-          if (matchedCustomers.isNotEmpty) {
-            setState(() {
-              totalPages = (products.length / itemsPerPage).ceil();
-
-              itemCount = products.length;
-
-              productList = products;
-
-              _filterAndPaginateProducts();
-            });
-          }
-        }
-      } else {
-        throw Exception('Failed to load data');
       }
+      else{
+        if (response.statusCode == 200) {
+
+          final jsonData = jsonDecode(response.body);
+
+          List<detail> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => detail.fromJson(item)).toList();
+            }
+            else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List)
+                  .map((item) => detail.fromJson(item))
+                  .toList();
+              totalItems =
+                  jsonData['totalItems'] ?? 0;
+
+            }
+            List<detail> matchedCustomers = products.where((customer) {  return customer.CusId == userId;}).toList();
+
+            if (matchedCustomers.isNotEmpty) {
+              setState(() {
+                totalPages = (products.length / itemsPerPage).ceil();
+
+                itemCount = products.length;
+
+                productList = products;
+
+                _filterAndPaginateProducts();
+              });
+            }
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       print('Error decoding JSON: $e');
 // Optionally, show an error message to the user
@@ -950,14 +1102,8 @@ class _CusDraftPageState extends State<CusDraftPage> {
                                                     children: [
                                                       ElevatedButton(
                                                         onPressed: () {
-
                                                           deleteRowAPI(
                                                               detail.orderId!);
-                                                          Navigator.pop(context);
-                                                          fetchProducts(currentPage, itemsPerPage);
-                                                          context.go('/Customer_Draft_List');
-
-
                                                         },
                                                         style: ElevatedButton
                                                             .styleFrom(
@@ -1371,9 +1517,6 @@ class _CusDraftPageState extends State<CusDraftPage> {
 
                                                           deleteRowAPI(
                                                               detail.orderId!);
-                                                          Navigator.pop(context);
-                                                          fetchProducts(currentPage, itemsPerPage);
-                                                          context.go('/Customer_Draft_List');
 
 
                                                         },

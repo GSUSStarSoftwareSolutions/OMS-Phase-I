@@ -139,44 +139,120 @@ class _UserProfileState extends State<UserProfile>  with SingleTickerProviderSta
           'Authorization': 'Bearer $token',
         },
       );
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final List<dynamic> users = json.decode(response.body);
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
 
-        final matchedUser = users.firstWhere(
-              (user) => user['userId'] == userId,
-          orElse: () => null,
-        );
+      }else{
+        if (response.statusCode == 200) {
+          final List<dynamic> users = json.decode(response.body);
 
-        if (matchedUser != null) {
-          setState(() {
-            userName1 = matchedUser['userName'] ?? '';
-            email1 = matchedUser['email'] ?? '';
-            companyName1 = matchedUser['companyName'] ?? '';
-            location1 = matchedUser['location'] ?? '';
-            number = matchedUser['mobileNumber'] ?? '';
-            role = matchedUser['role']?? '';
-            shippingAddress1 =matchedUser['shippingAddress1']??'';
-            shippingAddress2 =matchedUser['shippingAddress2']??'';
-            //roleController.text = matchedUser['role'] ?? '';
+          final matchedUser = users.firstWhere(
+                (user) => user['userId'] == userId,
+            orElse: () => null,
+          );
 
-            userName.text = userName1;
-            email.text = email1;
-            companyName.text = companyName1;
-            location.text = location1;
-            mobileNumber.text = number;
-            shipadr1.text =shippingAddress1;
-            shipadr2.text =shippingAddress2;
-            userRole.text = role;
-            //  roleController.text = matchedUser['role'] ?? '';
-            isLoading = false;
-          });
+          if (matchedUser != null) {
+            setState(() {
+              userName1 = matchedUser['userName'] ?? '';
+              email1 = matchedUser['email'] ?? '';
+              companyName1 = matchedUser['companyName'] ?? '';
+              location1 = matchedUser['location'] ?? '';
+              number = matchedUser['mobileNumber'] ?? '';
+              role = matchedUser['role']?? '';
+              shippingAddress1 =matchedUser['shippingAddress1']??'';
+              shippingAddress2 =matchedUser['shippingAddress2']??'';
+              //roleController.text = matchedUser['role'] ?? '';
+
+              userName.text = userName1;
+              email.text = email1;
+              companyName.text = companyName1;
+              location.text = location1;
+              mobileNumber.text = number;
+              shipadr1.text =shippingAddress1;
+              shipadr2.text =shippingAddress2;
+              userRole.text = role;
+              //  roleController.text = matchedUser['role'] ?? '';
+              isLoading = false;
+            });
+          } else {
+            print('User not found');
+          }
         } else {
-          print('User not found');
+          print('Failed to fetch data: ${response.statusCode}');
         }
-      } else {
-        print('Failed to fetch data: ${response.statusCode}');
       }
+
+
     } catch (error) {
       print('An error occurred: $error');
     }
@@ -215,70 +291,147 @@ class _UserProfileState extends State<UserProfile>  with SingleTickerProviderSta
         headers: headers,
         body: jsonEncode(data),
       );
-
-      if (response.statusCode == 200) {
-        final addResponseBody = jsonDecode(response.body);
-
-        if (addResponseBody['status'] == 'success') {
-          // Show success dialog
-          final customerId = addResponseBody['id'];
-          showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
+      if(token == " ")
+      {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
                 ),
-                icon: const Icon(Icons.check_circle_rounded, color: Colors.green, size: 25),
-                title: const Text(
-                  'Updated Successfully!.',
-                  style: TextStyle(fontSize: 15),
-                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-                actions: [
-                  ElevatedButton(
-                    onPressed: () {
-                      context.go('/Cus_Create_Order', extra: {'testing':'test'});
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    child: const Text('OK', style: TextStyle(color: Colors.white)),
-                  ),
-                ],
+                  ],
+                ),
               );
-            },
-          );
-        } else if (addResponseBody['status'] == 'failed' &&
-            addResponseBody['error'] == 'email already exist') {
-          // Display the SnackBar for existing email error
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('This email already exists.'),
-              duration: Duration(seconds: 2), // Optional duration
-            ),
-          );
-        }
-        else if (addResponseBody['status'] == 'failed' &&
-            addResponseBody['error'] == 'mobile number already exists') {
-          // Display the SnackBar for existing email error
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('This mobile number already exists.'),
-              duration: Duration(seconds: 2), // Optional duration
-            ),
-          );
-        }
-        else {
-          print('Unexpected response: $addResponseBody');
-        }
-      } else {
-        print('Error: ${response.statusCode}');
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+else{
+        if (response.statusCode == 200) {
+          final addResponseBody = jsonDecode(response.body);
+
+          if (addResponseBody['status'] == 'success') {
+            // Show success dialog
+            final customerId = addResponseBody['id'];
+            showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  icon: const Icon(Icons.check_circle_rounded, color: Colors.green, size: 25),
+                  title: const Text(
+                    'Updated Successfully!.',
+                    style: TextStyle(fontSize: 15),
+                  ),
+
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {
+                        context.go('/Cus_Create_Order', extra: {'testing':'test'});
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                      child: const Text('OK', style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else if (addResponseBody['status'] == 'failed' &&
+              addResponseBody['error'] == 'email already exist') {
+            // Display the SnackBar for existing email error
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('This email already exists.'),
+                duration: Duration(seconds: 2), // Optional duration
+              ),
+            );
+          }
+          else if (addResponseBody['status'] == 'failed' &&
+              addResponseBody['error'] == 'mobile number already exists') {
+            // Display the SnackBar for existing email error
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('This mobile number already exists.'),
+                duration: Duration(seconds: 2), // Optional duration
+              ),
+            );
+          }
+          else {
+            print('Unexpected response: $addResponseBody');
+          }
+        } else {
+          print('Error: ${response.statusCode}');
+        }
+      }
+
     } catch (e) {
       print('Network error: $e');
       ScaffoldMessenger.of(context).showSnackBar(

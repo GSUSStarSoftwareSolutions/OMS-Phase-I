@@ -61,7 +61,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
   int startIndex = 0;
   List<ord.Product> filteredProducts = [];
   String? dropdownValue1 = 'Category';
-  String token = window.sessionStorage["token"] ?? " ";
+  String token = window.sessionStorage['token'] ?? " ";
   String? dropdownValue2 = 'Sub Category';
   bool _hasShownPopup = false;
 
@@ -92,31 +92,109 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
           "Authorization": 'Bearer $token',
         },
       );
+      if(token == " "){
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return
+                AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  contentPadding: EdgeInsets.zero,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            // Warning Icon
+                            Icon(Icons.warning, color: Colors.orange, size: 50),
+                            SizedBox(height: 16),
+                            // Confirmation Message
+                            Text(
+                              'Session Expired',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text("Please log in again to continue",style: TextStyle(
+                              fontSize: 12,
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        List<ord.Product> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => ord.Product.fromJson(item)).toList();
-          } else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List).map((item) => ord.Product.fromJson(item)).toList();
-            //  totalItems = jsonData['totalItems'] ?? 0;
-
-            print('pages');
-            print(totalPages);// Changed itemsPerPage to 10
-          }
-
-          setState(() {
-            productList = products;
-            totalPages = (products.length / itemsPerPage).ceil();
-            print(totalPages);
-            _filterAndPaginateProducts();
+                              color: Colors.black,
+                            ),),
+                            SizedBox(height: 20),
+                            // Buttons
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    // Handle Yes action
+                                    context.go('/');
+                                    // Navigator.of(context).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    side: BorderSide(color: Colors.blue),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'ok',
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+            },
+          ).whenComplete(() {
+            _hasShownPopup = false;
           });
-        }
-      } else {
-        throw Exception('Failed to load data');
+
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          List<ord.Product> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => ord.Product.fromJson(item)).toList();
+            } else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List).map((item) => ord.Product.fromJson(item)).toList();
+              //  totalItems = jsonData['totalItems'] ?? 0;
+
+              print('pages');
+              print(totalPages);// Changed itemsPerPage to 10
+            }
+
+            setState(() {
+              productList = products;
+              totalPages = (products.length / itemsPerPage).ceil();
+              print(totalPages);
+              _filterAndPaginateProducts();
+            });
+          }
+        }
+        else {
+          throw Exception('Failed to load data');
+        }
+      }
+
+
     } catch (e) {
       print('Error decoding JSON: $e');
       // Optionally, show an error message to the user
@@ -403,9 +481,9 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                                   'Product List',
                                   style: TextStyle(
                                     fontSize: 20,
+                                    color: Colors.black,
                                     fontWeight: FontWeight.bold,
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               const Spacer(),

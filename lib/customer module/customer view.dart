@@ -34,6 +34,7 @@ class CustomerDetails extends StatefulWidget {
   State<CustomerDetails> createState() => _CustomerDetailsState();
 }
 class _CustomerDetailsState extends State<CustomerDetails> {
+  bool _hasShownPopup = false;
   List<String> statusOptions = ['Order', 'Invoice', 'Delivery', 'Payment'];
   Timer? _searchDebounceTimer;
   String _searchText = '';
@@ -104,32 +105,108 @@ class _CustomerDetailsState extends State<CustomerDetails> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        // print('json data');
-        // print(jsonData);
-        List<detail> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => detail.fromJson(item)).toList();
-          } else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List).map((item) => detail.fromJson(item)).toList();
-            totalItems = jsonData['totalItems'] ?? 0; // Get the total number of items
-          }
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-          if(mounted){
-            setState(() {
-              totalPages = (products.length / itemsPerPage).ceil();
-              print('pages');
-              print(totalPages);
-              productList = products;
-              print(productList);
-              _filterAndPaginateProducts();
-            });
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
+      }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          // print('json data');
+          // print(jsonData);
+          List<detail> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => detail.fromJson(item)).toList();
+            } else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List).map((item) => detail.fromJson(item)).toList();
+              totalItems = jsonData['totalItems'] ?? 0; // Get the total number of items
+            }
+
+            if(mounted){
+              setState(() {
+                totalPages = (products.length / itemsPerPage).ceil();
+                print('pages');
+                print(totalPages);
+                productList = products;
+                print(productList);
+                _filterAndPaginateProducts();
+              });
+            }
           }
+        } else {
+          throw Exception('Failed to load data');
         }
-      } else {
-        throw Exception('Failed to load data');
       }
     } catch (e) {
       print('Error decoding JSON: $e');
@@ -143,8 +220,6 @@ class _CustomerDetailsState extends State<CustomerDetails> {
 
     }
   }
-
-
   Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
@@ -228,10 +303,82 @@ class _CustomerDetailsState extends State<CustomerDetails> {
 
 
 
-  Future<List<dynamic>>fetchProducts1(String orderId) async {
-    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzI2NTUwOTkzLCJpYXQiOjE3MjY1NDM3OTN9.rld2WZLY1ike7K1ykjgT11WV5hxJ6WLzYxtkvCmJZeDteUqK3m1Run-GGxlDdNlDus6oLCCLCtC1lbKZl1k38Q';
-
+  Future<List<dynamic>> fetchProducts1(String orderId) async {
     try {
+      // Validate token before making the API call
+      if (token == " ") {
+        // Show session expired dialog
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          "Please log in again to continue",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                context.go('/'); // Navigate to login
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'OK',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+
+        // Return an empty list as the function must return a List<dynamic>
+        return [];
+      }
+
+      // API Call
       final response = await http.get(
         Uri.parse(
           '$apicall/order_master/get_all_ordermaster_by_customer/$orderId',
@@ -245,15 +392,19 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       if (response.statusCode == 200) {
         print('Response Body: ${response.body}');
         return jsonDecode(response.body);
-
       } else {
         throw Exception('Failed to load data');
       }
     } catch (e) {
       print('Error decoding JSON: $e');
-      rethrow; // Re-throw the exception to handle it in the caller function
+      // Return an empty list on exception to handle gracefully
+      return [];
     }
   }
+
+
+
+
   Future<void> downloadPdf(String orderId1) async {
     String orderId = orderId1;
     try {
@@ -519,8 +670,9 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                                   Text(
                                     'Customer',
                                     style: TextStyle(
+                                      color: Colors.black,
                                         fontSize: 20, fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,
+
                                   ),
 
                                 ],

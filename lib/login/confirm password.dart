@@ -76,6 +76,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
       if (response.statusCode == 200) {
         // Success response handling
         showDialog(
+          barrierDismissible: false,
           context: context,
           builder: (context) {
             return AlertDialog(
@@ -117,6 +118,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
         );
       } else if (response.body == 'Invalid OTP') {
         showDialog(
+          barrierDismissible: false,
           context: context,
           builder: (context) {
             return AlertDialog(
@@ -469,6 +471,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                                 ConfirmPassword.text);
                                           } else {
                                             showDialog(
+                                              barrierDismissible: false,
                                               context: context,
                                               builder: (context) {
                                                 return AlertDialog(
@@ -847,6 +850,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                                   ConfirmPassword.text);
                                             } else {
                                               showDialog(
+                                                barrierDismissible: false,
                                                 context: context,
                                                 builder: (context) {
                                                   return AlertDialog(

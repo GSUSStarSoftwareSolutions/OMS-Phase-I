@@ -395,13 +395,88 @@ class _EditDraftOrderState extends State<EditDraftOrder> {
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_draft_master'
+            '$apicall/order_master/get_all_draft_master'
         ),
         headers: {
           "Content-type": "application/json",
           "Authorization": 'Bearer $token',
         },
       );
+      if (token == " ") {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            "Please log in again to continue", style: TextStyle(
+                            fontSize: 12,
+
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+      }
+      else{
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
 // print('json data');
@@ -415,22 +490,22 @@ class _EditDraftOrderState extends State<EditDraftOrder> {
             products = (jsonData['body'] as List)
                 .map((item) => detail.fromJson(item))
                 .toList();
-
           }
-          List<detail> matchedCustomers = products.where((customer) {  return customer.CusId == userId;}).toList();
+          List<detail> matchedCustomers = products.where((customer) {
+            return customer.CusId == userId;
+          }).toList();
 
           if (matchedCustomers.isNotEmpty) {
             setState(() {
-
               print('pages');
               itemCount = products.length;
-
             });
           }
         }
       } else {
         throw Exception('Failed to load data');
       }
+    }
     } catch (e) {
       print('Error decoding JSON: $e');
 // Optionally, show an error message to the user
@@ -729,6 +804,81 @@ class _EditDraftOrderState extends State<EditDraftOrder> {
 
 
   Future<List<detail>> fetchOrders() async {
+    if (token == " ") {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          "Please log in again to continue", style: TextStyle(
+                          fontSize: 12,
+
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
+      return [];
+    }
     final response = await http.get(
       Uri.parse(
           '$apicall/order_master/get_all_ordermaster'),
@@ -737,17 +887,22 @@ class _EditDraftOrderState extends State<EditDraftOrder> {
         // Add the token to the Authorization header
       },
     );
-    if (response.statusCode == 200) {
+
+   if (response.statusCode == 200) {
       detailJson = json.decode(response.body);
-      List<detail> filteredData = detailJson.map((json) => detail.fromJson(json)).toList();
+      List<detail> filteredData = detailJson.map((json) =>
+          detail.fromJson(json)).toList();
       if (_searchText.isNotEmpty) {
         print(_searchText);
-        filteredData = filteredData.where((detail) => detail.orderId!.toLowerCase().contains(_searchText.toLowerCase())).toList();
+        filteredData = filteredData.where((detail) =>
+            detail.orderId!.toLowerCase().contains(_searchText.toLowerCase()))
+            .toList();
       }
       return filteredData;
     } else {
       throw Exception('Failed to load orders');
-    }
+
+  }
   }
 
 
@@ -760,88 +915,166 @@ class _EditDraftOrderState extends State<EditDraftOrder> {
       },
       body: jsonEncode(updatedOrder),
     );
-
-    if (response.statusCode == 200) {
-      fetchCount();
-      print('Return Master added successfully');
-      final responseBody = jsonDecode(response.body);
-      final OrderID = responseBody['id'];
-
-      await showDialog(
+    if (token == " ") {
+      showDialog(
         barrierDismissible: false,
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-            ),
-            icon: const Icon(
-              Icons.check_circle_rounded,
-              color: Colors.green,
-              size: 25,
-            ),
-            title: const Padding(
-              padding: EdgeInsets.only(left: 12),
-              child: Text('Order Created Successfully', style: TextStyle(fontSize: 15),),
-            ),
-            content: Padding(
-                padding: const EdgeInsets.only(left: 25),
-                child: Row(
-                  children: [
-                    const Text('Your Order ID is: '),
-                    SelectableText('$OrderID'),
-                  ],
-                )
-            ),
-            actions: <Widget>[
-              ElevatedButton(
-                child: const Text('OK',style: TextStyle(color: Colors.white),),
-                onPressed: () {
-                  context.go('/Customer_Order_List');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  side: const BorderSide(color: Colors.blue),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          "Please log in again to continue", style: TextStyle(
+                          fontSize: 12,
+
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
+    }
+    else {
+      if (response.statusCode == 200) {
+        fetchCount();
+        print('Return Master added successfully');
+        final responseBody = jsonDecode(response.body);
+        final OrderID = responseBody['id'];
+
+        await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              icon: const Icon(
+                Icons.check_circle_rounded,
+                color: Colors.green,
+                size: 25,
+              ),
+              title: const Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: Text('Order Created Successfully',
+                  style: TextStyle(fontSize: 15),),
+              ),
+              content: Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Row(
+                    children: [
+                      const Text('Your Order ID is: '),
+                      SelectableText('$OrderID'),
+                    ],
+                  )
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: const Text(
+                    'OK', style: TextStyle(color: Colors.white),),
+                  onPressed: () {
+                    context.go('/Customer_Order_List');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    side: const BorderSide(color: Colors.blue),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
-      );
+              ],
+            );
+          },
+        );
 
-      // final responseData = jsonDecode(response.body);
-      //
-      // String orderId;
-      //
-      // try {
-      //   orderId = responseData['id'];
-      //
-      // }catch(e){
-      //   print('Error parsing orderId: $e');
-      //   orderId = ''; // or some default value
-      // }
-      // print('from the api response');
-      // print(orderId);
-      //
-      // context.go('/View_Draft_Order',extra: {
-      //   'selectedProducts': updatedOrder,
-      //   'orderId': orderId,
-      //   'orderDetails':  filteredData.map((detail) => OrderDetail(
-      //     orderId: detail.orderId,
-      //     orderDate: detail.orderDate,
-      //     items: [],
-      //     // Add other fields as needed
-      //   )).toList(),
-      //
-      // });
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to update order.');
+        // final responseData = jsonDecode(response.body);
+        //
+        // String orderId;
+        //
+        // try {
+        //   orderId = responseData['id'];
+        //
+        // }catch(e){
+        //   print('Error parsing orderId: $e');
+        //   orderId = ''; // or some default value
+        // }
+        // print('from the api response');
+        // print(orderId);
+        //
+        // context.go('/View_Draft_Order',extra: {
+        //   'selectedProducts': updatedOrder,
+        //   'orderId': orderId,
+        //   'orderDetails':  filteredData.map((detail) => OrderDetail(
+        //     orderId: detail.orderId,
+        //     orderDate: detail.orderDate,
+        //     items: [],
+        //     // Add other fields as needed
+        //   )).toList(),
+        //
+        // });
+      } else {
+        // If the server did not return a 200 OK response,
+        // then throw an exception.
+        throw Exception('Failed to update order.');
+      }
     }
+
   }
   void updateTotalAmount(int productIndex) {
     if (productIndex >= 0 && productIndex < widget.selectedProducts.length) {
@@ -1275,8 +1508,19 @@ class _EditDraftOrderState extends State<EditDraftOrder> {
                   if (_deliveryaddressController.text.isEmpty) {
                     errors.add('Delivery address is required');
                   }
-                  if(EmailIdController.text.isEmpty ||!RegExp(r'^[\w-]+(\.[\w-]+)*@gmail\.com$').hasMatch(EmailIdController.text)){
-                    errors.add('Please fill Email Address Format @gmail.com');
+                  if (EmailIdController
+                      .text
+                      .isEmpty ||
+                      !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$')
+                          .hasMatch(
+                          EmailIdController.text)) {
+                    ScaffoldMessenger.of(
+                        context)
+                        .showSnackBar(
+                      SnackBar(
+                          content:
+                          Text('Enter Valid E-mail Address')),
+                    );
                   }
                   if (_contactPersonController.text.isEmpty || _contactPersonController.text.length <=2) {
                     errors.add('Please enter a contact person name.');

@@ -46,6 +46,9 @@ class _SecondPageState extends State<SecondPage> {
   final List<String> list2 = ['Select', 'PCS', 'NOS', 'PKT'];
   String dropdownValue2 = 'Select';
   final List<String> list3 = ['Select', 'Yes', 'No'];
+  final List<String> list5 = ['Select', 'Accessories', 'Equipments', 'Tools'];
+  final List<String> list6 = ['Select'];
+  final List<String> list4 = ['Select', 'Refrigerators', 'WashingMachines', 'AirConditioners'];
   String dropdownValue3 = 'Select';
   final _validate = GlobalKey<FormState>();
   var result;
@@ -163,314 +166,103 @@ class _SecondPageState extends State<SecondPage> {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json'
           });
-
-      if (getAllResponse.statusCode == 200) {
-        final jsonData = jsonDecode(getAllResponse.body);
-        final productMasters = jsonData;
-
-        bool isProductMasterExists = false;
-
-        for (var productMaster in productMasters) {
-          if (productMaster['productName'] == productNameController.text &&
-              productMaster['category'] == dropdownValue &&
-              productMaster['subCategory'] == dropdownValue3) {
-            isProductMasterExists = true;
-            break;
-          }
-        }
-
-        if (isProductMasterExists) {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                icon: const Icon(Icons.warning_sharp, color: Colors.red, size: 25,),
-                content: const Text('A product with the same details already exists.'),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
-          final addApiUrl = '$apicall/productmaster/add_productmaster';
-
-          final addResponse = await http.post(Uri.parse(addApiUrl),
-              headers: {
-                'Authorization': 'Bearer $token',
-                'Content-Type': 'application/json'
-              },
-              body: jsonEncode(productMasterData));
-
-          final addResponseBody = jsonDecode(addResponse.body);
-
-          if (addResponse.statusCode == 200 && addResponseBody['status'] == 'success') {
-            print('Product added successfully');
-            showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (BuildContext context) {
-                return  AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  contentPadding: EdgeInsets.zero,
-                  content:
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Close Button
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            // Warning Icon
-                            const Icon(Icons.check_circle_rounded, color: Colors.green, size: 50),
-                            const SizedBox(height: 16),
-                            // Confirmation Message
-                            const Text(
-                              'Product Added Successfully',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+      if(token == " "){
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
-                            const SizedBox(height: 20),
-                            // Buttons
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-                                ElevatedButton(
-                                  onPressed: () {
-                                    context.go('/Product_List');
-                                    // Handle No action
-                                    // Navigator.of(context).pop();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    side: const BorderSide(color: Colors.blue),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'OK',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-                //   AlertDialog(
-                //   shape: const RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.all(Radius.circular(5))),
-                //   icon: const Icon(
-                //     Icons.check_circle_rounded,
-                //     color: Colors.green,
-                //     size: 25,
-                //   ),
-                //   title: const Text("Success"),
-                //   content:
-                //   Column(
-                //     mainAxisSize: MainAxisSize.min,
-                //     children: [
-                //       // Close Button
-                //       Align(
-                //         alignment: Alignment.topRight,
-                //         child: IconButton(
-                //           icon: Icon(Icons.close, color: Colors.red),
-                //           onPressed: () {
-                //             Navigator.of(context).pop();
-                //           },
-                //         ),
-                //       ),
-                //       Padding(
-                //         padding: const EdgeInsets.all(16.0),
-                //         child: Column(
-                //           children: [
-                //             // Warning Icon
-                //             Icon(Icons.warning, color: Colors.orange, size: 50),
-                //             SizedBox(height: 16),
-                //             // Confirmation Message
-                //             Text(
-                //               'Are You Sure',
-                //               style: TextStyle(
-                //                 fontSize: 18,
-                //                 fontWeight: FontWeight.bold,
-                //                 color: Colors.black,
-                //               ),
-                //             ),
-                //             SizedBox(height: 20),
-                //             // Buttons
-                //             Row(
-                //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //               children: [
-                //                 ElevatedButton(
-                //                   onPressed: () {
-                //                     // Handle Yes action
-                //                     context.go('/',extra: {
-                //                       'cameFromRoute': true,
-                //                     });
-                //                     //  Navigator.push(
-                //                     //    context,
-                //                     //    PageRouteBuilder(
-                //                     //      pageBuilder: (context, animation,
-                //                     //          secondaryAnimation) =>
-                //                     //          LoginScr(),
-                //                     //      transitionDuration:
-                //                     //      const Duration(milliseconds: 5),
-                //                     //      transitionsBuilder: (context, animation,
-                //                     //          secondaryAnimation, child) {
-                //                     //        return FadeTransition(
-                //                     //          opacity: animation,
-                //                     //          child: child,
-                //                     //        );
-                //                     //      },
-                //                     //    ),
-                //                     //  );
-                //                     // Navigator.of(context).pop();
-                //                   },
-                //                   style: ElevatedButton.styleFrom(
-                //                     backgroundColor: Colors.white,
-                //                     side: BorderSide(color: Colors.blue),
-                //                     shape: RoundedRectangleBorder(
-                //                       borderRadius: BorderRadius.circular(10.0),
-                //                     ),
-                //                   ),
-                //                   child: Text(
-                //                     'Yes',
-                //                     style: TextStyle(
-                //                       color: Colors.blue,
-                //                     ),
-                //                   ),
-                //                 ),
-                //                 ElevatedButton(
-                //                   onPressed: () {
-                //                     // Handle No action
-                //                     Navigator.of(context).pop();
-                //                   },
-                //                   style: ElevatedButton.styleFrom(
-                //                     backgroundColor: Colors.white,
-                //                     side: BorderSide(color: Colors.red),
-                //                     shape: RoundedRectangleBorder(
-                //                       borderRadius: BorderRadius.circular(10.0),
-                //                     ),
-                //                   ),
-                //                   child: Text(
-                //                     'No',
-                //                     style: TextStyle(
-                //                       color: Colors.red,
-                //                     ),
-                //                   ),
-                //                 ),
-                //               ],
-                //             ),
-                //           ],
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                //   // const Padding(
-                //   //   padding: EdgeInsets.only(left: 26),
-                //   //   child: Text("Product added successfully"),
-                //   // ),
-                //   // Row(
-                //   //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   //   children: [
-                //   //     ElevatedButton(
-                //   //       onPressed: () {
-                //   //         // Handle Yes action
-                //   //         context.go('/',extra: {
-                //   //           'cameFromRoute': true,
-                //   //         });
-                //   //         //  Navigator.push(
-                //   //         //    context,
-                //   //         //    PageRouteBuilder(
-                //   //         //      pageBuilder: (context, animation,
-                //   //         //          secondaryAnimation) =>
-                //   //         //          LoginScr(),
-                //   //         //      transitionDuration:
-                //   //         //      const Duration(milliseconds: 5),
-                //   //         //      transitionsBuilder: (context, animation,
-                //   //         //          secondaryAnimation, child) {
-                //   //         //        return FadeTransition(
-                //   //         //          opacity: animation,
-                //   //         //          child: child,
-                //   //         //        );
-                //   //         //      },
-                //   //         //    ),
-                //   //         //  );
-                //   //         // Navigator.of(context).pop();
-                //   //       },
-                //   //       style: ElevatedButton.styleFrom(
-                //   //         backgroundColor: Colors.white,
-                //   //         side: BorderSide(color: Colors.blue),
-                //   //         shape: RoundedRectangleBorder(
-                //   //           borderRadius: BorderRadius.circular(10.0),
-                //   //         ),
-                //   //       ),
-                //   //       child: Text(
-                //   //         'Yes',
-                //   //         style: TextStyle(
-                //   //           color: Colors.blue,
-                //   //         ),
-                //   //       ),
-                //   //     ),
-                //   //     ElevatedButton(
-                //   //       onPressed: () {
-                //   //         // Handle No action
-                //   //         Navigator.of(context).pop();
-                //   //       },
-                //   //       style: ElevatedButton.styleFrom(
-                //   //         backgroundColor: Colors.white,
-                //   //         side: BorderSide(color: Colors.red),
-                //   //         shape: RoundedRectangleBorder(
-                //   //           borderRadius: BorderRadius.circular(10.0),
-                //   //         ),
-                //   //       ),
-                //   //       child: Text(
-                //   //         'No',
-                //   //         style: TextStyle(
-                //   //           color: Colors.red,
-                //   //         ),
-                //   //       ),
-                //   //     ),
-                //   //   ],
-                //   // ),
-                //   // actions: [
-                //   //   TextButton(
-                //   //     child: const Text("OK"),
-                //   //     onPressed: () {
-                //   //       Navigator.of(context).pop();
-                //   //       context.go('Product_List');
-                //   //     },
-                //   //   ),
-                //   // ],
-                // );
-              },
-            );
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
+      }
+      else{
+        if (getAllResponse.statusCode == 200) {
+          final jsonData = jsonDecode(getAllResponse.body);
+          final productMasters = jsonData;
+
+          bool isProductMasterExists = false;
+
+          for (var productMaster in productMasters) {
+            if (productMaster['productName'] == productNameController.text &&
+                productMaster['category'] == dropdownValue &&
+                productMaster['subCategory'] == dropdownValue3) {
+              isProductMasterExists = true;
+              break;
+            }
           }
-          else if (addResponseBody['status'] == 'product already exists') {
+
+          if (isProductMasterExists) {
             showDialog(
               context: context,
               builder: (context) {
                 return AlertDialog(
                   icon: const Icon(Icons.warning_sharp, color: Colors.red, size: 25,),
-                  content: const Text('Product already exists.'),
+                  content: const Text('A product with the same details already exists.'),
                   actions: <Widget>[
                     TextButton(
                       child: const Text('OK'),
@@ -483,12 +275,300 @@ class _SecondPageState extends State<SecondPage> {
               },
             );
           } else {
-            print('Error adding product master: ${addResponse.statusCode}');
+            final addApiUrl = '$apicall/productmaster/add_productmaster';
+
+            final addResponse = await http.post(Uri.parse(addApiUrl),
+                headers: {
+                  'Authorization': 'Bearer $token',
+                  'Content-Type': 'application/json'
+                },
+                body: jsonEncode(productMasterData));
+
+            final addResponseBody = jsonDecode(addResponse.body);
+
+            if (addResponse.statusCode == 200 && addResponseBody['status'] == 'success') {
+              print('Product added successfully');
+              showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (BuildContext context) {
+                  return  AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    content:
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Close Button
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              // Warning Icon
+                              const Icon(Icons.check_circle_rounded, color: Colors.green, size: 50),
+                              const SizedBox(height: 16),
+                              // Confirmation Message
+                              const Text(
+                                'Product Added Successfully',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              // Buttons
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      context.go('/Product_List');
+                                      // Handle No action
+                                      // Navigator.of(context).pop();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      side: const BorderSide(color: Colors.blue),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10.0),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'OK',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                  //   AlertDialog(
+                  //   shape: const RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.all(Radius.circular(5))),
+                  //   icon: const Icon(
+                  //     Icons.check_circle_rounded,
+                  //     color: Colors.green,
+                  //     size: 25,
+                  //   ),
+                  //   title: const Text("Success"),
+                  //   content:
+                  //   Column(
+                  //     mainAxisSize: MainAxisSize.min,
+                  //     children: [
+                  //       // Close Button
+                  //       Align(
+                  //         alignment: Alignment.topRight,
+                  //         child: IconButton(
+                  //           icon: Icon(Icons.close, color: Colors.red),
+                  //           onPressed: () {
+                  //             Navigator.of(context).pop();
+                  //           },
+                  //         ),
+                  //       ),
+                  //       Padding(
+                  //         padding: const EdgeInsets.all(16.0),
+                  //         child: Column(
+                  //           children: [
+                  //             // Warning Icon
+                  //             Icon(Icons.warning, color: Colors.orange, size: 50),
+                  //             SizedBox(height: 16),
+                  //             // Confirmation Message
+                  //             Text(
+                  //               'Are You Sure',
+                  //               style: TextStyle(
+                  //                 fontSize: 18,
+                  //                 fontWeight: FontWeight.bold,
+                  //                 color: Colors.black,
+                  //               ),
+                  //             ),
+                  //             SizedBox(height: 20),
+                  //             // Buttons
+                  //             Row(
+                  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //               children: [
+                  //                 ElevatedButton(
+                  //                   onPressed: () {
+                  //                     // Handle Yes action
+                  //                     context.go('/',extra: {
+                  //                       'cameFromRoute': true,
+                  //                     });
+                  //                     //  Navigator.push(
+                  //                     //    context,
+                  //                     //    PageRouteBuilder(
+                  //                     //      pageBuilder: (context, animation,
+                  //                     //          secondaryAnimation) =>
+                  //                     //          LoginScr(),
+                  //                     //      transitionDuration:
+                  //                     //      const Duration(milliseconds: 5),
+                  //                     //      transitionsBuilder: (context, animation,
+                  //                     //          secondaryAnimation, child) {
+                  //                     //        return FadeTransition(
+                  //                     //          opacity: animation,
+                  //                     //          child: child,
+                  //                     //        );
+                  //                     //      },
+                  //                     //    ),
+                  //                     //  );
+                  //                     // Navigator.of(context).pop();
+                  //                   },
+                  //                   style: ElevatedButton.styleFrom(
+                  //                     backgroundColor: Colors.white,
+                  //                     side: BorderSide(color: Colors.blue),
+                  //                     shape: RoundedRectangleBorder(
+                  //                       borderRadius: BorderRadius.circular(10.0),
+                  //                     ),
+                  //                   ),
+                  //                   child: Text(
+                  //                     'Yes',
+                  //                     style: TextStyle(
+                  //                       color: Colors.blue,
+                  //                     ),
+                  //                   ),
+                  //                 ),
+                  //                 ElevatedButton(
+                  //                   onPressed: () {
+                  //                     // Handle No action
+                  //                     Navigator.of(context).pop();
+                  //                   },
+                  //                   style: ElevatedButton.styleFrom(
+                  //                     backgroundColor: Colors.white,
+                  //                     side: BorderSide(color: Colors.red),
+                  //                     shape: RoundedRectangleBorder(
+                  //                       borderRadius: BorderRadius.circular(10.0),
+                  //                     ),
+                  //                   ),
+                  //                   child: Text(
+                  //                     'No',
+                  //                     style: TextStyle(
+                  //                       color: Colors.red,
+                  //                     ),
+                  //                   ),
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  //   // const Padding(
+                  //   //   padding: EdgeInsets.only(left: 26),
+                  //   //   child: Text("Product added successfully"),
+                  //   // ),
+                  //   // Row(
+                  //   //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //   //   children: [
+                  //   //     ElevatedButton(
+                  //   //       onPressed: () {
+                  //   //         // Handle Yes action
+                  //   //         context.go('/',extra: {
+                  //   //           'cameFromRoute': true,
+                  //   //         });
+                  //   //         //  Navigator.push(
+                  //   //         //    context,
+                  //   //         //    PageRouteBuilder(
+                  //   //         //      pageBuilder: (context, animation,
+                  //   //         //          secondaryAnimation) =>
+                  //   //         //          LoginScr(),
+                  //   //         //      transitionDuration:
+                  //   //         //      const Duration(milliseconds: 5),
+                  //   //         //      transitionsBuilder: (context, animation,
+                  //   //         //          secondaryAnimation, child) {
+                  //   //         //        return FadeTransition(
+                  //   //         //          opacity: animation,
+                  //   //         //          child: child,
+                  //   //         //        );
+                  //   //         //      },
+                  //   //         //    ),
+                  //   //         //  );
+                  //   //         // Navigator.of(context).pop();
+                  //   //       },
+                  //   //       style: ElevatedButton.styleFrom(
+                  //   //         backgroundColor: Colors.white,
+                  //   //         side: BorderSide(color: Colors.blue),
+                  //   //         shape: RoundedRectangleBorder(
+                  //   //           borderRadius: BorderRadius.circular(10.0),
+                  //   //         ),
+                  //   //       ),
+                  //   //       child: Text(
+                  //   //         'Yes',
+                  //   //         style: TextStyle(
+                  //   //           color: Colors.blue,
+                  //   //         ),
+                  //   //       ),
+                  //   //     ),
+                  //   //     ElevatedButton(
+                  //   //       onPressed: () {
+                  //   //         // Handle No action
+                  //   //         Navigator.of(context).pop();
+                  //   //       },
+                  //   //       style: ElevatedButton.styleFrom(
+                  //   //         backgroundColor: Colors.white,
+                  //   //         side: BorderSide(color: Colors.red),
+                  //   //         shape: RoundedRectangleBorder(
+                  //   //           borderRadius: BorderRadius.circular(10.0),
+                  //   //         ),
+                  //   //       ),
+                  //   //       child: Text(
+                  //   //         'No',
+                  //   //         style: TextStyle(
+                  //   //           color: Colors.red,
+                  //   //         ),
+                  //   //       ),
+                  //   //     ),
+                  //   //   ],
+                  //   // ),
+                  //   // actions: [
+                  //   //   TextButton(
+                  //   //     child: const Text("OK"),
+                  //   //     onPressed: () {
+                  //   //       Navigator.of(context).pop();
+                  //   //       context.go('Product_List');
+                  //   //     },
+                  //   //   ),
+                  //   // ],
+                  // );
+                },
+              );
+            }
+            else if (addResponseBody['status'] == 'product already exists') {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    icon: const Icon(Icons.warning_sharp, color: Colors.red, size: 25,),
+                    content: const Text('Product already exists.'),
+                    actions: <Widget>[
+                      TextButton(
+                        child: const Text('OK'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            } else {
+              print('Error adding product master: ${addResponse.statusCode}');
+            }
           }
+        } else {
+          print('Failed to load product masters');
         }
-      } else {
-        print('Failed to load product masters');
       }
+
+
     } catch (e) {
       print('Error: $e');
       rethrow; // rethrow the exception
@@ -574,142 +654,6 @@ class _SecondPageState extends State<SecondPage> {
       ),
     );
   }
-
-
-  // Future<void> addProductMaster() async {
-  //   List<String> errors = [];
-  //
-  //   // if (productNameController.text.isEmpty) errors.add('Product name');
-  //   // if (dropdownValue == 'Select') errors.add('Category');
-  //   // if (dropdownValue1 == 'Select') errors.add('Sub category');
-  //   // if (dropdownValue2 == 'Select') errors.add('Unit');
-  //   // if (dropdownValue3 == 'Select') errors.add('Tax');
-  //   // if (priceController.text.isEmpty) errors.add('Price');
-  //   // if (discountController.text.isEmpty) errors.add('Discount');
-  //   // if (selectedImages.isEmpty) errors.add('Image');
-  //   //
-  //   // if (errors.isNotEmpty) {
-  //   //   _showSnackBar('Please fill in the following fields: ${errors.join(', ')}');
-  //   //   return;
-  //   // }
-  //
-  //
-  //   final productMasterData = {
-  //     "productName": productNameController.text,
-  //     "category": dropdownValue,
-  //     "subCategory": dropdownValue3,
-  //     "tax": dropdownValue1,
-  //     "unit": dropdownValue2,
-  //     "price": double.parse(priceController.text),
-  //     "discount": discountController.text,
-  //     "imageId": storeImage,
-  //   };
-  //
-  //   try {
-  //     final getAllResponse = await http.get(
-  //         Uri.parse(
-  //         '$apicall/productmaster/get_all_productmaster'),
-  //         headers: {
-  //           'Authorization': 'Bearer $token',
-  //           'Content-Type': 'application/json'
-  //         });
-  //
-  //     if (getAllResponse.statusCode == 200) {
-  //       final jsonData = jsonDecode(getAllResponse.body);
-  //       final productMasters = jsonData;
-  //
-  //       bool isProductMasterExists = false;
-  //
-  //       for (var productMaster in productMasters) {
-  //         if (productMaster['productName'] == productNameController.text &&
-  //             productMaster['category'] == dropdownValue &&
-  //             productMaster['subCategory'] ==  dropdownValue3
-  //             // productMaster['tax'] == productMasterData['tax'] &&
-  //             // productMaster['unit'] == productMasterData['unit'] &&
-  //             // productMaster['price'] == productMasterData['price'].toString() &&
-  //             // productMaster['discount'] == productMasterData['discount'] &&
-  //             // productMaster['imageId'] == productMasterData['imageId']
-  //         )
-  //         {
-  //           isProductMasterExists = true;
-  //           break;
-  //         }
-  //       }
-  //
-  //       if (isProductMasterExists) {
-  //         showDialog(
-  //                context: context,
-  //                builder: (context) {
-  //                  return AlertDialog(
-  //                    icon: Icon(Icons.warning_sharp,color: Colors.red,size: 25,),
-  //                    content: Text('A product with the same details already exists.'),
-  //                    actions: <Widget>[
-  //                      TextButton(
-  //                        child: Text('OK'),
-  //                        onPressed: () {
-  //                          Navigator.of(context).pop();
-  //                        },
-  //                      ),
-  //                    ],
-  //                  );
-  //                },
-  //              );
-  //       } else {
-  //         final addApiUrl = '$apicall/productmaster/add_productmaster';
-  //
-  //         final addResponse = await http.post(Uri.parse(addApiUrl),
-  //             headers: {
-  //               'Authorization': 'Bearer $token',
-  //               'Content-Type': 'application/json'
-  //             },
-  //             body: jsonEncode(productMasterData));
-  //
-  //         if (addResponse.statusCode == 200) {
-  //           print('A Product added successfully');
-  //              showDialog(
-  //                context: context,
-  //                builder: (BuildContext context) {
-  //                  return AlertDialog(
-  //                    shape: const RoundedRectangleBorder(
-  //                        borderRadius: BorderRadius.all(Radius.circular(5))),
-  //                    icon: const Icon(
-  //                      Icons.check_circle_rounded,
-  //                      color: Colors.green,
-  //                      size: 25,
-  //                    ),
-  //                    title: const Text("Success"),
-  //                    content: const Padding(
-  //                      padding: EdgeInsets.only(left: 26),
-  //                      child: Text("Product added successfully"),
-  //                    ),
-  //                    actions: [
-  //                      TextButton(
-  //                        child: const Text("OK"),
-  //                        onPressed: () {
-  //                          Navigator.of(context).pop();
-  //                          context.go('/Product_List');
-  //                        },
-  //                      ),
-  //                    ],
-  //                  );
-  //                },
-  //              );
-  //         } else {
-  //           print('Error adding product master: ${addResponse.statusCode}');
-  //         }
-  //       }
-  //     } else {
-  //       print('Failed to load product masters');
-  //     }
-  //   } catch (e) {
-  //     print('Error: $e');
-  //     rethrow; // rethrow the exception
-  //   }
-  // }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -861,7 +805,6 @@ class _SecondPageState extends State<SecondPage> {
                                   'Add New Product',
                                   style: TextStyle(
                                     fontSize: 20,
-                                    // fontWeight: FontWeight.bold,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -1159,76 +1102,276 @@ class _SecondPageState extends State<SecondPage> {
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         // Sub Category field
-                                                        Padding(
-                                                          padding: const EdgeInsets.all(4.0),
-                                                          child: Align(
-                                                            alignment: const Alignment(-1.0,-0.3),
-                                                            child: RichText(
-                                                              text:  const TextSpan(
-                                                                children: [
-                                                                  TextSpan(
-                                                                    text: 'Sub Category ',
-                                                                    style: TextStyle(
-                                                                        color: Colors.black87,
-                                                                        fontSize: 16// Set the product name to black color
+
+
+                                                          Padding(
+                                                            padding: const EdgeInsets.all(4.0),
+                                                            child: Align(
+                                                              alignment: const Alignment(-1.0,-0.3),
+                                                              child: RichText(
+                                                                text:  const TextSpan(
+                                                                  children: [
+                                                                    TextSpan(
+                                                                      text: 'Sub Category ',
+                                                                      style: TextStyle(
+                                                                          color: Colors.black87,
+                                                                          fontSize: 16// Set the product name to black color
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  TextSpan(
-                                                                    text: '*',
-                                                                    style: TextStyle(
-                                                                      color: Colors.red, // Set the asterisk to red color
+                                                                    TextSpan(
+                                                                      text: '*',
+                                                                      style: TextStyle(
+                                                                        color: Colors.red, // Set the asterisk to red color
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
-                                                        ),
+
+
+
                                                         const SizedBox(height: 2),
-                                                        Padding(
-                                                          padding: const EdgeInsets.all(8.0),
-                                                          child: Container(
-                                                            height: 40,
-                                                            decoration: BoxDecoration(
-                                                              color: Colors.white,
-                                                              borderRadius: BorderRadius.circular(2),
-                                                              border: Border.all(color:
-                                                              Colors.blue[100]!),
-                                                            ),
-                                                            child: Padding(
-                                                              padding:
-                                                              const EdgeInsets.symmetric(
-                                                                  horizontal: 10),
-                                                              child: DropdownButton<String>(
-                                                                value: dropdownValue3,
-                                                                icon:  Icon(Icons.arrow_drop_down_circle_rounded,color: Colors.blue[800],),
-                                                                iconSize: 18,
-                                                                // Size of the icon
-                                                                elevation: 16,
-                                                                style: const TextStyle(
-                                                                    color: Colors.black),
-                                                                underline: Container(),
-                                                                // We don't need the default underline since we're using a custom border
-                                                                onChanged: (String? value) {
-                                                                  setState(() {
-                                                                    dropdownValue3 = value!;
-                                                                  });
-                                                                },
-                                                                items: list3.map<
-                                                                    DropdownMenuItem<
-                                                                        String>>(
-                                                                        (String value) {
-                                                                      return DropdownMenuItem<
-                                                                          String>(
-                                                                        value: value,
-                                                                        child: Text(value,style: const TextStyle(color: Colors.grey),),
-                                                                      );
-                                                                    }).toList(),
-                                                                isExpanded: true,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
+                                          Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Container(
+                                                  height: 40,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(2),
+                                                    border: Border.all(color:
+                                                    Colors.blue[100]!),
+                                                  ),
+                                                  child: Padding(
+                                                    padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                    child: DropdownButton<String>(
+                                                      value: dropdownValue3,
+                                                      icon: Icon(
+                                                        Icons.arrow_drop_down_circle_rounded, color: Colors.blue[800],),
+                                                      iconSize: 18,
+                                                      // Size of the icon
+                                                      elevation: 16,
+                                                      style: const TextStyle(
+                                                          color: Colors.black),
+                                                      underline: Container(),
+                                                      // We don't need the default underline since we're using a custom border
+                                                      onChanged: (String? value) {
+                                                        setState(() {
+                                                          dropdownValue3 = value!;
+                                                        });
+                                                      },
+                                                      items: list3.map<
+                                                          DropdownMenuItem<
+                                                              String>>(
+                                                              (String value) {
+                                                            return DropdownMenuItem<
+                                                                String>(
+                                                              value: value,
+                                                              child: Text(
+                                                                value, style: const TextStyle(color: Colors.grey),),
+                                                            );
+                                                          }).toList(),
+                                                      isExpanded: true,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+    // if(dropdownValue == "Electronics")...{
+    //   Padding(
+    //     padding: const EdgeInsets.all(8.0),
+    //     child: Container(
+    //       height: 40,
+    //       decoration: BoxDecoration(
+    //         color: Colors.white,
+    //         borderRadius: BorderRadius.circular(2),
+    //         border: Border.all(color:
+    //         Colors.blue[100]!),
+    //       ),
+    //       child: Padding(
+    //         padding:
+    //         const EdgeInsets.symmetric(
+    //             horizontal: 10),
+    //         child: DropdownButton<String>(
+    //           value: dropdownValue3,
+    //           icon: Icon(
+    //             Icons.arrow_drop_down_circle_rounded, color: Colors.blue[800],),
+    //           iconSize: 18,
+    //           // Size of the icon
+    //           elevation: 16,
+    //           style: const TextStyle(
+    //               color: Colors.black),
+    //           underline: Container(),
+    //           // We don't need the default underline since we're using a custom border
+    //           onChanged: (String? value) {
+    //             setState(() {
+    //               dropdownValue3 = value!;
+    //             });
+    //           },
+    //           items: list3.map<
+    //               DropdownMenuItem<
+    //                   String>>(
+    //                   (String value) {
+    //                 return DropdownMenuItem<
+    //                     String>(
+    //                   value: value,
+    //                   child: Text(
+    //                     value, style: const TextStyle(color: Colors.grey),),
+    //                 );
+    //               }).toList(),
+    //           isExpanded: true,
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    // }
+    // else if(dropdownValue == "Automotive")...{
+    //   Padding(
+    //     padding: const EdgeInsets.all(8.0),
+    //     child: Container(
+    //       height: 40,
+    //       decoration: BoxDecoration(
+    //         color: Colors.white,
+    //         borderRadius: BorderRadius.circular(2),
+    //         border: Border.all(color:
+    //         Colors.blue[100]!),
+    //       ),
+    //       child: Padding(
+    //         padding:
+    //         const EdgeInsets.symmetric(
+    //             horizontal: 10),
+    //         child: DropdownButton<String>(
+    //           value: dropdownValue3,
+    //           icon: Icon(
+    //             Icons.arrow_drop_down_circle_rounded, color: Colors.blue[800],),
+    //           iconSize: 18,
+    //           // Size of the icon
+    //           elevation: 16,
+    //           style: const TextStyle(
+    //               color: Colors.black),
+    //           underline: Container(),
+    //           // We don't need the default underline since we're using a custom border
+    //           onChanged: (String? value) {
+    //             setState(() {
+    //               dropdownValue3 = value!;
+    //             });
+    //           },
+    //           items: list5.map<
+    //               DropdownMenuItem<
+    //                   String>>(
+    //                   (String value) {
+    //                 return DropdownMenuItem<
+    //                     String>(
+    //                   value: value,
+    //                   child: Text(
+    //                     value, style: const TextStyle(color: Colors.grey),),
+    //                 );
+    //               }).toList(),
+    //           isExpanded: true,
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    // }
+    //             else if(dropdownValue == "Home Appliance")...{
+    //     Padding(
+    //       padding: const EdgeInsets.all(8.0),
+    //       child: Container(
+    //         height: 40,
+    //         decoration: BoxDecoration(
+    //           color: Colors.white,
+    //           borderRadius: BorderRadius.circular(2),
+    //           border: Border.all(color:
+    //           Colors.blue[100]!),
+    //         ),
+    //         child: Padding(
+    //           padding:
+    //           const EdgeInsets.symmetric(
+    //               horizontal: 10),
+    //           child: DropdownButton<String>(
+    //             value: dropdownValue3,
+    //             icon: Icon(
+    //               Icons.arrow_drop_down_circle_rounded, color: Colors.blue[800],),
+    //             iconSize: 18,
+    //             // Size of the icon
+    //             elevation: 16,
+    //             style: const TextStyle(
+    //                 color: Colors.black),
+    //             underline: Container(),
+    //             // We don't need the default underline since we're using a custom border
+    //             onChanged: (String? value) {
+    //               setState(() {
+    //                 dropdownValue3 = value!;
+    //               });
+    //             },
+    //             items: list4.map<
+    //                 DropdownMenuItem<
+    //                     String>>(
+    //                     (String value) {
+    //                   return DropdownMenuItem<
+    //                       String>(
+    //                     value: value,
+    //                     child: Text(
+    //                       value, style: const TextStyle(color: Colors.grey),),
+    //                   );
+    //                 }).toList(),
+    //             isExpanded: true,
+    //           ),
+    //         ),
+    //       ),
+    //     ),
+    //                     }
+    //                       else...{
+    //       Padding(
+    //         padding: const EdgeInsets.all(8.0),
+    //         child: Container(
+    //           height: 40,
+    //           decoration: BoxDecoration(
+    //             color: Colors.white,
+    //             borderRadius: BorderRadius.circular(2),
+    //             border: Border.all(color:
+    //             Colors.blue[100]!),
+    //           ),
+    //           child: Padding(
+    //             padding:
+    //             const EdgeInsets.symmetric(
+    //                 horizontal: 10),
+    //             child: DropdownButton<String>(
+    //               value: dropdownValue3,
+    //               icon: Icon(
+    //                 Icons.arrow_drop_down_circle_rounded, color: Colors.blue[800],),
+    //               iconSize: 18,
+    //               // Size of the icon
+    //               elevation: 16,
+    //               style: const TextStyle(
+    //                   color: Colors.black),
+    //               underline: Container(),
+    //               // We don't need the default underline since we're using a custom border
+    //               onChanged: (String? value) {
+    //                 setState(() {
+    //                   dropdownValue3 = value!;
+    //                 });
+    //               },
+    //               items: list6.map<
+    //                   DropdownMenuItem<
+    //                       String>>(
+    //                       (String value) {
+    //                     return DropdownMenuItem<
+    //                         String>(
+    //                       value: value,
+    //                       child: Text(
+    //                         value, style: const TextStyle(color: Colors.grey),),
+    //                     );
+    //                   }).toList(),
+    //               isExpanded: true,
+    //             ),
+    //           ),
+    //         ),
+    //       ),
+    //                     }
+
                                                       ],
                                                     ),
                                                   ),
@@ -1935,7 +2078,7 @@ class _SecondPageState extends State<SecondPage> {
                                                                         color: Colors.blue[900], size: 50),
                                                                     const SizedBox(height: 8),
                                                                     const Text(
-                                                                      'Click to uplowad image',
+                                                                      'Click to upload image',
                                                                       textAlign: TextAlign.center,
                                                                     ),
                                                                     const SizedBox(height: 8),

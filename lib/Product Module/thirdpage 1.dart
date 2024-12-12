@@ -67,6 +67,7 @@ class ProductForm1 extends StatefulWidget {
 }
 
 class _ProductForm1State extends State<ProductForm1> {
+  bool _hasShownPopup = false;
   String? _textInput;
   String? _priceInput;
   Map<String, dynamic> _displayData = {};
@@ -126,68 +127,6 @@ class _ProductForm1State extends State<ProductForm1> {
         discountController.text.isNotEmpty;
   }
 
-  Future<void> fetchData(String productName, String category) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$apicall/productmaster/search_by_productname/$productName'),
-        headers: {
-          "Content-Type": "application/json",
-          'Authorization': 'Bearer $token'
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        final jsonData = jsonDecode(responseBody);
-        if (jsonData != null) {
-          if (jsonData is List) {
-            final List<dynamic> jsonDataList = jsonData;
-            final List<ord.Product> products = jsonDataList
-                .map<ord.Product>((item) => ord.Product.fromJson(item))
-                .toList();
-
-            // Limit the number of products to 10
-            final limitedProducts = products.take(10).toList();
-
-            setState(() {
-              productList = limitedProducts;
-            });
-          } else if (jsonData is Map) {
-            final List<dynamic>? jsonDataList = jsonData['body'];
-            if (jsonDataList != null) {
-              final List<ord.Product> products = jsonDataList
-                  .map<ord.Product>((item) => ord.Product.fromJson(item))
-                  .toList();
-
-              // Limit the number of products to 10
-              final limitedProducts = products.take(10).toList();
-
-              setState(() {
-                productList = limitedProducts;
-              });
-            } else {
-              setState(() {
-                productList = []; // Initialize with an empty list
-              });
-            }
-          } else {
-            setState(() {
-              productList = []; // Initialize with an empty list
-            });
-          }
-        } else {
-          setState(() {
-            productList = []; // Initialize with an empty list
-          });
-        }
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (error) {
-      print('Error: $error');
-    }
-  }
-
   Future fetchImage(String imageId) async {
     print('---------inside Image Fetch Api---------');
     String url =
@@ -218,8 +157,8 @@ class _ProductForm1State extends State<ProductForm1> {
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem(
-          'Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
+      _buildMenuItem('Customer', Icons.account_circle_outlined,
+          Colors.blue[900]!, '/Customer'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -235,13 +174,12 @@ class _ProductForm1State extends State<ProductForm1> {
               'Products', Icons.image_outlined, Colors.black, '/Product_List')),
       _buildMenuItem(
           'Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-
       _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!,
           '/Delivery_List'),
       _buildMenuItem('Invoice', Icons.document_scanner_outlined,
           Colors.blue[900]!, '/Invoice'),
-      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!,
-          '/Payment_List'),
+      _buildMenuItem(
+          'Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
       _buildMenuItem(
           'Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
       _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!,
@@ -382,11 +320,11 @@ class _ProductForm1State extends State<ProductForm1> {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       };
-      final http.Response response = await http.delete(apiUri,
+      final http.Response response = await http.delete(
+        apiUri,
         headers: headers,
       );
-
-      if (response.statusCode == 200) {
+      if (token == " ") {
         showDialog(
           barrierDismissible: false,
           context: context,
@@ -399,45 +337,51 @@ class _ProductForm1State extends State<ProductForm1> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Close Button
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
                         // Warning Icon
-                        const Icon(Icons.check_circle_rounded,
-                            color: Colors.green, size: 50),
-                        const SizedBox(height: 16),
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
                         // Confirmation Message
-                        const Text(
-                          'Product Deleted Successfuly',
+                        Text(
+                          'Session Expired',
                           style: TextStyle(
-                            fontSize: 18,
-                            //  fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        Text(
+                          "Please log in again to continue",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 20),
                         // Buttons
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Handle No action
-                                context.go('/Product_List');
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                side: const BorderSide(color: Colors.blue),
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
-                              child: const Text(
-                                'OK',
+                              child: Text(
+                                'ok',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.blue,
                                 ),
                               ),
                             ),
@@ -450,54 +394,82 @@ class _ProductForm1State extends State<ProductForm1> {
               ),
             );
           },
-        );
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
       } else {
-        print('Failed to delete product: ${response.statusCode}');
+        if (response.statusCode == 200) {
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Close Button
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          const Icon(Icons.check_circle_rounded,
+                              color: Colors.green, size: 50),
+                          const SizedBox(height: 16),
+                          // Confirmation Message
+                          const Text(
+                            'Product Deleted Successfuly',
+                            style: TextStyle(
+                              fontSize: 18,
+                              //  fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle No action
+                                  context.go('/Product_List');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  side: const BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'OK',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        } else {
+          print('Failed to delete product: ${response.statusCode}');
+        }
       }
     } catch (e) {
       print('Error: $e');
     }
-  }
-
-  void searchSelect(String productName) async {
-    // print(token);
-    try {
-      // Make an HTTP request to fetch data from the API
-      final response = await http.get(
-        Uri.parse('$apicall/productmaster/search_by_productname/$productName'),
-        headers: {
-          "Content-Type": "application/json",
-          'Authorization': 'Bearer $token'
-        },
-      );
-
-      // Check if the request was successful
-      if (response.statusCode == 200) {
-        //print(token);
-        // Parse the response body
-        final jsonData = jsonDecode(response.body);
-        // Convert the JSON data into a list of Product objects
-        final List<ord.Product> products = jsonData
-            .map<ord.Product>((item) => ord.Product.fromJson(item))
-            .toList();
-        // Update the state to reflect the fetched products
-        setState(() {
-          productList = products;
-        });
-      } else {
-        // Handle error if the request was not successful
-        throw Exception('Failed to load data');
-      }
-    } catch (error) {
-      // Handle any errors that occur during the process
-      print('Error: $error');
-    }
-  }
-
-  void handleTextFormFieldTap() async {
-    String productName = 'ProductName';
-    String category = 'category';
-    await fetchData(productName, category);
   }
 
   Future<void> checkimage() async {
@@ -530,37 +502,90 @@ class _ProductForm1State extends State<ProductForm1> {
         "Authorization": 'Bearer $token'
       },
     );
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
 
-    if (response.statusCode == 200) {
-      try {
-        final jsonData = jsonDecode(response.body);
-        if (jsonData != null) {
-          if (jsonData is List) {
-            final products =
-                jsonData.map((item) => ord.Product.fromJson(item)).toList();
-            final product =
-                products.firstWhere((element) => element.prodId == prodId);
-            setState(() {
-              productNameController.text = product.productName;
-              categoryController.text = product.category;
-              subCategoryController.text = product.subCategory;
-              taxController.text = product.tax;
-              unitController.text = product.unit;
-              priceController.text = product.price.toString();
-              discountController.text = product.discount;
-              imageIdContoller.text = product.imageId;
-              print('image name');
-              print(imageIdContoller.text);
-              loadImage(imageIdContoller.text);
-              //await loadImage(imageIdContoller.text);
-            });
-          } else if (jsonData is Map) {
-            if (jsonData.containsKey('body')) {
-              final products = jsonData['body']
-                  .map((item) => ord.Product.fromJson(item))
-                  .toList();
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
+
+    }
+    else{
+      if (response.statusCode == 200) {
+        try {
+          final jsonData = jsonDecode(response.body);
+          if (jsonData != null) {
+            if (jsonData is List) {
+              final products =
+              jsonData.map((item) => ord.Product.fromJson(item)).toList();
               final product =
-                  products.firstWhere((element) => element.prodId == prodId);
+              products.firstWhere((element) => element.prodId == prodId);
               setState(() {
                 productNameController.text = product.productName;
                 categoryController.text = product.category;
@@ -570,24 +595,48 @@ class _ProductForm1State extends State<ProductForm1> {
                 priceController.text = product.price.toString();
                 discountController.text = product.discount;
                 imageIdContoller.text = product.imageId;
-                print('image size');
+                print('image name');
                 print(imageIdContoller.text);
+                loadImage(imageIdContoller.text);
+                //await loadImage(imageIdContoller.text);
               });
+            } else if (jsonData is Map) {
+              if (jsonData.containsKey('body')) {
+                final products = jsonData['body']
+                    .map((item) => ord.Product.fromJson(item))
+                    .toList();
+                final product =
+                products.firstWhere((element) => element.prodId == prodId);
+                setState(() {
+                  productNameController.text = product.productName;
+                  categoryController.text = product.category;
+                  subCategoryController.text = product.subCategory;
+                  taxController.text = product.tax;
+                  unitController.text = product.unit;
+                  priceController.text = product.price.toString();
+                  discountController.text = product.discount;
+                  imageIdContoller.text = product.imageId;
+                  print('image size');
+                  print(imageIdContoller.text);
+                });
+              } else {
+                print('No product found');
+              }
             } else {
               print('No product found');
             }
           } else {
             print('No product found');
           }
-        } else {
-          print('No product found');
+        } catch (e) {
+          print('Error decoding JSON: $e');
         }
-      } catch (e) {
-        print('Error decoding JSON: $e');
+      } else {
+        throw Exception('Failed to load data');
       }
-    } else {
-      throw Exception('Failed to load data');
     }
+
+
   }
 
   @override
@@ -637,14 +686,15 @@ class _ProductForm1State extends State<ProductForm1> {
                   height: maxHeight, //height
                   child: Stack(
                     children: [
-                      if(constraints.maxHeight <= 500)...{
+                      if (constraints.maxHeight <= 500) ...{
                         SingleChildScrollView(
                           child: Align(
                             alignment: Alignment.topLeft,
                             child: Container(
                               width: 200,
                               color: const Color(0xFFF7F6FA),
-                              padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                              padding: const EdgeInsets.only(
+                                  left: 15, top: 10, right: 15),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: _buildMenuItems(context),
@@ -652,15 +702,14 @@ class _ProductForm1State extends State<ProductForm1> {
                             ),
                           ),
                         )
-
-                      }
-                      else...{
+                      } else ...{
                         Align(
                           alignment: Alignment.topLeft,
                           child: Container(
                             width: 200,
                             color: const Color(0xFFF7F6FA),
-                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            padding: const EdgeInsets.only(
+                                left: 15, top: 10, right: 15),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: _buildMenuItems(context),
@@ -742,12 +791,12 @@ class _ProductForm1State extends State<ProductForm1> {
                                 child: ListView.separated(
                                   itemCount: searchText.isNotEmpty
                                       ? widget.orderDetails!
-                                      .where((orderDetail) => orderDetail
-                                      .orderDate
-                                      .toLowerCase()
-                                      .contains(
-                                      searchText.toLowerCase()))
-                                      .length
+                                          .where((orderDetail) => orderDetail
+                                              .orderDate
+                                              .toLowerCase()
+                                              .contains(
+                                                  searchText.toLowerCase()))
+                                          .length
                                       : widget.orderDetails!.length,
                                   // searchText.isNotEmpty
                                   //     ? widget.orderDetails!.length : widget.orderDetails!.where((orderDetail) =>
@@ -757,14 +806,14 @@ class _ProductForm1State extends State<ProductForm1> {
                                     // final OrderDetail orderDetail = widget.orderDetails![index];
                                     //original
                                     final OrderDetail orderDetail = (searchText
-                                        .isNotEmpty
+                                            .isNotEmpty
                                         ? widget.orderDetails!
-                                        .where((orderDetail) => orderDetail
-                                        .orderDate
-                                        .toLowerCase()
-                                        .contains(
-                                        searchText.toLowerCase()))
-                                        .toList()[index]
+                                            .where((orderDetail) => orderDetail
+                                                .orderDate
+                                                .toLowerCase()
+                                                .contains(
+                                                    searchText.toLowerCase()))
+                                            .toList()[index]
                                         : widget.orderDetails![index]);
                                     //   final OrderDetail orderDetail = orderDetails[index];
                                     // final OrderDetail orderDetail = searchText.isNotEmpty ?
@@ -818,47 +867,23 @@ class _ProductForm1State extends State<ProductForm1> {
                                         setState(() {
                                           // _isLoading = true;
                                           for (int i = 0;
-                                          i < _isSelected.length;
-                                          i++) {
+                                              i < _isSelected.length;
+                                              i++) {
                                             _isSelected[i] = i == index;
                                           }
                                           prodIdController.text =
-                                          orderDetail.orderId!;
+                                              orderDetail.orderId!;
                                         });
                                         await Future.delayed(
                                             const Duration(milliseconds: 2));
                                         await fetchProducts(
                                             orderDetail.orderId!);
-
-                                        //context.go('/dasbaord/productpage/ontap');
-                                        //                                     setState(() {
-                                        //                                       prodIdController.text = orderDetail.orderId!;
-                                        //                                      // productNameController.text = orderDetail.orderDate!;
-                                        //
-                                        //                                       print(prodIdController.text);
-                                        //                                        //You need to set the other controllers here, but you don't have these properties in OrderDetail
-                                        //                                        // categoryController.text = orderDetail.category;
-                                        //                                        // subCategoryController.text = orderDetail.subCategory;
-                                        //                                        // taxController.text = orderDetail.tax;
-                                        //                                        // unitController.text = orderDetail.unit;
-                                        //                                        // priceController.text = orderDetail.price.toString();
-                                        //                                        // discountController.text = orderDetail.discount;
-                                        //                                        // imageIdContoller.text = orderDetail.imageId;
-                                        //                                       print('---iamde');
-                                        //                                       // widget.dia
-                                        //                                       _displayData['imageId'] = imageIdContoller.text;
-                                        // // widget.displayData['imageId'] =
-                                        // //     imageIdContoller.text;
-                                        //                                       // widget.displayData['imageId'] =_displayData['imageId'];
-                                        //                                       print(imageIdContoller.text);
-                                        //                                       // fetchImage(orderDetail.imageId); // You don't have imageId in OrderDetail
-                                        //                                     });
                                       },
                                       child: Container(
                                         decoration: isSelected
                                             ? BoxDecoration(
-                                            color: Colors.lightBlue[
-                                            100]) // selected color
+                                                color: Colors.lightBlue[
+                                                    100]) // selected color
                                             : null,
                                         child: ListTile(
                                           title: Text(
@@ -942,7 +967,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                             return AlertDialog(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                BorderRadius.circular(15.0),
+                                                    BorderRadius.circular(15.0),
                                               ),
                                               contentPadding: EdgeInsets.zero,
                                               content: Column(
@@ -951,9 +976,10 @@ class _ProductForm1State extends State<ProductForm1> {
                                                   // Close Button
                                                   Align(
                                                     alignment:
-                                                    Alignment.topRight,
+                                                        Alignment.topRight,
                                                     child: IconButton(
-                                                      icon: const Icon(Icons.close,
+                                                      icon: const Icon(
+                                                          Icons.close,
                                                           color: Colors.red),
                                                       onPressed: () {
                                                         Navigator.of(context)
@@ -963,32 +989,35 @@ class _ProductForm1State extends State<ProductForm1> {
                                                   ),
                                                   Padding(
                                                     padding:
-                                                    const EdgeInsets.all(
-                                                        16.0),
+                                                        const EdgeInsets.all(
+                                                            16.0),
                                                     child: Column(
                                                       children: [
                                                         // Warning Icon
-                                                        const Icon(Icons.warning,
+                                                        const Icon(
+                                                            Icons.warning,
                                                             color:
-                                                            Colors.orange,
+                                                                Colors.orange,
                                                             size: 50),
-                                                        const SizedBox(height: 16),
+                                                        const SizedBox(
+                                                            height: 16),
                                                         // Confirmation Message
                                                         const Text(
                                                           'Are You Sure',
                                                           style: TextStyle(
                                                             fontSize: 18,
                                                             fontWeight:
-                                                            FontWeight.bold,
+                                                                FontWeight.bold,
                                                             color: Colors.black,
                                                           ),
                                                         ),
-                                                        const SizedBox(height: 20),
+                                                        const SizedBox(
+                                                            height: 20),
                                                         // Buttons
                                                         Row(
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceEvenly,
+                                                              MainAxisAlignment
+                                                                  .spaceEvenly,
                                                           children: [
                                                             ElevatedButton(
                                                               onPressed: () {
@@ -999,26 +1028,26 @@ class _ProductForm1State extends State<ProductForm1> {
                                                                 // Navigator.of(context).pop();
                                                               },
                                                               style:
-                                                              ElevatedButton
-                                                                  .styleFrom(
+                                                                  ElevatedButton
+                                                                      .styleFrom(
                                                                 backgroundColor:
-                                                                Colors
-                                                                    .white,
+                                                                    Colors
+                                                                        .white,
                                                                 side: const BorderSide(
                                                                     color: Colors
                                                                         .blue),
                                                                 shape:
-                                                                RoundedRectangleBorder(
+                                                                    RoundedRectangleBorder(
                                                                   borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                      10.0),
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10.0),
                                                                 ),
                                                               ),
                                                               child: const Text(
                                                                 'Yes',
                                                                 style:
-                                                                TextStyle(
+                                                                    TextStyle(
                                                                   color: Colors
                                                                       .blue,
                                                                 ),
@@ -1028,30 +1057,30 @@ class _ProductForm1State extends State<ProductForm1> {
                                                               onPressed: () {
                                                                 // Handle No action
                                                                 Navigator.of(
-                                                                    context)
+                                                                        context)
                                                                     .pop();
                                                               },
                                                               style:
-                                                              ElevatedButton
-                                                                  .styleFrom(
+                                                                  ElevatedButton
+                                                                      .styleFrom(
                                                                 backgroundColor:
-                                                                Colors
-                                                                    .white,
+                                                                    Colors
+                                                                        .white,
                                                                 side: const BorderSide(
                                                                     color: Colors
                                                                         .red),
                                                                 shape:
-                                                                RoundedRectangleBorder(
+                                                                    RoundedRectangleBorder(
                                                                   borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                      10.0),
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10.0),
                                                                 ),
                                                               ),
                                                               child: const Text(
                                                                 'No',
                                                                 style:
-                                                                TextStyle(
+                                                                    TextStyle(
                                                                   color: Colors
                                                                       .red,
                                                                 ),
@@ -1090,7 +1119,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                 ),
                                 Padding(
                                   padding:
-                                  const EdgeInsets.only(right: 30, top: 3),
+                                      const EdgeInsets.only(right: 30, top: 3),
                                   child: OutlinedButton(
                                     onPressed: () {
                                       print('---- image path-----');
@@ -1222,7 +1251,8 @@ class _ProductForm1State extends State<ProductForm1> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 FutureBuilder(
-                                  future: Future.delayed(const Duration(seconds: 2)),
+                                  future: Future.delayed(
+                                      const Duration(seconds: 2)),
                                   // 2-second buffer
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
@@ -1239,62 +1269,62 @@ class _ProductForm1State extends State<ProductForm1> {
                                           decoration: BoxDecoration(
                                             color: Colors.grey[300],
                                             borderRadius:
-                                            BorderRadius.circular(4),
+                                                BorderRadius.circular(4),
                                           ),
                                           child: Center(
                                               child:
-                                              ImageLoadingIcon()), // Custom icon here
+                                                  ImageLoadingIcon()), // Custom icon here
                                         ),
                                       );
                                     } else {
                                       return storeImageBytes1 != null
                                           ? Padding(
-                                        padding: EdgeInsets.only(
-                                            top: maxHeight * 0.12),
-                                        child: Container(
-                                          margin: EdgeInsets.only(
-                                              left: maxWidth * 0.12),
-                                          width: maxWidth * 0.2,
-                                          height: 300,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.grey),
-                                            color: Colors.white70,
-                                            borderRadius:
-                                            BorderRadius.circular(8),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.blue
-                                                    .withOpacity(0.1),
-                                                spreadRadius: 1,
-                                                blurRadius: 3,
-                                                offset:
-                                                const Offset(0, 1),
+                                              padding: EdgeInsets.only(
+                                                  top: maxHeight * 0.12),
+                                              child: Container(
+                                                margin: EdgeInsets.only(
+                                                    left: maxWidth * 0.12),
+                                                width: maxWidth * 0.2,
+                                                height: 300,
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.grey),
+                                                  color: Colors.white70,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.blue
+                                                          .withOpacity(0.1),
+                                                      spreadRadius: 1,
+                                                      blurRadius: 3,
+                                                      offset:
+                                                          const Offset(0, 1),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Image.memory(
+                                                    storeImageBytes1!),
                                               ),
-                                            ],
-                                          ),
-                                          child: Image.memory(
-                                              storeImageBytes1!),
-                                        ),
-                                      )
+                                            )
                                           : Padding(
-                                        padding: EdgeInsets.only(
-                                            top: maxHeight * 0.12),
-                                        child: Container(
-                                          margin: EdgeInsets.only(
-                                              left: maxWidth * 0.12),
-                                          width: maxWidth * 0.2,
-                                          height: 300,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[300],
-                                            borderRadius:
-                                            BorderRadius.circular(4),
-                                          ),
-                                          child: const Center(
-                                              child: Text(
-                                                  'No Image Found.')),
-                                        ),
-                                      );
+                                              padding: EdgeInsets.only(
+                                                  top: maxHeight * 0.12),
+                                              child: Container(
+                                                margin: EdgeInsets.only(
+                                                    left: maxWidth * 0.12),
+                                                width: maxWidth * 0.2,
+                                                height: 300,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[300],
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: const Center(
+                                                    child: Text(
+                                                        'No Image Found.')),
+                                              ),
+                                            );
                                     }
                                   },
                                 ),
@@ -1316,14 +1346,15 @@ class _ProductForm1State extends State<ProductForm1> {
                   width: 1500,
                   child: Stack(
                     children: [
-                      if(constraints.maxHeight <= 500)...{
+                      if (constraints.maxHeight <= 500) ...{
                         SingleChildScrollView(
                           child: Align(
                             alignment: Alignment.topLeft,
                             child: Container(
                               width: 200,
                               color: const Color(0xFFF7F6FA),
-                              padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                              padding: const EdgeInsets.only(
+                                  left: 15, top: 10, right: 15),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: _buildMenuItems(context),
@@ -1331,15 +1362,14 @@ class _ProductForm1State extends State<ProductForm1> {
                             ),
                           ),
                         )
-
-                      }
-                      else...{
+                      } else ...{
                         Align(
                           alignment: Alignment.topLeft,
                           child: Container(
                             width: 200,
                             color: const Color(0xFFF7F6FA),
-                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                            padding: const EdgeInsets.only(
+                                left: 15, top: 10, right: 15),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: _buildMenuItems(context),
@@ -1392,7 +1422,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                               ),
                                               const Padding(
                                                 padding:
-                                                EdgeInsets.only(left: 20),
+                                                    EdgeInsets.only(left: 20),
                                                 child: Text(
                                                   'Product List',
                                                   style: TextStyle(
@@ -1407,38 +1437,38 @@ class _ProductForm1State extends State<ProductForm1> {
                                                 alignment: Alignment.topRight,
                                                 child: Padding(
                                                   padding:
-                                                  const EdgeInsets.only(
-                                                      top: 15, right: 30),
+                                                      const EdgeInsets.only(
+                                                          top: 15, right: 30),
                                                   child: OutlinedButton(
                                                     onPressed: () {
                                                       showDialog(
                                                         barrierDismissible:
-                                                        false,
+                                                            false,
                                                         context: context,
                                                         builder: (BuildContext
-                                                        context) {
+                                                            context) {
                                                           return AlertDialog(
                                                             shape:
-                                                            RoundedRectangleBorder(
+                                                                RoundedRectangleBorder(
                                                               borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                  15.0),
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15.0),
                                                             ),
                                                             contentPadding:
-                                                            EdgeInsets.zero,
+                                                                EdgeInsets.zero,
                                                             content: Column(
                                                               mainAxisSize:
-                                                              MainAxisSize
-                                                                  .min,
+                                                                  MainAxisSize
+                                                                      .min,
                                                               children: [
                                                                 // Close Button
                                                                 Align(
                                                                   alignment:
-                                                                  Alignment
-                                                                      .topRight,
+                                                                      Alignment
+                                                                          .topRight,
                                                                   child:
-                                                                  IconButton(
+                                                                      IconButton(
                                                                     icon: const Icon(
                                                                         Icons
                                                                             .close,
@@ -1447,16 +1477,16 @@ class _ProductForm1State extends State<ProductForm1> {
                                                                     onPressed:
                                                                         () {
                                                                       Navigator.of(
-                                                                          context)
+                                                                              context)
                                                                           .pop();
                                                                     },
                                                                   ),
                                                                 ),
                                                                 Padding(
                                                                   padding:
-                                                                  const EdgeInsets
-                                                                      .all(
-                                                                      16.0),
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          16.0),
                                                                   child: Column(
                                                                     children: [
                                                                       // Warning Icon
@@ -1466,30 +1496,30 @@ class _ProductForm1State extends State<ProductForm1> {
                                                                           color: Colors
                                                                               .orange,
                                                                           size:
-                                                                          50),
+                                                                              50),
                                                                       const SizedBox(
                                                                           height:
-                                                                          16),
+                                                                              16),
                                                                       // Confirmation Message
                                                                       const Text(
                                                                         'Are You Sure',
                                                                         style:
-                                                                        TextStyle(
+                                                                            TextStyle(
                                                                           fontSize:
-                                                                          18,
+                                                                              18,
                                                                           fontWeight:
-                                                                          FontWeight.bold,
+                                                                              FontWeight.bold,
                                                                           color:
-                                                                          Colors.black,
+                                                                              Colors.black,
                                                                         ),
                                                                       ),
                                                                       const SizedBox(
                                                                           height:
-                                                                          20),
+                                                                              20),
                                                                       // Buttons
                                                                       Row(
                                                                         mainAxisAlignment:
-                                                                        MainAxisAlignment.spaceEvenly,
+                                                                            MainAxisAlignment.spaceEvenly,
                                                                         children: [
                                                                           ElevatedButton(
                                                                             onPressed:
@@ -1500,7 +1530,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                                                               // Navigator.of(context).pop();
                                                                             },
                                                                             style:
-                                                                            ElevatedButton.styleFrom(
+                                                                                ElevatedButton.styleFrom(
                                                                               backgroundColor: Colors.white,
                                                                               side: const BorderSide(color: Colors.blue),
                                                                               shape: RoundedRectangleBorder(
@@ -1508,7 +1538,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                                                               ),
                                                                             ),
                                                                             child:
-                                                                            const Text(
+                                                                                const Text(
                                                                               'Yes',
                                                                               style: TextStyle(
                                                                                 color: Colors.blue,
@@ -1522,7 +1552,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                                                               Navigator.of(context).pop();
                                                                             },
                                                                             style:
-                                                                            ElevatedButton.styleFrom(
+                                                                                ElevatedButton.styleFrom(
                                                                               backgroundColor: Colors.white,
                                                                               side: const BorderSide(color: Colors.red),
                                                                               shape: RoundedRectangleBorder(
@@ -1530,7 +1560,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                                                               ),
                                                                             ),
                                                                             child:
-                                                                            const Text(
+                                                                                const Text(
                                                                               'No',
                                                                               style: TextStyle(
                                                                                 color: Colors.red,
@@ -1551,13 +1581,13 @@ class _ProductForm1State extends State<ProductForm1> {
                                                     style: OutlinedButton
                                                         .styleFrom(
                                                       backgroundColor:
-                                                      Colors.red[900],
+                                                          Colors.red[900],
                                                       // Button background color
                                                       shape:
-                                                      RoundedRectangleBorder(
+                                                          RoundedRectangleBorder(
                                                         borderRadius:
-                                                        BorderRadius.circular(
-                                                            5), // Rounded corners
+                                                            BorderRadius.circular(
+                                                                5), // Rounded corners
                                                       ),
                                                       side: BorderSide
                                                           .none, // No outline
@@ -1567,7 +1597,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                                       style: TextStyle(
                                                         fontSize: 14,
                                                         fontWeight:
-                                                        FontWeight.w100,
+                                                            FontWeight.w100,
                                                         color: Colors.white,
                                                       ),
                                                     ),
@@ -1596,17 +1626,17 @@ class _ProductForm1State extends State<ProductForm1> {
                                                     print('hii');
                                                     // widget.displayData['imageId'] = imageIdContoller.text;
                                                     print(widget.displayData[
-                                                    'imageId'] ??
+                                                            'imageId'] ??
                                                         "");
                                                     _displayData['imageId'] ??
                                                         "";
                                                     print(
                                                         'checkk what is this');
                                                     print(_displayData[
-                                                    'imageId'] ??
+                                                            'imageId'] ??
                                                         "");
                                                     widget.displayData[
-                                                    'imageId'] ??
+                                                            'imageId'] ??
                                                         "";
                                                     print(
                                                         imageIdContoller.text);
@@ -1623,7 +1653,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                                         prodIdController.text;
 
                                                     if (storeImageBytes1 !=
-                                                        null &&
+                                                            null &&
                                                         productNameController
                                                             .text.isNotEmpty &&
                                                         priceController
@@ -1647,24 +1677,24 @@ class _ProductForm1State extends State<ProductForm1> {
                                                           extra: {
                                                             'prodId': prodText,
                                                             'textInput':
-                                                            _textInput ??
-                                                                '',
+                                                                _textInput ??
+                                                                    '',
                                                             'priceInput':
-                                                            _priceInput ??
-                                                                '',
+                                                                _priceInput ??
+                                                                    '',
                                                             'discountInput':
-                                                            discountInput ??
-                                                                '',
+                                                                discountInput ??
+                                                                    '',
                                                             'inputText':
-                                                            inputText,
+                                                                inputText,
                                                             'subText': subText,
                                                             'unitText':
-                                                            unitText,
+                                                                unitText,
                                                             'taxText': taxText,
                                                             'imagePath':
-                                                            storeImageBytes1,
+                                                                storeImageBytes1,
                                                             'imageId': _displayData[
-                                                            'imageId'] ??
+                                                                    'imageId'] ??
                                                                 imageIdContoller
                                                                     .text ??
                                                                 '',
@@ -1692,15 +1722,15 @@ class _ProductForm1State extends State<ProductForm1> {
                                                     }
                                                   },
                                                   style:
-                                                  OutlinedButton.styleFrom(
+                                                      OutlinedButton.styleFrom(
                                                     backgroundColor:
-                                                    Colors.blue[800],
+                                                        Colors.blue[800],
                                                     // Button background color
                                                     shape:
-                                                    RoundedRectangleBorder(
+                                                        RoundedRectangleBorder(
                                                       borderRadius:
-                                                      BorderRadius.circular(
-                                                          5), // Rounded corners
+                                                          BorderRadius.circular(
+                                                              5), // Rounded corners
                                                     ),
                                                     side: BorderSide
                                                         .none, // No outline
@@ -1741,11 +1771,11 @@ class _ProductForm1State extends State<ProductForm1> {
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius:
-                                          BorderRadius.circular(4),
+                                              BorderRadius.circular(4),
                                         ),
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
+                                              CrossAxisAlignment.stretch,
                                           children: [
                                             SizedBox(
                                               height: 35,
@@ -1757,12 +1787,12 @@ class _ProductForm1State extends State<ProductForm1> {
                                                     bottom: 5),
                                                 child: TextFormField(
                                                   decoration:
-                                                  const InputDecoration(
+                                                      const InputDecoration(
                                                     hintText: 'Search product',
                                                     contentPadding:
-                                                    EdgeInsets.all(8),
+                                                        EdgeInsets.all(8),
                                                     border:
-                                                    OutlineInputBorder(),
+                                                        OutlineInputBorder(),
                                                     prefixIcon: Icon(
                                                       Icons.search_outlined,
                                                       color: Colors.blue,
@@ -1774,29 +1804,6 @@ class _ProductForm1State extends State<ProductForm1> {
                                                           value.toLowerCase();
                                                     });
                                                   },
-                                                  // final List<OrderDetail> filteredOrderDetails = searchText.isNotEmpty
-                                                  // ? widget.orderDetails!.where((orderDetail) =>
-                                                  // orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
-                                                  // ).toList()
-                                                  //     : widget.orderDetails!;
-                                                  //
-                                                  // ...
-                                                  //
-                                                  // itemCount: filteredOrderDetails.length,
-                                                  //
-                                                  // itemBuilder: (context, index) {
-                                                  // final OrderDetail orderDetail = filteredOrderDetails[index];
-                                                  // ...
-                                                  // }
-                                                  //  onChanged: _onSearchChanged(),
-                                                  // onChanged: (value) {
-                                                  // //  token = window.sessionStorage["token"] ?? " ";
-                                                  //   setState(() {
-                                                  //     searchText = value; // Update searchText
-                                                  //   });
-                                                  //   //_newData();
-                                                  //   // fetchImage(); // Fetch data
-                                                  // },
                                                 ),
                                               ),
                                             ),
@@ -1806,112 +1813,62 @@ class _ProductForm1State extends State<ProductForm1> {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                  BorderRadius.circular(10),
+                                                      BorderRadius.circular(10),
                                                 ),
                                                 child: ListView.separated(
-                                                  itemCount: searchText.isNotEmpty
+                                                  itemCount: searchText
+                                                          .isNotEmpty
                                                       ? widget.orderDetails!
-                                                      .where((orderDetail) =>
-                                                      orderDetail
-                                                          .orderDate
-                                                          .toLowerCase()
-                                                          .contains(
-                                                          searchText
-                                                              .toLowerCase()))
-                                                      .length
+                                                          .where((orderDetail) =>
+                                                              orderDetail
+                                                                  .orderDate
+                                                                  .toLowerCase()
+                                                                  .contains(
+                                                                      searchText
+                                                                          .toLowerCase()))
+                                                          .length
                                                       : widget
-                                                      .orderDetails!.length,
-                                                  // searchText.isNotEmpty
-                                                  //     ? widget.orderDetails!.length : widget.orderDetails!.where((orderDetail) =>
-                                                  //     orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
-                                                  // ).length,
+                                                          .orderDetails!.length,
                                                   itemBuilder:
                                                       (context, index) {
-                                                    // final OrderDetail orderDetail = widget.orderDetails![index];
-                                                    //original
                                                     final OrderDetail orderDetail = (searchText
-                                                        .isNotEmpty
+                                                            .isNotEmpty
                                                         ? widget.orderDetails!
-                                                        .where((orderDetail) =>
-                                                        orderDetail
-                                                            .orderDate
-                                                            .toLowerCase()
-                                                            .contains(
-                                                            searchText
-                                                                .toLowerCase()))
-                                                        .toList()[index]
+                                                            .where((orderDetail) =>
+                                                                orderDetail
+                                                                    .orderDate
+                                                                    .toLowerCase()
+                                                                    .contains(
+                                                                        searchText
+                                                                            .toLowerCase()))
+                                                            .toList()[index]
                                                         : widget.orderDetails![
-                                                    index]);
-                                                    //   final OrderDetail orderDetail = orderDetails[index];
-                                                    // final OrderDetail orderDetail = searchText.isNotEmpty ?
-                                                    // widget.orderDetails!.where((orderDetail) => orderDetail.orderDate.toLowerCase().contains(searchText.toLowerCase())
-                                                    // ).length :widget.orderDetails![index];
+                                                            index]);
                                                     bool isSelected =
                                                         orderDetail.orderId ==
                                                             prodIdController
                                                                 .text;
-                                                    // widget.orderDetails!.sort((a, b) {
-                                                    //   if (a.orderId ==
-                                                    //       prodIdController.text) {
-                                                    //     return -1; // selected product name comes first
-                                                    //   } else if (b.orderId ==
-                                                    //       prodIdController.text) {
-                                                    //     return 1; // selected product name comes first
-                                                    //   } else {
-                                                    //     final aIsNumber = a.orderId[0]
-                                                    //         .contains(RegExp(r'[0-90]'));
-                                                    //     final bIsNumber = b.orderId[0]
-                                                    //         .contains(RegExp(r'[0-90]'));
-                                                    //
-                                                    //     if (aIsNumber && !bIsNumber) {
-                                                    //       return 1;
-                                                    //     } else if (!aIsNumber && bIsNumber) {
-                                                    //       return -1;
-                                                    //     } else {
-                                                    //       return a.orderId
-                                                    //           .compareTo(b.orderId);
-                                                    //     }
-                                                    //   }
-                                                    // });
-                                                    // widget.orderDetails!.sort((a, b) {
-                                                    //   if (a.orderId == prodIdController.text) {
-                                                    //     return -1; // selected product name comes first
-                                                    //   } else if (b.orderId == prodIdController.text) {
-                                                    //     return 1; // selected product name comes first
-                                                    //   } else {
-                                                    //     final aIsNumber = a.orderId[0].contains(RegExp(r'[0-90]'));
-                                                    //     final bIsNumber = b.orderId[0].contains(RegExp(r'[0-90]'));
-                                                    //
-                                                    //     if (aIsNumber && !bIsNumber) {
-                                                    //       return 1;
-                                                    //     } else if (!aIsNumber && bIsNumber) {
-                                                    //       return -1;
-                                                    //     } else {
-                                                    //       return a.orderId.compareTo(b.orderId);
-                                                    //     }
-                                                    //   }
-                                                    // });
                                                     return GestureDetector(
                                                       onTap: () async {
                                                         setState(() {
                                                           // _isLoading = true;
                                                           for (int i = 0;
-                                                          i <
-                                                              _isSelected
-                                                                  .length;
-                                                          i++) {
+                                                              i <
+                                                                  _isSelected
+                                                                      .length;
+                                                              i++) {
                                                             _isSelected[i] =
                                                                 i == index;
                                                           }
                                                           prodIdController
-                                                              .text =
-                                                          orderDetail
-                                                              .orderId!;
+                                                                  .text =
+                                                              orderDetail
+                                                                  .orderId!;
                                                         });
                                                         await Future.delayed(
                                                             const Duration(
                                                                 milliseconds:
-                                                                2));
+                                                                    2));
                                                         await fetchProducts(
                                                             orderDetail
                                                                 .orderId!);
@@ -1943,24 +1900,24 @@ class _ProductForm1State extends State<ProductForm1> {
                                                       child: Container(
                                                         decoration: isSelected
                                                             ? BoxDecoration(
-                                                            color: Colors
-                                                                .lightBlue[
-                                                            100]) // selected color
+                                                                color: Colors
+                                                                        .lightBlue[
+                                                                    100]) // selected color
                                                             : null,
                                                         child: ListTile(
                                                           title: Text(
                                                             '${orderDetail.orderDate}',
                                                             style: const TextStyle(
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold),
+                                                                    FontWeight
+                                                                        .bold),
                                                           ),
                                                           subtitle: Text(
                                                               '${orderDetail.orderCategory}'),
                                                           // You don't have category in OrderDetail
                                                           tileColor: isSelected
                                                               ? Colors
-                                                              .lightBlue[100]
+                                                                  .lightBlue[100]
                                                               : null,
                                                         ),
                                                       ),
@@ -1968,7 +1925,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                                   },
                                                   separatorBuilder:
                                                       (BuildContext context,
-                                                      int index) {
+                                                          int index) {
                                                     return const Divider();
                                                   },
                                                 )),
@@ -1976,8 +1933,8 @@ class _ProductForm1State extends State<ProductForm1> {
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 250),
+                                        padding:
+                                            const EdgeInsets.only(left: 250),
                                         child: Container(
                                           margin: const EdgeInsets.symmetric(
                                               horizontal: 10),
@@ -1987,7 +1944,7 @@ class _ProductForm1State extends State<ProductForm1> {
                                           width: 2,
                                           // Border height
                                           color:
-                                          Colors.grey[300], // Border color
+                                              Colors.grey[300], // Border color
                                         ),
                                       ),
                                       Padding(
@@ -2004,116 +1961,122 @@ class _ProductForm1State extends State<ProductForm1> {
                                             height: 800,
                                             child: Row(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                                  MainAxisAlignment.start,
                                               children: [
                                                 FutureBuilder(
                                                   future: Future.delayed(
-                                                      const Duration(seconds: 2)),
+                                                      const Duration(
+                                                          seconds: 2)),
                                                   // 2-second buffer
                                                   builder: (context, snapshot) {
                                                     if (snapshot
-                                                        .connectionState ==
+                                                            .connectionState ==
                                                         ConnectionState
                                                             .waiting) {
                                                       // Display the custom loading icon while waiting
                                                       return Padding(
                                                         padding:
-                                                        const EdgeInsets.only(
-                                                            top: 80),
+                                                            const EdgeInsets
+                                                                .only(top: 80),
                                                         child: Container(
                                                           margin:
-                                                          const EdgeInsets.only(
-                                                              left: 50),
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 50),
                                                           width: 300,
                                                           height: 300,
                                                           decoration:
-                                                          BoxDecoration(
+                                                              BoxDecoration(
                                                             color: Colors
                                                                 .grey[300],
                                                             borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                4),
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
                                                           ),
                                                           child: Center(
                                                               child:
-                                                              ImageLoadingIcon()), // Custom icon here
+                                                                  ImageLoadingIcon()), // Custom icon here
                                                         ),
                                                       );
                                                     } else {
                                                       return storeImageBytes1 !=
-                                                          null
+                                                              null
                                                           ? Padding(
-                                                        padding: const EdgeInsets
-                                                            .only(
-                                                            top: 80),
-                                                        child: Container(
-                                                          margin: const EdgeInsets
-                                                              .only(
-                                                              left:
-                                                              50),
-                                                          width: 300,
-                                                          height: 300,
-                                                          decoration:
-                                                          BoxDecoration(
-                                                            border: Border.all(
-                                                                color: Colors
-                                                                    .grey),
-                                                            color: Colors
-                                                                .white70,
-                                                            borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                8),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: Colors
-                                                                    .blue
-                                                                    .withOpacity(
-                                                                    0.1),
-                                                                spreadRadius:
-                                                                1,
-                                                                blurRadius:
-                                                                3,
-                                                                offset:
-                                                                const Offset(
-                                                                    0,
-                                                                    1),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      top: 80),
+                                                              child: Container(
+                                                                margin:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            50),
+                                                                width: 300,
+                                                                height: 300,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  border: Border.all(
+                                                                      color: Colors
+                                                                          .grey),
+                                                                  color: Colors
+                                                                      .white70,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8),
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: Colors
+                                                                          .blue
+                                                                          .withOpacity(
+                                                                              0.1),
+                                                                      spreadRadius:
+                                                                          1,
+                                                                      blurRadius:
+                                                                          3,
+                                                                      offset:
+                                                                          const Offset(
+                                                                              0,
+                                                                              1),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                child: Image.memory(
+                                                                    storeImageBytes1!),
                                                               ),
-                                                            ],
-                                                          ),
-                                                          child: Image.memory(
-                                                              storeImageBytes1!),
-                                                        ),
-                                                      )
+                                                            )
                                                           : Padding(
-                                                        padding: const EdgeInsets
-                                                            .only(
-                                                            top: 80),
-                                                        child: Container(
-                                                          margin: const EdgeInsets
-                                                              .only(
-                                                              left:
-                                                              50),
-                                                          width: 300,
-                                                          height: 300,
-                                                          decoration:
-                                                          BoxDecoration(
-                                                            color: Colors
-                                                                .grey[
-                                                            300],
-                                                            borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                4),
-                                                          ),
-                                                          child: const Center(
-                                                              child: Text(
-                                                                  'No Image Found.')),
-                                                        ),
-                                                      );
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      top: 80),
+                                                              child: Container(
+                                                                margin:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            50),
+                                                                width: 300,
+                                                                height: 300,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      300],
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              4),
+                                                                ),
+                                                                child: const Center(
+                                                                    child: Text(
+                                                                        'No Image Found.')),
+                                                              ),
+                                                            );
                                                     }
                                                   },
                                                 ),
@@ -2137,24 +2100,14 @@ class _ProductForm1State extends State<ProductForm1> {
                   ),
                 )
               }
-
-
-
-
-
-
             ],
           );
-
-
-
 
           /// For web view
         }),
       ),
     );
   }
-
 
   Widget _buildFirstWidget2(context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -2198,7 +2151,7 @@ class _ProductForm1State extends State<ProductForm1> {
                         fillColor: Colors.white,
                         enabled: isEditing,
                         contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 10),
+                            const EdgeInsets.symmetric(horizontal: 10),
                         border: InputBorder.none,
                         filled: true,
                         // hintText: 'Enter product Name',
@@ -2259,7 +2212,7 @@ class _ProductForm1State extends State<ProductForm1> {
                               border: InputBorder.none,
                               hintText: 'Enter Category',
                               contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                                  const EdgeInsets.symmetric(horizontal: 10),
                             ),
                           ),
                         ),
@@ -2300,7 +2253,7 @@ class _ProductForm1State extends State<ProductForm1> {
                               border: InputBorder.none,
                               hintText: 'Enter Sub Category',
                               contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                                  const EdgeInsets.symmetric(horizontal: 10),
                             ),
                           ),
                         ),
@@ -2345,7 +2298,7 @@ class _ProductForm1State extends State<ProductForm1> {
                               border: InputBorder.none,
                               hintText: 'Enter tax',
                               contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                                  const EdgeInsets.symmetric(horizontal: 10),
                             ),
                           ),
                         ),
@@ -2386,7 +2339,7 @@ class _ProductForm1State extends State<ProductForm1> {
                               border: InputBorder.none,
                               hintText: 'Enter Unit',
                               contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                                  const EdgeInsets.symmetric(horizontal: 10),
                             ),
                           ),
                         ),
@@ -2437,7 +2390,7 @@ class _ProductForm1State extends State<ProductForm1> {
                               border: InputBorder.none,
                               hintText: 'Enter Price',
                               contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                                  const EdgeInsets.symmetric(horizontal: 10),
                             ),
                             onChanged: (value) {
                               if (value.isNotEmpty && !isNumeric(value)) {
@@ -2498,7 +2451,7 @@ class _ProductForm1State extends State<ProductForm1> {
                               fillColor: Colors.white,
                               hintText: 'Enter Discount',
                               contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                                  const EdgeInsets.symmetric(horizontal: 10),
                             ),
                             onChanged: (value) {
                               if (value.isNotEmpty && !isNumeric(value)) {
@@ -2524,9 +2477,6 @@ class _ProductForm1State extends State<ProductForm1> {
       );
     });
   }
-
-
-
 
   final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 

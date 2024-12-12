@@ -686,6 +686,81 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
 
 
   Future<List<detail>> fetchOrders() async {
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
+
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
+return [];
+    }
+
     final response = await http.get(
       Uri.parse(
           '$apicall/order_master/get_all_ordermaster'),
@@ -717,59 +792,134 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
       },
       body: jsonEncode(updatedOrder),
     );
+if(token == " "){
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return
+        AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Warning Icon
+                    Icon(Icons.warning, color: Colors.orange, size: 50),
+                    SizedBox(height: 16),
+                    // Confirmation Message
+                    Text(
+                      'Session Expired',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text("Please log in again to continue",style: TextStyle(
+                      fontSize: 12,
 
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
+                      color: Colors.black,
+                    ),),
+                    SizedBox(height: 20),
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            // Handle Yes action
+                            context.go('/');
+                            // Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: BorderSide(color: Colors.blue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text(
+                            'ok',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+    },
+  ).whenComplete(() {
+    _hasShownPopup = false;
+  });
 
-      String orderId;
+}
+else{
+  if (response.statusCode == 200) {
+    final responseData = jsonDecode(response.body);
 
-      try {
-        orderId = responseData['id'];
+    String orderId;
 
-      }catch(e){
-        print('Error parsing orderId: $e');
-        orderId = ''; // or some default value
-      }
-      print('from the api response');
-      print(orderId);
-      context.go('/View_Order',extra: {
-        'selectedProducts': updatedOrder,
-        'orderId': orderId,
-        'orderDetails':  filteredData.map((detail) => OrderDetail(
-          orderId: detail.orderId,
-          orderDate: detail.orderDate,
-          items: [],
-          // Add other fields as needed
-        )).toList(),
+    try {
+      orderId = responseData['id'];
 
-      });
-      //original code
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => SeventhPage(
-      //     selectedProducts: updatedOrder,
-      //     orderId: orderId,
-      //     orderDetails:  filteredData.map((detail) => OrderDetail(
-      //       orderId: detail.orderId,
-      //       orderDate: detail.orderDate,
-      //       items: [],
-      //       // Add other fields as needed
-      //     )).toList(),
-      //     product: null,
-      //   )), // Replace with your next page
-      // );
-
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text(responseData['message'])),
-      // );
-
-      // Redirect to the next page
-
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to update order.');
+    }catch(e){
+      print('Error parsing orderId: $e');
+      orderId = ''; // or some default value
     }
+    print('from the api response');
+    print(orderId);
+    context.go('/View_Order',extra: {
+      'selectedProducts': updatedOrder,
+      'orderId': orderId,
+      'orderDetails':  filteredData.map((detail) => OrderDetail(
+        orderId: detail.orderId,
+        orderDate: detail.orderDate,
+        items: [],
+        // Add other fields as needed
+      )).toList(),
+
+    });
+    //original code
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => SeventhPage(
+    //     selectedProducts: updatedOrder,
+    //     orderId: orderId,
+    //     orderDetails:  filteredData.map((detail) => OrderDetail(
+    //       orderId: detail.orderId,
+    //       orderDate: detail.orderDate,
+    //       items: [],
+    //       // Add other fields as needed
+    //     )).toList(),
+    //     product: null,
+    //   )), // Replace with your next page
+    // );
+
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text(responseData['message'])),
+    // );
+
+    // Redirect to the next page
+
+  } else {
+
+    throw Exception('Failed to update order.');
+  }
+}
+
   }
   void updateTotalAmount(int productIndex) {
     if (productIndex >= 0 && productIndex < widget.selectedProducts.length) {
@@ -782,51 +932,6 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
 
 
 
-  // void _onSaveChanges() {
-  //
-  //   // if (_deliveryaddressController.text.isEmpty) {
-  //   //
-  //   //   ScaffoldMessenger.of(context).showSnackBar(
-  //   //     SnackBar(content: Text('Delivery address is required')),
-  //   //   );
-  //   // }else if(_contactPersonController.text.isEmpty){
-  //   //   ScaffoldMessenger.of(context).showSnackBar(
-  //   //     SnackBar(content: Text('Contact person is required')),
-  //   //   );
-  //   // }else if (_contactNumberController.text.isEmpty) {
-  //   //
-  //   //   ScaffoldMessenger.of(context).showSnackBar(
-  //   //     SnackBar(content: Text('Contact number is required')),
-  //   //   );
-  //   //
-  //   // }else if (_commentsController.text.isEmpty) {
-  //   //   ScaffoldMessenger.of(context).showSnackBar(
-  //   //     SnackBar(content: Text('Comments are required')),
-  //   //   );
-  //   // }else if (widget.data[items].isEmpty) {
-  //   //   ScaffoldMessenger.of(context).showSnackBar(
-  //   //     SnackBar(content: Text('Please Select Items are required')),
-  //   //   );
-  //   // }
-  //   // else{
-  //     final updatedOrder = {
-  //       "orderId": widget.data['orderId'],
-  //       "orderDate": _dateController.text,
-  //       "deliveryLocation": widget.data['deliveryLocation'],
-  //       "deliveryAddress": _deliveryaddressController.text,
-  //       "contactPerson": _contactPersonController.text,
-  //       "contactNumber": _contactNumberController.text,
-  //       "comments": _commentsController.text,
-  //       "total": double.parse(widget.data['total'].toString()),
-  //       "items": widget.data['items'],
-  //     };
-  //
-  //     _updateOrder(updatedOrder);
-  //   //}
-  //
-  //
-  //   // context.go('/seventhPage', extra: {'selectedProducts': updatedOrder});
-  // }
 
 
 
@@ -839,32 +944,8 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
   }
 
 
-  // void _calculateTotal() {
-  //   double calculatedTotal = 0;
-  //   // Loop through items and calculate the total amount for each item
-  //   for (var item in widget.data['items']) {
-  //     calculatedTotal += calculateTotalAmount(item); // Calculate and accumulate total
-  //   }
-  //   // Force updating the total to the calculated value, overriding any preset total
-  //   setState(() {
-  //     // Ensure the calculated total is reflected in the data map, regardless of any previous value
-  //     widget.data['total'] = calculatedTotal.round(); // Update the total with the calculated amount
-  //     print("Calculated Total: ${widget.data['total']}"); // For debugging purposes
-  //   });
-  // }
 
 
-  void _calculateTotal1() {
-    double total1 = 0;
-    for (var item in widget.data['items']) {
-      double price = item['price'] ?? 0; // default to 0 if price is null
-      int qty = item['qty'] ?? 0; // default to 0 if qty is null
-      total1 += price * qty;
-    }
-    setState(() {
-      widget.data['total1'] = total1.round(); // Update the total
-    });
-  }
 
   void _calculateTotal() {
     double total = 0;
@@ -889,33 +970,6 @@ class _SelectedProductPageState extends State<SelectedProductPage> {
   }
 
 
-  //original
-  // void _calculateTotal() {
-  //   double total = 0;
-  //   double total1 = 0;
-  //   for (var item in widget.data['items']) {
-  //    // total += (item['actualAmount'] as int) * (item['qty'] as int);
-  //     total += calculateTotalAmount(item);
-  //     total1 += calculateActualAmount(item);
-  //   }
-  //   setState(() {
-  //     widget.data['total'] = total.round(); // Update the total
-  //     widget.data['total1'] = total1.round();
-  //   });
-  // }
-  // void _calculateTotal() {
-  //   double total = 0;
-  //   for (var item in widget.data['items']) {
-  //     double calculatedTotalAmount = calculateTotalAmount(item);
-  //     total += calculateActualAmount(item);
-  //     if (total != calculatedTotalAmount) {
-  //       total = calculatedTotalAmount; // Recalculate if the totals don't match
-  //     }
-  //   }
-  //   setState(() {
-  //     widget.data['total'] = total.round(); // Update the total
-  //   });
-  // }
 
 
   @override

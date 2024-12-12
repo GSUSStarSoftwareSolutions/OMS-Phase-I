@@ -125,32 +125,110 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        List<ors.detail> products = [];
-        if (jsonData is List) {
-          products = jsonData.map((item) => ors.detail.fromJson(item)).toList();
-        } else if (jsonData is Map && jsonData.containsKey('body')) {
-          final body = jsonData['body'];
-          if (body != null) {
-            products = (body as List)
-                .map((item) => ors.detail.fromJson(item))
-                .toList();
-            totalItems =
-                jsonData['totalItems'] ?? 0; // Get the total number of items
-          } else {}
-        } else {}
+      if(token == " ")
+      {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-        if (mounted) {
-          setState(() {
-            totalPages = (products.length / itemsPerPage).ceil();
-            productList = products;
-            _filterAndPaginateProducts();
-          });
-        }
-      } else {
-        throw Exception('Failed to load data');
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          List<ors.detail> products = [];
+          if (jsonData is List) {
+            products = jsonData.map((item) => ors.detail.fromJson(item)).toList();
+          } else if (jsonData is Map && jsonData.containsKey('body')) {
+            final body = jsonData['body'];
+            if (body != null) {
+              products = (body as List)
+                  .map((item) => ors.detail.fromJson(item))
+                  .toList();
+              totalItems =
+                  jsonData['totalItems'] ?? 0; // Get the total number of items
+            } else {}
+          } else {}
+
+          if (mounted) {
+            setState(() {
+              totalPages = (products.length / itemsPerPage).ceil();
+              productList = products;
+              _filterAndPaginateProducts();
+            });
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       if (mounted) {
         if (context.findAncestorWidgetOfExactType<Scaffold>() != null) {
@@ -179,32 +257,110 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        if (jsonData == null) {
-          return;
-        }
-        // List<detail> filteredData = [];
-        if (jsonData is List) {
-          filteredData =
-              jsonData.map((item) => ors.detail.fromJson(item)).toList();
-        } else if (jsonData is Map && jsonData.containsKey('body')) {
-          final body = jsonData['body'];
-          if (body != null) {
-            filteredData = (body as List)
-                .map((item) => ors.detail.fromJson(item))
-                .toList();
-          } else {}
-        } else {}
+      if(token == " ")
+      {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-        if (mounted) {
-          setState(() {
-            filteredData = filteredData; // Update the filteredData list
-          });
-        }
-      } else {
-        throw Exception('Failed to load data');
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          if (jsonData == null) {
+            return;
+          }
+          // List<detail> filteredData = [];
+          if (jsonData is List) {
+            filteredData =
+                jsonData.map((item) => ors.detail.fromJson(item)).toList();
+          } else if (jsonData is Map && jsonData.containsKey('body')) {
+            final body = jsonData['body'];
+            if (body != null) {
+              filteredData = (body as List)
+                  .map((item) => ors.detail.fromJson(item))
+                  .toList();
+            } else {}
+          } else {}
+
+          if (mounted) {
+            setState(() {
+              filteredData = filteredData; // Update the filteredData list
+            });
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       if (mounted) {
         if (context.findAncestorWidgetOfExactType<Scaffold>() != null) {
@@ -251,18 +407,6 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
     }
   }
 
-  // void sortColumn(int index) {
-  //   setState(() {
-  //     columnSortState[index] = !columnSortState[index];
-  //     filteredData1.sort((a, b) {
-  //       if (columnSortState[index]) {
-  //         return a[[index]].toString().compareTo(b[columns[index]].toString());
-  //       } else {
-  //         return b[[index]].toString().compareTo(a[columns[index]].toString());
-  //       }
-  //     });
-  //   });
-  // }
   void _filterAndPaginateProducts() {
     filteredData1 = productList.where((product) {
       final matchesSearchText =
@@ -363,15 +507,92 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
         'Authorization': 'Bearer $token',
       },
     );
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
 
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      setState(() {
-        _dashboardCounts = DashboardCounts.fromJson(jsonData);
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
       });
-    } else {
-      throw Exception('Failed to load dashboard counts');
+
     }
+    else{
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        setState(() {
+          _dashboardCounts = DashboardCounts.fromJson(jsonData);
+        });
+      } else {
+        throw Exception('Failed to load dashboard counts');
+      }
+    }
+
+
   }
 
   @override
@@ -509,7 +730,6 @@ class _DashboardPageState extends State<DashboardPage>  with SingleTickerProvide
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20),
-                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                                 // const Spacer(),

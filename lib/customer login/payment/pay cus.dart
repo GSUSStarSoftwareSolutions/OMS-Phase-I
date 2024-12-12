@@ -30,6 +30,7 @@ class _CusPaymentState extends State<CusPayment> {
   String? _selectedReason = 'Payment mode';
   String userId = window.sessionStorage['userId'] ?? '';
   final _reasonController = TextEditingController();
+  bool _hasShownPopup = false;
   DateTime? selectedDate;
   String token = window.sessionStorage["token"] ?? " ";
   final List<String> list = ['UPI', 'Credit/Debit Card', 'Cash'];
@@ -278,28 +279,106 @@ class _CusPaymentState extends State<CusPayment> {
           "Authorization": 'Bearer $token',
         },
       );
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        List<detail> products = [];
-        if (jsonData != null) {
-          if (jsonData is List) {
-            products = jsonData.map((item) => detail.fromJson(item)).toList();
-          } else if (jsonData is Map && jsonData.containsKey('body')) {
-            products = (jsonData['body'] as List).map((item) => detail.fromJson(item)).toList();
-            totalItems = jsonData['totalItems'] ?? 0; // Get the total number of items
-          }
+      if(token == " ")
+      {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
 
-          if(mounted){
-            setState(() {
-              totalPages = (products.length / itemsPerPage).ceil();
-              productList = products;
-              _filterAndPaginateProducts();
-            });
-          }
-        }
-      } else {
-        throw Exception('Failed to load data');
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
       }
+      else{
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          List<detail> products = [];
+          if (jsonData != null) {
+            if (jsonData is List) {
+              products = jsonData.map((item) => detail.fromJson(item)).toList();
+            } else if (jsonData is Map && jsonData.containsKey('body')) {
+              products = (jsonData['body'] as List).map((item) => detail.fromJson(item)).toList();
+              totalItems = jsonData['totalItems'] ?? 0; // Get the total number of items
+            }
+
+            if(mounted){
+              setState(() {
+                totalPages = (products.length / itemsPerPage).ceil();
+                productList = products;
+                _filterAndPaginateProducts();
+              });
+            }
+          }
+        } else {
+          throw Exception('Failed to load data');
+        }
+      }
+
     } catch (e) {
       // Optionally, show an error message to the user
     } finally {
@@ -328,110 +407,185 @@ class _CusPaymentState extends State<CusPayment> {
     };
 
     final response = await http.post(Uri.parse(url), headers: headers, body: jsonEncode(data));
-
-    if (response.statusCode == 200) {
-      // Parse response body
-      final addResponseBody = jsonDecode(response.body);
-
-      if (addResponseBody['status'] == 'success') {
-        // Payment successful
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return Stack(
-                children:[
-                  Positioned(
-                    top: 0, // Adjust for top placement
-                    left: 0,
-                    right: 0,
-                    child: Align(
-                      alignment: Alignment.topCenter, // Center the confetti at the top
-                      child: ConfettiWidget(
-                        confettiController: _confettiController,
-                        blastDirection: pi / 2, // Blast downwards
-                        emissionFrequency: 0.05,
-                        numberOfParticles: 30,
-                        gravity: 0.3,
-                        colors: const [Colors.red, Colors.blue, Colors.green, Colors.yellow],
+if(token == " "){
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return
+        AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Warning Icon
+                    Icon(Icons.warning, color: Colors.orange, size: 50),
+                    SizedBox(height: 16),
+                    // Confirmation Message
+                    Text(
+                      'Session Expired',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
-                  ),
-                  AlertDialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    contentPadding: EdgeInsets.zero,
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
+                    Text("Please log in again to continue",style: TextStyle(
+                      fontSize: 12,
+
+                      color: Colors.black,
+                    ),),
+                    SizedBox(height: 20),
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              const Icon(Icons.check_circle_rounded, color: Colors.green, size: 50),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Payment Received Successfully',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      context.go('/Customer_Payment_List');
-                                      // Navigator.push(
-                                      //   context,
-                                      //   PageRouteBuilder(
-                                      //     pageBuilder: (context, animation, secondaryAnimation) => PaymentList(),
-                                      //     transitionDuration: const Duration(milliseconds: 50),
-                                      //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                      //       return FadeTransition(opacity: animation, child: child);
-                                      //     },
-                                      //   ),
-                                      // );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      side: const BorderSide(color: Colors.blue),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10.0),
-                                      ),
-                                    ),
-                                    child: const Text('OK', style: TextStyle(color: Colors.white)),
-                                  ),
-                                ],
-                              ),
-                            ],
+                        ElevatedButton(
+                          onPressed: () {
+                            // Handle Yes action
+                            context.go('/');
+                            // Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: BorderSide(color: Colors.blue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text(
+                            'ok',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ]
-            );
-          },
-        );
-        _confettiController.play();
-      } else if (addResponseBody['status'] == 'failure') {
-        // Payment failed due to exceeding amount
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Paid amount exceeds the gross amount.'),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
-      } else {
-        // Handle other cases
-      }
+    },
+  ).whenComplete(() {
+    _hasShownPopup = false;
+  });
+
+}else{
+  if (response.statusCode == 200) {
+    // Parse response body
+    final addResponseBody = jsonDecode(response.body);
+
+    if (addResponseBody['status'] == 'success') {
+      // Payment successful
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return Stack(
+              children:[
+                Positioned(
+                  top: 0, // Adjust for top placement
+                  left: 0,
+                  right: 0,
+                  child: Align(
+                    alignment: Alignment.topCenter, // Center the confetti at the top
+                    child: ConfettiWidget(
+                      confettiController: _confettiController,
+                      blastDirection: pi / 2, // Blast downwards
+                      emissionFrequency: 0.05,
+                      numberOfParticles: 30,
+                      gravity: 0.3,
+                      colors: const [Colors.red, Colors.blue, Colors.green, Colors.yellow],
+                    ),
+                  ),
+                ),
+                AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  contentPadding: EdgeInsets.zero,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.check_circle_rounded, color: Colors.green, size: 50),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Payment Received Successfully',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    context.go('/Customer_Payment_List');
+                                    // Navigator.push(
+                                    //   context,
+                                    //   PageRouteBuilder(
+                                    //     pageBuilder: (context, animation, secondaryAnimation) => PaymentList(),
+                                    //     transitionDuration: const Duration(milliseconds: 50),
+                                    //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                    //       return FadeTransition(opacity: animation, child: child);
+                                    //     },
+                                    //   ),
+                                    // );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                    side: const BorderSide(color: Colors.blue),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                  ),
+                                  child: const Text('OK', style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ]
+          );
+        },
+      );
+      _confettiController.play();
+    } else if (addResponseBody['status'] == 'failure') {
+      // Payment failed due to exceeding amount
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Paid amount exceeds the gross amount.'),
+        ),
+      );
     } else {
-      // If the response code is not 200, print the error
+      // Handle other cases
     }
+  } else {
+    // If the response code is not 200, print the error
+  }
+}
+
   }
 
 

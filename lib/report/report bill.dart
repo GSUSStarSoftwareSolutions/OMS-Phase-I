@@ -38,6 +38,7 @@ class Reportspage extends StatefulWidget {
 class _ReportspageState extends State<Reportspage> {
   List<String> statusOptions = ['Order', 'Invoice', 'Delivery', 'Payment'];
   Timer? _searchDebounceTimer;
+  bool _hasShownPopup = false;
   List<String> columns = [
     'Order ID',
     'Order Date',
@@ -75,16 +76,6 @@ class _ReportspageState extends State<Reportspage> {
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
 
-  void _onSearchTextChanged(String text) {
-    if (_searchDebounceTimer != null) {
-      _searchDebounceTimer!.cancel(); // Cancel the previous timer
-    }
-    _searchDebounceTimer = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _searchText = text;
-      });
-    });
-  }
 
   String dropdownValue = 'Download'; // Initial value
 
@@ -100,103 +91,6 @@ class _ReportspageState extends State<Reportspage> {
   int totalItems = 0;
   int totalPages = 0;
   bool isLoading = false;
-
-  // Future downloadCreditMemoPdf(String orderId) async {
-  //   final String orderId1 = orderId;
-  //   try {
-  //     final productMasterData = await _fetchAllpayProductMaster();
-  //     final orderDetails = await _fetchpayOrderDetails(orderId1);
-  //     for (var product in productMasterData) {
-  //       for (var item in orderDetails!.items) {
-  //         if (product['productName'] == item['productName']) {
-  //           item['tax'] = product['tax'];
-  //           item['discount'] = product['discount'];
-  //           item['discountamount'] = (double.parse(item['totalAmount'].toString()) * double.parse(item['discount'].replaceAll('%', ''))) / 100;
-  //           item['taxamount'] = ((double.parse(item['totalAmount'].toString()) -
-  //               double.parse(item['discountamount'].toString())) *
-  //               double.parse(item['tax'].replaceAll('%', '').toString())) / 100;
-  //         }
-  //       }
-  //     }
-  //
-  //     if (orderDetails != null) {
-  //       final Uint8List pdfBytes = await CreditMemoPdf(orderDetails);
-  //       final blob = html.Blob([pdfBytes]);
-  //       final url = html.Url.createObjectUrlFromBlob(blob);
-  //       final anchor = html.AnchorElement(href: url)
-  //         ..setAttribute('download', 'Credit_Memo.pdf')
-  //         ..click();
-  //       html.Url.revokeObjectUrl(url);
-  //     } else {
-  //       print('Failed to fetch order details.');
-  //     }
-  //   } catch (e) {
-  //     print('Error generating PDF: $e');
-  //   }
-  // }
-  Future<List<dynamic>> _fetchAllpayProductMaster() async {
-    //  final String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzI1NjA3Nzc3LCJpYXQiOjE3MjU2MDA1Nzd9.stF0hO6T4ue3A_ayQw8BVgBg2Nov1k2_uwrc1BdlyJcWwEl8ycxIedJrTAuMCLJD8o7K7k6PQkWb1IFrD-hSqA';
-    try {
-      final response = await http.get(
-        Uri.parse(
-            '$apicall/productmaster/get_all_productmaster'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print('Product Master Data:');
-        print(data);
-        // print('discount');
-        // print(data['discount']);
-        return data;
-      } else {
-        print('Failed to fetch product master data.');
-        return [];
-      }
-    } catch (e) {
-      print('Error fetching product master data: $e');
-      return [];
-    }
-  }
-
-  Future<OrderDetail?> _fetchpayOrderDetails(String orderId) async {
-    //  String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzI1NjA3Nzc3LCJpYXQiOjE3MjU2MDA1Nzd9.stF0hO6T4ue3A_ayQw8BVgBg2Nov1k2_uwrc1BdlyJcWwEl8ycxIedJrTAuMCLJD8o7K7k6PQkWb1IFrD-hSqA';
-    try {
-      final url =
-          '$apicall/order_master/search_by_orderid/$orderId';
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        print('onTap');
-        print(responseBody);
-        if (responseBody != null) {
-          final jsonData = jsonDecode(responseBody);
-          if (jsonData is List<dynamic>) {
-            final jsonObject = jsonData.first;
-            return OrderDetail.fromJson(jsonObject);
-          } else {
-            print('Failed to load order details');
-          }
-        } else {
-          print('Failed to load order details');
-        }
-      } else {
-        print('Failed to load order details');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-    return null;
-  }
-
   Future downloadinvoicePdf(String orderId) async {
     final String orderId1 = orderId;
     try {
@@ -236,6 +130,81 @@ class _ReportspageState extends State<Reportspage> {
   }
 
   Future<List<dynamic>> _fetchAllinvoiceProductMaster() async {
+    if(token == " "){
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text("Please log in again to continue",style: TextStyle(
+                          fontSize: 12,
+
+                          color: Colors.black,
+                        ),),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+        },
+      ).whenComplete(() {
+        _hasShownPopup = false;
+      });
+return [];
+    }
+
     //  final String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzIzMTE0OTQ0LCJpYXQiOjE3MjMxMDc3NDR9.1UxLslHM3GivBHoBr8pS02OxD6dC5IRG4ryxiUdgzIJmFjSCwftf6Kme4rPLb-ZOjzOoAaxueSzKxiLmjnmSFg';
     try {
       final response = await http.get(
@@ -245,6 +214,7 @@ class _ReportspageState extends State<Reportspage> {
           'Authorization': 'Bearer $token',
         },
       );
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         print('Product Master Data:');
@@ -612,6 +582,84 @@ class _ReportspageState extends State<Reportspage> {
           "Authorization": 'Bearer $token',
         },
       );
+      if(token == " ")
+      {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return
+              AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Warning Icon
+                          Icon(Icons.warning, color: Colors.orange, size: 50),
+                          SizedBox(height: 16),
+                          // Confirmation Message
+                          Text(
+                            'Session Expired',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text("Please log in again to continue",style: TextStyle(
+                            fontSize: 12,
+
+                            color: Colors.black,
+                          ),),
+                          SizedBox(height: 20),
+                          // Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Yes action
+                                  context.go('/');
+                                  // Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(color: Colors.blue),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+
+      }
+      else{
+
+      }
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         // print('json data');
