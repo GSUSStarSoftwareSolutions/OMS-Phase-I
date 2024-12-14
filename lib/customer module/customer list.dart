@@ -15,6 +15,7 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import '../Order Module/firstpage.dart';
+import '../dashboard/dashboard.dart';
 import '../pdf/credit memo pdf.dart';
 import '../pdf/delivery note pdf.dart';
 import '../pdf/invoice pdf.dart';
@@ -22,6 +23,8 @@ import '../pdf/order bill pdf.dart';
 import 'dart:html' as html;
 import '../widgets/custom loading.dart';
 import '../widgets/no datafound.dart';
+import '../widgets/productsap.dart' as ord;
+import '../widgets/text_style.dart';
 import 'customer view.dart';
 
 void main(){
@@ -51,12 +54,12 @@ class _CusListState extends State<CusList> {
   List<Product> filteredProducts = [];
   int currentPage = 1;
   String? dropdownValue1 = 'Status';
-  late Future<List<CusDetail>> futureOrders;
-  List<CusDetail> productList = [];
+  late Future<List<ord.BusinessPartnerData>> futureOrders;
+  List<ord.BusinessPartnerData> productList = [];
   final ScrollController _scrollController = ScrollController();
   List<dynamic> detailJson = [];
   String searchQuery = '';
-  List<CusDetail>filteredData = [];
+  List<ord.BusinessPartnerData>filteredData = [];
   String status = '';
   String selectDate = '';
   final ScrollController horizontalScroll = ScrollController();
@@ -64,14 +67,14 @@ class _CusListState extends State<CusList> {
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
   List<String> _sortOrder = List.generate(6, (index) => 'asc');
-  List<String> columns = ['Customer ID','Customer Name','Contact','Email Address' ,'Credit Amount'];
+  List<String> columns = ['Customer ID','Customer Name','City','telephoneNumber1','Email ID'];
   List<double> columnWidths = [130, 145, 139, 160, 135,];
   List<bool> columnSortState = [true, true, true,true,true];
 
 
   void _onSearchTextChanged(String text) {
     if (_searchDebounceTimer != null) {
-      _searchDebounceTimer!.cancel(); // Cancel the previous timer
+      _searchDebounceTimer!.cancel(); //  Cancel the previous timer
     }
     _searchDebounceTimer = Timer(const Duration(milliseconds: 500), () {
       setState(() {
@@ -247,70 +250,86 @@ class _CusListState extends State<CusList> {
     'Customer': false,
     'Products': false,
     'Orders': false,
-    'Invoice': false,
-    'Delivery': false,
-    'Payment': false,
-    'Return': false,
-    'Reports': false,
   };
 
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      Container(
-          decoration: BoxDecoration(
-            color: Colors.blue[800],
-            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-            // color: Color.fromRGBO(224, 59, 48, 1.0),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(8), // Radius for top-left corner
-              topRight: Radius.circular(8), // No radius for top-right corner
-              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
-              bottomRight: Radius.circular(8), // No radius for bottom-right corner
-            ),
+      Column(
+        children: [
+          const SizedBox(
+            height: 10,
           ),
-          child: _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.white, '/Customer')),
-      _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
-      _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
-      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
-      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
+          _buildMenuItem('Home', Icons.home_outlined,
+              Colors.blue[900]!, '/Home'),
+          _buildMenuItem('Product', Icons.production_quantity_limits,
+              Colors.blue[900]!, '/Product_List'),
+          Container(
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.blue[800],
+                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+                // color: Color.fromRGBO(224, 59, 48, 1.0),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  // Radius for top-left corner
+                  topRight: Radius.circular(8),
+                  // No radius for top-right corner
+                  bottomLeft: Radius.circular(8),
+                  // Radius for bottom-left corner
+                  bottomRight:
+                  Radius.circular(8), // No radius for bottom-right corner
+                ),
+              ),
+              child: _buildMenuItem(
+                  'Customer', Icons.account_circle_outlined, Colors.white, '/Customer')),
+          _buildMenuItem(
+              'Orders', Icons.production_quantity_limits, Colors.blue[900]!, '/Order_List'),
+        ],
+      ),
+      const SizedBox(
+        height: 6,
+      ),
+
+
+
     ];
   }
 
-  Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+  Widget _buildMenuItem(
+      String title, IconData icon, Color iconColor, String route) {
     iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
-    title == 'Customer'? _isHovered[title] = false :  _isHovered[title] = false;
-    title == 'Customer'? iconColor = Colors.white : Colors.black;
+    title == 'Customer' ? _isHovered[title] = false : _isHovered[title] = false;
+    title == 'Customer' ? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovered[title] = true),
+      onEnter: (_) => setState(
+            () => _isHovered[title] = true,
+      ),
       onExit: (_) => setState(() => _isHovered[title] = false),
       child: GestureDetector(
         onTap: () {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 5,right: 10),
+          margin: const EdgeInsets.only(bottom: 5, right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 5,top: 5),
+            padding: const EdgeInsets.only(left: 10,top:2),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(icon, color: iconColor),
+                Icon(icon, color: iconColor,size: 20,),
                 const SizedBox(width: 10),
                 Text(
                   title,
                   style: TextStyle(
                     color: iconColor,
-                    fontSize: 16,
+                    fontSize: 15,
                     decoration: TextDecoration.none, // Remove underline
                   ),
                 ),
@@ -477,132 +496,66 @@ class _CusListState extends State<CusList> {
   }
 
   Future<void> fetchProducts(int page, int itemsPerPage) async {
-
     if (isLoading) return;
-    if (!mounted) return;
     setState(() {
       isLoading = true;
     });
+
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/customer_master/get_all_customermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/user_master/get_all_customer_data?page=$page&limit=$itemsPerPage', // Adjusted for API call
         ),
         headers: {
           "Content-type": "application/json",
           "Authorization": 'Bearer $token',
         },
       );
-      if(token == " "){
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return
-              AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                contentPadding: EdgeInsets.zero,
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          // Warning Icon
-                          Icon(Icons.warning, color: Colors.orange, size: 50),
-                          SizedBox(height: 16),
-                          // Confirmation Message
-                          Text(
-                            'Session Expired',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text("Please log in again to continue",style: TextStyle(
-                            fontSize: 12,
 
-                            color: Colors.black,
-                          ),),
-                          SizedBox(height: 20),
-                          // Buttons
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Handle Yes action
-                                  context.go('/');
-                                  // Navigator.of(context).pop();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  side: BorderSide(color: Colors.blue),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: Text(
-                                  'ok',
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-          },
-        ).whenComplete(() {
-          _hasShownPopup = false;
-        });
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<ord.BusinessPartnerData> products = [];
 
-      }
-      else{
-        if (response.statusCode == 200) {
-          final jsonData = jsonDecode(response.body);
-          // print('json data');
-          // print(jsonData);
-          List<CusDetail> products = [];
-          if (jsonData != null) {
-            if (jsonData is List) {
-              products = jsonData.map((item) => CusDetail.fromJson(item)).toList();
-            } else if (jsonData is Map && jsonData.containsKey('body')) {
-              products = (jsonData['body'] as List).map((item) => CusDetail.fromJson(item)).toList();
-              totalItems = jsonData['totalItems'] ?? 0; // Get the total number of items
-            }
+        if (jsonData != null && jsonData.containsKey('d') && jsonData['d'].containsKey('results')) {
+          // Accessing the 'results' from the new API response structure
+          var results = jsonData['d']['results'];
 
-            if(mounted){
-              setState(() {
-                totalPages = (products.length / itemsPerPage).ceil();
-                productList = products;
-                _filterAndPaginateProducts();
-              });
-            }
-          }
-        } else {
-          throw Exception('Failed to load data');
+          // Mapping the relevant fields for each product
+          products = results.map<ord.BusinessPartnerData>((item) {
+            return ord.BusinessPartnerData(
+              businessPartner: item['BusinessPartner'] ?? '',
+              businessPartnerName: item['BusinessPartnerName'] ?? '',
+              customer: item['Customer'] ?? '',
+              addressID: item['AddressID'] ?? '',
+              cityName: item['CityName'] ?? '',
+              postalCode: item['PostalCode'] ?? '',
+              streetName: item['StreetName'] ?? '',
+              region: item['Region'] ?? '',
+              telephoneNumber1: item['TelephoneNumber1'] ?? '',
+              country: item['Country'] ?? '',
+              districtName: item['DistrictName'] ?? '',
+              emailAddress: item['EmailAddress'] ?? '',
+              mobilePhoneNumber: item['MobilePhoneNumber'] ?? '',
+            );
+          }).toList();
+
+          setState(() {
+            productList = products;
+            totalPages = (results.length / itemsPerPage).ceil();  // Update total pages based on new structure
+            print(totalPages);  // Debugging output
+            _filterAndPaginateProducts();
+          });
         }
+      } else {
+        throw Exception('Failed to load data');
       }
-
     } catch (e) {
+      print('Error decoding JSON: $e');
       // Optionally, show an error message to the user
     } finally {
-      if(mounted){
-        setState(() {
-          isLoading = false;
-        });
-      }
-
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -610,9 +563,9 @@ class _CusListState extends State<CusList> {
   void _filterAndPaginateProducts() {
     filteredData = productList.
     where((product) {
-      final matchesSearchText= product.cusId!.toLowerCase().contains(_searchText.toLowerCase());
-      final matchlocation = product.email!.toLowerCase().contains(location.toLowerCase());
-      final MatchName = product.cusName!.toLowerCase().contains(Name.toLowerCase());
+      final matchesSearchText= product.customer!.toLowerCase().contains(_searchText.toLowerCase());
+      final matchlocation = product.emailAddress.toLowerCase().contains(location.toLowerCase());
+      final MatchName = product.businessPartnerName.toLowerCase().contains(Name.toLowerCase());
       return matchesSearchText && matchlocation && MatchName;
     }).toList();
     totalPages = (filteredData.length / itemsPerPage).ceil();    setState(() {    currentPage = 1;  });}
@@ -679,259 +632,285 @@ class _CusListState extends State<CusList> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: const Color(0xFFF0F4F8),
-        appBar:
-        AppBar(
-          backgroundColor: const Color(0xFFFFFFFF),
-          title: Image.asset("images/Final-Ikyam-Logo.png"),
-          // Set background color to white
-          elevation: 2.0,
-          shadowColor: const Color(0xFFFFFFFF),
-          // Set shadow color to black
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.notifications),
-                  onPressed: () {
-                    // Handle notification icon press
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(width: 10,),
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: AccountMenu(),
-
-            ),
-          ],
-        ),
+        backgroundColor: Color.fromRGBO(21, 101, 192, 0.07),
         body: LayoutBuilder(
             builder: (context,constraints) {
               double maxWidth = constraints.maxWidth;
+              double maxHeight = constraints.maxHeight;
               return
                 Stack(
                   children: [
-                    if(constraints.maxHeight <= 500)...{
+                    Container(
+                      color: Colors.white, // White background color
+                      height: 60.0, // Total height including bottom shadow
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 15, top: 10),
+                                child: Image.asset(
+                                  "images/Final-Ikyam-Logo.png",
+                                  height: 35.0,
+                                  // Adjusted to better match proportions
+                                ),
+                              ),
+                              const Spacer(),
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: IconButton(
+                                      icon: const Icon(Icons.notifications),
+                                      color: Colors.black, // Default icon color
+                                      onPressed: () {
+                                        // Handle notification icon press
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.only(right: 10, top: 10),
+                                    // Adjust padding for better spacing
+                                    child: AccountMenu(),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 7,
+                          ),
+                          const Divider(
+                            height: 3.0,
+                            thickness: 3.0, // Thickness of the shadow
+                            color: Color(0x29000000), // Shadow color (#00000029)
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (constraints.maxHeight <= 500) ...{
                       SingleChildScrollView(
-                        child:  Align(
+                        child: Align(
                           // Added Align widget for the left side menu
                           alignment: Alignment.topLeft,
-                          child: Container(
-                            height: 1400,
-                            width: 200,
-                            color: const Color(0xFFF7F6FA),
-                            padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: _buildMenuItems(context),
-
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 80),
+                            child: Container(
+                              height: 1400,
+                              width: 200,
+                              color: const Color(0xFFF7F6FA),
+                              padding:
+                              const EdgeInsets.only(left: 15, top: 50, right: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: _buildMenuItems(context),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    }
-                    else...{
+                    } else ...{
                       Align(
-                        // Added Align widget for the left side menu
                         alignment: Alignment.topLeft,
-                        child: Container(
-                          height: 1400,
-                          width: 200,
-                          color: const Color(0xFFF7F6FA),
-                          padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: _buildMenuItems(context),
-
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 62),
+                          child: Container(
+                            height: 1400,
+                            width: 200,
+                            color: Colors.white,
+                            padding:
+                            const EdgeInsets.only(left: 15, top: 10, right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildMenuItems(context),
+                            ),
                           ),
                         ),
                       ),
+                      VerticalDividerWidget(
+                        height: maxHeight,
+                        color: Color(0x29000000),
+                      ),
                     },
 
-                    Padding(
-                      padding: const EdgeInsets.only(left: 190),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 10),
-                        width: 1, // Set the width to 1 for a vertical line
-                        height: 1400, // Set the height to your liking
-                        decoration: const BoxDecoration(
-                          border: Border(left: BorderSide(width: 1, color: Colors.grey)),
-                        ),
-                      ),
-                    ),
                     Positioned(
                       left: 201,
-                      top: 0,
+                      top: 60,
                       right: 0,
                       bottom: 0,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Center(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              color: Colors.white,
-                              height: 50,
-                              child: Row(
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 20),
-                                    child: Text(
-                                      'Customer List',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                          fontSize: 20, fontWeight: FontWeight.bold),
-
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Align(
-                                    alignment: Alignment.topRight,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, right: 80),
-                                      child: OutlinedButton(
-                                        onPressed: () {
-                                           context.go('/Create_Cus');
-
-                                          //context.go('/Home/Orders/Create_Order');
-                                        },
-                                        style: OutlinedButton.styleFrom(
-                                          backgroundColor:
-                                          Colors.blue[800],
-                                          // Button background color
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(
-                                                5), // Rounded corners
-                                          ),
-                                          side: BorderSide.none, // No outline
-                                        ),
-                                        child: const Text(
-                                          'Create',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w100,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  // Align(
-                                  //   alignment: Alignment.topRight,
-                                  //   child: Padding(
-                                  //     padding: const EdgeInsets.only(top: 10, right: 80),
-                                  //     child: MouseRegion(
-                                  //       onEnter: (_) {
-                                  //         setState(() {
-                                  //           _isHovered1 = true;
-                                  //           _controller.forward(); // Start shake animation when hovered
-                                  //         });
-                                  //       },
-                                  //       onExit: (_) {
-                                  //         setState(() {
-                                  //           _isHovered1 = false;
-                                  //           _controller.stop(); // Stop shake animation when not hovered
-                                  //         });
-                                  //       },
-                                  //       child: AnimatedBuilder(
-                                  //           animation: _controller,
-                                  //           builder: (context, child) {
-                                  //             return Transform.translate(offset: Offset(_isHovered1? _shakeAnimation.value : 0,0),
-                                  //               child: AnimatedContainer(
-                                  //                 duration: const Duration(milliseconds: 300),
-                                  //                 curve: Curves.easeInOut,
-                                  //                 decoration: BoxDecoration(
-                                  //                   color: _isHovered1
-                                  //                       ? Colors.blue[800]
-                                  //                       : Colors.blue[800], // Background color change on hover
-                                  //                   borderRadius: BorderRadius.circular(5),
-                                  //                   boxShadow: _isHovered1
-                                  //                       ? [
-                                  //                     const BoxShadow(
-                                  //                         color: Colors.black45,
-                                  //                         blurRadius: 6,
-                                  //                         spreadRadius: 2)
-                                  //                   ]
-                                  //                       : [],
-                                  //                 ),
-                                  //                 child: OutlinedButton(
-                                  //                   onPressed: () {
-                                  //                     context.go('/Create_New_Order');
-                                  //                     //context.go('/Home/Orders/Create_Order');
-                                  //                   },
-                                  //                   style: OutlinedButton.styleFrom(
-                                  //                     backgroundColor: Colors.blue[800],
-                                  //                     shape: RoundedRectangleBorder(
-                                  //                       borderRadius: BorderRadius.circular(
-                                  //                           5), // Rounded corners
-                                  //                     ),
-                                  //                     side: BorderSide.none, // No outline
-                                  //                   ),
-                                  //                   child: const Text(
-                                  //                     'Create',
-                                  //                     style: TextStyle(
-                                  //                       fontSize: 14,
-                                  //                       fontWeight: FontWeight.w100,
-                                  //                       color: Colors.white,
-                                  //                     ),
-                                  //                   ),
-                                  //                 ),
-                                  //               ),
-                                  //             );
-                                  //           }
-                                  //
-                                  //       ),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(left: 0),
-                            // Space above/below the border
-                            height: 1,
-                            // width: 10  00,
-                            width: constraints.maxWidth,
-                            // Border height
-                            color: Colors.grey, // Border color
-                          ),
+                          // Center(
+                          //   child: Container(
+                          //     padding: const EdgeInsets.symmetric(horizontal: 16),
+                          //     color: Colors.white,
+                          //     height: 50,
+                          //     child: Row(
+                          //       children: [
+                          //         const Padding(
+                          //           padding: EdgeInsets.only(left: 20),
+                          //           child: Text(
+                          //             'Customer List',
+                          //             style: TextStyle(
+                          //               color: Colors.black,
+                          //                 fontSize: 20, fontWeight: FontWeight.bold),
+                          //
+                          //           ),
+                          //         ),
+                          //         const Spacer(),
+                          //         Align(
+                          //           alignment: Alignment.topRight,
+                          //           child: Padding(
+                          //             padding: const EdgeInsets.only(
+                          //                 top: 10, right: 80),
+                          //             child: OutlinedButton(
+                          //               onPressed: () {
+                          //                  context.go('/Create_Cus');
+                          //
+                          //                 //context.go('/Home/Orders/Create_Order');
+                          //               },
+                          //               style: OutlinedButton.styleFrom(
+                          //                 backgroundColor:
+                          //                 Colors.blue[800],
+                          //                 // Button background color
+                          //                 shape: RoundedRectangleBorder(
+                          //                   borderRadius:
+                          //                   BorderRadius.circular(
+                          //                       5), // Rounded corners
+                          //                 ),
+                          //                 side: BorderSide.none, // No outline
+                          //               ),
+                          //               child: const Text(
+                          //                 'Create',
+                          //                 style: TextStyle(
+                          //                   fontSize: 14,
+                          //                   fontWeight: FontWeight.w100,
+                          //                   color: Colors.white,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         ),
+                          //         // Align(
+                          //         //   alignment: Alignment.topRight,
+                          //         //   child: Padding(
+                          //         //     padding: const EdgeInsets.only(top: 10, right: 80),
+                          //         //     child: MouseRegion(
+                          //         //       onEnter: (_) {
+                          //         //         setState(() {
+                          //         //           _isHovered1 = true;
+                          //         //           _controller.forward(); // Start shake animation when hovered
+                          //         //         });
+                          //         //       },
+                          //         //       onExit: (_) {
+                          //         //         setState(() {
+                          //         //           _isHovered1 = false;
+                          //         //           _controller.stop(); // Stop shake animation when not hovered
+                          //         //         });
+                          //         //       },
+                          //         //       child: AnimatedBuilder(
+                          //         //           animation: _controller,
+                          //         //           builder: (context, child) {
+                          //         //             return Transform.translate(offset: Offset(_isHovered1? _shakeAnimation.value : 0,0),
+                          //         //               child: AnimatedContainer(
+                          //         //                 duration: const Duration(milliseconds: 300),
+                          //         //                 curve: Curves.easeInOut,
+                          //         //                 decoration: BoxDecoration(
+                          //         //                   color: _isHovered1
+                          //         //                       ? Colors.blue[800]
+                          //         //                       : Colors.blue[800], // Background color change on hover
+                          //         //                   borderRadius: BorderRadius.circular(5),
+                          //         //                   boxShadow: _isHovered1
+                          //         //                       ? [
+                          //         //                     const BoxShadow(
+                          //         //                         color: Colors.black45,
+                          //         //                         blurRadius: 6,
+                          //         //                         spreadRadius: 2)
+                          //         //                   ]
+                          //         //                       : [],
+                          //         //                 ),
+                          //         //                 child: OutlinedButton(
+                          //         //                   onPressed: () {
+                          //         //                     context.go('/Create_New_Order');
+                          //         //                     //context.go('/Home/Orders/Create_Order');
+                          //         //                   },
+                          //         //                   style: OutlinedButton.styleFrom(
+                          //         //                     backgroundColor: Colors.blue[800],
+                          //         //                     shape: RoundedRectangleBorder(
+                          //         //                       borderRadius: BorderRadius.circular(
+                          //         //                           5), // Rounded corners
+                          //         //                     ),
+                          //         //                     side: BorderSide.none, // No outline
+                          //         //                   ),
+                          //         //                   child: const Text(
+                          //         //                     'Create',
+                          //         //                     style: TextStyle(
+                          //         //                       fontSize: 14,
+                          //         //                       fontWeight: FontWeight.w100,
+                          //         //                       color: Colors.white,
+                          //         //                     ),
+                          //         //                   ),
+                          //         //                 ),
+                          //         //               ),
+                          //         //             );
+                          //         //           }
+                          //         //
+                          //         //       ),
+                          //         //     ),
+                          //         //   ),
+                          //         // ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
+                          // Container(
+                          //   margin: const EdgeInsets.only(left: 0),
+                          //   // Space above/below the border
+                          //   height: 1,
+                          //   // width: 10  00,
+                          //   width: constraints.maxWidth,
+                          //   // Border height
+                          //   color: Colors.grey, // Border color
+                          // ),
                           if(constraints.maxWidth >= 1350)...{
                             Expanded(
                                 child: SingleChildScrollView(
                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 30,top: 5),
+                                            child: Text('Customer List',style: TextStyles.heading,),
+                                          ),
+
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
                                           Padding(
                                               padding: const EdgeInsets.only(
                                                   left: 30,
-                                                  top: 50,
+                                                  top: 7,
                                                   right: 30,
                                                   bottom: 15),
                                               child: Container(
-                                                height: 755,
+                                                height: 635,
                                                 width: maxWidth * 0.8,
                                                 decoration:BoxDecoration(
                                                   //   border: Border.all(color: Colors.grey),
                                                   color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black.withOpacity(0.3), // Soft grey shadow
-                                                      spreadRadius: 3,
-                                                      blurRadius: 3,
-                                                      offset: const Offset(0, 3),
-                                                    ),
-                                                  ],
+                                                  border: Border.all(color: Color(0x29000000)),
+                                                  borderRadius: BorderRadius.circular(15),
+
                                                 ),
                                                 child: SizedBox(
                                                   child: Column(
@@ -1145,67 +1124,17 @@ class _CusListState extends State<CusList> {
                               hintStyle: const TextStyle(fontSize: 13,color: Colors.grey),
                               contentPadding: const EdgeInsets.only(bottom: 20,left: 10), // adjusted padding
                               border: InputBorder.none,
-                              suffixIcon: Icon(Icons.search_outlined, color: Colors.blue[800]),
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.only(left: 10, right: 5), // Adjust image padding
+                                  child: Image.asset(
+                                    'images/search.png', // Replace with your image asset path
+                                  ),
+                                )
                             ),
                             onChanged: _updateSearch,
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                //    const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: constraints.maxWidth * 0.12, // reduced width
-                              maxHeight: 30, // reduced height
-                            ),
-                            child: Container(
-                              height: 35,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(2),
-                                border: Border.all(color: Colors.grey),
-                              ),
-                              child:
-                              TextFormField(  decoration:  InputDecoration(    hintText: 'Search by Name',    hintStyle: const TextStyle(fontSize: 13,color: Colors.grey),    contentPadding: const EdgeInsets.only(bottom: 20,left: 10),   border: InputBorder.none,  ),  onChanged: _updateSearch2,),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        //  const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: constraints.maxWidth * 0.128, // reduced width
-                              maxHeight: 30, // reduced height
-                            ),
-                            child: Container(
-                              height: 35,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(2),
-                                border: Border.all(color: Colors.grey),
-                              ),
-                              child:
-                              TextFormField(  decoration:  InputDecoration(    hintText: 'Search by Email',    hintStyle: const TextStyle(fontSize: 13,color: Colors.grey),    contentPadding: const EdgeInsets.only(bottom: 20,left: 10), border: InputBorder.none,  ),  onChanged: _updateSearch1,),
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
@@ -1257,7 +1186,7 @@ class _CusListState extends State<CusList> {
                         fontWeight: FontWeight.bold
                     ),)),
                     DataColumn(label: Text(
-                      'Contact',style:TextStyle(
+                      'telephoneNumber1',style:TextStyle(
                         color: Colors.indigo[900],
                         fontSize: 13,
                         fontWeight: FontWeight.bold
@@ -1295,15 +1224,15 @@ class _CusListState extends State<CusList> {
       if (sortDirection == 'asc') {
         filteredData.sort((a, b) {
           if (columnIndex == 0) {
-            return a.cusId!.compareTo(b.cusId!);
+            return a.customer!.compareTo(b.customer!);
           } else if (columnIndex == 1) {
-            return a.cusName!.compareTo(b.cusName!);
+            return a.businessPartnerName!.compareTo(b.businessPartnerName!);
           } else if (columnIndex == 2) {
-            return a.contact!.compareTo(b.contact!);
+            return a.telephoneNumber1!.compareTo(b.telephoneNumber1!);
           } else if (columnIndex == 3) {
-            return a.email!.toLowerCase().compareTo(b.email!.toLowerCase());
+            return a.emailAddress!.toLowerCase().compareTo(b.emailAddress!.toLowerCase());
           } else if (columnIndex == 4) {
-            return a.creditAmount!.compareTo(b.creditAmount!);
+            return a.postalCode!.compareTo(b.postalCode!);
           } else {
             return 0;
           }
@@ -1311,15 +1240,15 @@ class _CusListState extends State<CusList> {
       } else {
         filteredData.sort((a, b) {
           if (columnIndex == 0) {
-            return b.cusId!.compareTo(a.cusId!); // Reverse the comparison
+            return b.customer.compareTo(a.customer); // Reverse the comparison
           } else if (columnIndex == 1) {
-            return b.cusName!.compareTo(a.cusName!); // Reverse the comparison
+            return b.businessPartnerName.compareTo(a.businessPartnerName!); // Reverse the comparison
           } else if (columnIndex == 2) {
-            return b.contact!.compareTo(a.contact!); // Reverse the comparison
+            return b.telephoneNumber1!.compareTo(a.telephoneNumber1!); // Reverse the comparison
           } else if (columnIndex == 3) {
-            return b.email!.toLowerCase().compareTo(a.email!.toLowerCase()); // Reverse the comparison
+            return b.emailAddress!.toLowerCase().compareTo(a.emailAddress!.toLowerCase()); // Reverse the comparison
           } else if (columnIndex == 4) {
-            return b.creditAmount!.compareTo(a.creditAmount!); // Reverse the comparison
+            return b.postalCode!.compareTo(a.postalCode!); // Reverse the comparison
           } else {
             return 0;
           }
@@ -1447,30 +1376,30 @@ class _CusListState extends State<CusList> {
                       [
 
                         DataCell(
-                            Text(detail.cusId!,style:
+                            Text(detail.customer!,style:
                             const TextStyle(
                               // fontSize: 16,
                                 color: Colors.grey),)),
                         DataCell(
-                          Text(detail.cusName!,style: const TextStyle(
+                          Text(detail.businessPartnerName!,style: const TextStyle(
                             // fontSize: 16,
                               color: Colors.grey)),
                         ),
                         DataCell(
-                          Text(detail.contact!,style: const TextStyle(
+                          Text(detail.telephoneNumber1!,style: const TextStyle(
                             //fontSize: 16,
                               color: Colors.grey)),
                         ),
                         DataCell(
                           Container(
                             width: columnWidths[3],
-                            child: Text(detail.email.toString(),style: const TextStyle(
+                            child: Text(detail.emailAddress.toString(),style: const TextStyle(
                               // fontSize: 16,
                                 color: Colors.grey)),
                           ),
                         ),
                         DataCell(
-                          Text(detail.creditAmount!.toStringAsFixed(2),style: const TextStyle(
+                          Text(detail.postalCode.toString(),style: const TextStyle(
                             //fontSize: 16,
                               color: Colors.grey)),
                         ),
@@ -1481,11 +1410,11 @@ class _CusListState extends State<CusList> {
                           //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
                           if (filteredData.length <= 9) {
                            context.go('/Cus_Details',extra:{
-                             'orderId': detail.cusId
+                             'orderId': detail.customer
                            });
                           } else {
                             context.go('/Cus_Details',extra:{
-                              'orderId': detail.cusId
+                              'orderId': detail.customer
                             });
 
                           };
@@ -1541,7 +1470,7 @@ class _CusListState extends State<CusList> {
                         fontWeight: FontWeight.bold
                     ),)),
                     DataColumn(label: Text(
-                      'Contact',style:TextStyle(
+                      'telephoneNumber1',style:TextStyle(
                         color: Colors.indigo[900],
                         fontSize: 13,
                         fontWeight: FontWeight.bold
@@ -1579,15 +1508,15 @@ class _CusListState extends State<CusList> {
       if (sortDirection == 'asc') {
         filteredData.sort((a, b) {
           if (columnIndex == 0) {
-            return a.cusId!.compareTo(b.cusId!);
+            return a.customer!.compareTo(b.customer!);
           } else if (columnIndex == 1) {
-            return a.cusName!.compareTo(b.cusName!);
+            return a.businessPartnerName!.compareTo(b.businessPartnerName!);
           } else if (columnIndex == 2) {
-            return a.contact!.compareTo(b.contact!);
+            return a.telephoneNumber1!.compareTo(b.telephoneNumber1!);
           } else if (columnIndex == 3) {
-            return a.email!.toLowerCase().compareTo(b.email!.toLowerCase());
+            return a.emailAddress!.toLowerCase().compareTo(b.emailAddress!.toLowerCase());
           } else if (columnIndex == 4) {
-            return a.creditAmount!.compareTo(b.creditAmount!);
+            return a.postalCode!.compareTo(b.postalCode!);
           } else {
             return 0;
           }
@@ -1595,15 +1524,15 @@ class _CusListState extends State<CusList> {
       } else {
         filteredData.sort((a, b) {
           if (columnIndex == 0) {
-            return b.cusId!.compareTo(a.cusId!); // Reverse the comparison
+            return b.customer!.compareTo(a.customer!); // Reverse the comparison
           } else if (columnIndex == 1) {
-            return b.cusName!.compareTo(a.cusName!); // Reverse the comparison
+            return b.businessPartnerName!.compareTo(a.businessPartnerName!); // Reverse the comparison
           } else if (columnIndex == 2) {
-            return b.contact!.compareTo(a.contact!); // Reverse the comparison
+            return b.telephoneNumber1!.compareTo(a.telephoneNumber1!); // Reverse the comparison
           } else if (columnIndex == 3) {
-            return b.email!.toLowerCase().compareTo(a.email!.toLowerCase()); // Reverse the comparison
+            return b.emailAddress!.toLowerCase().compareTo(a.emailAddress!.toLowerCase()); // Reverse the comparison
           } else if (columnIndex == 4) {
-            return b.creditAmount!.compareTo(a.creditAmount!); // Reverse the comparison
+            return b.postalCode!.compareTo(a.postalCode!); // Reverse the comparison
           } else {
             return 0;
           }
@@ -1616,13 +1545,11 @@ class _CusListState extends State<CusList> {
       // double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width * 0.92;
 
-
       return
         Column(
           children: [
             Container(
               width: right - 100,
-
               decoration:const BoxDecoration(
                   color: Color(0xFFF7F7F7),
                   border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
@@ -1646,17 +1573,13 @@ class _CusListState extends State<CusList> {
                                 Text(
                                   column,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.indigo[900],
-                                    fontSize: 13,
-                                  ),
+                                    style: TextStyles.subhead
                                 ),
 
                                 IconButton(
                                   icon: _sortOrder[columns.indexOf(column)] == 'asc'
                                       ? SizedBox(width: 12,
-                                      child: Image.asset("images/sort.png",color: Colors.grey,))
+                                      child: Image.asset("images/sort.png",color: Colors.blue,))
                                       : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
                                   onPressed: () {
                                     setState(() {
@@ -1668,42 +1591,7 @@ class _CusListState extends State<CusList> {
                                 //SizedBox(width: 50,),
                                 //Padding(
                                 //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-                                //  child:
 
-                                Spacer(),
-
-                                MouseRegion(
-                                  cursor: SystemMouseCursors.resizeColumn,
-                                  child: GestureDetector(
-                                      onHorizontalDragUpdate: (details) {
-                                        // Update column width dynamically as user drags
-                                        setState(() {
-                                          columnWidths[columns.indexOf(column)] += details.delta.dx;
-                                          columnWidths[columns.indexOf(column)] =
-                                              columnWidths[columns.indexOf(column)].clamp(50.0, 300.0);
-                                        });
-                                        // setState(() {
-                                        //   columnWidths[columns.indexOf(column)] += details.delta.dx;
-                                        //   if (columnWidths[columns.indexOf(column)] < 50) {
-                                        //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-                                        //   }
-                                        // });
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10,bottom: 10),
-                                        child: Row(
-                                          children: [
-                                            VerticalDivider(
-                                              width: 5,
-                                              thickness: 4,
-                                              color: Colors.grey,
-
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                  ),
-                                ),
                                 // ),
                               ],
                             ),
@@ -1731,45 +1619,33 @@ class _CusListState extends State<CusList> {
                       [
 
                         DataCell(
-                            Text(detail.cusId!,style:
-                            const TextStyle(
-                              // fontSize: 16,
-                                color: Colors.grey),)),
+                            Text(detail.customer,   style: TextStyles.body,)),
                         DataCell(
-                          Text(detail.cusName!,style: const TextStyle(
-                            // fontSize: 16,
-                              color: Colors.grey)),
+                          Text(detail.businessPartnerName,   style: TextStyles.body,),
                         ),
                         DataCell(
-                          Text(detail.contact!,style: const TextStyle(
-                            //fontSize: 16,
-                              color: Colors.grey)),
+                          Text(detail.cityName,   style: TextStyles.body,),
                         ),
                         DataCell(
                           Container(
                             width: columnWidths[3],
-                            child: Text(detail.email.toString(),style: const TextStyle(
-                              // fontSize: 16,
-                                color: Colors.grey)),
+                            child: Text(detail.telephoneNumber1.toString(),   style: TextStyles.body,),
                           ),
                         ),
                         DataCell(
-                          Text(detail.creditAmount!.toStringAsFixed(2),style: const TextStyle(
-                            //fontSize: 16,
-                              color: Colors.grey)),
+                          Text(detail.emailAddress.toString(),   style: TextStyles.body,),
                         ),
-
                       ],
                       onSelectChanged: (selected){
                         if(selected != null && selected){
                           //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
                           if (filteredData.length <= 9) {
                             context.go('/Cus_Details',extra:{
-                              'orderId': detail.cusId
+                              'orderId': detail.customer
                             });
                           } else {
                             context.go('/Cus_Details',extra:{
-                              'orderId': detail.cusId
+                              'orderId': detail.customer
                             });
 
                           };
@@ -1787,7 +1663,7 @@ class _CusListState extends State<CusList> {
 
 // void _filterAndPaginateProducts() {
 //   filteredData = productList.where((product) {
-//     final matchesSearchText= product.cusId!.toLowerCase().contains(_searchText.toLowerCase());
+//     final matchesSearchText= product.customer!.toLowerCase().contains(_searchText.toLowerCase());
 //     // print('-----');
 //     // print(product.orderDate);
 //     String orderYear = '';
@@ -1838,31 +1714,31 @@ class _CusListState extends State<CusList> {
 
 }
 class CusDetail {
-  String? cusId;
-  String? cusName;
-  String? contact;
+  String? customer;
+  String? businessPartnerName;
+  String? telephoneNumber1;
   String? location;
   String? email;
-  double? creditAmount;
+  double? postalCode;
 
 
   CusDetail({
-    this.cusId,
-    this.cusName,
-    this.contact,
+    this.customer,
+    this.businessPartnerName,
+    this.telephoneNumber1,
     this.location,
     this.email,
-    this.creditAmount
+    this.postalCode
   });
 
   factory CusDetail.fromJson(Map<String, dynamic> json) {
     return CusDetail(
-      cusId: json['customerId'] ?? '',
-      cusName: json['customerName'] ?? '',
+      customer: json['customerId'] ?? '',
+      businessPartnerName: json['customerName'] ?? '',
       email: json['email'] ?? '',
-      contact: json['contactNo'] ?? '',
+      telephoneNumber1: json['telephoneNumber1No'] ?? '',
       location: json['deliveryLocation'] ?? '',
-      creditAmount: json['returnCredit'] ?? 0.0,
+      postalCode: json['returnCredit'] ?? 0.0,
 
     );
   }
@@ -1875,17 +1751,17 @@ class CusDetail {
 
   @override
   String toString() {
-    return 'cus ID: $cusId, Order Date: $cusName, Total: $contact, Status: $Location, Delivery Status: $creditAmount';
+    return 'cus ID: $customer, Order Date: $businessPartnerName, Total: $telephoneNumber1, Status: $Location, Delivery Status: $postalCode';
   }
 
   String toJson() {
     return jsonEncode({
-      "cusId": cusId,
-      "cusName": cusName,
+      "customer": customer,
+      "businessPartnerName": businessPartnerName,
       "email": email,
-      "Contact": contact,
+      "telephoneNumber1": telephoneNumber1,
       "Location": location,
-      "CreditAmount": creditAmount,
+      "postalCode": postalCode,
 
     });
   }

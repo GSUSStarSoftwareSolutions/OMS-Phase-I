@@ -15,9 +15,11 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import '../dashboard/dashboard.dart';
 import '../main.dart';
 import '../widgets/custom loading.dart';
 import '../widgets/no datafound.dart';
+import '../widgets/text_style.dart';
 
 void main() {
   runApp(const Orderspage());
@@ -31,14 +33,13 @@ class Orderspage extends StatefulWidget {
 }
 
 class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateMixin {
-  List<String> _sortOrder = List.generate(6, (index) => 'asc');
+  List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Order ID',
+    'Customer ID',
     'Order Date',
-    'Invoice No',
     'Total',
-    'Delivery Status',
-    'Payment Status',
+    'Status',
   ];
   bool _hasShownPopup = false;
   List<double> columnWidths = [95, 110, 110, 95, 150, 140];
@@ -55,17 +56,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
   int currentPage = 1;
   String? dropdownValue1 = 'Status';
   final ScrollController horizontalScroll = ScrollController();
-  Map<String, bool> _isHovered = {
-    'Home': false,
-    'Customer': false,
-    'Products': false,
-    'Orders': false,
-    'Invoice': false,
-    'Delivery': false,
-    'Payment': false,
-    'Return': false,
-    'Reports': false,
-  };
+
   late Future<List<detail>> futureOrders;
   List<detail> productList = [];
 
@@ -265,64 +256,92 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
 //_filterAndPaginateProducts();
   }
 
+  Map<String, bool> _isHovered = {
+    'Home': false,
+    'Customer': false,
+    'Products': false,
+    'Orders': false,
+  };
+
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
-      _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
-      _buildMenuItem('Customer', Icons.account_circle_outlined, Colors.blue[900]!, '/Customer'),
-      _buildMenuItem('Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
-      Container(
-          decoration: BoxDecoration(
-            color: Colors.blue[800],
-            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-            // color: Color.fromRGBO(224, 59, 48, 1.0),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(8), // Radius for top-left corner
-              topRight: Radius.circular(8), // No radius for top-right corner
-              bottomLeft: Radius.circular(8), // Radius for bottom-left corner
-              bottomRight: Radius.circular(8), // No radius for bottom-right corner
-            ),
+      Column(
+        children: [
+          const SizedBox(
+            height: 10,
           ),
-          child: _buildMenuItem('Orders', Icons.warehouse_outlined, Colors.white, '/Order_List')),
-      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!, '/Delivery_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined, Colors.blue[900]!, '/Invoice'),
+          _buildMenuItem('Home', Icons.home_outlined,
+              Colors.blue[900]!, '/Home'),
+          _buildMenuItem('Product', Icons.production_quantity_limits,
+              Colors.blue[900]!, '/Product_List'),
+          _buildMenuItem(
+              'Customer', Icons.account_circle_outlined, Colors.white, '/Customer'),
+          Container(
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.blue[800],
+                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+                // color: Color.fromRGBO(224, 59, 48, 1.0),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  // Radius for top-left corner
+                  topRight: Radius.circular(8),
+                  // No radius for top-right corner
+                  bottomLeft: Radius.circular(8),
+                  // Radius for bottom-left corner
+                  bottomRight:
+                  Radius.circular(8), // No radius for bottom-right corner
+                ),
+              ),
+              child: _buildMenuItem(
+    'Orders', Icons.production_quantity_limits, Colors.blue[900]!, '/Order_List')),
 
-      _buildMenuItem('Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem('Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!, '/Report_List'),
+        ],
+      ),
+      const SizedBox(
+        height: 6,
+      ),
+
+
+
     ];
   }
 
-  Widget _buildMenuItem(String title, IconData icon, Color iconColor, String route) {
+  Widget _buildMenuItem(
+      String title, IconData icon, Color iconColor, String route) {
     iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
-    title == 'Orders'? _isHovered[title] = false :  _isHovered[title] = false;
-    title == 'Orders'? iconColor = Colors.white : Colors.black;
+    title == 'Orders' ? _isHovered[title] = false : _isHovered[title] = false;
+    title == 'Orders' ? iconColor = Colors.white : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovered[title] = true),
+      onEnter: (_) => setState(
+            () => _isHovered[title] = true,
+      ),
       onExit: (_) => setState(() => _isHovered[title] = false),
       child: GestureDetector(
         onTap: () {
           context.go(route);
         },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 5,right: 10),
+          margin: const EdgeInsets.only(bottom: 5, right: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered[title]! ? Colors.black12 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 5,top: 5),
+            padding: const EdgeInsets.only(left: 10,top:2),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(icon, color: iconColor),
+                Icon(icon, color: iconColor,size: 20,),
                 const SizedBox(width: 10),
                 Text(
                   title,
                   style: TextStyle(
                     color: iconColor,
-                    fontSize: 16,
+                    fontSize: 15,
                     decoration: TextDecoration.none, // Remove underline
                   ),
                 ),
@@ -368,188 +387,140 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: const Color(0xFFF0F4F8),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFFFFFFF),
-          title: Image.asset("images/Final-Ikyam-Logo.png"),
-// Set background color to white
-          elevation: 2.0,
-          shadowColor: const Color(0xFFFFFFFF),
-// Set shadow color to black
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.notifications),
-                  onPressed: () {
-// Handle notification icon press
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: AccountMenu(),
-            ),
-          ],
-        ),
+        backgroundColor: Color.fromRGBO(21, 101, 192, 0.07),
+
         body: LayoutBuilder(builder: (context, constraints) {
           double maxWidth = constraints.maxWidth;
+          double maxHeight = constraints.maxHeight;
           return Stack(
             children: [
-
-              if(constraints.maxHeight <= 500)...{
+              Container(
+                color: Colors.white, // White background color
+                height: 60.0, // Total height including bottom shadow
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15, top: 10),
+                          child: Image.asset(
+                            "images/Final-Ikyam-Logo.png",
+                            height: 35.0,
+                            // Adjusted to better match proportions
+                          ),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: IconButton(
+                                icon: const Icon(Icons.notifications),
+                                color: Colors.black, // Default icon color
+                                onPressed: () {
+                                  // Handle notification icon press
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Padding(
+                              padding:
+                              const EdgeInsets.only(right: 10, top: 10),
+                              // Adjust padding for better spacing
+                              child: AccountMenu(),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 7,
+                    ),
+                    const Divider(
+                      height: 3.0,
+                      thickness: 3.0, // Thickness of the shadow
+                      color: Color(0x29000000), // Shadow color (#00000029)
+                    ),
+                  ],
+                ),
+              ),
+              if (constraints.maxHeight <= 500) ...{
                 SingleChildScrollView(
                   child: Align(
+                    // Added Align widget for the left side menu
                     alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 80),
+                      child: Container(
+                        height: 1400,
+                        width: 200,
+                        color: const Color(0xFFF7F6FA),
+                        padding:
+                        const EdgeInsets.only(left: 15, top: 50, right: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              } else ...{
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 60),
                     child: Container(
+                      height: 1400,
                       width: 200,
-                      color: const Color(0xFFF7F6FA),
-                      padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
+                      color: Colors.white,
+                      padding:
+                      const EdgeInsets.only(left: 15, top: 10, right: 15),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: _buildMenuItems(context),
                       ),
                     ),
                   ),
-                )
-
-              }
-              else...{
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    width: 200,
-                    color: const Color(0xFFF7F6FA),
-                    padding: const EdgeInsets.only(left: 15, top: 10,right: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _buildMenuItems(context),
-                    ),
-                  ),
+                ),
+                VerticalDividerWidget(
+                  height: maxHeight,
+                  color: Color(0x29000000),
                 ),
               },
-              Padding(
-                padding: const EdgeInsets.only(left: 190),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 10),
-                  width: 1, // Set the width to 1 for a vertical line
-                  height: 1400, // Set the height to your liking
-                  decoration: BoxDecoration(
-                    border:
-                        Border(left: BorderSide(width: 1, color: Colors.grey)),
-                  ),
-                ),
-              ),
+
               Positioned(
                 left: 201,
-                top: 0,
+                top: 60,
                 right: 0,
                 bottom: 0,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        color: Colors.white,
-                        height: 50,
-                        child: Row(
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(left: 20),
-                              child: Text(
-                                'Orders List',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            const Spacer(),
-                            Align(
-                              alignment: Alignment.topRight,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 10, right: 80),
-                                child: AnimatedBuilder(
-                                    animation: _controller,
-                                    builder: (context, child) {
-                                      return Transform.translate(offset: Offset(_isHovered1? _shakeAnimation.value : 0,0),
-                                        child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
-                                          curve: Curves.easeInOut,
-                                          decoration: BoxDecoration(
-                                            color: _isHovered1
-                                                ? Colors.blue[800]
-                                                : Colors.blue[800], // Background color change on hover
-                                            borderRadius: BorderRadius.circular(5),
-                                            boxShadow: _isHovered1
-                                                ? [
-                                              const BoxShadow(
-                                                  color: Colors.black45,
-                                                  blurRadius: 6,
-                                                  spreadRadius: 2)
-                                            ]
-                                                : [],
-                                          ),
-                                          child: OutlinedButton(
-                                            onPressed: () {
-                                              context.go('/Create_New_Order');
-                                                      //context.go('/Home/Orders/Create_Order');
-                                            },
-                                            style: OutlinedButton.styleFrom(
-                                              backgroundColor: Colors.blue[800],
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(
-                                                    5), // Rounded corners
-                                              ),
-                                              side: BorderSide.none, // No outline
-                                            ),
-                                            child: const Text(
-                                              'Create',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w100,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }
 
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 0),
-                      // Space above/below the border
-                      height: 1,
-                      // width: 10  00,
-                      width: constraints.maxWidth,
-                      // Border height
-                      color: Colors.grey, // Border color
-                    ),
                     if(constraints.maxWidth >= 1350)...{
                       Expanded(
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 30,top: 20),
+                                      child: Text('Order List',style: TextStyles.heading,),
+                                    ),
+
+                                  ],
+                                ),
+                                Row(
                                   children: [
                                     Padding(
                                         padding: const EdgeInsets.only(
                                             left: 30,
-                                            top: 50,
+                                            top:20,
                                             right: 30,
                                             bottom: 15),
                                         child: Container(
@@ -558,15 +529,8 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                           decoration:BoxDecoration(
                                             //   border: Border.all(color: Colors.grey),
                                             color: Colors.white,
-                                            borderRadius: BorderRadius.circular(8),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(0.3), // Soft grey shadow
-                                                spreadRadius: 3,
-                                                blurRadius: 3,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ],
+                                            border: Border.all(color: Color(0x29000000)),
+                                            borderRadius: BorderRadius.circular(15),
                                           ),
                                           child: SizedBox(
                                             child: Column(
@@ -753,47 +717,53 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-//  const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth * 0.261,
-                          maxHeight: 39,
-                        ),
-                        child: Container(
-// width: constraints.maxWidth * 0.252, // reduced width
-                          height: 35, // reduced height
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(2),
-                            border: Border.all(color: Colors.grey),
-                          ),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'Search by Order ID',
-                              hintStyle:
-                                  TextStyle(fontSize: 13, color: Colors.grey),
-                              contentPadding:
-                                  EdgeInsets.only(bottom: 20, left: 10),
-                              // adjusted padding
-                              border: InputBorder.none,
-                              suffixIcon: Icon(Icons.search_outlined,
-                                  color: Colors.blue[800]),
-                            ),
-                            onChanged: _updateSearch,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+
 //    const SizedBox(height: 8),
                 Row(
                   children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+//  const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: constraints.maxWidth * 0.261,
+                              maxHeight: 39,
+                            ),
+                            child: Container(
+// width: constraints.maxWidth * 0.252, // reduced width
+                              height: 35, // reduced height
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(2),
+                                border: Border.all(color: Colors.grey),
+                              ),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: 'Search by Order ID',
+                                  hintStyle:
+                                  TextStyle(fontSize: 13, color: Colors.grey),
+                                  contentPadding:
+                                  EdgeInsets.only(bottom: 20, left: 10),
+                                  // adjusted padding
+                                  border: InputBorder.none,
+                                    suffixIcon: Padding(
+                                      padding: const EdgeInsets.only(left: 10, right: 5), // Adjust image padding
+                                      child: Image.asset(
+                                        'images/search.png', // Replace with your image asset path
+                                      ),
+                                    )
+                                ),
+                                onChanged: _updateSearch,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Spacer(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -851,7 +821,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                 }).toList(),
                                 iconStyleData: const IconStyleData(
                                   icon: Icon(
-                                    Icons.arrow_drop_down_circle_rounded,
+                                    Icons.keyboard_arrow_down,
                                     color: Colors.indigo,
                                     size: 16,
                                   ),
@@ -878,86 +848,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                         ),
                       ],
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-//  const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: constraints.maxWidth * 0.128,
-                              // reduced width
-                              maxHeight: 30, // reduced height
-                            ),
-                            child: Container(
-                              height: 35,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(2),
-                                border: Border.all(color: Colors.grey),
-                              ),
-                              child: DropdownButtonFormField2<String>(
-                                decoration: const InputDecoration(
-                                  contentPadding:
-                                      EdgeInsets.only(bottom: 22, left: 10),
-                                  border: InputBorder.none,
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                ),
-                                value: dropdownValue2,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    dropdownValue2 = newValue;
-                                    selectDate = newValue ?? '';
-                                    _filterAndPaginateProducts();
-                                  });
-                                },
-                                items: <String>[
-                                  'Select Year',
-                                  '2023',
-                                  '2024',
-                                  '2025'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value,
-                                        style: TextStyle(
-                                            color: value == 'Select Year'
-                                                ? Colors.grey
-                                                : Colors.black,
-                                            fontSize: 13)),
-                                  );
-                                }).toList(),
-                                iconStyleData: const IconStyleData(
-                                  icon: Icon(
-                                    Icons.arrow_drop_down_circle_rounded,
-                                    color: Colors.indigo,
-                                    size: 16,
-                                  ),
-                                  iconSize: 16,
-                                ),
-                                buttonStyleData: const ButtonStyleData(
-                                  height: 50, // Button height
-                                  padding: EdgeInsets.only(left: 10, right: 10), // Button padding
-                                ),
-                                dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(7), // Rounded corners
-                                    color: Colors.white, // Dropdown background color
-                                  ),
-                                  maxHeight: 200, // Max height for dropdown items
-                                  width: constraints.maxWidth * 0.12, // Dropdown width
-                                  offset:  const Offset(0, -10),
-                                ),
-                               // focusColor: Color(0xFFF0F4F8),
-                                isExpanded: true,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+
                   ],
                 ),
               ],
@@ -1340,11 +1231,7 @@ columnSpacing: 35,
                             children: [
                               Text(
                                 column,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
+                                  style: TextStyles.subhead
                               ),
                             ],
                           ),
@@ -1399,11 +1286,7 @@ columnSpacing: 35,
                             children: [
                               Text(
                                 column,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
+                                  style: TextStyles.subhead
                               ),
                               IconButton(
                                 icon:
@@ -1427,41 +1310,6 @@ columnSpacing: 35,
 //Padding(
 //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
 //  child:
-                              Spacer(),
-                              MouseRegion(
-                                cursor: SystemMouseCursors.resizeColumn,
-                                child: GestureDetector(
-                                    onHorizontalDragUpdate: (details) {
-// Update column width dynamically as user drags
-                                      setState(() {
-                                        columnWidths[columns.indexOf(column)] +=
-                                            details.delta.dx;
-                                        columnWidths[columns.indexOf(column)] =
-                                            columnWidths[
-                                                    columns.indexOf(column)]
-                                                .clamp(151.0, 300.0);
-                                      });
-// setState(() {
-//   columnWidths[columns.indexOf(column)] += details.delta.dx;
-//   if (columnWidths[columns.indexOf(column)] < 50) {
-//     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-//   }
-// });
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          VerticalDivider(
-                                            width: 5,
-                                            thickness: 4,
-                                            color: Colors.grey,
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              ),
 // ),
                             ],
                           ),
@@ -1496,11 +1344,7 @@ columnSpacing: 35,
                             // Same dynamic width as column headers
                             child: Text(
                               detail.orderId.toString(),
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.deepOrange[200]
-                                    : const Color(0xFFFFB315),
-                              ),
+                              style: TextStyles.body,
                             ),
                           ),
                         ),
@@ -1508,10 +1352,8 @@ columnSpacing: 35,
                           Container(
                             width: columnWidths[1],
                             child: Text(
-                              detail.orderDate!,
-                              style: const TextStyle(
-                                color: Color(0xFFA6A6A6),
-                              ),
+                              detail.orderDate,
+                              style: TextStyles.body,
                             ),
                           ),
                         ),
@@ -1520,9 +1362,7 @@ columnSpacing: 35,
                             width: columnWidths[2],
                             child: Text(
                               detail.invoiceNo!,
-                              style: const TextStyle(
-                                color: Color(0xFFA6A6A6),
-                              ),
+                              style: TextStyles.body,
                             ),
                           ),
                         ),
@@ -1531,9 +1371,7 @@ columnSpacing: 35,
                             width: columnWidths[3],
                             child: Text(
                               detail.total.toString(),
-                              style: const TextStyle(
-                                color: Color(0xFFA6A6A6),
-                              ),
+                              style: TextStyles.body,
                             ),
                           ),
                         ),
@@ -1542,23 +1380,19 @@ columnSpacing: 35,
                             width: columnWidths[4],
                             child: Text(
                               detail.deliveryStatus.toString(),
-                              style:  TextStyle(
-                                color: detail.deliveryStatus == "In Progress" ? Colors.orange : detail.deliveryStatus == "Delivered" ? Colors.green : Colors.red,
-                              ),
+                              style: TextStyles.body,
                             ),
                           ),
                         ),
-                        DataCell(
-                          Container(
-                            width: columnWidths[4],
-                            child: Text(
-                              detail.paymentStatus.toString(),
-                              style: const TextStyle(
-                                color: Color(0xFFA6A6A6),
-                              ),
-                            ),
-                          ),
-                        ),
+                        // DataCell(
+                        //   Container(
+                        //     width: columnWidths[4],
+                        //     child: Text(
+                        //       detail.paymentStatus.toString(),
+                        //       style: TextStyles.body,
+                        //     ),
+                        //   ),
+                        // ),
 
                       ],
                       onSelectChanged: (selected) {

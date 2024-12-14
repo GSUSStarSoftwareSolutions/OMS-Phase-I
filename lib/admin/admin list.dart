@@ -8,15 +8,21 @@ import 'package:btb/widgets/productclass.dart';
 import 'package:btb/widgets/custom%20loading.dart';
 import 'package:btb/widgets/pagination.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:btb/widgets/productclass.dart' as ord;
 import 'package:btb/Order%20Module/firstpage.dart' as ors;
+
 import '../dashboard/dashboard.dart';
 import '../widgets/confirmdialog.dart';
+import '../widgets/layout size.dart';
 import '../widgets/no datafound.dart';
+import '../widgets/sample.dart';
+import '../widgets/text_style.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -100,81 +106,80 @@ class _AdminListState extends State<AdminList> {
         Uri.parse(apiUri),
         headers: headers,
       );
-      if(token == " "){
+      if (token == " ") {
         showDialog(
           barrierDismissible: false,
           context: context,
           builder: (BuildContext context) {
-            return
-              AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                contentPadding: EdgeInsets.zero,
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          // Warning Icon
-                          Icon(Icons.warning, color: Colors.orange, size: 50),
-                          SizedBox(height: 16),
-                          // Confirmation Message
-                          Text(
-                            'Session Expired',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text("Please log in again to continue",style: TextStyle(
-                            fontSize: 12,
-
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                             color: Colors.black,
-                          ),),
-                          SizedBox(height: 20),
-                          // Buttons
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Handle Yes action
-                                  context.go('/');
-                                  // Navigator.of(context).pop();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  side: BorderSide(color: Colors.blue),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: Text(
-                                  'ok',
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                  ),
+                          ),
+                        ),
+                        Text(
+                          "Please log in again to continue",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
+                  ),
+                ],
+              ),
+            );
           },
         ).whenComplete(() {
           _hasShownPopup = false;
         });
-
-      }
-      else{
+      } else {
         if (response.statusCode == 200) {
           Navigator.pop(context);
           fetchProducts(currentPage, itemsPerPage);
@@ -182,8 +187,6 @@ class _AdminListState extends State<AdminList> {
           print('Failed to delete customer: ${response.statusCode}');
         }
       }
-
-
     } catch (e) {
       print('Error: $e');
     }
@@ -208,80 +211,80 @@ class _AdminListState extends State<AdminList> {
           "Authorization": 'Bearer $token',
         },
       );
-      if(token == " "){
+      if (token == " ") {
         showDialog(
           barrierDismissible: false,
           context: context,
           builder: (BuildContext context) {
-            return
-              AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                contentPadding: EdgeInsets.zero,
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          // Warning Icon
-                          Icon(Icons.warning, color: Colors.orange, size: 50),
-                          SizedBox(height: 16),
-                          // Confirmation Message
-                          Text(
-                            'Session Expired',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text("Please log in again to continue",style: TextStyle(
-                            fontSize: 12,
-
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                             color: Colors.black,
-                          ),),
-                          SizedBox(height: 20),
-                          // Buttons
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Handle Yes action
-                                  context.go('/');
-                                  // Navigator.of(context).pop();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  side: BorderSide(color: Colors.blue),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: Text(
-                                  'ok',
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                  ),
+                          ),
+                        ),
+                        Text(
+                          "Please log in again to continue",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
+                  ),
+                ],
+              ),
+            );
           },
         ).whenComplete(() {
           _hasShownPopup = false;
         });
-
-      }else{
+      } else {
         if (response.statusCode == 200) {
           final jsonData = jsonDecode(response.body);
           List<UserResponse> products = [];
@@ -310,7 +313,6 @@ class _AdminListState extends State<AdminList> {
           throw Exception('Failed to load data');
         }
       }
-
     } catch (e) {
       if (mounted) {
         if (context.findAncestorWidgetOfExactType<Scaffold>() != null) {
@@ -328,7 +330,6 @@ class _AdminListState extends State<AdminList> {
     }
   }
 
-
   void _updateSearch(String searchText) {
     setState(() {
       _searchText = searchText;
@@ -337,8 +338,6 @@ class _AdminListState extends State<AdminList> {
       // _clearSearch();
     });
   }
-
-
 
   void _goToPreviousPage() {
     if (currentPage > 1) {
@@ -359,9 +358,14 @@ class _AdminListState extends State<AdminList> {
       }
     }
   }
+
   Future<void> updateRequestStatus(String userId, String status) async {
-    bool? isActive = (status == 'Active') ? true : (status == 'In Active') ? false : null;
-  //  bool isActive = status == 'Active';
+    bool? isActive = (status == 'Active')
+        ? true
+        : (status == 'In Active')
+            ? false
+            : null;
+    //  bool isActive = status == 'Active';
 
     //  String status = 'false';
     final String apiUrl =
@@ -374,89 +378,86 @@ class _AdminListState extends State<AdminList> {
           'Authorization': 'Bearer $token'
         },
       );
-      if(token == " "){
-
-          showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (BuildContext context) {
-              return
-                AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  contentPadding: EdgeInsets.zero,
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
+      if (token == " ") {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Warning Icon
+                        Icon(Icons.warning, color: Colors.orange, size: 50),
+                        SizedBox(height: 16),
+                        // Confirmation Message
+                        Text(
+                          'Session Expired',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          "Please log in again to continue",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Warning Icon
-                            Icon(Icons.warning, color: Colors.orange, size: 50),
-                            SizedBox(height: 16),
-                            // Confirmation Message
-                            Text(
-                              'Session Expired',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text("Please log in again to continue",style: TextStyle(
-                              fontSize: 12,
-
-                              color: Colors.black,
-                            ),),
-                            SizedBox(height: 20),
-                            // Buttons
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    // Handle Yes action
-                                    context.go('/');
-                                    // Navigator.of(context).pop();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    side: BorderSide(color: Colors.blue),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'ok',
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                    ),
-                                  ),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Yes action
+                                context.go('/');
+                                // Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
-                              ],
+                              ),
+                              child: Text(
+                                'ok',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                );
-            },
-          ).whenComplete(() {
-            _hasShownPopup = false;
-          });
-
-        }
-      else{
+                ],
+              ),
+            );
+          },
+        ).whenComplete(() {
+          _hasShownPopup = false;
+        });
+      } else {
         if (response.statusCode == 200) {
           if (status == 'Completed') {
             // _getCustomers(currentPage, itemsPerPage);
           }
         } else {}
       }
-
     } catch (e) {
       print('Error: $e');
     }
@@ -485,6 +486,87 @@ class _AdminListState extends State<AdminList> {
     });
   }
 
+  Map<String, bool> _isHovered = {
+    'Home': false,
+  };
+
+  List<Widget> _buildMenuItems(BuildContext context, constraints) {
+    double maxWidth = constraints.maxWidth;
+    return [
+      Column(
+        children: [
+          const SizedBox(
+            height: 10,
+          ),
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+                width: maxWidth * 0.11,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: Colors.blue[800],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                    bottomLeft: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
+                  ),
+                ),
+                child: _buildMenuItem(
+                    context, 'Home', Icons.home, Colors.white, '/User_List')),
+          ),
+        ],
+      ),
+      const SizedBox(
+        height: 6,
+      ),
+    ];
+  }
+
+  Widget _buildMenuItem(BuildContext context, String title, IconData icon,
+      Color iconColor, String route) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => {},
+      onExit: (_) => {},
+      child: GestureDetector(
+        onTap: () {
+          context.go(route);
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 5, right: 20),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 10, top: 2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(
+                  icon,
+                  color: iconColor,
+                  size: 20,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 15,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -494,7 +576,6 @@ class _AdminListState extends State<AdminList> {
     _dateController.text = formattedDate;
     fetchProducts(currentPage, itemsPerPage);
   }
-
 
   @override
   void dispose() {
@@ -508,345 +589,212 @@ class _AdminListState extends State<AdminList> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-          appBar: AppBar(
-            leading: null,
-            automaticallyImplyLeading: false,
-            backgroundColor: const Color(0xFFFFFFFF),
-            title: Image.asset("images/Final-Ikyam-Logo.png"),
-            // Set background color to white
-            elevation: 2.0,
-            shadowColor: const Color(0xFFFFFFFF),
-            // Set shadow color to black
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    icon: const Icon(Icons.notifications),
-                    onPressed: () {
-                      // Handle notification icon press
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: AccountMenu(),
-              ),
-            ],
-          ),
+          backgroundColor: Color.fromRGBO(21, 101, 192, 0.07),
           body: LayoutBuilder(builder: (context, BoxConstraints constraints) {
             double maxWidth = constraints.maxWidth;
+            double maxHeight = constraints.maxHeight;
             return Stack(
               children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    width: 200, // Set the width of the sidebar
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF7F6FA),
-                      // Set the background color
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 5,
+                Container(
+                  width: maxWidth,
+                  height: maxHeight * 0.080,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Color(0x29000000), // Bottom border color
+                        width: 3.0, // Thickness of the bottom border
+                      ),
+                    )
+                  ),
+                  // White background color
+                  //height: 62.0, // Total height including bottom shadow
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                       // crossAxisAlignment:CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, top: 5),
+                            child: Image.asset(
+                              "images/Final-Ikyam-Logo.png",
+                              height: 35.0,
+                              // Adjusted to better match proportions
+                            ),
+                          ),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  right: 10,
+                                ),
+                                // Adjust padding for better spacing
+                                child: AccountMenu(),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                if (constraints.maxHeight <= 500) ...{
+                  SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: maxHeight * 0.081),
+                      child: Container(
+                        height: maxHeight,
+                        width: maxWidth * 0.14,
+                        color: const Color(0xFFF7F6FA),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context, constraints),
                         ),
-                      ],
-                      borderRadius: const BorderRadius.only(
-                        // Add a rounded corner to the top-right
-                        topRight: Radius.circular(10),
                       ),
                     ),
+                  ),
+                } else ...{
+                  Align(
+                    alignment: Alignment.topLeft,
                     child: Padding(
-                      padding:
-                          const EdgeInsets.only(left: 15, top: 30, right: 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      padding: EdgeInsets.only(top: maxHeight * 0.080),
+                      child: Container(
+                        height: maxHeight,
+                        width: maxWidth * 0.13,
+
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border(
+                              left: BorderSide(
+                                color: Color(0x29000000), // Bottom border color
+                                width: 1.0, // Thickness of the bottom border
+                              ),
+                            )
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context, constraints),
+                        ),
+                      ),
+                    ),
+                  ),
+                  VerticalDividerWidget1(
+                    height: maxHeight,
+                    color: Color(0x29000000),
+                  ),
+                },
+                Positioned(
+                  left: maxWidth * 0.13,
+                  top: maxHeight * 0.08,
+                  right: 0,
+                  bottom: 0,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          // Home Button
-                          Container(
-                            width: 150,
-                            height: 45,
-                            decoration: BoxDecoration(
-                              color: Colors.blue[800],
-                              // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-                              // color: Color.fromRGBO(224, 59, 48, 1.0),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                // Radius for top-left corner
-                                topRight: Radius.circular(8),
-                                // No radius for top-right corner
-                                bottomLeft: Radius.circular(8),
-                                // Radius for bottom-left corner
-                                bottomRight: Radius.circular(
-                                    8), // No radius for bottom-right corner
-                              ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 30, top: 10),
+                            child: Text(
+                              'User Management',
+                              style: TextStyles.heading,
                             ),
-                            child: TextButton.icon(
+                          ),
+                          Spacer(),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 80, top: 10),
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: Colors.blue[800],
+                                // Button background color
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      5), // Rounded corners
+                                ),
+                                side: BorderSide.none, // No outline
+                              ),
                               onPressed: () {
-                                setState(() {
-                                  isHomeSelected = false;
-                                });
+                                context.go('/Create_User');
                               },
-                              icon: Icon(
-                                Icons.home_outlined,
-                                color: isHomeSelected
-                                    ? Colors.white
-                                    : Colors.white,
-                              ),
-                              label: const Text(
-                                'Home',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16),
-                              ),
+                              child: const Text(
+                                'New User',
+                                style: TextStyle(color: Colors.white),
+                              ), // add your button press logic here
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 190),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 10), // Space above/below the border
-                    width: 1, // Border height
-                    color: Colors.grey, // Border color
-                  ),
-                ),
-                Positioned(
-                  left: 201,
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: const Color(0xFFFFFDFF),
-                          height: 50,
-                          child: const Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 10),
-                                child: Text(
-                                  'User Management',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20),
-                                  textAlign: TextAlign.center,
+                      Padding(
+                          padding: EdgeInsets.only(
+                              left: maxWidth * 0.01,
+                              top: maxHeight * 0.02,
+                              right: maxWidth * 0.015,
+                          ),
+                          child: Container(
+                            width: maxWidth,
+                            height: maxHeight * 0.77,
+                            decoration: BoxDecoration(
+                              //   border: Border.all(color: Colors.grey),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  // Soft grey shadow
+                                  spreadRadius: 3,
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 3),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 0),
-                        // Space above/below the border
-                        height: 1,
-                        // width: 1000,
-                        width: constraints.maxWidth,
-                        // Border height
-                        color: Colors.grey, // Border color
-                      ),
-                      if (constraints.maxWidth >= 1320) ...{
-                        Expanded(
-                            child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 30,
-                                          top: 50,
-                                          right: 30,
-                                          bottom: 15),
-                                      child: Container(
-                                        height: 755,
-                                        width: maxWidth * 0.8,
-                                        decoration: BoxDecoration(
-                                          //   border: Border.all(color: Colors.grey),
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.black.withOpacity(0.3),
-                                              // Soft grey shadow
-                                              spreadRadius: 3,
-                                              blurRadius: 3,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-                                        child: SizedBox(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              buildSearchField1(),
-                                              const SizedBox(height: 10),
-                                              Expanded(
-                                                child: Scrollbar(
-                                                  controller: _scrollController,
-                                                  thickness: 6,
-                                                  thumbVisibility: true,
-                                                  child: SingleChildScrollView(
-                                                    controller:
-                                                        _scrollController,
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    child: buildDataTable1(),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: 1,
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 30),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  children: [
-                                                    PaginationControls(
-                                                      currentPage: currentPage,
-                                                      totalPages:
-                                                          filteredData1.length >
-                                                                  itemsPerPage
-                                                              ? totalPages
-                                                              : 1,
-                                                      onPreviousPage:
-                                                          _goToPreviousPage,
-                                                      onNextPage: _goToNextPage,
-                                                      // onLastPage: _goToLastPage,
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      )),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )),
-                      } else ...{
-                        Expanded(
-                            child: AdaptiveScrollbar(
-                          position: ScrollbarPosition.bottom,
-                          controller: horizontalScroll,
-                          child: SingleChildScrollView(
-                            controller: horizontalScroll,
-                            scrollDirection: Axis.horizontal,
-                            child: SingleChildScrollView(
+                              ],
+                            ),
+                            child: SizedBox(
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 30,
-                                              top: 50,
-                                              right: 30,
-                                              bottom: 15),
-                                          child: Container(
-                                            height: 755,
-                                            width: 1100,
-                                            decoration: BoxDecoration(
-                                              //   border: Border.all(color: Colors.grey),
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.3),
-                                                  // Soft grey shadow
-                                                  spreadRadius: 3,
-                                                  blurRadius: 3,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: SizedBox(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  buildSearchField1(),
-                                                  const SizedBox(height: 10),
-                                                  Expanded(
-                                                    child: Scrollbar(
-                                                      controller:
-                                                          _scrollController,
-                                                      thickness: 6,
-                                                      thumbVisibility: true,
-                                                      child:
-                                                          SingleChildScrollView(
-                                                        controller:
-                                                            _scrollController,
-                                                        scrollDirection:
-                                                            Axis.horizontal,
-                                                        child:
-                                                            buildDataTable2(),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 1,
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 30),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.end,
-                                                      children: [
-                                                        PaginationControls(
-                                                          currentPage:
-                                                              currentPage,
-                                                          totalPages: filteredData1
-                                                                      .length >
-                                                                  itemsPerPage
-                                                              ? totalPages
-                                                              : 1,
-                                                          onPreviousPage:
-                                                              _goToPreviousPage,
-                                                          onNextPage:
-                                                              _goToNextPage,
-                                                          // onLastPage: _goToLastPage,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          )),
-                                    ],
+                                  buildSearchField1(),
+                                  const SizedBox(height: 10),
+                                  Expanded(
+                                    child: Scrollbar(
+                                      controller: _scrollController,
+                                      thickness: 6,
+                                      thumbVisibility: true,
+                                      child: SingleChildScrollView(
+                                        controller: _scrollController,
+                                        scrollDirection: Axis.horizontal,
+                                        child: buildDataTable1(maxWidth,maxHeight),
+                                      ),
+                                    ),
                                   ),
+                                  const SizedBox(
+                                    height: 1,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 30),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        PaginationControls(
+                                          currentPage: currentPage,
+                                          totalPages: filteredData1.length >
+                                                  itemsPerPage
+                                              ? totalPages
+                                              : 1,
+                                          onPreviousPage: _goToPreviousPage,
+                                          onNextPage: _goToNextPage,
+                                          // onLastPage: _goToLastPage,
+                                        ),
+                                      ],
+                                    ),
+                                  )
                                 ],
                               ),
                             ),
-                          ),
-                        )),
-                      }
+                          )),
                     ],
                   ),
                 )
@@ -868,65 +816,31 @@ class _AdminListState extends State<AdminList> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 //wrap with row container
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 35, top: 30),
-                      child: Text(
-                        'User List',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 40, top: 30),
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.blue[800],
-                          // Button background color
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(5), // Rounded corners
-                          ),
-                          side: BorderSide.none, // No outline
-                        ),
-                        onPressed: () {
-                          context.go('/Create_User');
-                        },
-                        child: const Text(
-                          'New User',
-                          style: TextStyle(color: Colors.white),
-                        ), // add your button press logic here
-                      ),
-                    ),
-                  ],
-                ),
+
                 Padding(
-                  padding: const EdgeInsets.only(top: 20, left: 30),
+                  padding: const EdgeInsets.only(top: 15, left: 20),
                   child: Container(
                     width: maxWidth1 * 0.2, // reduced width
-                    height: 35, // reduced height
+                    height: 30, // reduced height
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(2),
-                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(3),
+                      border: Border.all(color: Colors.grey.shade400),
                     ),
                     child: TextFormField(
-                      decoration: const InputDecoration(
-                        hintText: 'Search by User ID and User Name',
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                        contentPadding: EdgeInsets.only(bottom: 20, left: 10),
-                        // adjusted padding
-                        border: InputBorder.none,
-                        suffixIcon: Padding(
-                          padding: EdgeInsets.only(right: 2),
-                          child: Icon(
-                            Icons.search_outlined,
-                            color: Colors.indigo,
-                            size: 20,
-                          ),
-                        ),
-                      ),
+                      decoration: InputDecoration(
+                          hintText: 'Search by User ID and User Name',
+                          hintStyle: TextStyles.body1,
+                          contentPadding: EdgeInsets.only(bottom: 20, left: 10),
+                          // adjusted padding
+                          border: InputBorder.none,
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.only(left: 10, right: 5),
+                            // Adjust image padding
+                            child: Image.asset(
+                              'images/search.png', // Replace with your image asset path
+                            ),
+                          )),
                       onChanged: _updateSearch,
                     ),
                   ),
@@ -934,7 +848,7 @@ class _AdminListState extends State<AdminList> {
               ],
             ),
             const SizedBox(
-              height: 15,
+              height: 10,
             ),
             Row(
               children: [
@@ -943,85 +857,84 @@ class _AdminListState extends State<AdminList> {
                   children: [
                     //  const SizedBox(height: 8),
                     Padding(
-                      padding: const EdgeInsets.only(left: 30),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth * 0.128,
-                          // reduced width
-                          maxHeight: 30, // reduced height
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Container(
+                        height: 30,
+                        width: maxWidth1 * 0.2,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(color: Colors.grey.shade400),
                         ),
-                        child: Container(
-                          height: 35,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(2),
-                            border: Border.all(color: Colors.grey),
+                        child: DropdownButtonFormField2<String>(
+                          decoration: InputDecoration(
+                            contentPadding:
+                                EdgeInsets.only(bottom: 20, left: 2),
+                            // adjusted padding
+                            border: InputBorder.none,
+                            filled: true,
+                            fillColor: Colors.white,
                           ),
-                          child: DropdownButtonFormField2<String>(
-                            decoration: InputDecoration(
-                              contentPadding:
-                                  EdgeInsets.only(bottom: 20, left: 2),
-                              // adjusted padding
-                              border: InputBorder.none,
-                              filled: true,
-                              fillColor: Colors.white,
+                          //   icon: Container(),
+                          value: dropdownValue2,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownValue2 = newValue;
+                              _Role = newValue ?? '';
+                              _filterAndPaginateProducts();
+                            });
+                          },
+                          items: <String>[
+                            'Role',
+                            'Admin',
+                            'Employee',
+                            'Customer',
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value,
+                                  style: GoogleFonts.jost(
+                                      color: value == 'Role'
+                                          ? Colors.grey
+                                          : Colors.black,
+                                      fontSize: 13)
+                                  // TextStyle(
+                                  //     color: value == 'Role'
+                                  //         ? Colors.grey
+                                  //         : Colors.black,
+                                  //     fontSize: 12)
+                                  ),
+                            );
+                          }).toList(),
+                          isExpanded: true,
+                          iconStyleData: const IconStyleData(
+                            icon: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Colors.grey,
+                              size: 16,
                             ),
-                            //   icon: Container(),
-                            value: dropdownValue2,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                dropdownValue2 = newValue;
-                                _Role = newValue ?? '';
-                                _filterAndPaginateProducts();
-                              });
-                            },
-                            items: <String>[
-                              'Role',
-                              'Admin',
-                              'Employee',
-                              'Customer',
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,
-                                    style: TextStyle(
-                                        color: value == 'Role'
-                                            ? Colors.grey
-                                            : Colors.black,
-                                        fontSize: 12)),
-                              );
-                            }).toList(),
-                            isExpanded: true,
-                            iconStyleData: const IconStyleData(
-                              icon: Icon(
-                                Icons.arrow_drop_down_circle_rounded,
-                                color: Colors.indigo,
-                                size: 16,
-                              ),
-                              iconSize: 16,
-                            ),
-                            buttonStyleData: const ButtonStyleData(
-                              // overlayColor: C,
-                              //focusColor: Color(0xFFF0F4F8),
-                              height: 50, // Button height
-                              padding: EdgeInsets.only(
-                                  left: 10, right: 10), // Button padding
-                            ),
-                            dropdownStyleData: DropdownStyleData(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(7),
-                                // Rounded corners
-                                color:
-                                    Colors.white, // Dropdown background color
-                              ),
-                              maxHeight: 150,
-                              // Max height for dropdown items
-                              width: constraints.maxWidth * 0.12,
-                              // Dropdown width
-                              offset: const Offset(0, -10),
-                            ),
-                            // focusColor: Color(0xFFF0F4F8),
+                            iconSize: 16,
                           ),
+                          buttonStyleData: const ButtonStyleData(
+                            // overlayColor: C,
+                            //focusColor: Color(0xFFF0F4F8),
+                            height: 50, // Button height
+                            padding: EdgeInsets.only(
+                                left: 10, right: 10), // Button padding
+                          ),
+                          dropdownStyleData: DropdownStyleData(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(7),
+                              // Rounded corners
+                              color: Colors.white, // Dropdown background color
+                            ),
+                            maxHeight: 200,
+                            // Max height for dropdown items
+                            width: constraints.maxWidth * 0.24,
+                            // Dropdown width
+                            offset: const Offset(0, -10),
+                          ),
+                          // focusColor: Color(0xFFF0F4F8),
                         ),
                       ),
                     ),
@@ -1167,507 +1080,7 @@ class _AdminListState extends State<AdminList> {
       return Column(
         children: [
           Container(
-            width:1100,
-            decoration: const BoxDecoration(
-                color: Color(0xFFF7F7F7),
-                border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 35,
-                columnSpacing: 20,
-                columns: columns.map((column) {
-                  return DataColumn(
-                    label: Stack(
-                      children: [
-                        SizedBox(
-                          //   padding: EdgeInsets.only(left: 5,right: 5),
-                          width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            //crossAxisAlignment: CrossAxisAlignment.end,
-                            //   mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                column,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
-                              ),
-                              if (columns.indexOf(column) < columns.length - 1)
-                              // if (columns.indexOf(column) < 0)
-                                IconButton(
-                                  icon: _sortOrder[columns.indexOf(column)] ==
-                                      'asc'
-                                      ? SizedBox(
-                                      width: 12,
-                                      child: Image.asset(
-                                        "images/sort.png",
-                                        color: Colors.grey,
-                                      ))
-                                      : SizedBox(
-                                      width: 12,
-                                      child: Image.asset(
-                                        "images/sort.png",
-                                        color: Colors.blue,
-                                      )),
-                                  onPressed: () {
-                                    setState(() {
-                                      _sortOrder[columns.indexOf(column)] =
-                                      _sortOrder[columns.indexOf(column)] ==
-                                          'asc'
-                                          ? 'desc'
-                                          : 'asc';
-                                      sortProducts(columns.indexOf(column),
-                                          _sortOrder[columns.indexOf(column)]);
-                                    });
-                                  },
-                                ),
-                              if (columns.indexOf(column) < columns.length - 1)
-                                Spacer(),
-                              if (columns.indexOf(column) < columns.length - 1)
-                                MouseRegion(
-                                  cursor: SystemMouseCursors.resizeColumn,
-                                  child: GestureDetector(
-                                      onHorizontalDragUpdate: (details) {
-                                        // Update column width dynamically as user drags
-                                        setState(() {
-                                          columnWidths[
-                                          columns.indexOf(column)] +=
-                                              details.delta.dx;
-                                          columnWidths[columns
-                                              .indexOf(column)] = columnWidths[
-                                          columns.indexOf(column)]
-                                              .clamp(161.0, 300.0);
-                                        });
-                                      },
-                                      child: const Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 10, bottom: 10),
-                                        child: Row(
-                                          children: [
-                                            VerticalDivider(
-                                              width: 5,
-                                              thickness: 4,
-                                              color: Colors.grey,
-                                            )
-                                          ],
-                                        ),
-                                      )),
-                                ),
-                              // ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    onSort: (columnIndex, ascending) {
-                      _sortOrder;
-                    },
-                  );
-                }).toList(),
-                rows: List.generate(
-                    math.min(
-                        itemsPerPage,
-                        filteredData1.length -
-                            (currentPage - 1) * itemsPerPage), (index) {
-                  final detail = filteredData1
-                      .skip((currentPage - 1) * itemsPerPage)
-                      .elementAt(index);
-                  final customerIndex =
-                      (currentPage - 1) * itemsPerPage + index;
-                  final isSelected = _selectedProduct == detail;
-                  return DataRow(
-                    color: MaterialStateProperty.resolveWith<Color>((states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.blue.shade500.withOpacity(
-                            0.8); // Add some opacity to the dark blue
-                      } else {
-                        return Colors.white.withOpacity(0.9);
-                      }
-                    }),
-                    cells: [
-                      DataCell(Text(
-                        detail.userId.toString(),
-                        style: TextStyle(
-                          //fontSize: 16,
-                          color: isSelected
-                              ? Colors.deepOrange[200]
-                              : const Color(0xFFFFB315),
-                        ),
-                      )),
-                      DataCell(Text(
-                        detail.userName,
-                        style: const TextStyle(
-                          // fontSize: 16,
-                            color: Colors.grey),
-                      )),
-                      DataCell(
-                        Text(detail.role,
-                            style: const TextStyle(
-                              // fontSize: 16,
-                                color: Colors.grey)),
-                      ),
-                      DataCell(
-                        Text(detail.companyName.toString(),
-                            style: const TextStyle(
-                              //fontSize: 16,
-                                color: Colors.grey)),
-                      ),
-                      DataCell(
-                        Text(detail.location.toString(),
-                            style: const TextStyle(
-                              //fontSize: 16,
-                                color: Colors.grey)),
-                      ),
-                      DataCell(
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12, bottom: 7),
-                          child: Container(
-                            width: 98,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: DropdownButtonFormField2<String>(
-                              decoration: InputDecoration(
-                                contentPadding:
-                                EdgeInsets.only(bottom: 15, left: 9),
-                                hintText:
-                                detail.active == true  ? 'Active' : 'In Active',
-                                hintStyle: TextStyle(
-                                    color: Colors.black, fontSize: 15),
-                                border: OutlineInputBorder(),
-                              ),
-                              items: const [
-                                DropdownMenuItem<String>(
-                                  value: 'Active',
-                                  //  enabled: false,
-                                  // Disable selection of "Active"
-                                  child: Text(
-                                    'Active',
-                                    style: TextStyle(
-                                        color: Colors
-                                            .grey), // Style the disabled item
-                                  ),
-                                ),
-                                DropdownMenuItem<String>(
-                                  value: 'In Active',
-                                  child: Text('In Active'),
-                                ),
-                              ],
-                              onChanged: (String? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    detail.active = (newValue == 'Active'); // Convert String to bool
-                                    updateRequestStatus(
-                                        detail.userId, newValue);
-                                  });
-                                }
-                              },
-                              dropdownStyleData: DropdownStyleData(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(7),
-                                  color:
-                                  Colors.white, // Dropdown background color
-                                ),
-                                maxHeight: 200,
-                                width: 98,
-                                offset: const Offset(0, -10),
-                                padding: EdgeInsets.zero,
-                              ),
-                              iconStyleData: const IconStyleData(
-                                icon: Padding(
-                                  padding: EdgeInsets.only(right: 9, top: 5),
-                                  child: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: Colors.indigo,
-                                    size: 17,
-                                  ),
-                                ),
-                                iconSize: 17,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // DataCell(Text(
-                      //   detail.active.toString(),
-                      //   style: const TextStyle(
-                      //     // fontSize: 16,
-                      //       color: Colors.grey),
-                      // )),
-                      DataCell(Row(children: [
-                        IconButton(
-                          icon: Icon(Icons.edit, color: Colors.green),
-                          onPressed: () {
-
-                            var selectedCustomer =
-                            filteredData1[customerIndex].toJson();
-                            print('select');
-                            print(selectedCustomer);
-                            context.go('/Edit_User', extra: {
-                              'EditUser': selectedCustomer,
-                            });
-                          },
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete,
-                              color: Colors.pinkAccent),
-                          onPressed: () {
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  contentPadding: EdgeInsets.zero,
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
-                                          children: [
-                                            const Icon(Icons.warning,
-                                                color: Colors.orange, size: 50),
-                                            const SizedBox(height: 16),
-                                            const Text(
-                                              'Are You Sure',
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 20),
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    deleteRowAPI(detail.userId);
-                                                  },
-                                                  style:
-                                                  ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                    Colors.green,
-                                                    side: const BorderSide(
-                                                        color: Colors.green),
-                                                    shape:
-                                                    RoundedRectangleBorder(
-                                                      borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                    ),
-                                                  ),
-                                                  child: const Text(
-                                                    'Yes',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                ),
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  style:
-                                                  ElevatedButton.styleFrom(
-                                                    backgroundColor: Colors.red,
-                                                    side: const BorderSide(
-                                                        color: Colors.red),
-                                                    shape:
-                                                    RoundedRectangleBorder(
-                                                      borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                    ),
-                                                  ),
-                                                  child: const Text(
-                                                    'No',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ])),
-                    ],
-                  );
-                  // onSelectChanged: (selected) {
-                  //   if (selected != null && selected) {
-                  //     final orderId = detail
-                  //         .orderId; // Capture the orderId of the selected row
-                  //     final detail1 = filteredData.firstWhere(
-                  //         (element) => element.orderId == orderId);
-                  //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                  //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                  //
-                  //     if (filteredData1.length <= 9) {
-                  //
-                  //     } else {
-                  //
-                  //     }
-                  //   }
-                  // });
-                })),
-          ),
-        ],
-      );
-    });
-  }
-
-  Widget buildDataTable1() {
-    if (isLoading) {
-      var width = MediaQuery.of(context).size.width;
-      var height = MediaQuery.of(context).size.height;
-      // Show loading indicator while data is being fetched
-      return Padding(
-        padding: EdgeInsets.only(
-            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
-      );
-    }
-
-    if (filteredData1.isEmpty) {
-      double right = MediaQuery.of(context).size.width;
-      return Column(
-        children: [
-          Container(
-            width: right - 270,
-            decoration: const BoxDecoration(
-                color: Color(0xFFF7F7F7),
-                border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                columnSpacing: 50,
-                columns: [
-                  DataColumn(
-                      label: Text(
-                    'User ID',
-                    style: TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'User Name',
-                    style: TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Role',
-                    style: TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Company Name',
-                    style: TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Location',
-                    style: TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Active',
-                    style: TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold),
-                  )),
-                ],
-                rows: const []),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 80, left: 130, right: 150),
-            child: CustomDatafound(),
-          ),
-        ],
-      );
-    }
-
-    void sortProducts(int columnIndex, String sortDirection) {
-      if (sortDirection == 'asc') {
-        filteredData1.sort((a, b) {
-          if (columnIndex == 0) {
-            return a.userId.compareTo(b.userId);
-          } else if (columnIndex == 1) {
-            return a.userName.compareTo(b.userName);
-          } else if (columnIndex == 2) {
-            return a.role.compareTo(b.role);
-          } else if (columnIndex == 3) {
-            return a.companyName.compareTo(b.companyName!);
-          } else if (columnIndex == 4) {
-            return a.location.compareTo(b.location);
-          } else {
-            return 0;
-          }
-        });
-      } else {
-        filteredData1.sort((a, b) {
-          if (columnIndex == 0) {
-            return b.userId.compareTo(a.userId); // Reverse the comparison
-          } else if (columnIndex == 1) {
-            return b.userName.compareTo(a.userName); // Reverse the comparison
-          } else if (columnIndex == 2) {
-            return b.role.compareTo(a.role); // Reverse the comparison
-          } else if (columnIndex == 3) {
-            return b.companyName
-                .compareTo(a.companyName); // Reverse the comparison
-          } else if (columnIndex == 4) {
-            return b.location.compareTo(a.location); // Reverse the comparison
-          } else {
-            return 0;
-          }
-        });
-      }
-      setState(() {});
-    }
-
-    return LayoutBuilder(builder: (context, constraints) {
-      // double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width;
-      return Column(
-        children: [
-          Container(
-            width: right - 270,
+            width: 1100,
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -1836,8 +1249,9 @@ class _AdminListState extends State<AdminList> {
                               decoration: InputDecoration(
                                 contentPadding:
                                     EdgeInsets.only(bottom: 15, left: 9),
-                                hintText:
-                                    detail.active == true  ? 'Active' : 'In Active',
+                                hintText: detail.active == true
+                                    ? 'Active'
+                                    : 'In Active',
                                 hintStyle: TextStyle(
                                     color: Colors.black, fontSize: 15),
                                 border: OutlineInputBorder(),
@@ -1845,7 +1259,7 @@ class _AdminListState extends State<AdminList> {
                               items: const [
                                 DropdownMenuItem<String>(
                                   value: 'Active',
-                                //  enabled: false,
+                                  //  enabled: false,
                                   // Disable selection of "Active"
                                   child: Text(
                                     'Active',
@@ -1862,7 +1276,8 @@ class _AdminListState extends State<AdminList> {
                               onChanged: (String? newValue) {
                                 if (newValue != null) {
                                   setState(() {
-                                    detail.active = (newValue == 'Active'); // Convert String to bool
+                                    detail.active = (newValue ==
+                                        'Active'); // Convert String to bool
                                     updateRequestStatus(
                                         detail.userId, newValue);
                                   });
@@ -1903,9 +1318,11 @@ class _AdminListState extends State<AdminList> {
                       // )),
                       DataCell(Row(children: [
                         IconButton(
-                          icon: Icon(Icons.edit, color: Colors.green),
+                          icon: Image.asset(
+                            "images/edit_icon.png",
+                            color: Color.fromRGBO(0, 83, 176, 1),
+                          ),
                           onPressed: () {
-
                             var selectedCustomer =
                                 filteredData1[customerIndex].toJson();
                             print('select');
@@ -1919,8 +1336,10 @@ class _AdminListState extends State<AdminList> {
                           width: 10,
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete,
-                              color: Colors.pinkAccent),
+                          icon: Image.asset(
+                            "images/delete.png",
+                            color: Color.fromRGBO(250, 0, 0, 1),
+                          ),
                           onPressed: () {
                             showDialog(
                               barrierDismissible: false,
@@ -2036,6 +1455,529 @@ class _AdminListState extends State<AdminList> {
       );
     });
   }
+
+  Widget buildDataTable1(double width , double height) {
+    if (isLoading) {
+      var width = MediaQuery.of(context).size.width;
+      var height = MediaQuery.of(context).size.height;
+      // Show loading indicator while data is being fetched
+      return Padding(
+        padding: EdgeInsets.only(
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
+        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+      );
+    }
+
+    if (filteredData1.isEmpty) {
+      double right = MediaQuery.of(context).size.width;
+      return Column(
+        children: [
+          Container(
+            width: right - 270,
+            decoration: const BoxDecoration(
+                color: Color(0xFFF7F7F7),
+                border: Border.symmetric(
+                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+            child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columnSpacing: 50,
+                columns: [
+                  DataColumn(
+                      label: Text(
+                    'User ID',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
+                  DataColumn(
+                      label: Text(
+                    'User Name',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
+                  DataColumn(
+                      label: Text(
+                    'Role',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
+                  DataColumn(
+                      label: Text(
+                    'Company Name',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
+                  DataColumn(
+                      label: Text(
+                    'Location',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
+                  DataColumn(
+                      label: Text(
+                    'Active',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
+                ],
+                rows: const []),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 80, left: 130, right: 150),
+            child: CustomDatafound(),
+          ),
+        ],
+      );
+    }
+
+    void sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData1.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.userId.compareTo(b.userId);
+          } else if (columnIndex == 1) {
+            return a.userName.compareTo(b.userName);
+          } else if (columnIndex == 2) {
+            return a.role.compareTo(b.role);
+          } else if (columnIndex == 3) {
+            return a.companyName.compareTo(b.companyName!);
+          } else if (columnIndex == 4) {
+            return a.location.compareTo(b.location);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData1.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.userId.compareTo(a.userId); // Reverse the comparison
+          } else if (columnIndex == 1) {
+            return b.userName.compareTo(a.userName); // Reverse the comparison
+          } else if (columnIndex == 2) {
+            return b.role.compareTo(a.role); // Reverse the comparison
+          } else if (columnIndex == 3) {
+            return b.companyName
+                .compareTo(a.companyName); // Reverse the comparison
+          } else if (columnIndex == 4) {
+            return b.location.compareTo(a.location); // Reverse the comparison
+          } else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
+
+    return LayoutBuilder(builder: (context, constraints) {
+      // double padding = constraints.maxWidth * 0.065;
+      double right = MediaQuery.of(context).size.width;
+      double height = MediaQuery.of(context).size.height;
+      double maxWidth = constraints.maxWidth;
+      double maxHeight = constraints.maxHeight;
+      print(width);
+      print(maxWidth);
+      return Container(
+        height: height,
+        width: Responsive.scaleWidth(context),
+        decoration: const BoxDecoration(
+            color: Color.fromRGBO(241, 241, 241, 1),
+            border: Border.symmetric(
+                horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+        child: ListView(
+          children:[
+            DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 35,
+                columnSpacing: 20,
+                columns: columns.map((column) {
+                  return DataColumn(
+                    label: Stack(
+                      children: [
+                        SizedBox(
+                          //   padding: EdgeInsets.only(left: 5,right: 5),
+                          width: columnWidths[columns.indexOf(column)],
+                          // Dynamic width based on user interaction
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            //crossAxisAlignment: CrossAxisAlignment.end,
+                            //   mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(column,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyles.subhead
+                                // TextStyle(
+                                //   fontWeight: FontWeight.bold,
+                                //   color: Color.fromRGBO(0, 83, 176, 1),
+                                //   fontSize: 13,
+                                // ),
+                              ),
+                              if (columns.indexOf(column) < columns.length - 1)
+                              // if (columns.indexOf(column) < 0)
+                                IconButton(
+                                  icon: _sortOrder[columns.indexOf(column)] ==
+                                      'asc'
+                                      ? SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color:
+                                        Color.fromRGBO(0, 83, 176, 1),
+                                      ))
+                                      : SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color:
+                                        Color.fromRGBO(0, 83, 176, 1),
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      _sortOrder[columns.indexOf(column)] =
+                                      _sortOrder[columns.indexOf(column)] ==
+                                          'asc'
+                                          ? 'desc'
+                                          : 'asc';
+                                      sortProducts(columns.indexOf(column),
+                                          _sortOrder[columns.indexOf(column)]);
+                                    });
+                                  },
+                                ),
+
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    onSort: (columnIndex, ascending) {
+                      _sortOrder;
+                    },
+                  );
+                }).toList(),
+                rows: List.generate(
+                    math.min(
+                        itemsPerPage,
+                        filteredData1.length -
+                            (currentPage - 1) * itemsPerPage), (index) {
+                  final detail = filteredData1
+                      .skip((currentPage - 1) * itemsPerPage)
+                      .elementAt(index);
+                  final customerIndex =
+                      (currentPage - 1) * itemsPerPage + index;
+                  final isSelected = _selectedProduct == detail;
+                  return DataRow(
+                    color: MaterialStateProperty.resolveWith<Color>((states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return Colors.blue.shade500.withOpacity(
+                            0.8); // Add some opacity to the dark blue
+                      } else {
+                        return Colors.white.withOpacity(0.9);
+                      }
+                    }),
+                    cells: [
+                      DataCell(Text(
+                        detail.userId.toString(),
+                        style: TextStyles.body,
+                      )),
+                      DataCell(Text(
+                        detail.userName,
+                        style: TextStyles.body,
+                      )),
+                      DataCell(
+                        Text(
+                          detail.role,
+                          style: TextStyles.body,
+                        ),
+                      ),
+                      DataCell(
+                        Text(
+                          detail.companyName.toString(),
+                          style: TextStyles.body,
+                        ),
+                      ),
+                      DataCell(
+                        Text(
+                          detail.location.toString(),
+                          style: TextStyles.body,
+                        ),
+                      ),
+                      if (detail.active == true) ...{
+                        DataCell(
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12, bottom: 7),
+                            child: Container(
+                              width: 98,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: DropdownButtonFormField2<String>(
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.only(bottom: 15,),
+                                  hintText: ' Active',
+                                  hintStyle:  TextStyles.body,
+                                  border: InputBorder.none,
+                                ),
+                                items: [
+                                  DropdownMenuItem<String>(
+                                    value: 'In Active',
+                                    child:  Text(
+                                      'In Active',
+                                        style: TextStyles.body,
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      detail.active = (newValue == 'Active'); // Convert String to bool
+                                      updateRequestStatus(detail.userId, newValue);
+                                    });
+                                  }
+                                },
+                                dropdownStyleData: DropdownStyleData(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(7),
+                                    color: Colors.white, // Dropdown background color
+                                  ),
+                                  maxHeight: 200,
+                                  width: 98,
+                                  offset: const Offset(0, -10),
+                                  padding: EdgeInsets.zero,
+                                ),
+                                iconStyleData: const IconStyleData(
+                                  icon: Padding(
+                                    padding: EdgeInsets.only(right: 9, top: 5),
+                                    child: Icon(
+                                      Icons.arrow_drop_down,
+                                      color: Colors.indigo,
+                                      size: 17,
+                                    ),
+                                  ),
+                                  iconSize: 17,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      }
+
+
+                      else...{
+                        DataCell(
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12, bottom: 7),
+                            child: Container(
+                              width: 98,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: DropdownButtonFormField2<String>(
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.only(bottom: 15,),
+                                  hintText: 'In Active',
+                                  hintStyle:   TextStyles.body,
+                                  border: InputBorder.none
+                                ),
+                                items: [
+                                  DropdownMenuItem<String>(
+                                    value: 'Active',
+                                    child: Text(
+                                      'Active',
+                                      style: TextStyles.body,
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      detail.active = (newValue == 'In Active'); // Convert String to bool
+                                      updateRequestStatus(detail.userId, newValue);
+                                    });
+                                  }
+                                },
+                                dropdownStyleData: DropdownStyleData(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(7),
+                                    color: Colors.white, // Dropdown background color
+                                  ),
+                                  maxHeight: 200,
+                                  width: 98,
+                                  offset: const Offset(0, -10),
+                                  padding: EdgeInsets.zero,
+                                ),
+                                iconStyleData: const IconStyleData(
+                                  icon: Padding(
+                                    padding: EdgeInsets.only(right: 9, top: 5),
+                                    child: Icon(
+                                      Icons.arrow_drop_down,
+                                      color: Colors.indigo,
+                                      size: 17,
+                                    ),
+                                  ),
+                                  iconSize: 17,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      },
+
+                      // DataCell(Text(
+                      //   detail.active.toString(),
+                      //   style: const TextStyle(
+                      //     // fontSize: 16,
+                      //       color: Colors.grey),
+                      // )),
+                      DataCell(Row(children: [
+                        IconButton(
+                            icon: Image.asset(
+                              "images/edit_icon.png",
+                              color: Color.fromRGBO(0, 83, 176, 1),
+                            ),
+                            onPressed: () {
+                              var selectedCustomer =
+                              filteredData1[customerIndex].toJson();
+                              print('select');
+                              print(selectedCustomer);
+                              context.go('/Edit_User', extra: {
+                                'EditUser': selectedCustomer,
+                              });
+                            }),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        IconButton(
+                          icon: Image.asset(
+                            "images/delete.png",
+                            color: Color.fromRGBO(250, 0, 0, 1),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  contentPadding: EdgeInsets.zero,
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          children: [
+                                            const Icon(Icons.warning,
+                                                color: Colors.orange, size: 50),
+                                            const SizedBox(height: 16),
+                                            const Text(
+                                              'Are You Sure',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    deleteRowAPI(detail.userId);
+                                                  },
+                                                  style:
+                                                  ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                    Colors.green,
+                                                    side: const BorderSide(
+                                                        color: Colors.green),
+                                                    shape:
+                                                    RoundedRectangleBorder(
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    'Yes',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  style:
+                                                  ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.red,
+                                                    side: const BorderSide(
+                                                        color: Colors.red),
+                                                    shape:
+                                                    RoundedRectangleBorder(
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    'No',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ])),
+                    ],
+                  );
+                  // onSelectChanged: (selected) {
+                  //   if (selected != null && selected) {
+                  //     final orderId = detail
+                  //         .orderId; // Capture the orderId of the selected row
+                  //     final detail1 = filteredData.firstWhere(
+                  //         (element) => element.orderId == orderId);
+                  //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+                  //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+                  //
+                  //     if (filteredData1.length <= 9) {
+                  //
+                  //     } else {
+                  //
+                  //     }
+                  //   }
+                  // });
+                })),
+          ]
+        ),
+      );
+    });
+  }
 }
 
 class UserResponse {
@@ -2052,7 +1994,6 @@ class UserResponse {
   final String shippingAddress1;
   final String shippingAddress2;
 
-
   UserResponse({
     required this.userId,
     required this.userName,
@@ -2060,7 +2001,6 @@ class UserResponse {
     required this.active,
     required this.role,
     required this.email,
-
     required this.companyName,
     required this.mobileNumber,
     required this.location,
@@ -2096,7 +2036,7 @@ class UserResponse {
       'mobileNumber': mobileNumber,
       'location': location,
       'shippingAddress1': shippingAddress1,
-      'shippingAddress2':shippingAddress2,
+      'shippingAddress2': shippingAddress2,
     };
   }
 

@@ -175,7 +175,12 @@ class AccountMenu extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(right: 35),
         child: PopupMenuButton<String>(
-          icon: const Icon(Icons.account_circle),
+          icon: Image.asset(
+            'images/user.png', // Replace with your image path
+            width: 20,
+            height: 20,
+            fit: BoxFit.cover, // Ensures the image fills the available space
+          ),
           onSelected: (value) {
             if (!_hasShownPopup) {
               _hasShownPopup = true;

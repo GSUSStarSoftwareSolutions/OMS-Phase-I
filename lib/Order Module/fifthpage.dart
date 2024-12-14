@@ -132,8 +132,6 @@ class _FifthPageState extends State<FifthPage> {
       _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Home'),
       _buildMenuItem('Customer', Icons.account_circle_outlined,
           Colors.blue[900]!, '/Customer'),
-      _buildMenuItem(
-          'Products', Icons.image_outlined, Colors.blue[900]!, '/Product_List'),
       Container(
           decoration: BoxDecoration(
             color: Colors.blue[800],
@@ -147,16 +145,6 @@ class _FifthPageState extends State<FifthPage> {
           ),
           child: _buildMenuItem(
               'Orders', Icons.warehouse_outlined, Colors.white, '/Order_List')),
-      _buildMenuItem('Delivery', Icons.fire_truck_outlined, Colors.blue[900]!,
-          '/Delivery_List'),
-      _buildMenuItem('Invoice', Icons.document_scanner_outlined,
-          Colors.blue[900]!, '/Invoice'),
-      _buildMenuItem(
-          'Payment', Icons.payment_rounded, Colors.blue[900]!, '/Payment_List'),
-      _buildMenuItem(
-          'Return', Icons.keyboard_return, Colors.blue[900]!, '/Return_List'),
-      _buildMenuItem('Reports', Icons.insert_chart_outlined, Colors.blue[900]!,
-          '/Report_List'),
     ];
   }
 
@@ -1520,17 +1508,17 @@ class _FifthPageState extends State<FifthPage> {
                                                 top: 5, bottom: 5),
                                             child: Table(
                                               columnWidths: const {
-                                                0: FlexColumnWidth(0.9),
+                                                0: FlexColumnWidth(0.7),
                                                 1: FlexColumnWidth(2.7),
                                                 2: FlexColumnWidth(2),
                                                 3: FlexColumnWidth(1.8),
-                                                4: FlexColumnWidth(2),
-                                                5: FlexColumnWidth(1),
-                                                6: FlexColumnWidth(2),
+                                                4: FlexColumnWidth(1.5),
+                                                5: FlexColumnWidth(1.2),
+                                                6: FlexColumnWidth(1.8),
                                                 7: FlexColumnWidth(1),
                                                 8: FlexColumnWidth(1),
-                                                9: FlexColumnWidth(1),
-                                                10: FlexColumnWidth(1),
+                                                9: FlexColumnWidth(1.2),
+                                                10: FlexColumnWidth(0.7),
                                               },
                                               children: const [
                                                 TableRow(
@@ -1754,17 +1742,17 @@ class _FifthPageState extends State<FifthPage> {
                                               ),
                                               // border: TableBorder.all(color: const Color(0xFFB2C2D3)),
                                               columnWidths: const {
-                                                0: FlexColumnWidth(1),
+                                                0: FlexColumnWidth(0.7),
                                                 1: FlexColumnWidth(2.7),
                                                 2: FlexColumnWidth(2),
                                                 3: FlexColumnWidth(1.8),
-                                                4: FlexColumnWidth(2),
-                                                5: FlexColumnWidth(1),
-                                                6: FlexColumnWidth(2),
+                                                4: FlexColumnWidth(1.5),
+                                                5: FlexColumnWidth(1.2),
+                                                6: FlexColumnWidth(1.8),
                                                 7: FlexColumnWidth(1),
                                                 8: FlexColumnWidth(1),
-                                                9: FlexColumnWidth(1),
-                                                10: FlexColumnWidth(1),
+                                                9: FlexColumnWidth(1.2),
+                                                10: FlexColumnWidth(0.7),
                                               },
                                               children: [
                                                 TableRow(

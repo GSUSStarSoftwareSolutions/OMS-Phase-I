@@ -7,6 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+
+import '../dashboard/dashboard.dart';
+import '../widgets/confirmdialog.dart';
+import '../widgets/sample.dart';
+import '../widgets/text_style.dart';
 void main()
 {
   runApp(Createusr());
@@ -193,7 +198,7 @@ class _CreateusrState extends State<Createusr> {
             // Display the SnackBar for existing email error
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('This email already exists.'),
+                content: Text('email already exists'),
                 duration: Duration(seconds: 2), // Optional duration
               ),
             );
@@ -238,605 +243,631 @@ class _CreateusrState extends State<Createusr> {
     super.dispose();
   }
 
+  Map<String, bool> _isHovered = {
+    'Home': false,
+  };
+
+  List<Widget> _buildMenuItems(BuildContext context, constraints) {
+    double maxWidth = constraints.maxWidth;
+    return [
+      Column(
+        children: [
+          const SizedBox(
+            height: 10,
+          ),
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+                width: maxWidth * 0.11,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: Colors.blue[800],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                    bottomLeft: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
+                  ),
+                ),
+                child: _buildMenuItem(
+                    context, 'Home', Icons.home, Colors.white, '/User_List')),
+          ),
+        ],
+      ),
+      const SizedBox(
+        height: 6,
+      ),
+    ];
+  }
+
+  Widget _buildMenuItem(BuildContext context, String title, IconData icon,
+      Color iconColor, String route) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => {},
+      onExit: (_) => {},
+      child: GestureDetector(
+        onTap: () {
+          context.go(route);
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 5, right: 20),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 10, top: 2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(
+                  icon,
+                  color: iconColor,
+                  size: 20,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 15,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: const Color(0xFFF0F4F8),
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          leading: null,
-          backgroundColor: const Color(0xFFFFFFFF),
-          title: Image.asset("images/Final-Ikyam-Logo.png"),
-          // Set background color to white
-          elevation: 2.0,
-          shadowColor: const Color(0xFFFFFFFF),
-          // Set shadow color to black
-        ),
+        backgroundColor: Color.fromRGBO(21, 101, 192, 0.07),
+
         body: LayoutBuilder(
           builder: (context, constraints) {
+            double maxHeight = constraints.maxHeight;
+            double maxWidth = constraints.maxWidth;
             return Stack(
               children: [
-                const Sidebar(),
-                Padding(
-                  padding: const EdgeInsets.only(left: 200, top: 0),
-                  child: Container(
-                    width: 1, // Set the width to 1 for a vertical line
-                    height: 1400, // Set the height to your liking
-                    decoration: const BoxDecoration(
-                      border: Border(left: BorderSide(width: 1, color: Colors
-                          .grey)),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 201),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    color: Colors.white,
-                    height: 52,
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                              Icons.arrow_back), // Back button icon
-                          onPressed: () {
-                            context.go(
-                                '/User_List');
-                          },
+                Container(
+                  width: maxWidth,
+                  height: maxHeight * 0.080,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Color(0x29000000), // Bottom border color
+                          width: 3.0, // Thickness of the bottom border
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text(
-                            'Create User',
-                            style: TextStyle(
-                              fontSize: 18,
-                              // fontWeight: FontWeight.bold,
+                      )
+                  ), // White background color
+                  //height: 62.0, // Total height including bottom shadow
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, top: 5),
+                            child: Image.asset(
+                              "images/Final-Ikyam-Logo.png",
+                              height: 35.0,
+                              // Adjusted to better match proportions
                             ),
-                            textAlign: TextAlign.center,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 43, left: 200),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 10), // Space above/below the border
-                    height: 1, // Border height
-                    color: Colors.grey, // Border color
-                  ),
-                ),
 
-                     if(constraints.maxWidth >= 700)...{
-                     Padding(
-                     padding: const EdgeInsets.only(top: 80),
-                     child:Center(
-                     child: RawScrollbar(
-                     controller: _scrollController,
-                     thumbVisibility: true,
-                     // Always show scrollbar
-                     thickness: 15,
-                     // Thickness of the scrollbar
-                     radius: const Radius.circular(2),
-                     // Rounded corners for scrollbar
-                     thumbColor: Colors.grey[400],
-                     // Custom thumb color
-                     trackColor: Colors.grey[900],
-                     // Custom track color
-                     trackRadius: const Radius.circular(2),
-                     child: SingleChildScrollView(
-                     controller: _scrollController,
-                     child:Row(
-                     mainAxisAlignment: MainAxisAlignment.center,
-                     children: [
-                     Container(
-                     child: Padding(
-                     padding: const EdgeInsets.only(left: 200),
-                      child:Container(
-                        height: 520,
-                        width: 400,
-                        padding: const EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Form(
-                          key: formKey,
+                        ],
+                      ),
+
+                    ],
+                  ),
+                ),
+                if (constraints.maxHeight <= 500) ...{
+                  SingleChildScrollView(
+                    child: Align(
+                      // Added Align widget for the left side menu
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding:  EdgeInsets.only(top:  maxHeight * 0.081),
+                        child: Container(
+                          height: maxHeight,
+                          width: maxWidth * 0.14,
+                          color: const Color(0xFFF7F6FA),
+                          // padding:
+                          // const EdgeInsets.only(left: 15, top: 50, right: 15),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment
-                                .center,
-                            children: [
-                              const Text('User Details',
-                                style: TextStyle(fontSize: 15,
-                                  fontWeight: FontWeight.bold,),),
-
-
-                              const SizedBox(height: 26,),
-                              const Divider(
-                                height: 3,
-                                color: Colors.grey,
-                              ),
-                              const SizedBox(height: 8,),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 10, bottom: 8),
-                                child: AnimatedContainer(
-                                  duration: const Duration(
-                                      milliseconds: 300),
-                                  // Control animation duration
-                                  curve: Curves.easeInOut,
-                                  // Choose an animation curve
-                                  child: DropdownButtonHideUnderline(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border
-                                            .all( // Outline border
-                                          color: Colors.grey,
-                                          // Customize outline color
-                                          width: 1.5, // Customize outline thickness
-                                        ),
-                                        borderRadius: BorderRadius
-                                            .circular(6),
-                                        // Rounded corners for the outline
-                                        color: Colors
-                                            .white, // Background color for the dropdown
-                                      ),
-                                      child: DropdownButton2(
-                                        isExpanded: true,
-                                        hint: const Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                            'Select Role',
-                                            style: TextStyle(
-                                                fontSize: 16),
-                                          ),
-                                        ),
-
-                                        items: items
-                                            .map((item) =>
-                                            DropdownMenuItem<String>(
-                                              value: item,
-                                              child: Padding(
-                                                padding: const EdgeInsets
-                                                    .all(8.0),
-                                                child: Text(
-                                                  item,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                              ),
-                                            ))
-                                            .toList(),
-                                        value: selectedValue,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectedValue =
-                                            value as String;
-                                          });
-                                        },
-                                        // Updated properties as per the latest version of dropdown_button2
-                                        buttonStyleData: ButtonStyleData(
-                                          height: 42,
-                                          width: 285,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius
-                                                .circular(4),
-                                            color: Colors
-                                                .white, // No border here
-                                          ),
-                                        ),
-                                        dropdownStyleData: DropdownStyleData(
-                                          maxHeight: 100,
-                                          width: 285,
-                                          padding: const EdgeInsets
-                                              .symmetric(horizontal: 5,
-                                              vertical: 5),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius
-                                                .circular(15),
-                                            color: Colors
-                                                .grey[200], // Dropdown background color
-                                          ),
-                                          elevation: 5,
-                                          offset: const Offset(0, -10),
-                                        ),
-                                        iconStyleData: const IconStyleData(
-                                          icon: Padding(
-                                            padding: EdgeInsets.only(
-                                                right: 10),
-                                            child: Icon(Icons
-                                                .arrow_drop_down),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 40, right: 40),
-                                child: SizedBox(
-                                  height: 45,
-                                  child: TextFormField(
-                                    controller: userNameController,
-                                    decoration: const InputDecoration(
-                                      hintText: 'User Name',
-                                      contentPadding: EdgeInsets
-                                          .symmetric(
-                                          vertical: 5, horizontal: 8),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(6)),
-                                        // Set border radius for all sides
-                                        borderSide: BorderSide(
-                                            color: Colors.grey,
-                                            width: 1.5), // Set border color and width
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(6)),
-                                        // Same border radius when focused
-                                        borderSide: BorderSide(
-                                            color: Colors.blue,
-                                            width: 2.0), // Customize focused border color and width
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(6)),
-                                        // Same border radius when enabled
-                                        borderSide: BorderSide(
-                                            color: Colors.grey,
-                                            width: 1.5), // Customize enabled border color and width
-                                      ),
-                                      suffixIcon: Icon(
-                                          Icons.account_circle,
-                                          size: 20), // Icon at the end
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              const SizedBox(height: 14,),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 40, right: 40),
-                                child: SizedBox(
-                                  height: 45,
-                                  child:TextFormField(
-                                    controller: emailController,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Email Address',
-                                      contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(6)),
-                                        borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(6)),
-                                        borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(6)),
-                                        borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                                      ),
-                                      suffixIcon: Icon(Icons.mail, size: 20),
-                                    ),
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9@._]')), // Allows lowercase, digits, and common email symbols
-                                    ],
-                                    onChanged: (value) {
-                                      emailController.value = TextEditingValue(
-                                        text: value.toLowerCase(),
-                                        selection: emailController.selection,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              // const SizedBox(height: 11,),
-                              // Padding(
-                              //   padding: const EdgeInsets.only(
-                              //       left: 40, right: 40),
-                              //   child: SizedBox(
-                              //     height: 45,
-                              //     child: TextFormField(
-                              //       controller: passwordController,
-                              //       obscureText: _obscureText,
-                              //       decoration: InputDecoration(
-                              //         hintText: 'Create Password',
-                              //         contentPadding: const EdgeInsets
-                              //             .symmetric(
-                              //             vertical: 5, horizontal: 8),
-                              //         border: const OutlineInputBorder(
-                              //           borderRadius: BorderRadius.all(
-                              //               Radius.circular(6)),
-                              //           // Set border radius for all sides
-                              //           borderSide: BorderSide(
-                              //               color: Colors.grey,
-                              //               width: 1.5), // Set border color and width
-                              //         ),
-                              //         focusedBorder: const OutlineInputBorder(
-                              //           borderRadius: BorderRadius.all(
-                              //               Radius.circular(6)),
-                              //           // Same border radius when focused
-                              //           borderSide: BorderSide(
-                              //               color: Colors.blue,
-                              //               width: 2.0), // Customize focused border color and width
-                              //         ),
-                              //         enabledBorder: const OutlineInputBorder(
-                              //           borderRadius: BorderRadius.all(
-                              //               Radius.circular(6)),
-                              //           // Same border radius when enabled
-                              //           borderSide: BorderSide(
-                              //               color: Colors.grey,
-                              //               width: 1.5), // Customize enabled border color and width
-                              //         ),
-                              //         suffixIcon: IconButton(
-                              //           icon: Icon(
-                              //             _obscureText ? Icons
-                              //                 .visibility_off : Icons
-                              //                 .visibility,
-                              //           ),
-                              //           onPressed: _togglePasswordVisibility,
-                              //         ), // Icon at the end
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              const SizedBox(height: 14,),
-
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 40, right: 40),
-                                child: SizedBox(
-                                  height: 45,
-                                  child: TextFormField(
-                                    controller: departmentController,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Company Name',
-                                      contentPadding: EdgeInsets
-                                          .symmetric(
-                                          vertical: 5, horizontal: 8),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(6)),
-                                        // Set border radius for all sides
-                                        borderSide: BorderSide(
-                                            color: Colors.grey,
-                                            width: 1.5), // Set border color and width
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(6)),
-                                        // Same border radius when focused
-                                        borderSide: BorderSide(
-                                            color: Colors.blue,
-                                            width: 2.0), // Customize focused border color and width
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(6)),
-                                        // Same border radius when enabled
-                                        borderSide: BorderSide(
-                                            color: Colors.grey,
-                                            width: 1.5), // Customize enabled border color and width
-                                      ),
-                                      suffixIcon: Icon(Icons.business,
-                                          size: 20), // Icon at the end
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              const SizedBox(height: 14,),
-
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 40, right: 40),
-                                child: SizedBox(
-                                  height: 45,
-                                  child: TextFormField(
-                                    controller: mobileController,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Mobile No',
-                                      contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(6)),
-                                        borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(6)),
-                                        borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(6)),
-                                        borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                                      ),
-                                      suffixIcon: Icon(Icons.phone_android_outlined, size: 20),
-                                    ),
-                                    keyboardType: TextInputType.number, // Shows numeric keyboard
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly, // Allows only digits
-                                      LengthLimitingTextInputFormatter(10), // Limits input to 10 characters
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 14,),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 40, right: 40),
-                                child: TextFormField(
-                                  controller: location,
-                                  onChanged: (value) {
-                                    // Allow only alphabetic characters
-                                    String filteredValue = value.replaceAll(RegExp(r'[^a-zA-Z\s]'), '');
-
-                                    if (filteredValue.isNotEmpty) {
-                                      // Format the text: capitalize the first letter and make the rest lowercase
-                                      String formattedText = filteredValue[0].toUpperCase() +
-                                          filteredValue.substring(1).toLowerCase();
-
-                                      // Update the controller with the filtered and formatted text
-                                      location.value = location.value.copyWith(
-                                        text: formattedText,
-                                        selection: TextSelection.collapsed(offset: formattedText.length),
-                                      );
-                                    } else {
-                                      // Clear the text if filtered value is empty
-                                      location.clear();
-                                    }
-                                  },
-                                  decoration: const InputDecoration(
-                                    hintText: 'Location',
-                                    contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(6)),
-                                      borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(6)),
-                                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(6)),
-                                      borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                                    ),
-                                    suffixIcon: Icon(Icons.location_on, size: 20),
-                                  ),
-                                ),
-
-
-                              ),
-
-                              const SizedBox(height: 13,),
-                              SizedBox(
-                                width: 150,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-
-                                    if (selectedValue == null ||
-                                        selectedValue ==
-                                            'Select Role') {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please select a Role'),
-                                        ),
-                                      );
-                                    }
-
-                                    else if (userNameController.text
-                                        .isEmpty ||
-                                        userNameController.text
-                                            .length <= 2) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please fill user name'),
-                                        ),
-                                      );
-                                    }
-                                    else if (emailController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$')
-                                        .hasMatch(
-                                        emailController
-                                            .text)){
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Enter Valid Email Address'),
-                                        ),
-                                      );
-                                    }
-                                    else if (departmentController.text.isEmpty) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please fill Company Name.'),
-                                        ),
-                                      );
-                                    }
-
-                                    else if (mobileController.text.isEmpty ||
-                                        mobileController.text.length !=
-                                            10) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please fill a valid mobile number.'),
-                                        ),
-                                      );
-                                    }
-                                    else if (location.text.isEmpty) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please fill location '),
-                                        ),
-                                      );
-                                    }
-                                    else {
-                                      cusSave(context);
-                                    }
-
-                                    // Save form
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    backgroundColor: Colors.blue[900],
-                                    // Button background color
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius
-                                          .circular(
-                                          15), // Rounded corners
-                                    ),
-                                    side: const BorderSide( // Set border color to red
-                                      color: Colors.blue,
-                                      width: 1, // You can adjust the border width as needed
-                                    ), // No outline
-                                  ),
-                                  child: const Text(
-                                    '  Save  ',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context,constraints),
                           ),
                         ),
                       ),
-                     ),
-                     ),
-            ],
-                     ),
-                     ),
-            ),
-            ),
-            ),
+                    ),
+                  ),
+                } else ...{
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: maxHeight * 0.080),
+                      child: Container(
+                        height: maxHeight,
+                        width: maxWidth * 0.13,
+
+                        color: Colors.white,
+
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _buildMenuItems(context,constraints),
+                        ),
+                      ),
+                    ),
+                  ),
+                  VerticalDividerWidget1(
+                    height: maxHeight,
+                    color: Color(0x29000000),
+                  ),
+
+                },
+
+                     if(constraints.maxWidth >= 700)...{
+                       Positioned(
+                         left: 150,
+                         right: 0,
+                         top: 10,
+                         bottom: 0,
+                         child:    Padding(
+                           padding: const EdgeInsets.only(top: 80,),
+                           child:RawScrollbar(
+                             controller: _scrollController,
+                             thumbVisibility: true,
+                             // Always show scrollbar
+                             thickness: 15,
+                             // Thickness of the scrollbar
+                             radius: const Radius.circular(2),
+                             // Rounded corners for scrollbar
+                             thumbColor: Colors.grey[400],
+                             // Custom thumb color
+                             trackColor: Colors.grey[900],
+                             // Custom track color
+                             trackRadius: const Radius.circular(2),
+                             child: SingleChildScrollView(
+                               controller: _scrollController,
+                               child:Column(
+                                 mainAxisAlignment: MainAxisAlignment.center,
+                                 children: [
+                                   Padding(
+                                     padding: const EdgeInsets.only(left: 100),
+                                     child: Row(
+
+                                       children: [
+                                         IconButton(onPressed: (){
+                                           context.go(
+                                               '/User_List');
+                                         }, icon: Icon(Icons.arrow_back,size: 16,)),
+                                         Text('Create User',style: TextStyles.header3,),
+                                       ],
+                                     ),
+                                   ),
+                                   Container(
+                                     child: Padding(
+                                       padding: const EdgeInsets.only(left: 55,top: 20),
+                                       child:Container(
+                                         height: 350,
+                                         width: 1200,
+                                         padding: const EdgeInsets.all(16.0),
+                                         decoration: BoxDecoration(
+                                           color: Colors.white,
+                                           borderRadius: BorderRadius.circular(4),
+
+                                         ),
+                                         child: Form(
+                                           key: formKey,
+                                           child: Column(
+                                             crossAxisAlignment: CrossAxisAlignment.start,
+                                             children: [
+                                               Padding(
+                                                 padding: const EdgeInsets.only(left: 15,top: 30),
+                                                 child:  Text(
+                                                   'User  Details',
+                                                   style: TextStyles.header3),
+                                                 ),
+                                               const SizedBox(height: 26),
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                 children: [
+                                                   SizedBox(width: 15,),
+                                                   Expanded(
+                                                     child:  Padding(
+                                                       padding: const EdgeInsets.only(
+                                                           top: 10, bottom: 8,right: 10),
+                                                       child: AnimatedContainer(
+                                                         duration: const Duration(
+                                                             milliseconds: 300),
+                                                         // Control animation duration
+                                                         curve: Curves.easeInOut,
+                                                         // Choose an animation curve
+                                                         child: DropdownButtonHideUnderline(
+                                                           child: Container(
+                                                             decoration: BoxDecoration(
+                                                               border: Border
+                                                                   .all( // Outline border
+                                                                 color: Colors.grey.shade400,
+                                                                 // Customize outline color
+                                                                 width: 1.5, // Customize outline thickness
+                                                               ),
+                                                               borderRadius: BorderRadius
+                                                                   .circular(6),
+                                                               // Rounded corners for the outline
+                                                               color: Colors
+                                                                   .white, // Background color for the dropdown
+                                                             ),
+                                                             child: DropdownButton2(
+                                                               isExpanded: true,
+                                                               hint:  Padding(
+                                                                 padding: EdgeInsets.all(8.0),
+                                                                 child: Text(
+                                                                   'Select Role',
+                                                                   style: TextStyles.body1,
+                                                                 ),
+                                                               ),
+
+                                                               items: items
+                                                                   .map((item) =>
+                                                                   DropdownMenuItem<String>(
+                                                                     value: item,
+                                                                     child: Padding(
+                                                                       padding: const EdgeInsets
+                                                                           .all(8.0),
+                                                                       child: Text(
+                                                                         item,
+                                                                         style: const TextStyle(
+                                                                           fontSize: 14,
+                                                                         ),
+                                                                       ),
+                                                                     ),
+                                                                   ))
+                                                                   .toList(),
+                                                               value: selectedValue,
+                                                               onChanged: (value) {
+                                                                 setState(() {
+                                                                   selectedValue =
+                                                                   value as String;
+                                                                 });
+                                                               },
+                                                               // Updated properties as per the latest version of dropdown_button2
+                                                               buttonStyleData: ButtonStyleData(
+                                                                 height: 42,
+                                                                 width: 355,
+                                                                 decoration: BoxDecoration(
+                                                                   borderRadius: BorderRadius
+                                                                       .circular(4),
+                                                                   color: Colors
+                                                                       .white, // No border here
+                                                                 ),
+                                                               ),
+                                                               dropdownStyleData: DropdownStyleData(
+                                                                 maxHeight: 150,
+                                                                 width: 355,
+                                                                 padding: const EdgeInsets
+                                                                     .symmetric(horizontal: 5,
+                                                                     vertical: 5),
+                                                                 decoration: BoxDecoration(
+                                                                   border: Border.all(color: Colors.grey),
+                                                                   borderRadius: BorderRadius
+                                                                       .circular(10),
+                                                                   color: Colors
+                                                                       .white, // Dropdown background color
+                                                                 ),
+                                                                 elevation: 5,
+                                                                 offset: const Offset(0, -10),
+                                                               ),
+                                                               iconStyleData: const IconStyleData(
+                                                                 icon: Padding(
+                                                                   padding: EdgeInsets.only(
+                                                                       right: 10),
+                                                                   child: Icon(Icons
+                                                                       .arrow_drop_down),
+                                                                 ),
+                                                               ),
+                                                             ),
+                                                           ),
+                                                         ),
+                                                       ),
+                                                     ),
+                                                   ),
+                                                   SizedBox(width: 15,),
+                                                   Expanded(
+                                                     child: Padding(
+                                                       padding: const EdgeInsets.only(right: 8.0),
+                                                       child: TextFormField(
+                                                         controller: userNameController,
+                                                         decoration:  InputDecoration(
+                                                           hintText: 'User Name',
+                                                           hintStyle: TextStyles.body1,
+                                                           contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                                                           border: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                                                           ),
+                                                           focusedBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                                           ),
+                                                           enabledBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color:Colors.grey.shade400, width: 1.5),
+                                                           ),
+                                                           suffixIcon: Icon(Icons.account_circle, size: 20),
+                                                         ),
+                                                       ),
+                                                     ),
+                                                   ),
+
+                                                   SizedBox(width: 15,),
+
+                                                   Expanded(
+                                                     child: Padding(
+                                                       padding: const EdgeInsets.only(right: 8.0),
+                                                       child: TextFormField(
+                                                         controller: emailController,
+                                                         decoration:  InputDecoration(
+                                                           hintText: 'Email Address',
+                                                           hintStyle: TextStyles.body1,
+                                                           contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                                                           border: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.grey.shade400,  width: 1.5),
+                                                           ),
+                                                           focusedBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                                           ),
+                                                           enabledBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.grey.shade400,  width: 1.5),
+                                                           ),
+                                                           suffixIcon: Icon(Icons.mail, size: 20),
+                                                         ),
+                                                         inputFormatters: [
+                                                           FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9@._]')),
+                                                         ],
+                                                         onChanged: (value) {
+                                                           emailController.value = TextEditingValue(
+                                                             text: value.toLowerCase(),
+                                                             selection: emailController.selection,
+                                                           );
+                                                         },
+                                                       ),
+                                                     ),
+                                                   ),
+                                                   SizedBox(width: 15,),
+                                                 ],
+                                               ),
+
+                                               const SizedBox(height: 22),
+
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                 children: [
+                                                   SizedBox(width: 15,),
+                                                   Expanded(
+                                                     child: Padding(
+                                                       padding: const EdgeInsets.only(right: 8.0),
+                                                       child: TextFormField(
+                                                         controller: departmentController,
+                                                         decoration:  InputDecoration(
+                                                           hintText: 'Company Name',
+                                                           hintStyle: TextStyles.body1,
+                                                           contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                                                           border: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                                                           ),
+                                                           focusedBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                                           ),
+                                                           enabledBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                                                           ),
+                                                           suffixIcon: Icon(Icons.business, size: 20),
+                                                         ),
+                                                       ),
+                                                     ),
+                                                   ),
+                                                   SizedBox(width: 15,),
+                                                   Expanded(
+                                                     child: Padding(
+                                                       padding: const EdgeInsets.only(right: 8.0),
+                                                       child: TextFormField(
+                                                         controller: mobileController,
+                                                         decoration:  InputDecoration(
+                                                           hintText: 'Mobile No',
+                                                           hintStyle: TextStyles.body1,
+                                                           contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                                                           border: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.grey.shade400,  width: 1.5),
+                                                           ),
+                                                           focusedBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                                           ),
+                                                           enabledBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.grey.shade400,  width: 1.5),
+                                                           ),
+                                                           suffixIcon: Icon(Icons.phone_android_outlined, size: 20),
+                                                         ),
+                                                         keyboardType: TextInputType.number,
+                                                         inputFormatters: [
+                                                           FilteringTextInputFormatter.digitsOnly,
+                                                           LengthLimitingTextInputFormatter(10),
+                                                         ],
+                                                       ),
+                                                     ),
+                                                   ),
+
+                                                   SizedBox(width: 15,),
+                                                   Expanded(
+                                                     child: Padding(
+                                                       padding: const EdgeInsets.only(right: 8.0),
+                                                       child: TextFormField(
+                                                         controller: location,
+                                                         decoration:  InputDecoration(
+                                                           hintText: 'Location',
+                                                           hintStyle: TextStyles.body1,
+                                                           contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                                                           border: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color:Colors.grey.shade400,  width: 1.5),
+                                                           ),
+                                                           focusedBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                                           ),
+                                                           enabledBorder: OutlineInputBorder(
+                                                             borderRadius: BorderRadius.all(Radius.circular(6)),
+                                                             borderSide: BorderSide(color: Colors.grey.shade400,  width: 1.5),
+                                                           ),
+                                                           suffixIcon: Icon(Icons.location_on, size: 20),
+                                                         ),
+                                                       ),
+                                                     ),
+                                                   ),
+                                                   SizedBox(width: 15,),
+                                                 ],
+
+                                               ),
+
+                                               const SizedBox(height: 20),
+
+                                               Padding(
+                                                 padding: const EdgeInsets.only(right: 20),
+                                                 child: Align(
+                                                   alignment: Alignment.bottomRight,
+                                                   child: SizedBox(
+                                                     width: 120,
+                                                     child: OutlinedButton(
+                                                       onPressed: () async {
+
+                                                         if (selectedValue == null ||
+                                                             selectedValue ==
+                                                                 'Select Role') {
+                                                           ScaffoldMessenger.of(context)
+                                                               .showSnackBar(
+                                                             const SnackBar(
+                                                               content: Text(
+                                                                   'Please select a Role'),
+                                                             ),
+                                                           );
+                                                         }
+
+                                                         else if (userNameController.text
+                                                             .isEmpty ||
+                                                             userNameController.text
+                                                                 .length <= 2) {
+                                                           ScaffoldMessenger.of(context)
+                                                               .showSnackBar(
+                                                             const SnackBar(
+                                                               content: Text(
+                                                                   'Please fill user name'),
+                                                             ),
+                                                           );
+                                                         }
+                                                         else if (emailController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$')
+                                                             .hasMatch(
+                                                             emailController
+                                                                 .text)){
+                                                           ScaffoldMessenger.of(context)
+                                                               .showSnackBar(
+                                                             const SnackBar(
+                                                               content: Text(
+                                                                   'Enter Valid Email Address'),
+                                                             ),
+                                                           );
+                                                         }
+                                                         else if (departmentController.text.isEmpty) {
+                                                           ScaffoldMessenger.of(context)
+                                                               .showSnackBar(
+                                                             const SnackBar(
+                                                               content: Text(
+                                                                   'Please fill Company Name.'),
+                                                             ),
+                                                           );
+                                                         }
+
+                                                         else if (mobileController.text.isEmpty ||
+                                                             mobileController.text.length !=
+                                                                 10) {
+                                                           ScaffoldMessenger.of(context)
+                                                               .showSnackBar(
+                                                             const SnackBar(
+                                                               content: Text(
+                                                                   'Please fill a valid mobile number.'),
+                                                             ),
+                                                           );
+                                                         }
+                                                         else if (location.text.isEmpty) {
+                                                           ScaffoldMessenger.of(context)
+                                                               .showSnackBar(
+                                                             const SnackBar(
+                                                               content: Text(
+                                                                   'Please fill location '),
+                                                             ),
+                                                           );
+                                                         }
+                                                         else {
+                                                           cusSave(context);
+                                                         }
+
+                                                         // Save form
+                                                       },
+                                                       style: OutlinedButton.styleFrom(
+                                                         backgroundColor: Colors.blue[900],
+                                                         padding: null,
+                                                         shape: RoundedRectangleBorder(
+                                                           borderRadius: BorderRadius.circular(5),
+                                                         ),
+                                                         side: const BorderSide(
+                                                           color: Colors.blue,
+                                                           width: 1,
+                                                         ),
+                                                       ),
+                                                       child: const Text(
+                                                         '  Save  ',
+                                                         style: TextStyle(
+                                                           fontSize: 12,
+                                                           fontWeight: FontWeight.bold,
+                                                           color: Colors.white,
+                                                         ),
+                                                       ),
+                                                     ),
+                                                   ),
+                                                 ),
+                                               ),
+                                             ],
+                                           ),
+                                         ),
+                                       ),
+                                     ),
+                                   ),
+                                 ],
+                               ),
+                             ),
+                           ),
+                         ),
+                       )
+
                     }
                     else...{
                        Padding(
@@ -873,9 +904,8 @@ class _CreateusrState extends State<Createusr> {
                             crossAxisAlignment: CrossAxisAlignment
                                 .center,
                             children: [
-                              const Text('User Details',
-                                style: TextStyle(fontSize: 15,
-                                  fontWeight: FontWeight.bold,),),
+                               Text('User Details',
+                                style: TextStyles.heading),
 
 
                               const SizedBox(height: 26,),

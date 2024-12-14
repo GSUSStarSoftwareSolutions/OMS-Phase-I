@@ -73,6 +73,9 @@ dependencies:
   flutter_date_range_picker: ^0.1.1
   confetti: ^0.8.0
   adaptive_scrollbar: ^2.1.2
+  google_fonts: ^6.2.1
+#  responsive_framework: ^1.5.1
+  responsive_framework: ^0.1.0
   #dropdown_search: ^6.0.0
   #syncfusion_flutter_datagrid: ^26.2.14
   #syncfusion_flutter_core: ^26.2.14
@@ -115,6 +118,14 @@ flutter:
      - images/network issue.gif
      - images/nodata.png
      - images/sort.png
+     - images/ix_sort.png
+     - images/edit_icon.png
+     - images/delete.png
+     - images/edit_icon.png
+     - images/home.png
+     - images/user.png
+     - images/search.png
+     - images/openorder.png
 
 
 
