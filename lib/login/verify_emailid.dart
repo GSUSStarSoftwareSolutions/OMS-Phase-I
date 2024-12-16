@@ -5,7 +5,10 @@ import 'package:btb/login/verification%20screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+
+import '../widgets/text_style.dart';
 
 
 
@@ -113,10 +116,10 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
             builder: (context) {
               return AlertDialog(
                 icon: Icon(Icons.check_circle_rounded,color: Colors.green,size: 25,),
-                content: const Padding(padding:
+                content:  Padding(padding:
                 EdgeInsets.only(left: 35),
                     child: Text(
-                        'A verification code has been \nsent successfully.Please \ncheck your email.')
+                      'A verification code has been \nsent successfully.Please \ncheck your email.',style: TextStyles.contact1,)
                 ),
                 actions: [
                   TextButton(
@@ -231,16 +234,16 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                 Align(
                   alignment: Alignment(-0.20, 0.5),
                   child: Text(
-                    'Password Reset',
-                    style: TextStyle(fontSize: constraints.maxWidth * 0.035, color: Colors.blue),
+                      'Password Reset',
+                      style: TextStyles.pass(context)
                   ),
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03), // 5% of screen height
                 Align(
                   alignment: Alignment(-0.14, 0.0),
                   child: Text(
-                    ' Enter your email address and\n we\'ll send you  a link to \n reset your password',
-                    style: TextStyle(fontSize: constraints.maxWidth * 0.023),
+                      ' Enter your email address and\n we\'ll send you  a link to \n reset your password',
+                      style: TextStyles.subhead1
                   ),
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03), // 5% of screen height
@@ -252,20 +255,23 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                       SizedBox(height: constraints.maxHeight * 0.04),
                       Align(
                         alignment: const Alignment(-0.325, 0.0),
-                        child: Text('Email Address', style: TextStyle(fontSize: constraints.maxWidth * 0.015,fontWeight: FontWeight.bold),),
+                        child: Text('Email Address', style: TextStyles.email(context)),
                       ),
                       const SizedBox(height: 10),
                       Align(
                         alignment: const Alignment(0.0, 0.8),
                         child: SizedBox(
-                          height: 30,
+                          height: 40,
                           width: constraints.maxWidth * 0.4,
                           child: TextFormField(
                             controller: emailController,
+                            style: GoogleFonts.inter(
+                                color: Colors.black,
+                                fontSize: 13),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               hintStyle: TextStyle(fontSize: 15),
-                              hintText: 'Enter your E-mail Address',
+                              hintText: 'Enter your email',
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 8,
@@ -305,7 +311,8 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                             ),
                             child: Align(
                                 alignment: Alignment(0.0, 0.0),
-                                child:  Text('Reset', style: TextStyle(fontSize: constraints.maxWidth * 0.02, color: Colors.white),)),
+                                child:  Text('Reset',
+                                    style:TextStyles.button1)),
                           ),
                         ),
                       ),
@@ -537,5 +544,3 @@ class ImageContainer1 extends StatelessWidget {
     );
   }
 }
-
-

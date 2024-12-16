@@ -4,11 +4,13 @@ import 'package:btb/admin/Api%20name.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import '../widgets/text_style.dart';
 import 'verify_emailid.dart';
 void main() => runApp(MaterialApp(
-      home: LoginContainer2(),
-    ));
+  home: LoginContainer2(),
+));
 
 class LoginContainer2 extends StatefulWidget {
   const LoginContainer2({super.key});
@@ -40,19 +42,19 @@ class _LoginContainer2State extends State<LoginContainer2> {
       Map tempData = json.decode(response.body);
       if (tempData.containsKey("error")) {
         // Handle empty input fields with appropriate messages
-      if (tempData['code'] == '401' &&
-          tempData['error'] == 'INVALID EMPLOYEE NAME or PASSWORD') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text("Enter valid  password")));
-      }
+        if (tempData['code'] == '401' &&
+            tempData['error'] == 'INVALID EMPLOYEE NAME or PASSWORD') {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text("Enter valid  password")));
+        }
 
-      else if (tempData['code'] == '404' &&
-          tempData['status'] == 'failed') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("User name not found")));
-      }
-      else if (tempData['code'] == '403' &&    tempData['status'] == 'failed') {  ScaffoldMessenger.of(context).showSnackBar(      const SnackBar(content: Text("Your account is inactive. Please contact the administrator for assistance")));}
+        else if (tempData['code'] == '404' &&
+            tempData['status'] == 'failed') {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("User name not found")));
+        }
+        else if (tempData['code'] == '403' &&    tempData['status'] == 'failed') {  ScaffoldMessenger.of(context).showSnackBar(      const SnackBar(content: Text("Your account is inactive. Please contact the administrator for assistance")));}
       } else {
         window.sessionStorage["userId"] = tempData['userId'];
         // Check the role and handle accordingly
@@ -65,8 +67,8 @@ class _LoginContainer2State extends State<LoginContainer2> {
           // Handle Admin role
           window.sessionStorage["userId"] = tempData['userId'];
           window.sessionStorage["token"] = tempData['token'];
-         //  String userId = tempData['userId'];
-        //  Provider.of<UserRoleProvider>(context, listen: false).setRole(role);
+          //  String userId = tempData['userId'];
+          //  Provider.of<UserRoleProvider>(context, listen: false).setRole(role);
           context.go('/Cus_Home');
           // Navigate to Admin-specific home
         } else if (role == 'Admin') {
@@ -106,11 +108,9 @@ class _LoginContainer2State extends State<LoginContainer2> {
                 Align(
                   alignment: Alignment(-0.14, 0.0),
                   child: Text(
-                    'Login to Your account',
-                    style: TextStyle(
-                        fontSize: constraints.maxWidth * 0.023,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue),
+                    'Login to your account',
+                    // style: TextStyles.Login,
+                    style: TextStyles.login(context),
                   ),
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03),
@@ -119,7 +119,8 @@ class _LoginContainer2State extends State<LoginContainer2> {
                   alignment: Alignment(-0.05, 0.0),
                   child: Text(
                     'Simplify your order management \nand gain complete control',
-                    style: TextStyle(fontSize: constraints.maxWidth * 0.020),
+                    // style: TextStyles.,
+                    style: TextStyles.loginSub(context),
                   ),
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03),
@@ -130,11 +131,11 @@ class _LoginContainer2State extends State<LoginContainer2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: constraints.maxHeight * 0.04),
-                      const Align(
+                      Align(
                           alignment: Alignment(-0.27, 0.0),
                           child: Text(
                             'Username',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyles.header3,
                           )),
                       const SizedBox(height: 10),
                       Align(
@@ -144,6 +145,10 @@ class _LoginContainer2State extends State<LoginContainer2> {
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
                             controller: userName,
+
+                            style: GoogleFonts.inter(
+                                color: Colors.black,
+                                fontSize: 13),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               hintText: 'Enter your username',
@@ -177,11 +182,11 @@ class _LoginContainer2State extends State<LoginContainer2> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Align(
-                          alignment: Alignment(-0.27, 0.0),
+                      Align(
+                          alignment: const Alignment(-0.27, 0.0),
                           child: Text(
-                            'Password',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                              'Password',
+                              style: TextStyles.header3
                           )),
                       const SizedBox(height: 10),
                       Align(
@@ -191,6 +196,9 @@ class _LoginContainer2State extends State<LoginContainer2> {
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
                             controller: Password,
+                            style: GoogleFonts.inter(
+                                color: Colors.black,
+                                fontSize: 13),
                             obscureText: _obscureText,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
@@ -250,8 +258,8 @@ class _LoginContainer2State extends State<LoginContainer2> {
                               ));
                             },
                             child: Text(
-                              'Forgot password ?',
-                              style: TextStyle(color: Colors.blue),
+                                'Forgot password ?',
+                                style: TextStyles.forgot
                             ),
                           )
                         // child: Text('Forgot password ?'),
@@ -291,11 +299,11 @@ class _LoginContainer2State extends State<LoginContainer2> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
-                            child: const Align(
+                            child:  Align(
                                 alignment: Alignment(0.0, 0.0),
                                 child: Text(
-                                  'Login',
-                                  style: TextStyle(color: Colors.white),
+                                    'Login',
+                                    style: TextStyles.button1
                                 )),
                           ),
                         ),
@@ -305,19 +313,15 @@ class _LoginContainer2State extends State<LoginContainer2> {
                         alignment: const Alignment(0.1, 0.0),
                         child: RichText(
                           textAlign: TextAlign.center,
-                          text: const TextSpan(
+                          text:  TextSpan(
                             children: [
                               TextSpan(
-                                text: 'Need help? ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
+                                  text: 'Need help? ',
+                                  style: TextStyles.need
                               ),
                               TextSpan(
-                                text: 'Contact Support',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                ),
+                                  text: 'Contact Support',
+                                  style: TextStyles.contact
                               ),
                             ],
                           ),
@@ -345,10 +349,11 @@ class _LoginContainer2State extends State<LoginContainer2> {
                     alignment: Alignment(-0.14, 0.0),
                     child: Text(
                       'Login to Your account',
-                      style: TextStyle(
-                          fontSize: constraints.maxWidth * 0.023,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue),
+                      style: TextStyles.login(context),
+                      // style: TextStyle(
+                      //     fontSize: constraints.maxWidth * 0.023,
+                      //     fontWeight: FontWeight.bold,
+                      //     color: Colors.blue),
                     ),
                   ),
                   SizedBox(height: constraints.maxHeight * 0.03),
@@ -357,7 +362,8 @@ class _LoginContainer2State extends State<LoginContainer2> {
                     alignment: Alignment(-0.05, 0.0),
                     child: Text(
                       'Simplify your order management \nand gain complete control',
-                      style: TextStyle(fontSize: constraints.maxWidth * 0.020),
+                      style: TextStyles.loginSub(context),
+                      // style: TextStyle(fontSize: constraints.maxWidth * 0.020),
                     ),
                   ),
                   SizedBox(height: constraints.maxHeight * 0.03),
@@ -368,11 +374,12 @@ class _LoginContainer2State extends State<LoginContainer2> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: constraints.maxHeight * 0.04),
-                        const Align(
+                        Align(
                             alignment: Alignment(-0.27, 0.0),
                             child: Text(
                               'Username',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyles.header3,
+                              // style: TextStyle(fontWeight: FontWeight.bold),
                             )),
                         const SizedBox(height: 10),
                         Align(
@@ -382,6 +389,9 @@ class _LoginContainer2State extends State<LoginContainer2> {
                             width: constraints.maxWidth * 0.39,
                             child: TextFormField(
                               controller: userName,
+                              style: GoogleFonts.inter(
+                                  color: Colors.black,
+                                  fontSize: 13),
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 hintText: 'Enter your username',
@@ -415,11 +425,12 @@ class _LoginContainer2State extends State<LoginContainer2> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        const Align(
+                        Align(
                             alignment: Alignment(-0.27, 0.0),
                             child: Text(
                               'Password',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyles.header3,
+                              // style: TextStyle(fontWeight: FontWeight.bold),
                             )),
                         const SizedBox(height: 10),
                         Align(
@@ -429,6 +440,9 @@ class _LoginContainer2State extends State<LoginContainer2> {
                             width: constraints.maxWidth * 0.39,
                             child: TextFormField(
                               controller: Password,
+                              style: GoogleFonts.inter(
+                                  color: Colors.black,
+                                  fontSize: 13),
                               obscureText: _obscureText,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
@@ -529,11 +543,12 @@ class _LoginContainer2State extends State<LoginContainer2> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
-                              child: const Align(
+                              child:  Align(
                                   alignment: Alignment(0.0, 0.0),
                                   child: Text(
                                     'Login',
-                                    style: TextStyle(color: Colors.white),
+                                    style: TextStyles.button1,
+                                    // style: TextStyle(color: Colors.white),
                                   )),
                             ),
                           ),
@@ -583,40 +598,11 @@ class ImageContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-      builder: (context,constraints){
-        if(constraints.maxHeight >=630){
-          return Container(
-            width: double.infinity, // Take full width
-            color: Colors.grey[100],
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 40, left: 25),
-                  child: Image.asset('images/Final-Ikyam-Logo.png'),
-                ),
-                const SizedBox(height: 50), // You can adjust this value
-                Center(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width *
-                        0.4, // Take 70% of screen width
-                    height: MediaQuery.of(context).size.width *
-                        0.3, // Take 70% of screen width
-                    child: Image.asset(
-                      'images/ikyam1.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-        else{
-          return Container(
-            width: double.infinity, // Take full width
-            color: Colors.grey[100],
-            child: SingleChildScrollView(
+        builder: (context,constraints){
+          if(constraints.maxHeight >=630){
+            return Container(
+              width: double.infinity, // Take full width
+              color: Colors.grey[100],
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -626,6 +612,35 @@ class ImageContainer extends StatelessWidget {
                   ),
                   const SizedBox(height: 50), // You can adjust this value
                   Center(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width *
+                          0.4, // Take 70% of screen width
+                      height: MediaQuery.of(context).size.width *
+                          0.3, // Take 70% of screen width
+                      child: Image.asset(
+                        'images/ikyam1.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          else{
+            return Container(
+              width: double.infinity, // Take full width
+              color: Colors.grey[100],
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 40, left: 25),
+                      child: Image.asset('images/Final-Ikyam-Logo.png'),
+                    ),
+                    const SizedBox(height: 50), // You can adjust this value
+                    Center(
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width *
                             0.4, // Take 70% of screen width
@@ -639,14 +654,14 @@ class ImageContainer extends StatelessWidget {
                         ),
                       ),
 
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }
+            );
+          }
 
-      }
+        }
     );
 
   }

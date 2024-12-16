@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 import '../../Order Module/firstpage.dart';
@@ -37,13 +38,13 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
   List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Order ID',
-    'Customer ID',
+    'Customer Name',
     'Order Date',
     'Total',
     'Status',
   ];
   bool _hasShownPopup = false;
-  List<double> columnWidths = [95, 110, 110, 95, 150, 140];
+  List<double> columnWidths = [95, 130, 110, 95, 150, 140];
   List<bool> columnSortState = [true, true, true, true, true, true];
   Timer? _searchDebounceTimer;
   String _searchText = '';
@@ -84,6 +85,13 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
       });
     });
   }
+
+  static final TextStyle filter = GoogleFonts.inter(
+    fontSize: 13.0, // Font size in px
+    fontWeight: FontWeight.w500, // Medium weight
+    color: Colors.grey,
+    // color: Color.fromRGBO(0, 83, 176, 1), // Default text color
+  );
 
   int itemsPerPage = 10;
   int totalItems = 0;
@@ -272,8 +280,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
           const SizedBox(
             height: 10,
           ),
-          _buildMenuItem('Home', Icons.home_outlined,
-              Colors.blue[900]!, '/Cus_Home'),
+          _buildMenuItem('Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
 
           Container(
               height: 42,
@@ -288,12 +295,11 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                   // No radius for top-right corner
                   bottomLeft: Radius.circular(8),
                   // Radius for bottom-left corner
-                  bottomRight:
-                  Radius.circular(8), // No radius for bottom-right corner
+                  bottomRight: Radius.circular(8), // No radius for bottom-right corner
                 ),
               ),
               child: _buildMenuItem(
-                  'Orders', Icons.production_quantity_limits, Colors.blue[900]!, '/Customer_Order_List')),
+                  'Orders', Icons.warehouse_outlined, Colors.blue[800]!, '/Customer_Order_List')),
         ],
       ),
       const SizedBox(
@@ -333,10 +339,12 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                 const SizedBox(width: 10),
                 Text(
                   title,
-                  style: TextStyle(
-                    color: iconColor,
-                    fontSize: 15,
-                    decoration: TextDecoration.none, // Remove underline
+                  style: GoogleFonts.inter(
+                    textStyle: TextStyle(
+                      color: iconColor,
+                      fontSize: 15,
+                      decoration: TextDecoration.none,  // Remove underline
+                    ),
                   ),
                 ),
               ],
@@ -381,7 +389,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color.fromRGBO(21, 101, 192, 0.07),
+        backgroundColor: Colors.grey[50],
 
         body: LayoutBuilder(builder: (context, constraints) {
           double maxWidth = constraints.maxWidth;
@@ -389,6 +397,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
           return Stack(
             children: [
               Container(
+                width: maxWidth,
                 color: Colors.white, // White background color
                 height: 60.0, // Total height including bottom shadow
                 child: Column(
@@ -408,17 +417,6 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                         const Spacer(),
                         Row(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: IconButton(
-                                icon: const Icon(Icons.notifications),
-                                color: Colors.black, // Default icon color
-                                onPressed: () {
-                                  // Handle notification icon press
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 10),
                             Padding(
                               padding:
                               const EdgeInsets.only(right: 10, top: 10),
@@ -441,25 +439,36 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                 ),
               ),
               if (constraints.maxHeight <= 500) ...{
-                SingleChildScrollView(
+                Positioned(
+                  top:60,
+                  left:0,
+                  right:0,
+                  bottom: 0,child:   SingleChildScrollView(
                   child: Align(
                     // Added Align widget for the left side menu
                     alignment: Alignment.topLeft,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 80),
+                      padding: const EdgeInsets.only(top: 2),
                       child: Container(
                         height: 1400,
                         width: 200,
-                        color: const Color(0xFFF7F6FA),
+                        color: Colors.white,
                         padding:
-                        const EdgeInsets.only(left: 15, top: 50, right: 15),
+                        const EdgeInsets.only(left: 15, top: 10, right: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: _buildMenuItems(context),
                         ),
                       ),
                     ),
+
                   ),
+
+                ),),
+
+                VerticalDividerWidget(
+                  height: maxHeight,
+                  color: Color(0x29000000),
                 ),
               } else ...{
                 Align(
@@ -506,9 +515,9 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                                       padding: const EdgeInsets.only(left: 30,top: 20),
                                       child: Text('Order List',style: TextStyles.heading,),
                                     ),
-                                    Spacer(),
+                                    const Spacer(),
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 10, right: 80),
+                                      padding: const EdgeInsets.only(top: 10, right: 110),
                                       child: OutlinedButton(
                                         onPressed: () {
                                           context.go('/Cus_Create_Order',extra: {'testing': 'hi'});
@@ -522,13 +531,9 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                                           ),
                                           side: BorderSide.none, // No outline
                                         ),
-                                        child: const Text(
+                                        child:  Text(
                                           'Create',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w100,
-                                            color: Colors.white,
-                                          ),
+                                          style: TextStyles.button
                                         ),
                                       ),
                                     ),
@@ -549,8 +554,18 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                                           decoration:BoxDecoration(
                                             //   border: Border.all(color: Colors.grey),
                                             color: Colors.white,
-                                            border: Border.all(color: Color(0x29000000)),
-                                            borderRadius: BorderRadius.circular(15),
+                                            borderRadius: BorderRadius.circular(2),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey.withOpacity(0.1),
+                                                // Soft grey shadow
+                                                spreadRadius: 3,
+                                                blurRadius: 3,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          //  border: Border.all(color: Color(0x29000000)),
+
                                           ),
                                           child: SizedBox(
                                             child: Column(
@@ -615,97 +630,132 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                     }
                     else...{
                       Expanded(
-                          child: AdaptiveScrollbar(
-
-                            position: ScrollbarPosition.bottom,controller: horizontalScroll,
-                            child: SingleChildScrollView(
-                              controller: horizontalScroll,
-                              scrollDirection: Axis.horizontal,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 1),
+                            child: AdaptiveScrollbar(
+                              position: ScrollbarPosition.bottom,controller: horizontalScroll,
                               child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 30,
-                                                top: 50,
-                                                right: 30,
-                                                bottom: 15),
-                                            child: Container(
-                                              height: 755,
-                                              width: 1100,
-                                              decoration:BoxDecoration(
-                                                //   border: Border.all(color: Colors.grey),
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(8),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withOpacity(0.3), // Soft grey shadow
-                                                    spreadRadius: 3,
-                                                    blurRadius: 3,
-                                                    offset: const Offset(0, 3),
-                                                  ),
-                                                ],
+                                controller: horizontalScroll,
+                                scrollDirection: Axis.horizontal,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        // crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 30,top: 20),
+                                            child: Text('Order List',style: TextStyles.heading,),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 10, left: 890),
+                                            child: OutlinedButton(
+                                              onPressed: () {
+                                                context.go('/Cus_Create_Order',extra: {'testing': 'hi'});
+                                                //context.go('/Home/Orders/Create_Order');
+                                              },
+                                              style: OutlinedButton.styleFrom(
+                                                backgroundColor: Colors.blue[800],
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(
+                                                      5), // Rounded corners
+                                                ),
+                                                side: BorderSide.none, // No outline
                                               ),
-                                              child: SizedBox(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                                  children: [
-                                                    buildSearchField(),
-                                                    const SizedBox(height: 10),
-                                                    Expanded(
-                                                      child: Scrollbar(
-                                                        controller:
-                                                        _scrollController,
-                                                        thickness: 6,
-                                                        thumbVisibility: true,
-                                                        child:
-                                                        SingleChildScrollView(
-                                                          controller:
-                                                          _scrollController,
-                                                          scrollDirection:
-                                                          Axis.horizontal,
-                                                          child: buildDataTable2(),
-                                                        ),
-                                                      ),
+                                              child:  Text(
+                                                  'Create',
+                                                  style: TextStyles.button
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 30,
+                                                  top: 25,
+                                                  right: 30,
+                                                  bottom: 15),
+                                              child: Container(
+                                                height: 640,
+                                                width: 1100,
+                                                decoration: BoxDecoration(
+                                                  //   border: Border.all(color: Colors.grey),
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(2),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey.withOpacity(0.1),
+                                                      // Soft grey shadow
+                                                      spreadRadius: 3,
+                                                      blurRadius: 3,
+                                                      offset: const Offset(0, 3),
                                                     ),
-                                                    const SizedBox(
-                                                      height: 1,
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                      const EdgeInsets.only(
-                                                          right: 30),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                        children: [
-                                                          PaginationControls(
-                                                            currentPage:
-                                                            currentPage,
-                                                            totalPages: filteredData
-                                                                .length >
-                                                                itemsPerPage
-                                                                ? totalPages
-                                                                : 1,
-                                                            onPreviousPage:
-                                                            _goToPreviousPage,
-                                                            onNextPage:
-                                                            _goToNextPage,
-                                                            // onLastPage: _goToLastPage,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    )
                                                   ],
                                                 ),
-                                              ),
-                                            )),
-                                      ],
-                                    ),
-                                  ],
+                                                child: SizedBox(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                    children: [
+                                                      buildSearchField(),
+                                                      const SizedBox(height: 10),
+                                                      Expanded(
+                                                        child: Scrollbar(
+                                                          controller:
+                                                          _scrollController,
+                                                          thickness: 6,
+                                                          thumbVisibility: true,
+                                                          child:
+                                                          SingleChildScrollView(
+                                                            controller:
+                                                            _scrollController,
+                                                            scrollDirection:
+                                                            Axis.horizontal,
+                                                            child: buildDataTable2(),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 1,
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(
+                                                            right: 30),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                          children: [
+                                                            PaginationControls(
+                                                              currentPage:
+                                                              currentPage,
+                                                              totalPages: filteredData
+                                                                  .length >
+                                                                  itemsPerPage
+                                                                  ? totalPages
+                                                                  : 1,
+                                                              onPreviousPage:
+                                                              _goToPreviousPage,
+                                                              onNextPage:
+                                                              _goToNextPage,
+                                                              // onLastPage: _goToLastPage,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              )),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -761,10 +811,11 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                                 border: Border.all(color: Colors.grey),
                               ),
                               child: TextFormField(
+                                style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
                                 decoration: InputDecoration(
-                                    hintText: 'Search by Order ID',
+                                    hintText: 'Search by Order ID or Customer Name',
                                     hintStyle:
-                                    TextStyle(fontSize: 13, color: Colors.grey),
+                                    TextStyles.body,
                                     contentPadding:
                                     EdgeInsets.only(bottom: 20, left: 10),
                                     // adjusted padding
@@ -783,91 +834,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                         ),
                       ],
                     ),
-                    Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-// const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: constraints.maxWidth * 0.12,
-                              // reduced width
-                              maxHeight: 30, // reduced height
-                            ),
-                            child: Container(
-                              height: 35,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(2),
-                                border: Border.all(color: Colors.grey),
-                              ),
-                              child: DropdownButtonFormField2<String>(
-                                decoration: const InputDecoration(
-                                  contentPadding:
-                                  EdgeInsets.only(bottom: 15, left: 10),
-                                  // adjusted padding
-                                  border: InputBorder.none,
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  hintText: 'Category',
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                ),
-                                value: dropdownValue1,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    dropdownValue1 = newValue;
-                                    status = newValue ?? '';
-                                    _filterAndPaginateProducts();
-                                  });
-                                },
-                                items: <String>[
-                                  'Status',
-                                  'Not Started',
-                                  'Created',
-                                  'Picked',
-                                  'Delivered',
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value,
-                                        style: TextStyle(
-                                            color: value == 'Status'
-                                                ? Colors.grey
-                                                : Colors.black,
-                                            fontSize: 13)),
-                                  );
-                                }).toList(),
-                                iconStyleData: const IconStyleData(
-                                  icon: Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: Colors.indigo,
-                                    size: 16,
-                                  ),
-                                  iconSize: 16,
-                                ),
-                                buttonStyleData: const ButtonStyleData(
-                                  height: 50, // Button height
-                                  padding: EdgeInsets.only(left: 10, right: 10), // Button padding
-                                ),
-                                dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(7), // Rounded corners
-                                    color: Colors.white, // Dropdown background color
-                                  ),
-                                  maxHeight: 200, // Max height for dropdown items
-                                  width: constraints.maxWidth * 0.12, // Dropdown width
-                                  offset:  const Offset(0, -10),
-                                ),
-                                isExpanded: true,
-                                // focusColor: Color(0xFFF0F4F8),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+
 
                   ],
                 ),
@@ -920,11 +887,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                             children: [
                               Text(
                                 column,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
+                                style: TextStyles.subhead,
                               ),
 
 // ),
@@ -948,6 +911,43 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
         ],
       );
     }
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.orderId!.toLowerCase().compareTo(b.orderId!.toLowerCase());
+          } else if (columnIndex == 1) {
+            return a.contactPerson!.compareTo(b.contactPerson!);
+          } else if (columnIndex == 2) {
+            return a.orderDate.compareTo(b.orderDate);
+          } else if (columnIndex == 3) {
+            return a.total.compareTo(b.total);
+          } else if (columnIndex == 4) {
+            return a.deliveryStatus.compareTo(b.deliveryStatus);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.orderId!.toLowerCase().compareTo(a.orderId!.toLowerCase());
+          } else if (columnIndex == 1) {
+            return b.contactPerson!.compareTo(a.contactPerson!);
+          } else if (columnIndex == 2) {
+            return b.orderDate.compareTo(a.orderDate);
+          } else if (columnIndex == 3) {
+            return b.total.compareTo(a.total);
+          } else if (columnIndex == 4) {
+            return b.deliveryStatus.compareTo(a.deliveryStatus);
+          }  else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
+
     return LayoutBuilder(builder: (context, constraints) {
 // double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width * 0.92;
@@ -981,18 +981,23 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                             children: [
                               Text(
                                 column,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
+                                style: TextStyles.subhead
                               ),
                               IconButton(
                                 icon:
                                 _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(width: 12,
-                                    child: Image.asset("images/sort.png",color: Colors.grey,))
-                                    : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                    ? SizedBox(
+                                    width: 12,
+                                    child: Image.asset(
+                                      "images/ix_sort.png",
+                                      color: Colors.blue,
+                                    ))
+                                    : SizedBox(
+                                    width: 12,
+                                    child: Image.asset(
+                                      "images/ix_sort.png",
+                                      color: Colors.blue,
+                                    )),
                                 onPressed: () {
                                   setState(() {
                                     _sortOrder[columns.indexOf(column)] =
@@ -1004,47 +1009,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                                         _sortOrder[columns.indexOf(column)]);
                                   });
                                 },
-                              ),
-//SizedBox(width: 50,),
-//Padding(
-//  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-//  child:
-                              Spacer(),
-                              MouseRegion(
-                                cursor: SystemMouseCursors.resizeColumn,
-                                child: GestureDetector(
-                                    onHorizontalDragUpdate: (details) {
-// Update column width dynamically as user drags
-                                      setState(() {
-                                        columnWidths[columns.indexOf(column)] +=
-                                            details.delta.dx;
-                                        columnWidths[columns.indexOf(column)] =
-                                            columnWidths[
-                                            columns.indexOf(column)]
-                                                .clamp(151.0, 300.0);
-                                      });
-// setState(() {
-//   columnWidths[columns.indexOf(column)] += details.delta.dx;
-//   if (columnWidths[columns.indexOf(column)] < 50) {
-//     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-//   }
-// });
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          VerticalDivider(
-                                            width: 5,
-                                            thickness: 4,
-                                            color: Colors.grey,
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              ),
-// ),
+                              ), // ),
                             ],
                           ),
                         ),
@@ -1078,11 +1043,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                                 // Same dynamic width as column headers
                                 child: Text(
                                   detail.orderId.toString(),
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? Colors.deepOrange[200]
-                                        : const Color(0xFFFFB315),
-                                  ),
+                                  style: TextStyles.body,
                                 ),
                               ),
                             ),
@@ -1090,10 +1051,8 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                               Container(
                                 width: columnWidths[1],
                                 child: Text(
-                                  detail.orderDate!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
+                                  detail.contactPerson!,
+                                  style: TextStyles.body,
                                 ),
                               ),
                             ),
@@ -1101,10 +1060,8 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                               Container(
                                 width: columnWidths[2],
                                 child: Text(
-                                  detail.invoiceNo!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
+                                  detail.orderDate!,
+                                  style: TextStyles.body,
                                 ),
                               ),
                             ),
@@ -1113,9 +1070,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                                 width: columnWidths[3],
                                 child: Text(
                                   detail.total.toString(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
+                                  style: TextStyles.body,
                                 ),
                               ),
                             ),
@@ -1124,83 +1079,20 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                                 width: columnWidths[4],
                                 child: Text(
                                   detail.deliveryStatus.toString(),
-                                  style:  TextStyle(
-                                    color: detail.deliveryStatus == "In Progress" ? Colors.orange : detail.deliveryStatus == "Delivered" ? Colors.green : Colors.red,
-                                  ),
+                                  style: TextStyles.body,
                                 ),
                               ),
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[4],
-                                child: Text(
-                                  detail.paymentStatus.toString(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
-                              ),
-                            ),
+
 
                           ],
                           onSelectChanged: (selected) {
                             if (selected != null && selected) {
-                              print('what is this');
-                              print(detail.invoiceNo);
-                              print(productList);
-                              print(detail.paymentStatus);
+                              context.go('/Customer_Order_View',extra: {
+                                'orderId': detail.orderId,
+                              });
 //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
 
-                              if (filteredData.length <= 9) {
-                                PaymentMap = {
-                                  'paymentId': detail.paymentDate,
-                                  'paymentmode': detail.paymentMode,
-                                  'paymentStatus': detail.paymentStatus,
-                                  'paymentdate': detail.paymentDate,
-                                  'paidamount': detail.paidAmount,
-                                };
-                                context.go('/Order_Placed_List', extra: {
-                                  'product': detail,
-                                  'item': [], // pass an empty list of maps
-                                  'body': {},
-                                  'status': detail.deliveryStatus,
-                                  'InvNo': detail.invoiceNo,
-                                  'paymentStatus': PaymentMap,
-                                  'itemsList': [], // pass an empty list of maps
-                                  'orderDetails': productList
-                                      .map((detail) => OrderDetail(
-                                    orderId: detail.orderId,
-                                    orderDate: detail.orderDate, items: [],
-                                    deliveryStatus: detail.deliveryStatus,
-// Add other fields as needed
-                                  ))
-                                      .toList(),
-                                });
-                              } else {
-                                PaymentMap = {
-                                  'paymentId': detail.paymentDate,
-                                  'paymentmode': detail.paymentMode,
-                                  'paymentStatus': detail.paymentStatus,
-                                  'paymentdate': detail.paymentDate,
-                                  'paidamount': detail.paidAmount,
-                                };
-                                context.go('/Order_Placed_List', extra: {
-                                  'product': detail,
-                                  'item': [], // pass an empty list of maps
-                                  'status': detail.deliveryStatus,
-                                  'InvNo': detail.invoiceNo,
-                                  'paymentStatus': PaymentMap,
-                                  'body': {},
-                                  'itemsList': [], // pass an empty list of maps
-                                  'orderDetails': filteredData
-                                      .map((detail) => OrderDetail(
-                                    orderId: detail.orderId,
-                                    orderDate: detail.orderDate, items: [],
-// Add other fields as needed
-                                  ))
-                                      .toList(),
-                                });
-                              }
                             }
                           });
                     })),
@@ -1221,6 +1113,43 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
             top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
+    }
+
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.orderId!.toLowerCase().compareTo(b.orderId!.toLowerCase());
+          } else if (columnIndex == 1) {
+            return a.contactPerson!.compareTo(b.contactPerson!);
+          } else if (columnIndex == 2) {
+            return a.orderDate.compareTo(b.orderDate);
+          } else if (columnIndex == 3) {
+            return a.total.compareTo(b.total);
+          } else if (columnIndex == 4) {
+            return a.deliveryStatus.compareTo(b.deliveryStatus);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.orderId!.toLowerCase().compareTo(a.orderId!.toLowerCase());
+          } else if (columnIndex == 1) {
+            return b.contactPerson!.compareTo(a.contactPerson!);
+          } else if (columnIndex == 2) {
+            return b.orderDate.compareTo(a.orderDate);
+          } else if (columnIndex == 3) {
+            return b.total.compareTo(a.total);
+          } else if (columnIndex == 4) {
+            return b.deliveryStatus.compareTo(a.deliveryStatus);
+          }  else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
     }
 
     if (filteredData.isEmpty) {
@@ -1273,6 +1202,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
         ],
       );
     }
+
     return LayoutBuilder(builder: (context, constraints) {
 // double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width * 0.92;
@@ -1311,9 +1241,18 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                               IconButton(
                                 icon:
                                 _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(width: 12,
-                                    child: Image.asset("images/sort.png",color: Colors.grey,))
-                                    : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                    ? SizedBox(
+                                    width: 12,
+                                    child: Image.asset(
+                                      "images/ix_sort.png",
+                                      color: Colors.blue,
+                                    ))
+                                    : SizedBox(
+                                    width: 12,
+                                    child: Image.asset(
+                                      "images/ix_sort.png",
+                                      color: Colors.blue,
+                                    )),
                                 onPressed: () {
                                   setState(() {
                                     _sortOrder[columns.indexOf(column)] =
@@ -1372,7 +1311,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                               Container(
                                 width: columnWidths[1],
                                 child: Text(
-                                  detail.orderDate,
+                                  detail.contactPerson!,
                                   style: TextStyles.body,
                                 ),
                               ),
@@ -1381,7 +1320,7 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
                               Container(
                                 width: columnWidths[2],
                                 child: Text(
-                                  detail.invoiceNo!,
+                                  detail.orderDate!,
                                   style: TextStyles.body,
                                 ),
                               ),
@@ -1416,64 +1355,9 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
 
                           ],
                           onSelectChanged: (selected) {
-                            if (selected != null && selected) {
-                              print('what is this');
-                              print(detail.invoiceNo);
-                              print(productList);
-                              print(detail.paymentStatus);
-//final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-
-                              if (filteredData.length <= 9) {
-                                PaymentMap = {
-                                  'paymentId': detail.paymentDate,
-                                  'paymentmode': detail.paymentMode,
-                                  'paymentStatus': detail.paymentStatus,
-                                  'paymentdate': detail.paymentDate,
-                                  'paidamount': detail.paidAmount,
-                                };
-                                context.go('/Order_Placed_List', extra: {
-                                  'product': detail,
-                                  'item': [], // pass an empty list of maps
-                                  'body': {},
-                                  'status': detail.deliveryStatus,
-                                  'InvNo': detail.invoiceNo,
-                                  'paymentStatus': PaymentMap,
-                                  'itemsList': [], // pass an empty list of maps
-                                  'orderDetails': productList
-                                      .map((detail) => OrderDetail(
-                                    orderId: detail.orderId,
-                                    orderDate: detail.orderDate, items: [],
-                                    deliveryStatus: detail.deliveryStatus,
-// Add other fields as needed
-                                  ))
-                                      .toList(),
-                                });
-                              } else {
-                                PaymentMap = {
-                                  'paymentId': detail.paymentDate,
-                                  'paymentmode': detail.paymentMode,
-                                  'paymentStatus': detail.paymentStatus,
-                                  'paymentdate': detail.paymentDate,
-                                  'paidamount': detail.paidAmount,
-                                };
-                                context.go('/Order_Placed_List', extra: {
-                                  'product': detail,
-                                  'item': [], // pass an empty list of maps
-                                  'status': detail.deliveryStatus,
-                                  'InvNo': detail.invoiceNo,
-                                  'paymentStatus': PaymentMap,
-                                  'body': {},
-                                  'itemsList': [], // pass an empty list of maps
-                                  'orderDetails': filteredData
-                                      .map((detail) => OrderDetail(
-                                    orderId: detail.orderId,
-                                    orderDate: detail.orderDate, items: [],
-// Add other fields as needed
-                                  ))
-                                      .toList(),
-                                });
-                              }
-                            }
+                          context.go('/Customer_Order_View',extra: {
+                            'orderId': detail.orderId,
+                          });
                           });
                     })),
           ),
@@ -1482,51 +1366,12 @@ class _CusOrderPageState extends State<CusOrderPage> with SingleTickerProviderSt
     });
   }
 
-  void _sortProducts(int columnIndex, String sortDirection) {
-    if (sortDirection == 'asc') {
-      filteredData.sort((a, b) {
-        if (columnIndex == 0) {
-          return a.paymentStatus!.toLowerCase().compareTo(b.paymentStatus!.toLowerCase());
-        } else if (columnIndex == 1) {
-          return a.orderId!.compareTo(b.orderId!);
-        } else if (columnIndex == 2) {
-          return a.orderDate.compareTo(b.orderDate);
-        } else if (columnIndex == 3) {
-          return a.invoiceNo!.compareTo(b.invoiceNo!);
-        } else if (columnIndex == 4) {
-          return a.total.compareTo(b.total);
-        } else if (columnIndex == 5) {
-          return a.deliveryStatus.compareTo(b.deliveryStatus);
-        } else {
-          return 0;
-        }
-      });
-    } else {
-      filteredData.sort((a, b) {
-        if (columnIndex == 0) {
-          return b.paymentStatus!.toLowerCase().compareTo(a.paymentStatus!.toLowerCase());
-        } else if (columnIndex == 1) {
-          return b.orderId!.compareTo(a.orderId!);
-        } else if (columnIndex == 2) {
-          return b.orderDate.compareTo(a.orderDate);
-        } else if (columnIndex == 3) {
-          return b.invoiceNo!.compareTo(a.invoiceNo!);
-        } else if (columnIndex == 4) {
-          return b.total.compareTo(a.total);
-        } else if (columnIndex == 5) {
-          return b.deliveryStatus.compareTo(a.deliveryStatus);
-        } else {
-          return 0;
-        }
-      });
-    }
-    setState(() {});
-  }
+
 
   void _filterAndPaginateProducts() {
     filteredData = productList.where((product) {
       final matchesSearchText =
-      product.orderId!.toLowerCase().contains(_searchText.toLowerCase());
+      product.orderId!.toLowerCase().contains(_searchText.toLowerCase()) || product.contactPerson!.toLowerCase().contains(_searchText.toLowerCase()) ;
 // print('-----');
 // print(product.orderDate);
       String orderYear = '';

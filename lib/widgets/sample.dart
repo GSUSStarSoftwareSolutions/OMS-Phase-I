@@ -217,7 +217,7 @@ class VerticalDividerWidget1 extends StatelessWidget {
       double maxWidth = constraints.maxWidth;
       double maxHeight = constraints.maxHeight;
       return Padding(
-        padding: EdgeInsets.only(left: maxWidth * 0.127, top: maxHeight * 0.08),
+        padding: EdgeInsets.only(left: 201, top: 61),
         child: Container(
           width: 4,
           height: height,

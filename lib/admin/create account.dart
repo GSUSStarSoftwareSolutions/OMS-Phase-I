@@ -9,11 +9,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
+import '../widgets/text_style.dart';
+
 void main() => runApp(MaterialApp(
-      home: createscr(),
-    ));
+  home: createscr(),
+));
 
 class createscr extends StatefulWidget {
   const createscr({super.key});
@@ -150,11 +153,8 @@ class _createscrState extends State<createscr> {
                 Align(
                   alignment: Alignment(0.05, 0.0),
                   child: Text(
-                    'Create an Account',
-                    style: TextStyle(
-                        fontSize: constraints.maxWidth * 0.023,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue),
+                      'Create an Account',
+                      style: TextStyles.login(context)
                   ),
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03),
@@ -164,11 +164,11 @@ class _createscrState extends State<createscr> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: constraints.maxHeight * 0.04),
-                      const Align(
-                          alignment: Alignment(-0.33, 0.0),
+                      Align(
+                          alignment:const Alignment(-0.33, 0.0),
                           child: Text(
                             'Email Address',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyles.header3,
                           )),
                       const SizedBox(height: 10),
                       Align(
@@ -178,6 +178,9 @@ class _createscrState extends State<createscr> {
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
                             controller: Email,
+                            style: GoogleFonts.inter(
+                                color: Colors.black,
+                                fontSize: 13),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               hintText: 'Enter your email address',
@@ -195,11 +198,11 @@ class _createscrState extends State<createscr> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Align(
-                          alignment: Alignment(-0.32, 0.0),
+                      Align(
+                          alignment:const Alignment(-0.32, 0.0),
                           child: Text(
                             'New Password',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style:TextStyles.header3,
                           )),
                       const SizedBox(height: 10),
                       Align(
@@ -209,6 +212,9 @@ class _createscrState extends State<createscr> {
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
                             controller: Password,
+                            style: GoogleFonts.inter(
+                                color: Colors.black,
+                                fontSize: 13),
                             obscureText: _obscureText1,
                             decoration: InputDecoration(
                               border: const OutlineInputBorder(),
@@ -226,18 +232,18 @@ class _createscrState extends State<createscr> {
                                   size: 20,
                                 ),
                                 onPressed:
-                                    _togglePasswordVisibility1, // Toggle password visibility
+                                _togglePasswordVisibility1, // Toggle password visibility
                               ),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Align(
-                          alignment: Alignment(-0.29, 0.0),
+                      Align(
+                          alignment: const Alignment(-0.29, 0.0),
                           child: Text(
                             'Confirm Password',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyles.header3,
                           )),
                       const SizedBox(height: 10),
                       Align(
@@ -247,6 +253,9 @@ class _createscrState extends State<createscr> {
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
                             controller: ConfirmPassword,
+                            style: GoogleFonts.inter(
+                                color: Colors.black,
+                                fontSize: 13),
                             obscureText: _obscureText,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
@@ -264,7 +273,7 @@ class _createscrState extends State<createscr> {
                                   size: 20,
                                 ),
                                 onPressed:
-                                    _togglePasswordVisibility, // Toggle password visibility
+                                _togglePasswordVisibility, // Toggle password visibility
                               ),
                             ),
                           ),
@@ -310,7 +319,7 @@ class _createscrState extends State<createscr> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content:
-                                          Text("Please Enter Email Address")),
+                                      Text("Please Enter Email Address")),
                                 );
                               } else {
                                 await checkLogin(Email.text, Password.text);
@@ -329,11 +338,11 @@ class _createscrState extends State<createscr> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
-                            child: const Align(
-                                alignment: Alignment(0.0, 0.0),
+                            child:  Align(
+                                alignment: const Alignment(0.0, 0.0),
                                 child: Text(
                                   'Create Account',
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyles.button1,
                                 )),
                           ),
                         ),
@@ -346,17 +355,13 @@ class _createscrState extends State<createscr> {
                           text: TextSpan(
                             children: [
                               TextSpan(
-                                text: 'Already have an account ? ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
+                                  text: 'Already have an account ? ',
+                                  style:TextStyles.need
                               ),
                               TextSpan(
                                 text: 'Log in',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style:
+                                TextStyles.contact,
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
                                     Navigator.push(

@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -36,13 +37,13 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
   List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Order ID',
-    'Customer ID',
+    'Customer Name',
     'Order Date',
     'Total',
     'Status',
   ];
   bool _hasShownPopup = false;
-  List<double> columnWidths = [95, 110, 110, 95, 150, 140];
+  List<double> columnWidths = [110, 150, 120, 95, 140];
   List<bool> columnSortState = [true, true, true, true, true, true];
   Timer? _searchDebounceTimer;
   String _searchText = '';
@@ -264,50 +265,6 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
   };
 
 
-  List<Widget> _buildMenuItems(BuildContext context) {
-    return [
-      Column(
-        children: [
-          const SizedBox(
-            height: 10,
-          ),
-          _buildMenuItem('Home', Icons.home_outlined,
-              Colors.blue[900]!, '/Home'),
-          _buildMenuItem('Product', Icons.production_quantity_limits,
-              Colors.blue[900]!, '/Product_List'),
-          _buildMenuItem(
-              'Customer', Icons.account_circle_outlined, Colors.white, '/Customer'),
-          Container(
-              height: 42,
-              decoration: BoxDecoration(
-                color: Colors.blue[800],
-                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-                // color: Color.fromRGBO(224, 59, 48, 1.0),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  // Radius for top-left corner
-                  topRight: Radius.circular(8),
-                  // No radius for top-right corner
-                  bottomLeft: Radius.circular(8),
-                  // Radius for bottom-left corner
-                  bottomRight:
-                  Radius.circular(8), // No radius for bottom-right corner
-                ),
-              ),
-              child: _buildMenuItem(
-    'Orders', Icons.production_quantity_limits, Colors.blue[900]!, '/Order_List')),
-
-        ],
-      ),
-      const SizedBox(
-        height: 6,
-      ),
-
-
-
-    ];
-  }
-
   Widget _buildMenuItem(
       String title, IconData icon, Color iconColor, String route) {
     iconColor = _isHovered[title] == true ? Colors.blue : Colors.black87;
@@ -353,6 +310,127 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
     );
   }
 
+  List<Widget> _buildMenuItems(BuildContext context) {
+    return [
+      Column(
+        children: [
+          const SizedBox(
+            height: 10,
+          ),
+          _buildMenuItem('Home', Icons.home_outlined,
+              Colors.blue[900]!, '/Home'),
+
+          _buildMenuItem('Product', Icons.production_quantity_limits,
+              Colors.blue[900]!, '/Product_List'),
+          _buildMenuItem(
+              'Customer', Icons.account_circle_outlined, Colors.white, '/Customer'),
+          Container(
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.blue[800],
+                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+                // color: Color.fromRGBO(224, 59, 48, 1.0),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  // Radius for top-left corner
+                  topRight: Radius.circular(8),
+                  // No radius for top-right corner
+                  bottomLeft: Radius.circular(8),
+                  // Radius for bottom-left corner
+                  bottomRight:
+                  Radius.circular(8), // No radius for bottom-right corner
+                ),
+              ),
+              child: _buildMenuItem(
+                  'Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List')),
+
+        ],
+      ),
+      const SizedBox(
+        height: 6,
+      ),
+
+
+
+    ];
+  }
+  List<Widget> _buildMenuItems1(BuildContext context) {
+    return [
+      Column(
+        children: [
+          const SizedBox(
+            height: 10,
+          ),
+          _buildMenuItem1(Icons.home_outlined,
+              Colors.blue[900]!, '/Home'),
+          _buildMenuItem1(Icons.production_quantity_limits,
+              Colors.blue[900]!, '/Product_List'),
+          _buildMenuItem1(Icons.account_circle_outlined, Colors.white, '/Customer'),
+          Container(
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.blue[800],
+                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+                // color: Color.fromRGBO(224, 59, 48, 1.0),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  // Radius for top-left corner
+                  topRight: Radius.circular(8),
+                  // No radius for top-right corner
+                  bottomLeft: Radius.circular(8),
+                  // Radius for bottom-left corner
+                  bottomRight:
+                  Radius.circular(8), // No radius for bottom-right corner
+                ),
+              ),
+              child: _buildMenuItem1(Icons.production_quantity_limits, Colors.blue[900]!, '/Order_List')),
+
+        ],
+      ),
+      const SizedBox(
+        height: 6,
+      ),
+
+
+
+    ];
+  }
+  Widget _buildMenuItem1(IconData icon, Color iconColor, String route) {
+    iconColor = _isHovered[route] == true ? Colors.blue : Colors.black87;
+    route == '/Order_List' ? _isHovered[route] = false : _isHovered[route] = false;
+    route == '/Order_List' ? iconColor = Colors.white : Colors.black;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(
+            () => _isHovered[route] = true,
+      ),
+      onExit: (_) => setState(() => _isHovered[route] = false),
+      child: GestureDetector(
+        onTap: () {
+          context.go(route);
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 5, right: 20),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: _isHovered[route]! ? Colors.black12 : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 10,top:2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(icon, color: iconColor,size: 20,),
+
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -387,7 +465,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color.fromRGBO(21, 101, 192, 0.07),
+        backgroundColor: Colors.grey[50],
 
         body: LayoutBuilder(builder: (context, constraints) {
           double maxWidth = constraints.maxWidth;
@@ -414,16 +492,6 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                         const Spacer(),
                         Row(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: IconButton(
-                                icon: const Icon(Icons.notifications),
-                                color: Colors.black, // Default icon color
-                                onPressed: () {
-                                  // Handle notification icon press
-                                },
-                              ),
-                            ),
                             const SizedBox(width: 10),
                             Padding(
                               padding:
@@ -447,31 +515,43 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                 ),
               ),
               if (constraints.maxHeight <= 500) ...{
-                SingleChildScrollView(
+                Positioned(
+                  top:60,
+                  left:0,
+                  right:0,
+                  bottom: 0,child:   SingleChildScrollView(
                   child: Align(
                     // Added Align widget for the left side menu
                     alignment: Alignment.topLeft,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 80),
+                      padding: const EdgeInsets.only(top: 2),
                       child: Container(
                         height: 1400,
                         width: 200,
-                        color: const Color(0xFFF7F6FA),
+                        color: Colors.white,
                         padding:
-                        const EdgeInsets.only(left: 15, top: 50, right: 15),
+                        const EdgeInsets.only(left: 15, top: 10, right: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: _buildMenuItems(context),
                         ),
                       ),
                     ),
+
                   ),
+
+                ),),
+
+                VerticalDividerWidget(
+                  height: maxHeight,
+                  color: Color(0x29000000),
                 ),
-              } else ...{
+              }
+              else ...{
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 60),
+                    padding: const EdgeInsets.only(top: 62),
                     child: Container(
                       height: 1400,
                       width: 200,
@@ -492,7 +572,8 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
               },
 
               Positioned(
-                left: 201,
+                left:201,
+                // left: constraints.maxWidth <= 600 ? 101: 201,
                 top: 60,
                 right: 0,
                 bottom: 0,
@@ -512,7 +593,6 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                       padding: const EdgeInsets.only(left: 30,top: 20),
                                       child: Text('Order List',style: TextStyles.heading,),
                                     ),
-
                                   ],
                                 ),
                                 Row(
@@ -522,15 +602,24 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                             left: 30,
                                             top:20,
                                             right: 30,
-                                            bottom: 15),
+                                            bottom: 15,
+                                        ),
                                         child: Container(
-                                          height: 755,
+                                          height: 640,
                                           width: maxWidth * 0.8,
-                                          decoration:BoxDecoration(
+                                          decoration: BoxDecoration(
                                             //   border: Border.all(color: Colors.grey),
                                             color: Colors.white,
-                                            border: Border.all(color: Color(0x29000000)),
-                                            borderRadius: BorderRadius.circular(15),
+                                            borderRadius: BorderRadius.circular(2),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey.withOpacity(0.1),
+                                                // Soft grey shadow
+                                                spreadRadius: 3,
+                                                blurRadius: 3,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
                                           ),
                                           child: SizedBox(
                                             child: Column(
@@ -596,32 +685,43 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                     else...{
                       Expanded(
                           child: AdaptiveScrollbar(
-
                             position: ScrollbarPosition.bottom,controller: horizontalScroll,
                             child: SingleChildScrollView(
                               controller: horizontalScroll,
                               scrollDirection: Axis.horizontal,
                               child: SingleChildScrollView(
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Row(
+                                      // crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 30,top: 20),
+                                          child: Text('Order List',style: TextStyles.heading,),
+                                        ),
+                                      ],
+                                    ),
                                     Row(
                                       children: [
                                         Padding(
                                             padding: const EdgeInsets.only(
                                                 left: 30,
-                                                top: 50,
+                                                top: 25,
                                                 right: 30,
                                                 bottom: 15),
                                             child: Container(
-                                              height: 755,
+                                              height: 640,
                                               width: 1100,
-                                              decoration:BoxDecoration(
+                                              decoration: BoxDecoration(
                                                 //   border: Border.all(color: Colors.grey),
                                                 color: Colors.white,
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius: BorderRadius.circular(2),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                    color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                    color: Colors.grey.withOpacity(0.1),
+                                                    // Soft grey shadow
                                                     spreadRadius: 3,
                                                     blurRadius: 3,
                                                     offset: const Offset(0, 3),
@@ -741,14 +841,15 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                 border: Border.all(color: Colors.grey),
                               ),
                               child: TextFormField(
+                                style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
                                 decoration: InputDecoration(
-                                  hintText: 'Search by Order ID',
-                                  hintStyle:
-                                  TextStyle(fontSize: 13, color: Colors.grey),
-                                  contentPadding:
-                                  EdgeInsets.only(bottom: 20, left: 10),
-                                  // adjusted padding
-                                  border: InputBorder.none,
+                                    hintText: 'Search by Order ID or Customer Name',
+                                    hintStyle:
+                                    TextStyle(fontSize: 13, color: Colors.grey),
+                                    contentPadding:
+                                    EdgeInsets.only(bottom: 20, left: 10),
+                                    // adjusted padding
+                                    border: InputBorder.none,
                                     suffixIcon: Padding(
                                       padding: const EdgeInsets.only(left: 10, right: 5), // Adjust image padding
                                       child: Image.asset(
@@ -786,7 +887,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               child: DropdownButtonFormField2<String>(
                                 decoration: const InputDecoration(
                                   contentPadding:
-                                      EdgeInsets.only(bottom: 15, left: 10),
+                                  EdgeInsets.only(bottom: 15, left: 10),
                                   // adjusted padding
                                   border: InputBorder.none,
                                   filled: true,
@@ -841,7 +942,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                   offset:  const Offset(0, -10),
                                 ),
                                 isExpanded: true,
-                               // focusColor: Color(0xFFF0F4F8),
+                                // focusColor: Color(0xFFF0F4F8),
                               ),
                             ),
                           ),
@@ -872,13 +973,49 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.orderId!.toLowerCase().compareTo(b.orderId!.toLowerCase());
+          } else if (columnIndex == 1) {
+            return a.contactPerson!.compareTo(b.contactPerson!);
+          } else if (columnIndex == 2) {
+            return a.orderDate.compareTo(b.orderDate);
+          } else if (columnIndex == 3) {
+            return a.total.compareTo(b.total);
+          } else if (columnIndex == 4) {
+            return a.deliveryStatus.compareTo(b.deliveryStatus);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.orderId!.toLowerCase().compareTo(a.orderId!.toLowerCase());
+          } else if (columnIndex == 1) {
+            return b.contactPerson!.compareTo(a.contactPerson!);
+          } else if (columnIndex == 2) {
+            return b.orderDate.compareTo(a.orderDate);
+          } else if (columnIndex == 3) {
+            return b.total.compareTo(a.total);
+          } else if (columnIndex == 4) {
+            return b.deliveryStatus.compareTo(a.deliveryStatus);
+          }  else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
 
     if (filteredData.isEmpty) {
       double right = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
-            width: 1100,
+            width:  1100,
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -886,6 +1023,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
             child: DataTable(
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
+                columnSpacing: 35,
                 columns:  columns.map((column) {
                   return DataColumn(
                     label: Stack(
@@ -899,15 +1037,9 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
 //   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                column,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
+                                  column,
+                                  style: TextStyles.subhead
                               ),
-
-// ),
                             ],
                           ),
                         ),
@@ -936,7 +1068,6 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
         children: [
           Container(
             width: 1100,
-
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -944,7 +1075,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
             child: DataTable(
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
-columnSpacing: 35,
+                columnSpacing: 35,
 // List.generate(5, (index)
                 columns:
                 columns.map((column) {
@@ -960,19 +1091,24 @@ columnSpacing: 35,
 //   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                column,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
+                                  column,
+                                  style: TextStyles.subhead
                               ),
                               IconButton(
                                 icon:
                                 _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(width: 12,
-                                    child: Image.asset("images/sort.png",color: Colors.grey,))
-                                    : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                    ?  SizedBox(
+                                    width: 12,
+                                    child: Image.asset(
+                                      "images/ix_sort.png",
+                                      color: Colors.blue,
+                                    ))
+                                    : SizedBox(
+                                    width: 12,
+                                    child: Image.asset(
+                                      "images/ix_sort.png",
+                                      color: Colors.blue,
+                                    )),
                                 onPressed: () {
                                   setState(() {
                                     _sortOrder[columns.indexOf(column)] =
@@ -989,41 +1125,6 @@ columnSpacing: 35,
 //Padding(
 //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
 //  child:
-                              Spacer(),
-                              MouseRegion(
-                                cursor: SystemMouseCursors.resizeColumn,
-                                child: GestureDetector(
-                                    onHorizontalDragUpdate: (details) {
-// Update column width dynamically as user drags
-                                      setState(() {
-                                        columnWidths[columns.indexOf(column)] +=
-                                            details.delta.dx;
-                                        columnWidths[columns.indexOf(column)] =
-                                            columnWidths[
-                                            columns.indexOf(column)]
-                                                .clamp(151.0, 300.0);
-                                      });
-// setState(() {
-//   columnWidths[columns.indexOf(column)] += details.delta.dx;
-//   if (columnWidths[columns.indexOf(column)] < 50) {
-//     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-//   }
-// });
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          VerticalDivider(
-                                            width: 5,
-                                            thickness: 4,
-                                            color: Colors.grey,
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              ),
 // ),
                             ],
                           ),
@@ -1058,22 +1159,7 @@ columnSpacing: 35,
                                 // Same dynamic width as column headers
                                 child: Text(
                                   detail.orderId.toString(),
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? Colors.deepOrange[200]
-                                        : const Color(0xFFFFB315),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[1],
-                                child: Text(
-                                  detail.orderDate!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
+                                  style: TextStyles.body,
                                 ),
                               ),
                             ),
@@ -1081,10 +1167,17 @@ columnSpacing: 35,
                               Container(
                                 width: columnWidths[2],
                                 child: Text(
-                                  detail.invoiceNo!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
+                                  detail.contactPerson!,
+                                  style: TextStyles.body,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                width: columnWidths[1],
+                                child: Text(
+                                  detail.orderDate,
+                                  style: TextStyles.body,
                                 ),
                               ),
                             ),
@@ -1093,9 +1186,7 @@ columnSpacing: 35,
                                 width: columnWidths[3],
                                 child: Text(
                                   detail.total.toString(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
+                                  style: TextStyles.body,
                                 ),
                               ),
                             ),
@@ -1104,23 +1195,19 @@ columnSpacing: 35,
                                 width: columnWidths[4],
                                 child: Text(
                                   detail.deliveryStatus.toString(),
-                                  style:  TextStyle(
-                                    color: detail.deliveryStatus == "In Progress" ? Colors.orange : detail.deliveryStatus == "Delivered" ? Colors.green : Colors.red,
-                                  ),
+                                  style: TextStyles.body,
                                 ),
                               ),
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[4],
-                                child: Text(
-                                  detail.paymentStatus.toString(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            // DataCell(
+                            //   Container(
+                            //     width: columnWidths[4],
+                            //     child: Text(
+                            //       detail.paymentStatus.toString(),
+                            //       style: TextStyles.body,
+                            //     ),
+                            //   ),
+                            // ),
 
                           ],
                           onSelectChanged: (selected) {
@@ -1128,6 +1215,7 @@ columnSpacing: 35,
                               print('what is this');
                               print(detail.invoiceNo);
                               print(productList);
+                              print(detail.orderId);
                               print(detail.paymentStatus);
 //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
 
@@ -1139,46 +1227,15 @@ columnSpacing: 35,
                                   'paymentdate': detail.paymentDate,
                                   'paidamount': detail.paidAmount,
                                 };
-                                context.go('/Order_Placed_List', extra: {
-                                  'product': detail,
-                                  'item': [], // pass an empty list of maps
-                                  'body': {},
-                                  'status': detail.deliveryStatus,
-                                  'InvNo': detail.invoiceNo,
-                                  'paymentStatus': PaymentMap,
-                                  'itemsList': [], // pass an empty list of maps
-                                  'orderDetails': productList
-                                      .map((detail) => OrderDetail(
-                                    orderId: detail.orderId,
-                                    orderDate: detail.orderDate, items: [],
-                                    deliveryStatus: detail.deliveryStatus,
-// Add other fields as needed
-                                  ))
-                                      .toList(),
+                                print(detail.orderId);
+                             //   print(detail.orderId);
+                                context.go('/Order_View', extra: {
+                                  'orderId': detail.orderId
                                 });
                               } else {
-                                PaymentMap = {
-                                  'paymentId': detail.paymentDate,
-                                  'paymentmode': detail.paymentMode,
-                                  'paymentStatus': detail.paymentStatus,
-                                  'paymentdate': detail.paymentDate,
-                                  'paidamount': detail.paidAmount,
-                                };
-                                context.go('/Order_Placed_List', extra: {
-                                  'product': detail,
-                                  'item': [], // pass an empty list of maps
-                                  'status': detail.deliveryStatus,
-                                  'InvNo': detail.invoiceNo,
-                                  'paymentStatus': PaymentMap,
-                                  'body': {},
-                                  'itemsList': [], // pass an empty list of maps
-                                  'orderDetails': filteredData
-                                      .map((detail) => OrderDetail(
-                                    orderId: detail.orderId,
-                                    orderDate: detail.orderDate, items: [],
-// Add other fields as needed
-                                  ))
-                                      .toList(),
+                                print(detail.orderId);
+                                context.go('/Order_View', extra: {
+                                  'orderId': detail.orderId
                                 });
                               }
                             }
@@ -1203,6 +1260,42 @@ columnSpacing: 35,
       );
     }
 
+    void _sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.orderId!.toLowerCase().compareTo(b.orderId!.toLowerCase());
+          } else if (columnIndex == 1) {
+            return a.contactPerson!.compareTo(b.contactPerson!);
+          } else if (columnIndex == 2) {
+            return a.orderDate.compareTo(b.orderDate);
+          } else if (columnIndex == 3) {
+            return a.total.compareTo(b.total);
+          } else if (columnIndex == 4) {
+            return a.deliveryStatus.compareTo(b.deliveryStatus);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.orderId!.toLowerCase().compareTo(a.orderId!.toLowerCase());
+          } else if (columnIndex == 1) {
+            return b.contactPerson!.compareTo(a.contactPerson!);
+          } else if (columnIndex == 2) {
+            return b.orderDate.compareTo(a.orderDate);
+          } else if (columnIndex == 3) {
+            return b.total.compareTo(a.total);
+          } else if (columnIndex == 4) {
+            return b.deliveryStatus.compareTo(a.deliveryStatus);
+          }  else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
     if (filteredData.isEmpty) {
       double right = MediaQuery.of(context).size.width;
       return Column(
@@ -1230,7 +1323,7 @@ columnSpacing: 35,
 //   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                column,
+                                  column,
                                   style: TextStyles.subhead
                               ),
                             ],
@@ -1247,7 +1340,7 @@ columnSpacing: 35,
           ),
           Padding(
             padding:
-                EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
         ],
@@ -1269,7 +1362,7 @@ columnSpacing: 35,
             child: DataTable(
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
-columnSpacing: 35,
+                columnSpacing: 35,
 // List.generate(5, (index)
                 columns:
                 columns.map((column) {
@@ -1285,22 +1378,31 @@ columnSpacing: 35,
 //   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                column,
+                                  column,
                                   style: TextStyles.subhead
                               ),
                               IconButton(
                                 icon:
-                                    _sortOrder[columns.indexOf(column)] == 'asc'
-                                        ? SizedBox(width: 12,
-                                        child: Image.asset("images/sort.png",color: Colors.grey,))
-                                        : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                _sortOrder[columns.indexOf(column)] == 'asc'
+                                    ?  SizedBox(
+                                    width: 12,
+                                    child: Image.asset(
+                                      "images/ix_sort.png",
+                                      color: Colors.blue,
+                                    ))
+                                    : SizedBox(
+                                    width: 12,
+                                    child: Image.asset(
+                                      "images/ix_sort.png",
+                                      color: Colors.blue,
+                                    )),
                                 onPressed: () {
                                   setState(() {
                                     _sortOrder[columns.indexOf(column)] =
-                                        _sortOrder[columns.indexOf(column)] ==
-                                                'asc'
-                                            ? 'desc'
-                                            : 'asc';
+                                    _sortOrder[columns.indexOf(column)] ==
+                                        'asc'
+                                        ? 'desc'
+                                        : 'asc';
                                     _sortProducts(columns.indexOf(column),
                                         _sortOrder[columns.indexOf(column)]);
                                   });
@@ -1324,189 +1426,113 @@ columnSpacing: 35,
                 rows: List.generate(
                     math.min(itemsPerPage,
                         filteredData.length - (currentPage - 1) * itemsPerPage),
-                    (index) {
-                  final detail =
+                        (index) {
+                      final detail =
                       filteredData[(currentPage - 1) * itemsPerPage + index];
-                  final isSelected = _selectedProduct == detail;
-                  return DataRow(
-                      color: MaterialStateProperty.resolveWith<Color>((states) {
-                        if (states.contains(MaterialState.hovered)) {
-                          return Colors.blue.shade500.withOpacity(
-                              0.8); // Add some opacity to the dark blue
-                        } else {
-                          return Colors.white.withOpacity(0.9);
-                        }
-                      }),
-                      cells: [
-                        DataCell(
-                          Container(
-                            width: columnWidths[0],
-                            // Same dynamic width as column headers
-                            child: Text(
-                              detail.orderId.toString(),
-                              style: TextStyles.body,
+                      final isSelected = _selectedProduct == detail;
+                      return DataRow(
+                          color: MaterialStateProperty.resolveWith<Color>((states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.blue.shade500.withOpacity(
+                                  0.8); // Add some opacity to the dark blue
+                            } else {
+                              return Colors.white.withOpacity(0.9);
+                            }
+                          }),
+                          cells: [
+                            DataCell(
+                              Container(
+                                width: columnWidths[0],
+                                // Same dynamic width as column headers
+                                child: Text(
+                                  detail.orderId.toString(),
+                                  style: TextStyles.body,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        DataCell(
-                          Container(
-                            width: columnWidths[1],
-                            child: Text(
-                              detail.orderDate,
-                              style: TextStyles.body,
+                            DataCell(
+                              Container(
+                                width: columnWidths[2],
+                                child: Text(
+                                  detail.contactPerson!,
+                                  style: TextStyles.body,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        DataCell(
-                          Container(
-                            width: columnWidths[2],
-                            child: Text(
-                              detail.invoiceNo!,
-                              style: TextStyles.body,
+                            DataCell(
+                              Container(
+                                width: columnWidths[1],
+                                child: Text(
+                                  detail.orderDate,
+                                  style: TextStyles.body,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        DataCell(
-                          Container(
-                            width: columnWidths[3],
-                            child: Text(
-                              detail.total.toString(),
-                              style: TextStyles.body,
+                            DataCell(
+                              Container(
+                                width: columnWidths[3],
+                                child: Text(
+                                  detail.total.toString(),
+                                  style: TextStyles.body,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        DataCell(
-                          Container(
-                            width: columnWidths[4],
-                            child: Text(
-                              detail.deliveryStatus.toString(),
-                              style: TextStyles.body,
+                            DataCell(
+                              Container(
+                                width: columnWidths[4],
+                                child: Text(
+                                  detail.deliveryStatus.toString(),
+                                  style: TextStyles.body,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        // DataCell(
-                        //   Container(
-                        //     width: columnWidths[4],
-                        //     child: Text(
-                        //       detail.paymentStatus.toString(),
-                        //       style: TextStyles.body,
-                        //     ),
-                        //   ),
-                        // ),
+                            // DataCell(
+                            //   Container(
+                            //     width: columnWidths[4],
+                            //     child: Text(
+                            //       detail.paymentStatus.toString(),
+                            //       style: TextStyles.body,
+                            //     ),
+                            //   ),
+                            // ),
 
-                      ],
-                      onSelectChanged: (selected) {
-                        if (selected != null && selected) {
-                          print('what is this');
-                          print(detail.invoiceNo);
-                          print(productList);
-                          print(detail.paymentStatus);
+                          ],
+                          onSelectChanged: (selected) {
+                            if (selected != null && selected) {
+                              print('what is this');
+                              print('hi');
+                              print(detail.invoiceNo);
+                              print(productList);
+                              print(detail.paymentStatus);
 //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
 
-                          if (filteredData.length <= 9) {
-                            PaymentMap = {
-                              'paymentId': detail.paymentDate,
-                              'paymentmode': detail.paymentMode,
-                              'paymentStatus': detail.paymentStatus,
-                              'paymentdate': detail.paymentDate,
-                              'paidamount': detail.paidAmount,
-                            };
-                            context.go('/Order_Placed_List', extra: {
-                              'product': detail,
-                              'item': [], // pass an empty list of maps
-                              'body': {},
-                              'status': detail.deliveryStatus,
-                              'InvNo': detail.invoiceNo,
-                              'paymentStatus': PaymentMap,
-                              'itemsList': [], // pass an empty list of maps
-                              'orderDetails': productList
-                                  .map((detail) => OrderDetail(
-                                        orderId: detail.orderId,
-                                        orderDate: detail.orderDate, items: [],
-                                        deliveryStatus: detail.deliveryStatus,
-// Add other fields as needed
-                                      ))
-                                  .toList(),
-                            });
-                          } else {
-                            PaymentMap = {
-                              'paymentId': detail.paymentDate,
-                              'paymentmode': detail.paymentMode,
-                              'paymentStatus': detail.paymentStatus,
-                              'paymentdate': detail.paymentDate,
-                              'paidamount': detail.paidAmount,
-                            };
-                            context.go('/Order_Placed_List', extra: {
-                              'product': detail,
-                              'item': [], // pass an empty list of maps
-                              'status': detail.deliveryStatus,
-                              'InvNo': detail.invoiceNo,
-                              'paymentStatus': PaymentMap,
-                              'body': {},
-                              'itemsList': [], // pass an empty list of maps
-                              'orderDetails': filteredData
-                                  .map((detail) => OrderDetail(
-                                        orderId: detail.orderId,
-                                        orderDate: detail.orderDate, items: [],
-// Add other fields as needed
-                                      ))
-                                  .toList(),
-                            });
-                          }
-                        }
-                      });
-                })),
+                              if (filteredData.length <= 9) {
+                                PaymentMap = {
+                                  'paymentId': detail.paymentDate,
+                                  'paymentmode': detail.paymentMode,
+                                  'paymentStatus': detail.paymentStatus,
+                                  'paymentdate': detail.paymentDate,
+                                  'paidamount': detail.paidAmount,
+                                };
+                                context.go('/Order_View',extra: {'orderId': detail.orderId});
+                              } else {
+                                context.go('/Order_View',extra: {'orderId': detail.orderId});
+                              }
+                            }
+                          });
+                    })),
           ),
         ],
       );
     });
   }
 
-  void _sortProducts(int columnIndex, String sortDirection) {
-    if (sortDirection == 'asc') {
-      filteredData.sort((a, b) {
-        if (columnIndex == 0) {
-          return a.paymentStatus!.toLowerCase().compareTo(b.paymentStatus!.toLowerCase());
-        } else if (columnIndex == 1) {
-          return a.orderId!.compareTo(b.orderId!);
-        } else if (columnIndex == 2) {
-          return a.orderDate.compareTo(b.orderDate);
-        } else if (columnIndex == 3) {
-          return a.invoiceNo!.compareTo(b.invoiceNo!);
-        } else if (columnIndex == 4) {
-          return a.total.compareTo(b.total);
-        } else if (columnIndex == 5) {
-          return a.deliveryStatus.compareTo(b.deliveryStatus);
-        } else {
-          return 0;
-        }
-      });
-    } else {
-      filteredData.sort((a, b) {
-        if (columnIndex == 0) {
-          return b.paymentStatus!.toLowerCase().compareTo(a.paymentStatus!.toLowerCase());
-        } else if (columnIndex == 1) {
-          return b.orderId!.compareTo(a.orderId!);
-        } else if (columnIndex == 2) {
-          return b.orderDate.compareTo(a.orderDate);
-        } else if (columnIndex == 3) {
-          return b.invoiceNo!.compareTo(a.invoiceNo!);
-        } else if (columnIndex == 4) {
-          return b.total.compareTo(a.total);
-        } else if (columnIndex == 5) {
-          return b.deliveryStatus.compareTo(a.deliveryStatus);
-        } else {
-          return 0;
-        }
-      });
-    }
-    setState(() {});
-  }
+
 
   void _filterAndPaginateProducts() {
     filteredData = productList.where((product) {
       final matchesSearchText =
-          product.orderId!.toLowerCase().contains(_searchText.toLowerCase());
+          product.orderId!.toLowerCase().contains(_searchText.toLowerCase()) || product.contactPerson!.toLowerCase().contains(_searchText.toLowerCase()) ;
 // print('-----');
 // print(product.orderDate);
       String orderYear = '';
@@ -1930,3 +1956,5 @@ class OrderDetail {
     });
   }
 }
+
+ 

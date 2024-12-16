@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../Order Module/firstpage.dart';
 import '../dashboard/dashboard.dart';
@@ -39,6 +40,7 @@ class CusList extends StatefulWidget {
 }
 class _CusListState extends State<CusList> {
   bool _hasShownPopup = false;
+  bool _isCustomerExpanded = false;
   List<String> statusOptions = ['Order', 'Invoice', 'Delivery', 'Payment'];
   Timer? _searchDebounceTimer;
   String _searchText = '';
@@ -67,7 +69,7 @@ class _CusListState extends State<CusList> {
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
   List<String> _sortOrder = List.generate(6, (index) => 'asc');
-  List<String> columns = ['Customer ID','Customer Name','City','telephoneNumber1','Email ID'];
+  List<String> columns = ['Customer ID','Customer Name','City','Mobile Number','Email ID'];
   List<double> columnWidths = [130, 145, 139, 160, 135,];
   List<bool> columnSortState = [true, true, true,true,true];
 
@@ -119,52 +121,7 @@ class _CusListState extends State<CusList> {
   //   } catch (e) {
   //   }
   // }
-  Future<List<dynamic>> _fetchAllpayProductMaster() async {
-    //  final String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzI1NjA3Nzc3LCJpYXQiOjE3MjU2MDA1Nzd9.stF0hO6T4ue3A_ayQw8BVgBg2Nov1k2_uwrc1BdlyJcWwEl8ycxIedJrTAuMCLJD8o7K7k6PQkWb1IFrD-hSqA';
-    try {
-      final response = await http.get(
-        Uri.parse('$apicall/productmaster/get_all_productmaster'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        // print('discount');
-        // print(data['discount']);
-        return data;
-      } else {
-        return [];
-      }
-    } catch (e) {
-      return [];
-    }
-  }
-  Future<OrderDetail?> _fetchpayOrderDetails(String orderId) async {
-    //  String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkaGFuYXNla2FyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6ImRldmVsb3BlciJ9XSwiZXhwIjoxNzI1NjA3Nzc3LCJpYXQiOjE3MjU2MDA1Nzd9.stF0hO6T4ue3A_ayQw8BVgBg2Nov1k2_uwrc1BdlyJcWwEl8ycxIedJrTAuMCLJD8o7K7k6PQkWb1IFrD-hSqA';
-    try {
-      final url = '$apicall/order_master/search_by_orderid/$orderId';
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-      if (response.statusCode == 200) {
-        final responseBody = response.body;
-        final jsonData = jsonDecode(responseBody);
-        if (jsonData is List<dynamic>) {
-          final jsonObject = jsonData.first;
-          return OrderDetail.fromJson(jsonObject);
-        } else {
-        }
-      } else {
-      }
-    } catch (e) {
-    }
-    return null;
-  }
+
   Future downloadinvoicePdf(String orderId) async {
     final String orderId1 = orderId;
     try {
@@ -283,8 +240,9 @@ class _CusListState extends State<CusList> {
               ),
               child: _buildMenuItem(
                   'Customer', Icons.account_circle_outlined, Colors.white, '/Customer')),
+          SizedBox(height: 6,),
           _buildMenuItem(
-              'Orders', Icons.production_quantity_limits, Colors.blue[900]!, '/Order_List'),
+              'Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
         ],
       ),
       const SizedBox(
@@ -495,8 +453,10 @@ class _CusListState extends State<CusList> {
     return null;
   }
 
+
   Future<void> fetchProducts(int page, int itemsPerPage) async {
     if (isLoading) return;
+
     setState(() {
       isLoading = true;
     });
@@ -504,7 +464,7 @@ class _CusListState extends State<CusList> {
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/user_master/get_all_customer_data?page=$page&limit=$itemsPerPage', // Adjusted for API call
+          '$apicall/customer_master/get_all_s4hana_customermaster?page=$page&limit=$itemsPerPage',
         ),
         headers: {
           "Content-type": "application/json",
@@ -516,41 +476,39 @@ class _CusListState extends State<CusList> {
         final jsonData = jsonDecode(response.body);
         List<ord.BusinessPartnerData> products = [];
 
-        if (jsonData != null && jsonData.containsKey('d') && jsonData['d'].containsKey('results')) {
-          // Accessing the 'results' from the new API response structure
-          var results = jsonData['d']['results'];
-
-          // Mapping the relevant fields for each product
-          products = results.map<ord.BusinessPartnerData>((item) {
+        if (jsonData != null) {
+          // Iterate over the response to map the products
+          products = jsonData.map<ord.BusinessPartnerData>((item) {
             return ord.BusinessPartnerData(
-              businessPartner: item['BusinessPartner'] ?? '',
-              businessPartnerName: item['BusinessPartnerName'] ?? '',
-              customer: item['Customer'] ?? '',
-              addressID: item['AddressID'] ?? '',
-              cityName: item['CityName'] ?? '',
-              postalCode: item['PostalCode'] ?? '',
-              streetName: item['StreetName'] ?? '',
-              region: item['Region'] ?? '',
-              telephoneNumber1: item['TelephoneNumber1'] ?? '',
-              country: item['Country'] ?? '',
-              districtName: item['DistrictName'] ?? '',
-              emailAddress: item['EmailAddress'] ?? '',
-              mobilePhoneNumber: item['MobilePhoneNumber'] ?? '',
+              customerName: item['customerName'] ?? '',
+              businessPartner: item['customer'] ?? '',
+              businessPartnerName: '', // Placeholder as it's not in the response
+              customer: item['customer'] ?? '',
+              addressID: item['addressID'] ?? '',
+              cityName: item['cityName'] ?? '',
+              postalCode: item['postalCode'] ?? '',
+              streetName: item['streetName'] ?? '',
+              region: item['region'] ?? '',
+              telephoneNumber1: item['telephoneNumber1'] ?? '',
+              country: item['country'] ?? '',
+              districtName: item['districtName'] ?? '',
+              emailAddress: item['emailAddress'] ?? '',
+              mobilePhoneNumber: item['mobilePhoneNumber'] ?? '',
             );
           }).toList();
 
           setState(() {
             productList = products;
-            totalPages = (results.length / itemsPerPage).ceil();  // Update total pages based on new structure
-            print(totalPages);  // Debugging output
+            totalPages = (products.length / itemsPerPage).ceil(); // Update total pages
+            print(totalPages); // Debugging output
             _filterAndPaginateProducts();
           });
         }
       } else {
-        throw Exception('Failed to load data');
+        throw Exception('Failed to load data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error decoding JSON: $e');
+      print('Error: $e');
       // Optionally, show an error message to the user
     } finally {
       setState(() {
@@ -560,13 +518,12 @@ class _CusListState extends State<CusList> {
   }
 
 
+
   void _filterAndPaginateProducts() {
     filteredData = productList.
     where((product) {
-      final matchesSearchText= product.customer!.toLowerCase().contains(_searchText.toLowerCase());
-      final matchlocation = product.emailAddress.toLowerCase().contains(location.toLowerCase());
-      final MatchName = product.businessPartnerName.toLowerCase().contains(Name.toLowerCase());
-      return matchesSearchText && matchlocation && MatchName;
+      final matchesSearchText= product.customer.toLowerCase().contains(_searchText.toLowerCase()) || product.customerName.toLowerCase().contains(_searchText.toLowerCase());
+      return matchesSearchText;
     }).toList();
     totalPages = (filteredData.length / itemsPerPage).ceil();    setState(() {    currentPage = 1;  });}
 
@@ -632,7 +589,7 @@ class _CusListState extends State<CusList> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color.fromRGBO(21, 101, 192, 0.07),
+        backgroundColor: Colors.grey[50],
         body: LayoutBuilder(
             builder: (context,constraints) {
               double maxWidth = constraints.maxWidth;
@@ -661,17 +618,6 @@ class _CusListState extends State<CusList> {
                               Row(
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 5),
-                                    child: IconButton(
-                                      icon: const Icon(Icons.notifications),
-                                      color: Colors.black, // Default icon color
-                                      onPressed: () {
-                                        // Handle notification icon press
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Padding(
                                     padding:
                                     const EdgeInsets.only(right: 10, top: 10),
                                     // Adjust padding for better spacing
@@ -692,28 +638,40 @@ class _CusListState extends State<CusList> {
                         ],
                       ),
                     ),
+
                     if (constraints.maxHeight <= 500) ...{
-                      SingleChildScrollView(
+                      Positioned(
+                        top:60,
+                        left:0,
+                        right:0,
+                        bottom: 0,child:   SingleChildScrollView(
                         child: Align(
                           // Added Align widget for the left side menu
                           alignment: Alignment.topLeft,
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 80),
+                            padding: const EdgeInsets.only(top: 2),
                             child: Container(
                               height: 1400,
                               width: 200,
-                              color: const Color(0xFFF7F6FA),
+                              color: Colors.white,
                               padding:
-                              const EdgeInsets.only(left: 15, top: 50, right: 15),
+                              const EdgeInsets.only(left: 15, top: 10, right: 15),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: _buildMenuItems(context),
                               ),
                             ),
                           ),
+
                         ),
+
+                      ),),
+
+                      VerticalDividerWidget(
+                        height: maxHeight,
+                        color: Color(0x29000000),
                       ),
-                    } else ...{
+                    }else ...{
                       Align(
                         alignment: Alignment.topLeft,
                         child: Padding(
@@ -887,7 +845,7 @@ class _CusListState extends State<CusList> {
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.only(left: 30,top: 5),
+                                            padding: const EdgeInsets.only(left: 30,top: 20),
                                             child: Text('Customer List',style: TextStyles.heading,),
                                           ),
 
@@ -899,18 +857,26 @@ class _CusListState extends State<CusList> {
                                           Padding(
                                               padding: const EdgeInsets.only(
                                                   left: 30,
-                                                  top: 7,
+                                                  top: 20,
                                                   right: 30,
-                                                  bottom: 15),
+                                                  bottom: 15,
+                                              ),
                                               child: Container(
-                                                height: 635,
+                                                height: 640,
                                                 width: maxWidth * 0.8,
-                                                decoration:BoxDecoration(
+                                                decoration: BoxDecoration(
                                                   //   border: Border.all(color: Colors.grey),
                                                   color: Colors.white,
-                                                  border: Border.all(color: Color(0x29000000)),
-                                                  borderRadius: BorderRadius.circular(15),
-
+                                                  borderRadius: BorderRadius.circular(2),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey.withOpacity(0.1),
+                                                      // Soft grey shadow
+                                                      spreadRadius: 3,
+                                                      blurRadius: 3,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
                                                 ),
                                                 child: SizedBox(
                                                   child: Column(
@@ -983,13 +949,25 @@ class _CusListState extends State<CusList> {
                                     scrollDirection: Axis.horizontal,
                                     child: SingleChildScrollView(
                                       child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 30,top: 20),
+                                                child: Text('Customer List',style: TextStyles.heading,),
+                                              ),
+
+                                            ],
+                                          ),
+
                                           Row(
                                             children: [
                                               Padding(
                                                   padding: const EdgeInsets.only(
                                                       left: 30,
-                                                      top: 50,
+                                                      top: 20,
                                                       right: 30,
                                                       bottom: 15),
                                                   child: Container(
@@ -998,10 +976,11 @@ class _CusListState extends State<CusList> {
                                                     decoration:BoxDecoration(
                                                       //   border: Border.all(color: Colors.grey),
                                                       color: Colors.white,
-                                                      borderRadius: BorderRadius.circular(8),
+                                                      borderRadius: BorderRadius.circular(2),
                                                       boxShadow: [
                                                         BoxShadow(
-                                                          color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                          color: Colors.grey.withOpacity(0.1),
+                                                          // Soft grey shadow
                                                           spreadRadius: 3,
                                                           blurRadius: 3,
                                                           offset: const Offset(0, 3),
@@ -1119,11 +1098,12 @@ class _CusListState extends State<CusList> {
                             border: Border.all(color: Colors.grey),
                           ),
                           child: TextFormField(
+                            style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
                             decoration:  InputDecoration(
-                              hintText: 'Search by Customer ID',
-                              hintStyle: const TextStyle(fontSize: 13,color: Colors.grey),
-                              contentPadding: const EdgeInsets.only(bottom: 20,left: 10), // adjusted padding
-                              border: InputBorder.none,
+                                hintText: 'Search by Customer ID or Customer Name',
+                                hintStyle: const TextStyle(fontSize: 13,color: Colors.grey),
+                                contentPadding: const EdgeInsets.only(bottom: 20,left: 10), // adjusted padding
+                                border: InputBorder.none,
                                 suffixIcon: Padding(
                                   padding: const EdgeInsets.only(left: 10, right: 5), // Adjust image padding
                                   child: Image.asset(
@@ -1165,7 +1145,7 @@ class _CusListState extends State<CusList> {
         Column(
           children: [
             Container(
-              width: 1100,
+              width:1100,
 
               decoration:const BoxDecoration(
                   color: Color(0xFFF7F7F7),
@@ -1175,34 +1155,15 @@ class _CusListState extends State<CusList> {
                   showCheckboxColumn: false,
                   headingRowHeight: 40,
                   columns: [
-                    DataColumn(label: Text('Customer ID',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
-                    DataColumn(label: Text('Customer Name',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
+                    DataColumn(label: Text('Customer ID',style:TextStyles.subhead,)),
+                    DataColumn(label: Text('Customer Name',style:TextStyles.subhead,)),
                     DataColumn(label: Text(
-                      'telephoneNumber1',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
+                      'City',style:TextStyles.subhead,)),
                     DataColumn(label: Text(
-                      'Location',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
+                      'Mobile Number',style:TextStyles.subhead,)),
                     DataColumn(label: Text(
-                      'Credit Amount',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
+                      'Email ID',style:TextStyles.subhead,)),
+
 
                   ],
                   rows: const []
@@ -1240,9 +1201,9 @@ class _CusListState extends State<CusList> {
       } else {
         filteredData.sort((a, b) {
           if (columnIndex == 0) {
-            return b.customer.compareTo(a.customer); // Reverse the comparison
+            return b.customer!.compareTo(a.customer!); // Reverse the comparison
           } else if (columnIndex == 1) {
-            return b.businessPartnerName.compareTo(a.businessPartnerName!); // Reverse the comparison
+            return b.businessPartnerName!.compareTo(a.businessPartnerName!); // Reverse the comparison
           } else if (columnIndex == 2) {
             return b.telephoneNumber1!.compareTo(a.telephoneNumber1!); // Reverse the comparison
           } else if (columnIndex == 3) {
@@ -1261,13 +1222,11 @@ class _CusListState extends State<CusList> {
       // double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width * 0.92;
 
-
       return
         Column(
           children: [
             Container(
               width: 1100,
-
               decoration:const BoxDecoration(
                   color: Color(0xFFF7F7F7),
                   border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
@@ -1289,20 +1248,25 @@ class _CusListState extends State<CusList> {
                               //   mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Text(
-                                  column,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.indigo[900],
-                                    fontSize: 13,
-                                  ),
+                                    column,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyles.subhead
                                 ),
 
                                 IconButton(
                                   icon: _sortOrder[columns.indexOf(column)] == 'asc'
-                                      ? SizedBox(width: 12,
-                                      child: Image.asset("images/sort.png",color: Colors.grey,))
-                                      : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                      ? SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      ))
+                                      : SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      )),
                                   onPressed: () {
                                     setState(() {
                                       _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
@@ -1313,42 +1277,7 @@ class _CusListState extends State<CusList> {
                                 //SizedBox(width: 50,),
                                 //Padding(
                                 //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-                                //  child:
 
-                                Spacer(),
-
-                                MouseRegion(
-                                  cursor: SystemMouseCursors.resizeColumn,
-                                  child: GestureDetector(
-                                      onHorizontalDragUpdate: (details) {
-                                        // Update column width dynamically as user drags
-                                        setState(() {
-                                          columnWidths[columns.indexOf(column)] += details.delta.dx;
-                                          columnWidths[columns.indexOf(column)] =
-                                              columnWidths[columns.indexOf(column)].clamp(50.0, 300.0);
-                                        });
-                                        // setState(() {
-                                        //   columnWidths[columns.indexOf(column)] += details.delta.dx;
-                                        //   if (columnWidths[columns.indexOf(column)] < 50) {
-                                        //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-                                        //   }
-                                        // });
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10,bottom: 10),
-                                        child: Row(
-                                          children: [
-                                            VerticalDivider(
-                                              width: 5,
-                                              thickness: 4,
-                                              color: Colors.grey,
-
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                  ),
-                                ),
                                 // ),
                               ],
                             ),
@@ -1376,42 +1305,30 @@ class _CusListState extends State<CusList> {
                       [
 
                         DataCell(
-                            Text(detail.customer!,style:
-                            const TextStyle(
-                              // fontSize: 16,
-                                color: Colors.grey),)),
+                            Text(detail.customer,   style: TextStyles.body,)),
                         DataCell(
-                          Text(detail.businessPartnerName!,style: const TextStyle(
-                            // fontSize: 16,
-                              color: Colors.grey)),
+                          Text(detail.customerName,   style: TextStyles.body,),
                         ),
                         DataCell(
-                          Text(detail.telephoneNumber1!,style: const TextStyle(
-                            //fontSize: 16,
-                              color: Colors.grey)),
+                          Text(detail.cityName,   style: TextStyles.body,),
                         ),
                         DataCell(
                           Container(
                             width: columnWidths[3],
-                            child: Text(detail.emailAddress.toString(),style: const TextStyle(
-                              // fontSize: 16,
-                                color: Colors.grey)),
+                            child: Text(detail.telephoneNumber1.toString(),   style: TextStyles.body,),
                           ),
                         ),
                         DataCell(
-                          Text(detail.postalCode.toString(),style: const TextStyle(
-                            //fontSize: 16,
-                              color: Colors.grey)),
+                          Text(detail.emailAddress.toString(),   style: TextStyles.body,),
                         ),
-
                       ],
                       onSelectChanged: (selected){
                         if(selected != null && selected){
                           //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
                           if (filteredData.length <= 9) {
-                           context.go('/Cus_Details',extra:{
-                             'orderId': detail.customer
-                           });
+                            context.go('/Cus_Details',extra:{
+                              'orderId': detail.customer
+                            });
                           } else {
                             context.go('/Cus_Details',extra:{
                               'orderId': detail.customer
@@ -1459,34 +1376,15 @@ class _CusListState extends State<CusList> {
                   showCheckboxColumn: false,
                   headingRowHeight: 40,
                   columns: [
-                    DataColumn(label: Text('Customer ID',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
-                    DataColumn(label: Text('Customer Name',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
+                    DataColumn(label: Text('Customer ID',style:TextStyles.subhead,)),
+                    DataColumn(label: Text('Customer Name',style:TextStyles.subhead,)),
                     DataColumn(label: Text(
-                      'telephoneNumber1',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
+                      'City',style:TextStyles.subhead,)),
                     DataColumn(label: Text(
-                      'Email Address',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
+                      'Mobile Number',style:TextStyles.subhead,)),
                     DataColumn(label: Text(
-                      'Credit Amount',style:TextStyle(
-                        color: Colors.indigo[900],
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold
-                    ),)),
+                      'Email ID',style:TextStyles.subhead,)),
+
 
                   ],
                   rows: const []
@@ -1571,16 +1469,25 @@ class _CusListState extends State<CusList> {
                               //   mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Text(
-                                  column,
-                                  overflow: TextOverflow.ellipsis,
+                                    column,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyles.subhead
                                 ),
 
                                 IconButton(
                                   icon: _sortOrder[columns.indexOf(column)] == 'asc'
-                                      ? SizedBox(width: 12,
-                                      child: Image.asset("images/sort.png",color: Colors.blue,))
-                                      : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                      ? SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      ))
+                                      : SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      )),
                                   onPressed: () {
                                     setState(() {
                                       _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
@@ -1621,7 +1528,7 @@ class _CusListState extends State<CusList> {
                         DataCell(
                             Text(detail.customer,   style: TextStyles.body,)),
                         DataCell(
-                          Text(detail.businessPartnerName,   style: TextStyles.body,),
+                          Text(detail.customerName,   style: TextStyles.body,),
                         ),
                         DataCell(
                           Text(detail.cityName,   style: TextStyles.body,),
@@ -1770,3 +1677,4 @@ class CusDetail {
 }
 
 
+ 

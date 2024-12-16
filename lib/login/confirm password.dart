@@ -918,5 +918,3 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
     );
   }
 }
-
-

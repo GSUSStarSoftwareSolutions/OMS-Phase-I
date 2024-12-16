@@ -4,7 +4,7 @@ class ProductData {
   final String productType;
   final String baseUnit;
   final String productDescription;
-  final String standardPrice;
+  final double standardPrice;
   final String currency;
 
   ProductData({
@@ -25,11 +25,13 @@ class ProductData {
       productType: json['ProductType'] ?? '',
       baseUnit: json['BaseUnit'] ?? '',
       productDescription: json['ProductDescription'] ?? '',
-      standardPrice: json['currency'] ?? '',
-      currency: json['StandardPrice'] ?? '',
+      standardPrice: json['StandardPrice'] ?? 0.0,
+      currency: json['currency']?.toString() ?? '',
     );
   }
 }
+
+
 
 
 class BusinessPartnerData {
@@ -39,6 +41,7 @@ class BusinessPartnerData {
   final String addressID;
   final String cityName;
   final String postalCode;
+  final String customerName;
   final String streetName;
   final String region;
   final String telephoneNumber1;
@@ -53,6 +56,7 @@ class BusinessPartnerData {
     required this.customer,
     required this.addressID,
     required this.cityName,
+    required this.customerName,
     required this.postalCode,
     required this.streetName,
     required this.region,
@@ -68,17 +72,19 @@ class BusinessPartnerData {
     return BusinessPartnerData(
       businessPartner: json['BusinessPartner'] ?? '',
       businessPartnerName: json['BusinessPartnerName'] ?? '',
-      customer: json['Customer'] ?? '',
-      addressID: json['AddressID'] ?? '',
-      cityName: json['CityName'] ?? '',
-      postalCode: json['PostalCode'] ?? '',
-      streetName: json['StreetName'] ?? '',
-      region: json['Region'] ?? '',
-      telephoneNumber1: json['TelephoneNumber1'] ?? '',
-      country: json['Country'] ?? '',
-      districtName: json['DistrictName'] ?? '',
-      emailAddress: json['EmailAddress'] ?? '',
-      mobilePhoneNumber: json['MobilePhoneNumber'] ?? '',
+      customer: json['customer'] ?? '',
+      addressID: json['addressID'] ?? '',
+      cityName: json['cityName'] ?? '',
+      postalCode: json['postalCode'] ?? '',
+      streetName: json['streetName'] ?? '',
+      region: json['region'] ?? '',
+      customerName: json['customerName'] ?? '',
+      telephoneNumber1: json['telephoneNumber1'] ?? '',
+      country: json['country'] ?? '',
+      districtName: json['districtName'] ?? '',
+      emailAddress: json['emailAddress'] ?? '',
+      mobilePhoneNumber: json['mobilePhoneNumber'] ?? '',
     );
   }
 }
+

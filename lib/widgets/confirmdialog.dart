@@ -161,6 +161,7 @@
 //
 
 
+import 'package:btb/widgets/text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:html' as html; // Import html package
@@ -175,12 +176,8 @@ class AccountMenu extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(right: 35),
         child: PopupMenuButton<String>(
-          icon: Image.asset(
-            'images/user.png', // Replace with your image path
-            width: 20,
-            height: 20,
-            fit: BoxFit.cover, // Ensures the image fills the available space
-          ),
+          color: Colors.white,
+          icon: Icon(Icons.account_circle_sharp),
           onSelected: (value) {
             if (!_hasShownPopup) {
               _hasShownPopup = true;
@@ -191,9 +188,9 @@ class AccountMenu extends StatelessWidget {
           },
           itemBuilder: (BuildContext context) {
             return [
-              const PopupMenuItem<String>(
+               PopupMenuItem<String>(
                 value: 'logout',
-                child: Text('Logout'),
+                child: Text('Logout',style: TextStyles.body,),
               ),
 
             ];
@@ -204,8 +201,8 @@ class AccountMenu extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) async {
-    await html.window.sessionStorage.remove('token');
+  void _logout(BuildContext context)  {
+   // await html.window.sessionStorage.remove('token');
     showConfirmationDialog(context);
   }
 
@@ -245,11 +242,7 @@ class AccountMenu extends StatelessWidget {
                     // Confirmation Message
                     Text(
                       'Are You Sure',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                      style: TextStyles.header1,
                     ),
                     SizedBox(height: 20),
                     // Buttons

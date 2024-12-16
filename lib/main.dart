@@ -1,4 +1,5 @@
 import 'dart:html';
+import 'package:btb/Order%20Module/order%20view.dart';
 import 'package:btb/admin/admin%20edit.dart';
 import 'package:btb/admin/admin%20list.dart';
 import 'package:btb/admin/create%20login.dart';
@@ -30,6 +31,7 @@ import 'Product/product list.dart';
 import 'admin/create users.dart';
 import 'customer login/home/home.dart';
 import 'customer login/order/order list.dart';
+import 'customer login/order/order view screen.dart';
 import 'customer module/customer list.dart';
 
 
@@ -238,6 +240,25 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
+        path: '/Customer_Order_View',
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: OrderView(orderId: extra!['orderId'] ?? '',),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
         path: '/Product_List',
         pageBuilder: (context, state) {
           return CustomTransitionPage(
@@ -385,38 +406,12 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
-        path: '/Order_Placed_List',
+        path: '/Order_View',
         pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-
-          // Check if extra is null and navigate to OrdersPage if so
-          if (extra == null) {
-            return CustomTransitionPage(
-              child: Orderspage(), // Navigate to OrdersPage on refresh
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-              transitionDuration:
-                  Duration(milliseconds: 300), // Adjust transition duration
-            );
-          }
-          // If extra is not null, load the SixthPage
+          final extraData = state.extra as Map<String, dynamic>? ?? {};
           return CustomTransitionPage(
-            child: SixthPage(
-              InvNo: extra['InvNo'] ?? '',
-              arrow: extra['arrow'] ?? '',
-              status: extra['status'] ?? '',
-              paymentStatus: extra['paymentStatus'] ?? {},
-              product: extra['product'] as detail?,
-              item: List<Map<String, dynamic>>.from(extra['item']),
-              body: Map<String, dynamic>.from(extra['body']),
-              itemsList: List<Map<String, dynamic>>.from(extra['itemsList']),
-              orderDetails: List<OrderDetail>.from(extra['orderDetails']),
-            ),
+            key: state.pageKey,
+            child: OrderView2(orderId: extraData['orderId'] ?? '',),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -424,11 +419,12 @@ class MyApp extends StatelessWidget {
                 child: child,
               );
             },
-            transitionDuration:
-                Duration(milliseconds: 300), // Adjust transition duration
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
           );
         },
       ),
+
       GoRoute(
         path: '/Added_to_cart',
         pageBuilder: (context, state) {

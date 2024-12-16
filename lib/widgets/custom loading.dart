@@ -4,10 +4,10 @@ class CustomLoadingIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300,
-      height: 300,
+      width: 120,
+      height: 120,
       child: Image.asset(
-        'images/buffer.gif', // Replace with your GIF path
+        'images/buffer.gif',
         fit: BoxFit.cover,
       ),
     );

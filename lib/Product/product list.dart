@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/single_child_widget.dart';
 import '../dashboard/dashboard.dart';
@@ -40,8 +41,8 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> with SingleTickerProviderStateMixin{
   ord.Product? _selectedProduct;
   List<String> _sortOrder = List.generate(5, (index) => 'asc');
-  List<String> columns = ['Product ID', 'Category Name','Product Type','Price','Base Unit'];
-  List<double> columnWidths = [130, 115, 125, 80, 100];
+  List<String> columns = ['Product Name', 'Category Name','Product Type','Price','Base Unit'];
+  List<double> columnWidths = [135, 120, 125, 80, 100];
   List<bool> columnSortState = [true, true, true,true,true];
   late ord.ProductData productData;
   bool isHomeSelected = false;
@@ -87,6 +88,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
 // Example method for fetching products
   Future<void> fetchProducts(int page, int itemsPerPage) async {
     if (isLoading) return;
+
     setState(() {
       isLoading = true;
     });
@@ -94,7 +96,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/productmaster/get_all_product_data?page=$page&limit=$itemsPerPage', // Adjusted for API call
+          '$apicall/productmaster/get_all_s4hana_productmaster?page=$page&limit=$itemsPerPage',
         ),
         headers: {
           "Content-type": "application/json",
@@ -104,37 +106,35 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
+
         List<ord.ProductData> products = [];
 
-        if (jsonData != null && jsonData.containsKey('d') && jsonData['d'].containsKey('results')) {
-          // Accessing the 'results' from the new API response structure
-          var results = jsonData['d']['results'];
-
-          // Mapping the relevant fields for each product
-          products = results.map<ord.ProductData>((item) {
+        if (jsonData != null) {
+          // Iterate over the response to map the products
+          products = jsonData.map<ord.ProductData>((item) {
             return ord.ProductData(
-              product: item['Product'] ?? '',
-              categoryName: item['CategoryName'] ?? '',
-              productType: item['ProductType'] ?? '',
-              baseUnit: item['BaseUnit'] ?? '',
-              productDescription: item['ProductDescription'] ?? '',
-              standardPrice: item['StandardPrice'] ?? '0.00',  // Default value if not present
-              currency: item['Currency'] ?? 'INR',  // Default to INR
+              product: item['product'] ?? '',
+              categoryName: item['categoryName'] ?? '',
+              productType: item['productType'] ?? '',
+              baseUnit: item['baseUnit'] ?? '',
+              productDescription: item['productDescription'] ?? '',
+              standardPrice: item['standardPrice'] ?? 0, // Default value if not present
+              currency: item['currency'] ?? 'INR', // Default to INR
             );
           }).toList();
 
           setState(() {
             productList = products;
-            totalPages = (results.length / itemsPerPage).ceil();  // Update total pages based on new structure
-            print(totalPages);  // Debugging output
+            totalPages = (products.length / itemsPerPage).ceil(); // Update total pages
+            print(totalPages); // Debugging output
             _filterAndPaginateProducts();
           });
         }
       } else {
-        throw Exception('Failed to load data');
+        throw Exception('Failed to load data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error decoding JSON: $e');
+      print('Error: $e');
       // Optionally, show an error message to the user
     } finally {
       setState(() {
@@ -142,6 +142,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
       });
     }
   }
+
 
 //   Future<void> fetchProducts(int page, int itemsPerPage) async {
 //     if (isLoading) return;
@@ -365,7 +366,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-          backgroundColor: Color.fromRGBO(21, 101, 192, 0.07),
+          backgroundColor: Colors.grey[50],
           body: LayoutBuilder(builder: (context, constraints) {
             double maxWidth = constraints.maxWidth;
             double maxHeight = constraints.maxHeight;
@@ -391,17 +392,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                           const Spacer(),
                           Row(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 5),
-                                child: IconButton(
-                                  icon: const Icon(Icons.notifications),
-                                  color: Colors.black, // Default icon color
-                                  onPressed: () {
-                                    // Handle notification icon press
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 10),
+
                               Padding(
                                 padding:
                                 const EdgeInsets.only(right: 10, top: 10),
@@ -424,27 +415,38 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                   ),
                 ),
                 if (constraints.maxHeight <= 500) ...{
-                  SingleChildScrollView(
+                  Positioned(
+                    top:60,
+                    left:0,
+                    right:0,
+                    bottom: 0,child:   SingleChildScrollView(
                     child: Align(
                       // Added Align widget for the left side menu
                       alignment: Alignment.topLeft,
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 80),
+                        padding: const EdgeInsets.only(top: 2),
                         child: Container(
                           height: 1400,
                           width: 200,
-                          color: const Color(0xFFF7F6FA),
+                          color: Colors.white,
                           padding:
-                          const EdgeInsets.only(left: 15, top: 50, right: 15),
+                          const EdgeInsets.only(left: 15, top: 10, right: 15),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: _buildMenuItems(context),
                           ),
                         ),
                       ),
+
                     ),
+
+                  ),),
+
+                  VerticalDividerWidget(
+                    height: maxHeight,
+                    color: Color(0x29000000),
                   ),
-                } else ...{
+                }else ...{
                   Align(
                     alignment: Alignment.topLeft,
                     child: Padding(
@@ -567,7 +569,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                             child: SingleChildScrollView(
                               child: Column(
                                 children: [
-                                  SizedBox(height: 20),
+                                  SizedBox(height: 10),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
@@ -587,14 +589,21 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                                               right: 30,
                                               bottom: 15),
                                           child: Container(
-                                            height: 755,
+                                            height: 690,
                                             width: maxWidth * 0.8,
-                                            decoration:BoxDecoration(
+                                            decoration: BoxDecoration(
                                               //   border: Border.all(color: Colors.grey),
                                               color: Colors.white,
-                                              border: Border.all(color: Color(0x29000000)),
-                                              borderRadius: BorderRadius.circular(15),
-
+                                              borderRadius: BorderRadius.circular(2),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey.withOpacity(0.1),
+                                                  // Soft grey shadow
+                                                  spreadRadius: 3,
+                                                  blurRadius: 3,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
                                             ),
                                             child: SizedBox(
                                               child: Column(
@@ -667,25 +676,38 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                                 scrollDirection: Axis.horizontal,
                                 child: SingleChildScrollView(
                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(height: 10,),
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 30,top: 20),
+                                            child: Text('Product List',style: TextStyles.heading,),
+                                          ),
+
+                                        ],
+                                      ),
                                       Row(
                                         children: [
                                           Padding(
                                               padding: const EdgeInsets.only(
                                                   left: 30,
-                                                  top: 50,
+                                                  top: 20,
                                                   right: 30,
                                                   bottom: 15),
                                               child: Container(
-                                                height: 755,
+                                                height: 690,
                                                 width: 1100,
-                                                decoration:BoxDecoration(
+                                                decoration: BoxDecoration(
                                                   //   border: Border.all(color: Colors.grey),
                                                   color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(8),
+                                                  borderRadius: BorderRadius.circular(2),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: Colors.black.withOpacity(0.3), // Soft grey shadow
+                                                      color: Colors.grey.withOpacity(0.1),
+                                                      // Soft grey shadow
                                                       spreadRadius: 3,
                                                       blurRadius: 3,
                                                       offset: const Offset(0, 3),
@@ -807,17 +829,19 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                                   border: Border.all(color: Colors.grey),
                                 ),
                                 child: TextFormField(
-                                  decoration: const InputDecoration(
+                                  style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
+                                  decoration:  InputDecoration(
                                     hintText: 'Search by product name',
                                     hintStyle: TextStyle(color: Colors.grey,fontSize: 13),
                                     contentPadding: EdgeInsets.only(bottom: 20,left: 10),
-                                    // adjusted padding
                                     border: InputBorder.none,
-                                    suffixIcon: Padding(
-                                      padding: EdgeInsets.only(right: 5),
-                                      child: Icon(Icons.search_outlined,
-                                          color: Colors.indigo),
-                                    ),
+                                      suffixIcon: Padding(
+                                        padding: const EdgeInsets.only(left: 10, right: 5),
+                                        // Adjust image padding
+                                        child: Image.asset(
+                                          'images/search.png', // Replace with your image asset path
+                                        ),
+                                      ),
                                   ),
                                   onChanged: _updateSearch,
                                 ),
@@ -837,304 +861,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
     );
   }
 
-  Widget buildDataTable2() {
-    // _filterAndPaginateProducts();
 
-    if (isLoading) {
-      var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
-      _loading = true;
-      // Show loading indicator while data is being fetched
-      return Padding(
-        padding: EdgeInsets.only(bottom: Height * 0.100,left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
-      );
-    }
-    if (filteredProducts.isEmpty) {
-      var _mediaQuery = MediaQuery.of(context).size.width;
-      return  Column(
-        children: [
-
-          Container(
-            width: 1100,
-            decoration:const  BoxDecoration(
-              ///  color:  Colors.grey,
-              // color:  Color(0xFFECEFF1),
-                color:  Color(0xFFF7F7F7),
-                border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
-            ),
-            child:
-            DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                columns: [
-                  DataColumn(
-                    label: Container(
-                      // padding: const EdgeInsets.only(left: 19),
-                      child: Text(
-                        'Product Name',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Container(
-                      // padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Category',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Container(
-                      //padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Sub Category',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Container(
-                      //padding: const EdgeInsets.only(left: 22),
-                      child: Text(
-                        'Unit',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Container(
-                      //padding: const EdgeInsets.only(left: 12),
-                      child: Text(
-                        'Price',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-                rows:
-                []
-            ),
-
-
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 150,left: 130,bottom: 350,right: 150),
-            child: CustomDatafound(),
-          ),
-          //Text('No productss found', style: TextStyle(fontSize: 24))),
-        ],
-
-      );
-
-    }
-    return LayoutBuilder(builder: (context, constraints){
-      var _mediaQuery = MediaQuery.of(context).size.width;
-      return Column(
-        children: [
-          // Heading Row with GestureDetector for resizing
-          Container(
-            width: 1100,
-            decoration: BoxDecoration(
-              color: Color(0xFFF7F7F7),
-              border: Border.symmetric(horizontal: BorderSide(color: Colors.grey, width: 0.5)),
-            ),
-            child:
-            DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                // List.generate(5, (index)
-                columns: columns.map((column) {
-                  return DataColumn(
-                    label: Stack(
-                      children: [
-                        Container(
-                          padding: null,
-                          width: columnWidths[columns.indexOf(column)], // Dynamic width based on user interaction
-                          child: Row(
-                            //crossAxisAlignment: CrossAxisAlignment.end,
-                            //   mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                column,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
-                              ),
-                              IconButton(
-                                icon: _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(width: 12,
-                                    child: Image.asset("images/sort.png",color: Colors.grey,))
-                                    : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
-                                onPressed: () {
-                                  setState(() {
-                                    _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
-                                    _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
-                                  });
-                                },
-                              ),
-                              //SizedBox(width: 50,),
-                              //Padding(
-                              //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-                              //  child:
-                              Spacer(),
-                              MouseRegion(
-
-                                cursor: SystemMouseCursors.resizeColumn,
-                                child: GestureDetector(
-
-                                    onHorizontalDragUpdate: (details) {
-                                      // Update column width dynamically as user drags
-                                      setState(() {
-                                        columnWidths[columns.indexOf(column)] += details.delta.dx;
-                                        columnWidths[columns.indexOf(column)] =
-                                            columnWidths[columns.indexOf(column)].clamp(131.0, 300.0);
-                                      });
-                                      // setState(() {
-                                      //   columnWidths[columns.indexOf(column)] += details.delta.dx;
-                                      //   if (columnWidths[columns.indexOf(column)] < 50) {
-                                      //     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-                                      //   }
-                                      // });
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 10,bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          VerticalDivider(
-                                            width: 5,
-                                            thickness: 4,
-                                            color: Colors.grey,
-
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                ),
-                              ),
-                              // ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    onSort: (columnIndex, ascending){
-                      _sortOrder;
-                    },
-                  );
-                }).toList(),
-
-
-                rows: List.generate(
-                    math.min(itemsPerPage, filteredProducts.length - (currentPage - 1) * itemsPerPage),(index)
-                {
-                  final product = filteredProducts[(currentPage - 1) * itemsPerPage + index];
-                  final isSelected = _selectedProduct == product;
-                  return DataRow(
-                    color: MaterialStateProperty.resolveWith<Color>((states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.blue.shade500.withOpacity(0.8); // Add some opacity to the dark blue
-                      } else {
-                        return Colors.white.withOpacity(0.9);
-                      }
-                    }),
-
-                    cells: [
-                      DataCell(
-                        Container(
-                          width: columnWidths[0], // Same dynamic width as column headers
-                          child: Text(product.productDescription,style: TextStyle(
-                            color: isSelected
-                                ? Colors.deepOrange[200]
-                                : const Color(0xFFFFB315),
-                          ),),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          width: columnWidths[1],
-                          child: Text(product.categoryName,
-                            style: const TextStyle(
-                              color: Color(0xFFA6A6A6),
-                            ),),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          width: columnWidths[2],
-                          child: Text(product.productType,
-                            style: const TextStyle(
-                              color: Color(0xFFA6A6A6),
-                            ),),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          width: columnWidths[3],
-                          child: Text(product.currency,
-                            style: const TextStyle(color: Color(0xFFA6A6A6),),
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          width: columnWidths[4],
-                          child: Text(product.baseUnit.toString(),  style: const TextStyle(color:
-                          Color(0xFFA6A6A6),
-                          ),),
-                        ),
-                      ),
-                    ],
-                    onSelectChanged: (selected) {
-                      if (selected != null && selected) {
-                        print('from first page');
-                        print(filteredProducts);
-                        print(product);
-
-                        if(filteredProducts.length <=9){
-
-                        }else {
-
-                        }
-
-
-                      }
-                    },
-
-                  );
-                }
-                )
-
-            ),
-          ),
-        ],
-      );
-    });
-  }
   Widget buildDataTable() {
     // _filterAndPaginateProducts();
 
@@ -1171,11 +898,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                       // padding: const EdgeInsets.only(left: 19),
                       child: Text(
                         'Product Name',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
+                        style: TextStyles.subhead,
                       ),
                     ),
                   ),
@@ -1184,11 +907,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                       // padding: const EdgeInsets.only(left: 10),
                       child: Text(
                         'Category',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
+                        style: TextStyles.subhead,
                       ),
                     ),
                   ),
@@ -1197,11 +916,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                       //padding: const EdgeInsets.only(left: 10),
                       child: Text(
                         'Sub Category',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
+                        style: TextStyles.subhead,
                       ),
                     ),
                   ),
@@ -1210,11 +925,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                       //padding: const EdgeInsets.only(left: 22),
                       child: Text(
                         'Unit',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
+                        style: TextStyles.subhead,
                       ),
                     ),
                   ),
@@ -1223,11 +934,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                       //padding: const EdgeInsets.only(left: 12),
                       child: Text(
                         'Price',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo[900],
-                          fontSize: 13,
-                        ),
+                          style: TextStyles.subhead,
                       ),
                     ),
                   ),
@@ -1248,6 +955,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
       );
 
     }
+
     return LayoutBuilder(builder: (context, constraints){
       var _mediaQuery = MediaQuery.of(context).size.width;
       return Column(
@@ -1280,17 +988,266 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                               children: [
                                 Text(
                                   column,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.indigo[900],
-                                    fontSize: 13,
-                                  ),
+                                  style: TextStyles.subhead,
                                 ),
                                 IconButton(
                                   icon: _sortOrder[columns.indexOf(column)] == 'asc'
-                                      ? SizedBox(width: 12,
-                                      child: Image.asset("images/sort.png",color: Colors.blue,))
-                                      : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                      ?  SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      ))
+                                      : SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
+                                      _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
+                                    });
+                                  },
+                                ),
+
+                                // ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      onSort: (columnIndex, ascending){
+                        _sortOrder;
+                      },
+                    );
+                  }).toList(),
+
+
+                  rows: List.generate(
+                      math.min(itemsPerPage, filteredProducts.length - (currentPage - 1) * itemsPerPage),(index)
+                  {
+                    final product = filteredProducts[(currentPage - 1) * itemsPerPage + index];
+                    final isSelected = _selectedProduct == product;
+                    return DataRow(
+                      color: MaterialStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue.shade500.withOpacity(0.8); // Add some opacity to the dark blue
+                        } else {
+                          return Colors.white.withOpacity(0.9);
+                        }
+                      }),
+
+                      cells: [
+                        DataCell(
+                          Container(
+                            width: columnWidths[0], // Same dynamic width as column headers
+                            child: Text(
+                              product.productDescription.length > 25
+                                  ? '${product.productDescription.substring(0, 25)}...'
+                                  : product.productDescription,
+                              style: TextStyles.body,
+                            ),
+                          ),
+                        ),
+
+                        DataCell(
+                          Container(
+                            width: columnWidths[1],
+                            child: Text(product.categoryName,
+                              style: TextStyles.body,),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[2],
+                            child: Text(product.productType,
+                              style: TextStyles.body,),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[3],
+                            child: Text(product.standardPrice.toString(),style: TextStyles.body,),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[4],
+                            child: Text(product.baseUnit.toString(),
+                              style: TextStyles.body,),
+                          ),
+                        ),
+                      ],
+                      onSelectChanged: (selected) {
+                        if (selected != null && selected) {
+                          print('from first page');
+                          print(filteredProducts);
+                          print(product);
+
+                          if(filteredProducts.length <=9){
+
+                          }else {
+
+                          }
+
+
+                        }
+                      },
+
+                    );
+                  }
+                  )
+
+              ),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+  Widget buildDataTable2() {
+    // _filterAndPaginateProducts();
+
+    if (isLoading) {
+      var width = MediaQuery.of(context).size.width;
+      var Height = MediaQuery.of(context).size.height;
+      _loading = true;
+      // Show loading indicator while data is being fetched
+      return Padding(
+        padding: EdgeInsets.only(bottom: Height * 0.100,left: width * 0.300),
+        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+      );
+    }
+    if (filteredProducts.isEmpty) {
+      var _mediaQuery = MediaQuery.of(context).size.width;
+      return  Column(
+        children: [
+
+          Container(
+            width: 1100,
+            decoration: BoxDecoration(
+              ///  color:  Colors.grey,
+              // color:  Color(0xFFECEFF1),
+                color:  Color(0xFFF7F7F7),
+                border: Border.symmetric(horizontal: BorderSide(color: Colors.grey,width: 0.5))
+            ),
+            child:
+            DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columns: [
+                  DataColumn(
+                    label: Container(
+                      // padding: const EdgeInsets.only(left: 19),
+                      child: Text(
+                        'Product Name',
+                        style: TextStyles.subhead,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Container(
+                      // padding: const EdgeInsets.only(left: 10),
+                      child: Text(
+                        'Category',
+                        style: TextStyles.subhead,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Container(
+                      //padding: const EdgeInsets.only(left: 10),
+                      child: Text(
+                        'Sub Category',
+                        style: TextStyles.subhead,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Container(
+                      //padding: const EdgeInsets.only(left: 22),
+                      child: Text(
+                        'Unit',
+                        style: TextStyles.subhead,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Container(
+                      //padding: const EdgeInsets.only(left: 12),
+                      child: Text(
+                        'Price',
+                        style: TextStyles.subhead,
+                      ),
+                    ),
+                  ),
+                ],
+                rows:
+                []
+            ),
+
+
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 150,left: 130,bottom: 350,right: 150),
+            child: CustomDatafound(),
+          ),
+          //Text('No productss found', style: TextStyle(fontSize: 24))),
+        ],
+
+      );
+
+    }
+
+    return LayoutBuilder(builder: (context, constraints){
+      var _mediaQuery = MediaQuery.of(context).size.width;
+      return Column(
+        children: [
+          // Heading Row with GestureDetector for resizing
+          Container(
+            width: 1100,
+            decoration: BoxDecoration(
+              color: Color(0xFFF7F7F7),
+              border: Border.symmetric(horizontal: BorderSide(color: Colors.grey, width: 0.5)),
+            ),
+            child:
+            SizedBox(
+              // width: _mediaQuery * 0.2,
+              child:
+              DataTable(
+                  showCheckboxColumn: false,
+                  headingRowHeight: 40,
+                  // List.generate(5, (index)
+                  columns: columns.map((column) {
+                    return DataColumn(
+                      label: Stack(
+                        children: [
+                          Container(
+                            padding: null,
+                            width: columnWidths[columns.indexOf(column)], // Dynamic width based on user interaction
+                            child: Row(
+                              //crossAxisAlignment: CrossAxisAlignment.end,
+                              //   mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  column,
+                                  style: TextStyles.subhead,),
+                                IconButton(
+                                  icon: _sortOrder[columns.indexOf(column)] == 'asc'
+                                      ?  SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      ))
+                                      : SizedBox(
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      )),
                                   onPressed: () {
                                     setState(() {
                                       _sortOrder[columns.indexOf(column)] = _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
@@ -1351,9 +1308,9 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                         DataCell(
                           Container(
                             width: columnWidths[3],
-                            child: Text(product.standardPrice,style: TextStyles.body,),
-                            ),
+                            child: Text(product.standardPrice.toString(),style: TextStyles.body,),
                           ),
+                        ),
                         DataCell(
                           Container(
                             width: columnWidths[4],
@@ -1400,30 +1357,34 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
           ),
           _buildMenuItem('Home', Icons.home_outlined,
               Colors.blue[900]!, '/Home'),
+          const SizedBox(
+            height: 6,
+          ),
           Container(
-              height: 42,
-              decoration: BoxDecoration(
-                color: Colors.blue[800],
-                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-                // color: Color.fromRGBO(224, 59, 48, 1.0),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  // Radius for top-left corner
-                  topRight: Radius.circular(8),
-                  // No radius for top-right corner
-                  bottomLeft: Radius.circular(8),
-                  // Radius for bottom-left corner
-                  bottomRight:
-                  Radius.circular(8), // No radius for bottom-right corner
-                ),
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.blue[800],
+              // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
+              // color: Color.fromRGBO(224, 59, 48, 1.0),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(8),
+                // Radius for top-left corner
+                topRight: Radius.circular(8),
+                // No radius for top-right corner
+                bottomLeft: Radius.circular(8),
+                // Radius for bottom-left corner
+                bottomRight:
+                Radius.circular(8), // No radius for bottom-right corner
               ),
-              child: _buildMenuItem('Product', Icons.production_quantity_limits,
-                  Colors.white, '/Customer'),),
+            ),
+
+            child: _buildMenuItem('Product', Icons.production_quantity_limits,
+                Colors.white, '/Customer'),),
 
           _buildMenuItem(
-                  'Customer', Icons.account_circle_outlined, Colors.white, '/Customer'),
+              'Customer', Icons.account_circle_outlined, Colors.white, '/Customer'),
           _buildMenuItem(
-              'Orders', Icons.production_quantity_limits, Colors.blue[900]!, '/Order_List'),
+              'Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
         ],
       ),
       const SizedBox(
@@ -1568,3 +1529,4 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
 
 }
 
+ 

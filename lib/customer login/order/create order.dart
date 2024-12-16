@@ -14,7 +14,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 import '../../Order Module/firstpage.dart';
 import '../../dashboard/dashboard.dart';
@@ -22,9 +24,6 @@ import '../../widgets/custom loading.dart';
 import '../../widgets/no datafound.dart';
 import '../../widgets/productsap.dart' as ord;
 import '../../widgets/text_style.dart';
-
-
-
 
 void main() {
   runApp(const CreateOrder());
@@ -37,7 +36,8 @@ class CreateOrder extends StatefulWidget {
   State<CreateOrder> createState() => _CreateOrderState();
 }
 
-class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStateMixin {
+class _CreateOrderState extends State<CreateOrder>
+    with SingleTickerProviderStateMixin {
   List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Order ID',
@@ -52,10 +52,13 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
   Timer? _searchDebounceTimer;
   String _searchText = '';
   bool isOrdersSelected = false;
+  Map<Map<String, dynamic>, TextEditingController> _controllers = {};
+
   bool _loading = false;
   detail? _selectedProduct;
   late TextEditingController _dateController;
   Map<String, dynamic> PaymentMap = {};
+
   int startIndex = 0;
   List<Product> filteredProducts = [];
   int currentPage = 1;
@@ -63,14 +66,34 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
   final ScrollController horizontalScroll = ScrollController();
 
   late Future<List<detail>> futureOrders;
- // List<ord.ProductData> productList = [];
 
-
+  // List<ord.ProductData> productList = [];
 
   final ScrollController _scrollController = ScrollController();
   List<dynamic> detailJson = [];
   String searchQuery = '';
+  final TextEditingController businessPartnerController =
+      TextEditingController();
+  final TextEditingController orderDate = TextEditingController();
+  final TextEditingController businessPartnerNameController =
+      TextEditingController();
+  final TextEditingController customerController = TextEditingController();
+  final TextEditingController addressIDController = TextEditingController();
+  final TextEditingController cityNameController = TextEditingController();
+  final TextEditingController postalCodeController = TextEditingController();
+  final TextEditingController streetNameController = TextEditingController();
+  final TextEditingController regionController = TextEditingController();
+  final TextEditingController telephoneNumber1Controller =
+      TextEditingController();
+  final TextEditingController countryController = TextEditingController();
+  final TextEditingController districtNameController = TextEditingController();
+  final TextEditingController emailAddressController = TextEditingController();
+  final TextEditingController mobilePhoneNumberController =
+      TextEditingController();
+
+  DateTime? _selectedDate;
   List<detail> filteredData = [];
+  bool _isTotalVisible = false;
   late AnimationController _controller;
   bool _isHovered1 = false;
   late Animation<double> _shakeAnimation;
@@ -78,8 +101,8 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
   String selectDate = '';
 
   String token = window.sessionStorage["token"] ?? " ";
+  String userId = window.sessionStorage["userId"] ?? " ";
   String? dropdownValue2 = 'Select Year';
-
 
   List<Map<String, dynamic>> productList = [];
   final List<Map<String, dynamic>> _selectedProducts = [];
@@ -90,7 +113,6 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
     {'name': 'Product 3', 'price': 300},
   ];
 
-
   Future<void> fetchProducts(int page, int itemsPerPage) async {
     if (isLoading) return;
     setState(() {
@@ -99,7 +121,8 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
 
     try {
       final response = await http.get(
-        Uri.parse('$apicall/productmaster/get_all_product_data?page=$page&limit=$itemsPerPage'),
+        Uri.parse(
+            '$apicall/productmaster/get_all_s4hana_productmaster?page=$page&limit=$itemsPerPage'),
         headers: {
           "Content-type": "application/json",
           "Authorization": 'Bearer $token',
@@ -108,23 +131,24 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
-        if (jsonData != null && jsonData.containsKey('d') && jsonData['d'].containsKey('results')) {
-          var results = jsonData['d']['results'];
+        if (jsonData != null) {
+          //var results = jsonData['d']['results'];
+          print(jsonData);
 
           // Update the product list
           setState(() {
-            productList = results.map<Map<String, dynamic>>((item) {
+            productList = jsonData.map<Map<String, dynamic>>((item) {
               return {
-                'product': item['Product'] ?? '',
-                'categoryName': item['CategoryName'] ?? '',
-                'productType': item['ProductType'] ?? '',
-                'baseUnit': item['BaseUnit'] ?? '',
-                'productDescription': item['ProductDescription'] ?? '',
-                'price': double.tryParse(item['StandardPrice'] ?? '0.00') ?? 0.00,
-                'currency': item['Currency'] ?? 'INR',
+                'product': item['product'] ?? '',
+                'categoryName': item['categoryName'] ?? '',
+                'productType': item['productType'] ?? '',
+                'baseUnit': item['baseUnit'] ?? '',
+                'productDescription': item['productDescription'] ?? '',
+                'price': item['standardPrice'] ?? 0,
+                'currency': item['currency'] ?? 'INR',
               };
             }).toList();
-            totalPages = (results.length / itemsPerPage).ceil();
+            totalPages = (jsonData.length / itemsPerPage).ceil();
           });
         }
       } else {
@@ -139,308 +163,253 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
     }
   }
 
- // final List<Map<String, dynamic>> _selectedProducts = [];
+// Function to calculate the total amount
+  double _calculateTotal() {
+    double total = 0.0;
+    for (var product in _selectedProducts) {
+      total += (product['qty'] * product['price']);
+    }
+    return total;
+  }
 
+  Future<void> fetchCustomerData(String userId) async {
+    if (isLoading) return;
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // API call to fetch customer data for a specific userId
+      final response = await http.get(
+        Uri.parse('$apicall/customer_master/get_all_s4hana_customermaster'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+
+        if (jsonData != null) {
+          var result = jsonData.firstWhere(
+            (item) => item['customer'] == userId,
+            orElse: () => null,
+          );
+
+          if (result != null) {
+            // Assigning values to controllers
+            businessPartnerController.text = result['BusinessPartner'] ?? '';
+            businessPartnerNameController.text = result['customerName'] ?? '';
+            customerController.text = result['customer'] ?? '';
+            addressIDController.text = result['addressID'] ?? '';
+            cityNameController.text = result['cityName'] ?? '';
+            postalCodeController.text = result['postalCode'] ?? '';
+            streetNameController.text = result['streetName'] ?? '';
+            regionController.text = result['region'] ?? '';
+            telephoneNumber1Controller.text = result['telephoneNumber1'] ?? '';
+            countryController.text = result['country'] ?? '';
+            districtNameController.text = result['districtName'] ?? '';
+            emailAddressController.text = result['emailAddress'] ?? '';
+            mobilePhoneNumberController.text =
+                result['mobilePhoneNumber'] ?? '';
+
+            print(businessPartnerController.text);
+            print(businessPartnerNameController.text);
+            print(customerController.text);
+            print(addressIDController.text);
+            print(cityNameController.text);
+            print(postalCodeController.text);
+            print(streetNameController.text);
+            print(regionController.text);
+            print(telephoneNumber1Controller.text);
+            print(countryController.text);
+            print(districtNameController.text);
+            print(emailAddressController.text);
+            print(mobilePhoneNumberController.text);
+          } else {
+            throw Exception('Customer data not found for userId: $userId');
+          }
+        } else {
+          throw Exception('Invalid JSON structure');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error fetching customer data: $e');
+      // Optionally, show an error message to the user
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  // Future<void> GetCustomerData(int page, int itemsPerPage) async {
+  //   if (isLoading) return;
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse(
+  //         '$apicall/user_master/get_all_customer_data?page=$page&limit=$itemsPerPage', // Adjusted for API call
+  //       ),
+  //       headers: {
+  //         "Content-type": "application/json",
+  //         "Authorization": 'Bearer $token',
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final jsonData = jsonDecode(response.body);
+  //       List<ord.BusinessPartnerData> products = [];
+  //
+  //       if (jsonData != null && jsonData.containsKey('d') && jsonData['d'].containsKey('results')) {
+  //         var results = jsonData['d']['results'];
+  //         // Mapping the relevant fields for each product
+  //         products = results.map<ord.BusinessPartnerData>((item) {
+  //           return ord.BusinessPartnerData(
+  //             businessPartner: item['BusinessPartner'] ?? '',
+  //             businessPartnerName: item['BusinessPartnerName'] ?? '',
+  //             customer: item['Customer'] ?? '',
+  //             addressID: item['AddressID'] ?? '',
+  //             cityName: item['CityName'] ?? '',
+  //             postalCode: item['PostalCode'] ?? '',
+  //             streetName: item['StreetName'] ?? '',
+  //             region: item['Region'] ?? '',
+  //             telephoneNumber1: item['TelephoneNumber1'] ?? '',
+  //             country: item['Country'] ?? '',
+  //             districtName: item['DistrictName'] ?? '',
+  //             emailAddress: item['EmailAddress'] ?? '',
+  //             mobilePhoneNumber: item['MobilePhoneNumber'] ?? '',
+  //           );
+  //         }).toList();
+  //
+  //         setState(() {
+  //           //productList = products;
+  //           totalPages = (results.length / itemsPerPage).ceil();  // Update total pages based on new structure
+  //           print(totalPages);  // Debugging output
+  //           //_filterAndPaginateProducts();
+  //         });
+  //       }
+  //     } else {
+  //       throw Exception('Failed to load data');
+  //     }
+  //   } catch (e) {
+  //     print('Error decoding JSON: $e');
+  //     // Optionally, show an error message to the user
+  //   } finally {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+
+  // final List<Map<String, dynamic>> _selectedProducts = [];
 
   Future<void> callApi() async {
     List<Map<String, dynamic>> items = [];
 
-    // for (int i = 0; i < widget.selectedProducts.length; i++) {
-    //   Product product = widget.selectedProducts[i];
-    //   items.add({
-    //     "productName": product.productName,
-    //     "category": product.category,
-    //     "subCategory": product.subCategory,
-    //     "price": product.price,
-    //     "qty": product.quantity,
-    //     "actualAmount": product.price * product.quantity,
-    //     "totalAmount": (product.totalAmount * product.quantity),
-    //     "discount": product.discount,
-    //     "tax": product.tax,
-    //   });
-    // }
+    // Process _selectedProducts rows into API payload
+    for (int i = 0; i < _selectedProducts.length; i++) {
+      final product = _selectedProducts[i];
+      items.add({
+        "baseUnit": product['baseUnit'] ?? '',
+        "categoryName": product['categoryName'] ?? '',
+        "currency": product['currency'] ?? '',
+        "product": product['product'] ?? '',
+        "productDescription": product['productDescription'] ?? '',
+        "productType": product['productType'] ?? '',
+        "qty": product['qty'] ?? '',
+        "standardPrice": product['price'] ?? '',
+        "totalAmount": ((product['qty'] * product['price'])) ?? ''
+        // "productName": product['productDescription'] ?? 'Dummy Product',
+        // "category": product['categoryName'] ?? 'Dummy Category',
+        // "subCategory": 'Dummy SubCategory',
+        // "price": product['price'] ?? 0.0,
+        // "qty": product['qty'] ?? 1,
+        // "actualAmount": (product['price'] ?? 0.0) * (product['qty'] ?? 1),
+        // "totalAmount": (product['price'] ?? 0.0) * (product['qty'] ?? 1),
+        // "discount": 0.0,
+        // "tax": 0.0,
+      });
+    }
 
-    final url = '$apicall/order_master/add_order_master';
+    // Dummy data for the main payload
+    final url =
+        '$apicall/order_master/add_order_master'; // Replace with your API endpoint
     final headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${token}',
+      'Authorization': 'Bearer $token', // Dummy token
     };
     final body = {
-      // "orderDate": data2['date'],
-      // "deliveryLocation": EmailIdController.text,
-      // "deliveryAddress": deliveryAddressController.text,
-      // "contactPerson": contactPersonController.text,
-      // "contactNumber": contactNumberController.text,
-      // "comments": ShippingAddress.text,
+      "deliveryLocation": cityNameController.text,
+      //  "deliveryAddress": "123 Dummy Street, City",
+      "contactPerson": businessPartnerNameController.text,
+      //  "contactNumber": "1234567890",
+      // "comments": "This is a dummy order comment.",
       // "status": "Not Started",
-      // "customerId": CusIdController.text,
-      // "total": data2['totalAmount'],
-      // "items": items,
+      "customerId": customerController.text,
+      "orderDate": _dateController.text, // 2024-11-17T00:00:00
+      "postalCode": postalCodeController.text, //
+      "region": regionController.text, //
+      "streetName": streetNameController.text, //
+      "telephoneNumber": telephoneNumber1Controller.text, //
+      "total": _calculateTotal(), // Dummy total amount
+      "items": items, // Rows data processed above
     };
 
-    final response = await http.post(Uri.parse(url),
-        headers: headers, body: json.encode(body));
-    // if (token == " ") {
-    //   showDialog(
-    //     barrierDismissible: false,
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return AlertDialog(
-    //         shape: RoundedRectangleBorder(
-    //           borderRadius: BorderRadius.circular(15.0),
-    //         ),
-    //         contentPadding: EdgeInsets.zero,
-    //         content: Column(
-    //           mainAxisSize: MainAxisSize.min,
-    //           children: [
-    //             Padding(
-    //               padding: const EdgeInsets.all(16.0),
-    //               child: Column(
-    //                 children: [
-    //                   // Warning Icon
-    //                   Icon(Icons.warning, color: Colors.orange, size: 50),
-    //                   SizedBox(height: 16),
-    //                   // Confirmation Message
-    //                   Text(
-    //                     'Session Expired',
-    //                     style: TextStyle(
-    //                       fontSize: 16,
-    //                       fontWeight: FontWeight.bold,
-    //                       color: Colors.black,
-    //                     ),
-    //                   ),
-    //                   Text(
-    //                     "Please log in again to continue",
-    //                     style: TextStyle(
-    //                       fontSize: 12,
-    //                       color: Colors.black,
-    //                     ),
-    //                   ),
-    //                   SizedBox(height: 20),
-    //                   // Buttons
-    //                   Row(
-    //                     mainAxisAlignment: MainAxisAlignment.center,
-    //                     children: [
-    //                       ElevatedButton(
-    //                         onPressed: () {
-    //                           // Handle Yes action
-    //                           context.go('/');
-    //                           // Navigator.of(context).pop();
-    //                         },
-    //                         style: ElevatedButton.styleFrom(
-    //                           backgroundColor: Colors.white,
-    //                           side: BorderSide(color: Colors.blue),
-    //                           shape: RoundedRectangleBorder(
-    //                             borderRadius: BorderRadius.circular(10.0),
-    //                           ),
-    //                         ),
-    //                         child: Text(
-    //                           'ok',
-    //                           style: TextStyle(
-    //                             color: Colors.blue,
-    //                           ),
-    //                         ),
-    //                       ),
-    //                     ],
-    //                   ),
-    //                 ],
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //       );
-    //     },
-    //   ).whenComplete(() {
-    //     _hasShownPopup = false;
-    //   });
-    // } else {
-    //   if (response.statusCode == 200) {
-    //     print('API call successful');
-    //     final responseData = json.decode(response.body);
-    //     String? invoiceNo;
-    //     // Add null checks and error handling
-    //     String orderId;
-    //
-    //     // String orderId;
-    //     try {
-    //       orderId = responseData['orderId'];
-    //       invoiceNo = responseData['invoiceNo'];
-    //     } catch (e) {
-    //       print('Error parsing orderId: $e');
-    //       orderId = ''; // or some default value
-    //     }
-    //
-    //     detail details;
-    //     try {
-    //       details = detail(
-    //         orderId: orderId,
-    //         orderDate: data2['date'],
-    //         total: double.parse(data2['totalAmount']),
-    //         status: '',
-    //         // Initialize status as empty string
-    //         deliveryStatus: '',
-    //         // Initialize delivery status as empty string
-    //         referenceNumber: '',
-    //         items: [], // Initialize reference number as empty string
-    //       );
-    //     } catch (e) {
-    //       print('Error creating detail object: $e');
-    //       details = detail(
-    //           orderId: '',
-    //           orderDate: '',
-    //           total: 0,
-    //           status: '',
-    //           deliveryStatus: '',
-    //           referenceNumber: '',
-    //           items: []); // or some default value
-    //     }
-    //
-    //     if (details != null) {
-    //       // await callApi2();
-    //       List<OrderDetail> orderDetails = filteredData
-    //           .map((detail) => OrderDetail(
-    //         orderId: detail.orderId,
-    //         orderDate: detail.orderDate,
-    //         items: [], // initialize items as an empty list
-    //         // Add other fields as needed
-    //       ))
-    //           .toList();
-    //
-    //       orderDetails.add(OrderDetail(
-    //         orderId: details.orderId,
-    //         orderDate: details.orderDate,
-    //         items: [], // initialize items as an empty list
-    //         // Add other fields as needed
-    //       ));
-    //
-    //       // Check if filteredData is updated
-    //       // if (filteredData.isNotEmpty) {
-    //       //   // Create details object
-    //       //   detail details = detail(
-    //       //     orderId: orderId,
-    //       //     orderDate: data2['date'],
-    //       //     total: double.parse(data2['totalAmount']),
-    //       //     status: '',
-    //       //     // Initialize status as empty string
-    //       //     deliveryStatus: '',
-    //       //     // Initialize delivery status as empty string
-    //       //     referenceNumber: '',
-    //       //     items: [], // Initialize reference number as empty string
-    //       //   );
-    //       // }
-    //
-    //       // Navigate to next page
-    //       // context.go('/Placed_Order_List', extra: {
-    //       //   'product': details,
-    //       //   'item': items,
-    //       //   'body': body,
-    //       //   'itemsList': items,
-    //       //   'orderDetails': filteredData,
-    //       // });
-    //
-    //       print('order');
-    //       print(orderDetails);
-    //       print(invoiceNo);
-    //
-    //       context.go('/Order_Placed', extra: {
-    //         'product': details,
-    //         'InvNo': invoiceNo,
-    //         'item': items,
-    //         'body': body,
-    //         'status': orderId,
-    //         'paymentStatus': PaymentMap,
-    //         'itemsList': items,
-    //         'orderDetails': orderDetails,
-    //       });
-    //       // context.go('/Placed_Order_List', extra: {
-    //       //   'product': details,
-    //       //   'item': items,
-    //       //   'body': body,
-    //       //   'itemsList': items,
-    //       //  'orderDetails': orderDetails,
-    //       // });
-    //
-    //       Future<void> navigateToNextPage() async {
-    //         // Call the API to fetch the orders
-    //         final orders = await fetchOrders();
-    //
-    //         // Update filteredData with the latest data
-    //         setState(() {
-    //           filteredData = orders.where((element) {
-    //             final matchesSearchText = element.orderId!
-    //                 .toLowerCase()
-    //                 .contains(searchQuery.toLowerCase());
-    //             String orderYear = '';
-    //             if (element.orderDate.contains('/')) {
-    //               final dateParts = element.orderDate.split('/');
-    //               if (dateParts.length == 3) {
-    //                 orderYear = dateParts[2]; // Extract the year
-    //               }
-    //             }
-    //             // final orderYear = element.orderDate.substring(5,9);
-    //             if (status.isEmpty && selectDate.isEmpty) {
-    //               return matchesSearchText; // Include all products that match the search text
-    //             }
-    //             if (status == 'Status' && selectDate == 'SelectYear') {
-    //               return matchesSearchText;
-    //             }
-    //             if (status == 'Status' && selectDate.isEmpty) {
-    //               return matchesSearchText;
-    //             }
-    //             if (selectDate == 'SelectYear' && status.isEmpty) {
-    //               return matchesSearchText;
-    //             }
-    //             if (status == 'Status' && selectDate.isNotEmpty) {
-    //               return matchesSearchText &&
-    //                   orderYear == selectDate; // Include all products
-    //             }
-    //             if (status.isNotEmpty && selectDate == 'SelectYear') {
-    //               return matchesSearchText &&
-    //                   element.status == status; // Include all products
-    //             }
-    //             if (status.isEmpty && selectDate.isNotEmpty) {
-    //               return matchesSearchText &&
-    //                   orderYear == selectDate; // Include all products
-    //             }
-    //
-    //             if (status.isNotEmpty && selectDate.isEmpty) {
-    //               return matchesSearchText &&
-    //                   element.status == status; // Include all products
-    //             }
-    //             return matchesSearchText &&
-    //                 (element.status == _category &&
-    //                     element.orderDate == selectDate);
-    //             //  return false;
-    //           }).toList();
-    //         });
-    //
-    //         // Navigate to the next page
-    //         // Navigator.push(
-    //         //   context,
-    //         //   PageRouteBuilder(
-    //         //     pageBuilder: (context, animation, secondaryAnimation) => SixthPage(
-    //         //       product: details,
-    //         //       item: items,
-    //         //       body: body,
-    //         //       itemsList: items,
-    //         //       orderDetails: filteredData.map((detail) => OrderDetail(
-    //         //         orderId: detail.orderId,
-    //         //         orderDate: detail.orderDate, items: [],
-    //         //         // Add other fields as needed
-    //         //       )).toList(),
-    //         //     ),
-    //         //   ),
-    //         // );
-    //       }
-    //
-    //       navigateToNextPage();
-    //     } else {
-    //       print('Failed to create detail object, not navigating to SixthPage');
-    //     }
-    //   } else {
-    //     print('API call failed with status code ${response.statusCode}');
-    //   }
-    // }
+    try {
+      // Make the POST API call
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(body),
+      );
+
+      // Handle the response
+      if (response.statusCode == 200) {
+        print('API call successful');
+        final responseData = json.decode(response.body);
+        print('Response: $responseData');
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 25,
+              ),
+              content: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Order Placed'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    context.go('/Customer_Order_List'); // Close the dialog
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+        // You can handle navigation or further logic here
+      } else {
+        print('API call failed with status code: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error during API call: $e');
+    }
   }
 
   void _onSearchTextChanged(String text) {
@@ -580,7 +549,6 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
       //     throw Exception('Failed to load data');
       //   }
       // }
-
     } catch (e) {
       print('Error decoding JSON: $e');
 // Optionally, show an error message to the user
@@ -592,7 +560,6 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
       }
     }
   }
-
 
   void _goToPreviousPage() {
     print("previos");
@@ -625,7 +592,6 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
     'Orders': false,
   };
 
-
   List<Widget> _buildMenuItems(BuildContext context) {
     return [
       Column(
@@ -633,9 +599,8 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
           const SizedBox(
             height: 10,
           ),
-          _buildMenuItem('Home', Icons.home_outlined,
-              Colors.blue[900]!, '/Cus_Home'),
-
+          _buildMenuItem(
+              'Home', Icons.home_outlined, Colors.blue[900]!, '/Cus_Home'),
           Container(
               height: 42,
               decoration: BoxDecoration(
@@ -650,11 +615,11 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                   bottomLeft: Radius.circular(8),
                   // Radius for bottom-left corner
                   bottomRight:
-                  Radius.circular(8), // No radius for bottom-right corner
+                      Radius.circular(8), // No radius for bottom-right corner
                 ),
               ),
-              child: _buildMenuItem(
-                  'Orders', Icons.production_quantity_limits, Colors.blue[900]!, '/Customer_Order_List')),
+              child: _buildMenuItem('Orders', Icons.warehouse_outlined,
+                  Colors.blue[900]!, '/Customer_Order_List')),
         ],
       ),
       const SizedBox(
@@ -671,7 +636,7 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(
-            () => _isHovered[title] = true,
+        () => _isHovered[title] = true,
       ),
       onExit: (_) => setState(() => _isHovered[title] = false),
       child: GestureDetector(
@@ -686,11 +651,15 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 10,top:2),
+            padding: const EdgeInsets.only(left: 10, top: 2),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(icon, color: iconColor,size: 20,),
+                Icon(
+                  icon,
+                  color: iconColor,
+                  size: 20,
+                ),
                 const SizedBox(width: 10),
                 Text(
                   title,
@@ -711,12 +680,16 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    _dateController = TextEditingController();
+    print(userId ?? '');
+    //  fetchProducts
+
     fetchProducts(currentPage, itemsPerPage);
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
+
     _shakeAnimation = Tween<double>(begin: 0, end: 5)
         .chain(CurveTween(curve: Curves.elasticIn))
         .animate(_controller)
@@ -727,6 +700,15 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
           _controller.forward();
         }
       });
+    //_dateController = TextEditingController();
+    _dateController = TextEditingController();
+    _selectedDate = DateTime.now();
+
+    String formattedDate1 =
+        DateFormat('yyyy-MM-ddTHH:mm:ss').format(_selectedDate!);
+    String formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate!);
+    _dateController.text = formattedDate;
+    orderDate.text = formattedDate1;
   }
 
   @override
@@ -736,14 +718,26 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
     super.dispose();
   }
 
+  // double calculateTotalAmount(List<Map<String, dynamic>> products) {
+  //   double total = 0.0;
+  //   for (var product in products) {
+  //     total += product['qty'] * product['price'];
+  //   }
+  //   return total;
+  // }
+
   @override
   Widget build(BuildContext context) {
+    //   double totalAmount = calculateTotalAmount(productList);
+    // double overallTotal = productList
+    //     .map((product) => product['qty'] * product['price'])
+    //     .fold(0.0, (sum, total) => sum + total);
     //String? role = Provider.of<UserRoleProvider>(context).role;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: const Color.fromRGBO(21, 101, 192, 0.07),
-
+        backgroundColor: Colors.grey[50],
+        //backgroundColor: const Color.fromRGBO(21, 101, 192, 0.07),
         body: LayoutBuilder(builder: (context, constraints) {
           double maxWidth = constraints.maxWidth;
           double maxHeight = constraints.maxHeight;
@@ -770,19 +764,8 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                         Row(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: IconButton(
-                                icon: const Icon(Icons.notifications),
-                                color: Colors.black, // Default icon color
-                                onPressed: () {
-                                  // Handle notification icon press
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Padding(
                               padding:
-                              const EdgeInsets.only(right: 10, top: 10),
+                                  const EdgeInsets.only(right: 10, top: 10),
                               // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
@@ -802,25 +785,35 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                 ),
               ),
               if (constraints.maxHeight <= 500) ...{
-                SingleChildScrollView(
-                  child: Align(
-                    // Added Align widget for the left side menu
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 80),
-                      child: Container(
-                        height: 1400,
-                        width: 200,
-                        color: const Color(0xFFF7F6FA),
-                        padding:
-                        const EdgeInsets.only(left: 15, top: 50, right: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                Positioned(
+                  top: 60,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: SingleChildScrollView(
+                    child: Align(
+                      // Added Align widget for the left side menu
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Container(
+                          height: 1400,
+                          width: 200,
+                          color: Colors.white,
+                          padding: const EdgeInsets.only(
+                              left: 15, top: 10, right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
                     ),
                   ),
+                ),
+                VerticalDividerWidget(
+                  height: maxHeight,
+                  color: Color(0x29000000),
                 ),
               } else ...{
                 Align(
@@ -832,7 +825,7 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                       width: 200,
                       color: Colors.white,
                       padding:
-                      const EdgeInsets.only(left: 15, top: 10, right: 15),
+                          const EdgeInsets.only(left: 15, top: 10, right: 15),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: _buildMenuItems(context),
@@ -845,929 +838,1324 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                   color: const Color(0x29000000),
                 ),
               },
-
               Positioned(
-                left: 201,
+                left: 202,
                 top: 60,
                 right: 0,
                 bottom: 0,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    if(constraints.maxWidth >= 1300)...{
-                Expanded(child: SingleChildScrollView(child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 40),
-                      child: Row(
-
-                        children: [
-                          IconButton(onPressed: (){
-                            context.go('/Customer_Order_List');
-                          }, icon: const Icon(Icons.arrow_back,size: 16,)),
-                          Text('Create Order',style: TextStyles.header3,),
-                        ],
-                      ),
-                    ),
-                Padding(
-                padding: const EdgeInsets.only(left: 50),
-                child: SizedBox(
-                  width: maxWidth,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    // mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-
-
-                      Padding(
-                        padding:  EdgeInsets.only(right: maxWidth * 0.08,top: 30),
-                        child:  Text(' Order Date',style: TextStyle(fontSize: maxWidth * 0.010,color: Colors.black87),),
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                    if (constraints.maxWidth >= 1300) ...{
+                      //   double overallTotal = _selectedProducts.fold(0, (sum, product) {return sum + (product['qty'] * product['price']);});
+                      Expanded(
+                          child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(right: 100, top: 10),
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    await callApi();
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                      onPressed: () {
+                                        context.go('/Customer_Order_List');
+                                      },
+                                      icon: const Icon(
+                                        Icons.arrow_back,
+                                        size: 20,
+                                      )),
+                                  Text(
+                                    'Create Order',
+                                    style: TextStyles.header1,
+                                  ),
+                                  const Spacer(),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 54, top: 5),
+                                      child: OutlinedButton(
+                                        onPressed: () async {
 
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    backgroundColor: Colors.blue[800],
-                                    // Button background color
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          5), // Rounded corners
+                                          if (_selectedProducts.isEmpty) {
+
+                                            // Check if no products are selected
+
+                                            ScaffoldMessenger.of(context).showSnackBar(
+
+                                              const SnackBar(
+
+                                                content: Text('Please add a product before creating an order'),
+
+                                                duration: Duration(seconds: 2),
+
+                                              ),
+
+                                            );
+
+                                          } else if (_selectedProducts.any((product) => product['productDescription'] == null || product['productDescription'].isEmpty)) {
+
+                                            // Check if any product has an empty or null productDescription
+
+                                            ScaffoldMessenger.of(context).showSnackBar(
+
+                                              const SnackBar(
+
+                                                content: Text('Each product must have a description'),
+
+                                                duration: Duration(seconds: 2),
+
+                                              ),
+
+                                            );
+
+                                          } else if (_selectedProducts.any((product) => product['qty'] == null || product['qty'] <= 0)) {
+
+                                            // Check if any product has an invalid or zero quantity
+
+                                            ScaffoldMessenger.of(context).showSnackBar(
+
+                                              const SnackBar(
+
+                                                content: Text('Each product must have a valid quantity greater than zero'),
+
+                                                duration: Duration(seconds: 2),
+
+                                              ),
+
+                                            );
+
+                                          } else {
+
+                                            // If all validations pass, proceed with API calls
+
+                                            await fetchCustomerData(userId);
+
+                                            await callApi();
+
+                                          }
+
+                                        },
+                                        // onPressed: () async {
+                                        //   if (_selectedProducts.isEmpty) {
+                                        //     ScaffoldMessenger.of(context)
+                                        //         .showSnackBar(
+                                        //       const SnackBar(
+                                        //         content: Text(
+                                        //             'Please add a product before creating an order'),
+                                        //         duration: Duration(
+                                        //             seconds:
+                                        //                 2), // Optional duration
+                                        //       ),
+                                        //     );
+                                        //   } else {
+                                        //     // Validate that all products have a name and quantity entered
+                                        //     bool isValid = true;
+                                        //     for (var product
+                                        //         in _selectedProducts) {
+                                        //       // Check if the product name is empty
+                                        //       String productName =
+                                        //           product['productName'] ?? '';
+                                        //       if (productName.isEmpty) {
+                                        //         isValid = false;
+                                        //         break; // Exit the loop if validation fails
+                                        //       }
+                                        //
+                                        //       // Check if quantity is entered (greater than 0)
+                                        //       int quantity =
+                                        //           product['qty'] ?? 0;
+                                        //       if (quantity <= 0) {
+                                        //         isValid = false;
+                                        //         break; // Exit the loop if validation fails
+                                        //       }
+                                        //     }
+                                        //
+                                        //     if (!isValid) {
+                                        //       ScaffoldMessenger.of(context)
+                                        //           .showSnackBar(
+                                        //         const SnackBar(
+                                        //           content: Text(
+                                        //               'Please make sure all products have a name and quantity'),
+                                        //           duration: Duration(
+                                        //               seconds:
+                                        //                   2), // Optional duration
+                                        //         ),
+                                        //       );
+                                        //     } else {
+                                        //       // Proceed with fetching customer data and calling the API
+                                        //       await fetchCustomerData(userId);
+                                        //       await callApi();
+                                        //     }
+                                        //   }
+                                        //
+                                        //   // if(_selectedProducts.isEmpty){
+                                        //   //   ScaffoldMessenger.of(context).showSnackBar(
+                                        //   //     const SnackBar(
+                                        //   //       content: Text('Please add a product before creating an order'),
+                                        //   //       duration: Duration(seconds: 2), // Optional duration
+                                        //   //     ),
+                                        //   //   );
+                                        //   // }else{
+                                        //   //   await fetchCustomerData(userId);
+                                        //   //   await callApi();
+                                        //   // }
+                                        // },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: Colors.blue[800],
+                                          // Button background color
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                5), // Rounded corners
+                                          ),
+                                          side: BorderSide.none, // No outline
+                                        ),
+                                        child: Text(
+                                          ' Create Order',
+                                          style: TextStyles.button1,
+                                        ),
+                                      ),
                                     ),
-                                    side: BorderSide.none, // No outline
-                                  ),
-                                  child: const Text(
-                                    ' Create Order',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
+                                  )
+                                ],
                               ),
-                            )
-                          ],
-                        ),
-                      ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(left: 5, top: 5),
+                              height: 1,
+                              width: constraints.maxWidth,
+                              color: Colors.grey.shade300,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 50),
+                              child: SizedBox(
+                                width: maxWidth,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  // mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          right: maxWidth * 0.08,
+                                          top: 30,
+                                          left: maxWidth * 0.016),
+                                      child: Text(
+                                        'Order Date',
+                                        style: TextStyles.header3,
+                                      ),
+                                    ),
 
-
-                      //  ),
-                      // SizedBox(height: 20.h),
-
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 5,),
-              Padding(
-                padding: const EdgeInsets.only(left: 50),
-                child: SizedBox(
-                  height: 39,
-                  width: maxWidth *0.13,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _dateController,
-                          // Replace with your TextEditingController
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.only(right: 20),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 2, left: 10),
-                                child: IconButton(
-                                  icon: const Padding(
-                                    padding: EdgeInsets.only(bottom: 16),
-                                    child: Icon(Icons.calendar_month),
-                                  ),
-                                  iconSize: 20,
-                                  onPressed: () {
-                                    // _showDatePicker(context);
-                                  },
+                                    //  ),
+                                    // SizedBox(height: 20.h),
+                                  ],
                                 ),
                               ),
                             ),
-                            hintText: '        Select Date',
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 8),
-                            border: const OutlineInputBorder(),
-                            filled: true,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 40,left: 50,right: 100,bottom: 30),
-                child: Container(
-                  //width: screenWidth * 0.8,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFFFFF), // background: #FFFFFF
-                    boxShadow: [const BoxShadow(
-                      offset: Offset(0, 3),
-                      blurRadius: 6,
-                      color: Color(0x29000000), // box-shadow: 0px 3px 6px #00000029
-                    )],
-                    border: Border.all(
-                      // border: 2px
-                      color: const Color(0xFFB2C2D3), // border: #B2C2D3
-                    ),
-                    borderRadius: const BorderRadius.all(Radius.circular(8)), // border-radius: 8px
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 10, left: 30),
-                        child: Text(
-                          'Order Details',
-                          style: TextStyle(fontSize: 19,color: Colors.black),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // SingleChildScrollView(
-                      //   scrollDirection: Axis.horizontal,
-                      //   child:
-                      //
-                      //   DataTable(
-                      //     border: const TableBorder(
-                      //       top: BorderSide(width:1 ,color: Colors.grey),
-                      //       bottom: BorderSide(width:1 ,color: Colors.grey),
-                      //       horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
-                      //       verticalInside: BorderSide(width: 1,color: Colors.grey),
-                      //     ),
-                      //     // border: TableBorder.all(color: const Color(0xFFB2C2D3)),
-                      //     columnSpacing: screenWidth * 0.066,
-                      //     headingRowHeight: 40,
-                      //     columns: const [
-                      //       DataColumn(label: Text('Product Name')),
-                      //       DataColumn(label: Text('Category')),
-                      //       DataColumn(label: Text('Sub Category')),
-                      //       DataColumn(label: Text('Price')),
-                      //       DataColumn(label: Text('Qty')),
-                      //       DataColumn(label: Text('Amount')),
-                      //       DataColumn(label: Text('TAX')),
-                      //       DataColumn(label: Text('Discount')),
-                      //       DataColumn(label: Text('Total Amount')),
-                      //     ],
-                      //     rows: const [],
-                      //   ),
-                      // ),
-                      // Row(
-                      //   children: [
-                      //     Padding(
-                      //       padding: const EdgeInsets.only(left: 30, top: 25),
-                      //       child: SizedBox(
-                      //         width: screenWidth * 0.15,
-                      //         child: OutlinedButton(
-                      //           // onPressed: handleButtonPress,
-                      //           //my copy
-                      //           onPressed: ()
-                      //
-                      //           {
-                      //             String validateFields() {
-                      //               if (ContactPersonController.text.isEmpty || ContactPersonController.text.length <= 2) {
-                      //                 return 'Please enter a contact person name';
-                      //               }
-                      //               if (ContactNumberController.text.isEmpty || ContactNumberController.text.length != 10) {
-                      //                 return 'Please enter a valid phone number.';
-                      //               }
-                      //               if (deliveryaddressController.text.isEmpty) {
-                      //                 return 'Please fill delivery address.';
-                      //               }
-                      //               if(EmailIdController.text.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$').hasMatch(EmailIdController.text) ){  ScaffoldMessenger.of(context).showSnackBar(    SnackBar(content: Text(        'Enter Valid E-mail Address')),  );}
-                      //               if (ShippingAddress.text.isEmpty) {
-                      //                 return 'Please fill Shipping address ';
-                      //               }
-                      //
-                      //
-                      //               return '';
-                      //             }
-                      //             String validationMessage = validateFields();
-                      //             if (validationMessage == '') {
-                      //               Map<String, dynamic> data = {
-                      //                 'CusId':userId,
-                      //                 'deliveryLocation': EmailIdController.text,
-                      //                 'ContactName': ContactPersonController.text,
-                      //                 'Address': deliveryaddressController.text,
-                      //                 'ContactNumber': ContactNumberController.text,
-                      //                 'Comments': ShippingAddress.text,
-                      //                 'date': _dateController.text,
-                      //               };
-                      //               context.go('/Search_products',extra: data);
-                      //               //   context.go('/Home/Orders/Create_Order/Add_Product',extra: data);
-                      //
-                      //             } else {
-                      //               ScaffoldMessenger.of(context).showSnackBar(
-                      //                 SnackBar(
-                      //                   content: Text(validationMessage),
-                      //                 ),
-                      //               );
-                      //             }
-                      //           },
-                      //
-                      //           style: OutlinedButton.styleFrom(
-                      //             backgroundColor: Colors.blue[800],
-                      //             shape: RoundedRectangleBorder(
-                      //               borderRadius: BorderRadius.circular(4),
-                      //             ),
-                      //             side: BorderSide.none,
-                      //           ),
-                      //           child: const Center(
-                      //             child: Text(
-                      //               '+ Add Products',
-                      //               style: TextStyle(color: Colors.white),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 70,
+                              ),
+                              child: SizedBox(
+                                height: 39,
+                                width: maxWidth * 0.11,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _dateController,
+                                        style: TextStyle(fontSize: maxWidth * 0.009),
+                                        // Replace with your TextEditingController
+                                        readOnly: true,
+                                        decoration: InputDecoration(
+                                          suffixIcon: Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 20),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 2, left: 10),
+                                              child: IconButton(
+                                                icon: const Padding(
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 16),
+                                                  child: Icon(
+                                                      Icons.calendar_month),
+                                                ),
+                                                iconSize: 20,
+                                                onPressed: () {
+                                                  // _showDatePicker(context);
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          hintText: '        Select Date',
+                                          fillColor: Colors.white,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 8, vertical: 8),
+                                          border: InputBorder.none,
+                                          filled: true,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 40, left: 70, right: 50, bottom: 30),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFFFFF),
+                                  boxShadow: [
+                                    const BoxShadow(
+                                      offset: Offset(0, 3),
+                                      blurRadius: 6,
+                                      color: Color(
+                                          0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                    )
+                                  ],
+                                  border: Border.all(
+                                    color: const Color(
+                                        0xFFB2C2D3), // border: #B2C2D3
+                                  ),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(8)), // border-radius: 8px
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 20, left: 25, bottom: 20),
+                                      child: Text(
+                                        'Item Table',
+                                        style: TextStyles.header3,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Container(
+                                      width: maxWidth,
+                                      color: Colors.grey[100],
+                                      child: DataTable(
+                                        dataRowHeight: 57,
+                                        headingRowHeight: 50,
+                                        dataRowColor: MaterialStateProperty
+                                            .resolveWith<Color>(
+                                          (Set<MaterialState> states) {
+                                            return Colors
+                                                .white; // Set row background to white
+                                          },
+                                        ),
+                                        columns: [
+                                          DataColumn(
+                                              label: Text('S.NO',
+                                                  style: TextStyles.subhead)),
+                                          DataColumn(
+                                              label: Text('Product Name',
+                                                  style: TextStyles.subhead)),
+                                          DataColumn(
+                                              label: Text('Category',
+                                                  style: TextStyles.subhead)),
+                                          DataColumn(
+                                              label: Text('Unit',
+                                                  style: TextStyles.subhead)),
+                                          DataColumn(
+                                              label: Text('Price',
+                                                  style: TextStyles.subhead)),
+                                          DataColumn(
+                                              label: Text('Qty',
+                                                  style: TextStyles.subhead)),
+                                          DataColumn(
+                                              label: Text('Total Amount',
+                                                  style: TextStyles.subhead)),
+                                          const DataColumn(label: Text(' ')),
+                                        ],
+                                        rows: _selectedProducts.map((product) {
+                                          int index = _selectedProducts
+                                                  .indexOf(product) +
+                                              1;
+                                          return DataRow(cells: [
+                                            DataCell(Text('$index')),
+                                            DataCell(_buildProductSearchField(
+                                                product)),
+                                            DataCell(Text(
+                                                product['categoryName'] ?? '')),
+                                            DataCell(Text(
+                                                product['baseUnit'] ?? '')),
+                                            DataCell(Text(product['price']
+                                                .toStringAsFixed(2))),
+                                            DataCell(_buildQuantityField(
+                                                product,
+                                                _controllers[product]!)),
+                                            DataCell(Text((product['qty'] *
+                                                    product['price'])
+                                                .toStringAsFixed(2))),
+                                            DataCell(IconButton(
+                                              icon: const Icon(
+                                                  Icons.remove_circle_outline,
+                                                  color: Colors.grey),
+                                              onPressed: () {
+                                                setState(() {
+                                                  if (_controllers
+                                                      .containsKey(product)) {
+                                                    _controllers[product]
+                                                        ?.dispose();
+                                                    _controllers
+                                                        .remove(product);
+                                                  }
+                                                  _selectedProducts
+                                                      .remove(product);
+                                                });
+                                              },
+                                            )),
+                                          ]);
+                                        }).toList(),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 45, bottom: 20, top: 20),
+                                          child: SizedBox(
+                                            width: 160,
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  // Add a new product with default values
+                                                  Map<String, dynamic>
+                                                      newProduct = {
+                                                    'product': '',
+                                                    'productDescription': '',
+                                                    'categoryName': '',
+                                                    'baseUnit': '',
+                                                    'price': 0.0,
+                                                    'qty': 0,
+                                                  };
 
-                      // Container(
-                      //   width: maxWidth,
-                      //   decoration: const BoxDecoration(
-                      //     border: Border(
-                      //       top: BorderSide(
-                      //           color:
-                      //           Color(0xFFB2C2D3),
-                      //           width: 1.2),
-                      //       bottom: BorderSide(
-                      //           color:
-                      //           Color(0xFFB2C2D3),
-                      //           width: 1.2),
-                      //     ),
-                      //   ),
-                      //   child: Padding(
-                      //     padding: const EdgeInsets.only(
-                      //         top: 5, bottom: 5),
-                      //     child: Table(
-                      //       columnWidths: const {
-                      //         0: FlexColumnWidth(0.7),
-                      //         1: FlexColumnWidth(2.7),
-                      //         2: FlexColumnWidth(2),
-                      //         3: FlexColumnWidth(1.8),
-                      //         4: FlexColumnWidth(1.5),
-                      //         5: FlexColumnWidth(1.2),
-                      //         6: FlexColumnWidth(1.8),
-                      //         7: FlexColumnWidth(1),
-                      //         8: FlexColumnWidth(1),
-                      //         9: FlexColumnWidth(1.2),
-                      //         10: FlexColumnWidth(0.7),
-                      //       },
-                      //       children:  [
-                      //         TableRow(
-                      //           children: [
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets.only(
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Center(
-                      //                   child: Padding(
-                      //                     padding:
-                      //                     const EdgeInsets.only(
-                      //                         left: 12),
-                      //                     child: Text(
-                      //                       'S.NO',
-                      //                       style: TextStyles.subhead,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets.only(
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Center(
-                      //                   child: Text(
-                      //                     'Product Name',
-                      //                       style: TextStyles.subhead,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets.only(
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Center(
-                      //                   child: Text(
-                      //                     'Category',
-                      //                       style: TextStyles.subhead,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets.only(
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Center(
-                      //                   child: Text(
-                      //                     'Unit',
-                      //                       style: TextStyles.subhead,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets.only(
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Center(
-                      //                   child: Text(
-                      //                     'Price',
-                      //                       style: TextStyles.subhead,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets.only(
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Center(
-                      //                   child: Text(
-                      //                     'QTY',
-                      //                       style: TextStyles.subhead,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets.only(
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Center(
-                      //                   child: Text(
-                      //                     'Total Amount',
-                      //                       style: TextStyles.subhead,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             const TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 EdgeInsets.only(
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Center(
-                      //                   child: Text(
-                      //                     '    ',
-                      //                     style: TextStyle(
-                      //                         fontWeight:
-                      //                         FontWeight
-                      //                             .bold),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-                      // Container(
-                      //   width: maxWidth,
-                      //   decoration: const BoxDecoration(
-                      //     border: Border(
-                      //       top: BorderSide(
-                      //           color:
-                      //           Color(0xFFB2C2D3),
-                      //           width: 1.2),
-                      //       bottom: BorderSide(
-                      //           color:
-                      //           Color(0xFFB2C2D3),
-                      //           width: 1.2),
-                      //     ),
-                      //   ),
-                      //   child: const Padding(
-                      //     padding: EdgeInsets.only(
-                      //         top: 20, bottom: 20),
-                      //     child: Center(child: Text('No Data found')),
-                      //   ),
-                      // ),
-                      // ListView.builder(
-                      //   shrinkWrap: true,
-                      //   physics:
-                      //   const NeverScrollableScrollPhysics(),
-                      //   itemCount:
-                      //   widget.selectedProducts.length,
-                      //   itemBuilder: (context, index) {
-                      //     Product product =
-                      //     widget.selectedProducts[index];
-                      //     return Table(
-                      //       border: TableBorder(
-                      //         bottom: BorderSide(
-                      //             width: 1,
-                      //             color: Colors.grey),
-                      //         //   horizontalInside: BorderSide(width: 1,color: Colors.grey), // horizontal border inside the table
-                      //         verticalInside: BorderSide(
-                      //             width: 1,
-                      //             color: Colors.grey),
-                      //       ),
-                      //       // border: TableBorder.all(color: const Color(0xFFB2C2D3)),
-                      //       columnWidths: const {
-                      //         0: FlexColumnWidth(0.7),
-                      //         1: FlexColumnWidth(2.7),
-                      //         2: FlexColumnWidth(2),
-                      //         3: FlexColumnWidth(1.8),
-                      //         4: FlexColumnWidth(1.5),
-                      //         5: FlexColumnWidth(1.2),
-                      //         6: FlexColumnWidth(1.8),
-                      //         7: FlexColumnWidth(1),
-                      //         8: FlexColumnWidth(1),
-                      //         9: FlexColumnWidth(1.2),
-                      //         10: FlexColumnWidth(0.7),
-                      //       },
-                      //       children: [
-                      //         TableRow(
-                      //           children: [
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 15,
-                      //                     bottom: 5),
-                      //                 child: Center(
-                      //                   child: Text(
-                      //                     (index + 1)
-                      //                         .toString(),
-                      //                     textAlign: TextAlign
-                      //                         .center,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Container(
-                      //                   height: 35,
-                      //                   width: 150,
-                      //                   decoration:
-                      //                   BoxDecoration(
-                      //                     color: Colors
-                      //                         .grey.shade200,
-                      //                     borderRadius:
-                      //                     BorderRadius
-                      //                         .circular(
-                      //                         4.0),
-                      //                   ),
-                      //                   child: Center(
-                      //                     child: Text(
-                      //                       product
-                      //                           .productName,
-                      //                       textAlign:
-                      //                       TextAlign
-                      //                           .center,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Container(
-                      //                   height: 35,
-                      //                   width: 150,
-                      //                   decoration:
-                      //                   BoxDecoration(
-                      //                     color: Colors
-                      //                         .grey.shade200,
-                      //                     borderRadius:
-                      //                     BorderRadius
-                      //                         .circular(
-                      //                         4.0),
-                      //                   ),
-                      //                   child: Center(
-                      //                     child: Text(
-                      //                       product.category,
-                      //                       textAlign:
-                      //                       TextAlign
-                      //                           .center,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Container(
-                      //                   height: 35,
-                      //                   decoration:
-                      //                   BoxDecoration(
-                      //                     color: Colors
-                      //                         .grey.shade200,
-                      //                     borderRadius:
-                      //                     BorderRadius
-                      //                         .circular(
-                      //                         4.0),
-                      //                   ),
-                      //                   child: Center(
-                      //                     child: Text(
-                      //                       product
-                      //                           .subCategory,
-                      //                       textAlign:
-                      //                       TextAlign
-                      //                           .center,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Container(
-                      //                   height: 35,
-                      //                   decoration:
-                      //                   BoxDecoration(
-                      //                     color: Colors
-                      //                         .grey.shade200,
-                      //                     borderRadius:
-                      //                     BorderRadius
-                      //                         .circular(
-                      //                         4.0),
-                      //                   ),
-                      //                   child: Center(
-                      //                     child: Text(
-                      //                       product.price
-                      //                           .toString(),
-                      //                       textAlign:
-                      //                       TextAlign
-                      //                           .center,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Container(
-                      //                   height: 35,
-                      //                   decoration:
-                      //                   BoxDecoration(
-                      //                     color: Colors
-                      //                         .grey.shade200,
-                      //                     borderRadius:
-                      //                     BorderRadius
-                      //                         .circular(
-                      //                         4.0),
-                      //                   ),
-                      //                   child: Center(
-                      //                     child: Text(
-                      //                       product.quantity
-                      //                           .toString(),
-                      //                       textAlign:
-                      //                       TextAlign
-                      //                           .center,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Container(
-                      //                   height: 35,
-                      //                   decoration:
-                      //                   BoxDecoration(
-                      //                     color: Colors
-                      //                         .grey.shade200,
-                      //                     borderRadius:
-                      //                     BorderRadius
-                      //                         .circular(
-                      //                         4.0),
-                      //                   ),
-                      //                   child: Center(
-                      //                     child: Text(
-                      //                       '${product.price * product.quantity}',
-                      //                       textAlign:
-                      //                       TextAlign
-                      //                           .center,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Container(
-                      //                   height: 35,
-                      //                   decoration:
-                      //                   BoxDecoration(
-                      //                     color: Colors
-                      //                         .grey.shade200,
-                      //                     borderRadius:
-                      //                     BorderRadius
-                      //                         .circular(
-                      //                         4.0),
-                      //                   ),
-                      //                   child: Center(
-                      //                     child: Text(
-                      //                       '${product.discount}',
-                      //                       textAlign:
-                      //                       TextAlign
-                      //                           .center,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Container(
-                      //                   height: 35,
-                      //                   decoration:
-                      //                   BoxDecoration(
-                      //                     color: Colors
-                      //                         .grey.shade200,
-                      //                     borderRadius:
-                      //                     BorderRadius
-                      //                         .circular(
-                      //                         4.0),
-                      //                   ),
-                      //                   child: Center(
-                      //                     child: Text(
-                      //                       '${product.tax}',
-                      //                       textAlign:
-                      //                       TextAlign
-                      //                           .center,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .only(
-                      //                     left: 10,
-                      //                     right: 10,
-                      //                     top: 10,
-                      //                     bottom: 10),
-                      //                 child: Container(
-                      //                   height: 35,
-                      //                   decoration:
-                      //                   BoxDecoration(
-                      //                     color: Colors
-                      //                         .grey.shade200,
-                      //                     borderRadius:
-                      //                     BorderRadius
-                      //                         .circular(
-                      //                         4.0),
-                      //                   ),
-                      //                   child: Center(
-                      //                     child: Text(
-                      //                       '${(product.totalAmount * product.quantity).toStringAsFixed(2)}',
-                      //                       textAlign:
-                      //                       TextAlign
-                      //                           .center,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             TableCell(
-                      //               child: Padding(
-                      //                 padding:
-                      //                 const EdgeInsets
-                      //                     .symmetric(
-                      //                     vertical: 20),
-                      //                 child: InkWell(
-                      //                   onTap: () {
-                      //                     _deleteProduct(
-                      //                         product);
-                      //                   },
-                      //                   child: const Icon(
-                      //                     Icons
-                      //                         .remove_circle_outline,
-                      //                     size: 18,
-                      //                     color: Colors.blue,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ],
-                      //     );
-                      //   },
-                      // ),
-                      Container(
-                        width: 1200,
-                        child: DataTable(columns: [
-                          DataColumn(label: Text('S.NO',style: TextStyles.subhead,)),
-                          DataColumn(label: Text('Product Name',style: TextStyles.subhead,)),
-                          DataColumn(label: Text('Category',style: TextStyles.subhead,)),
-                          DataColumn(label: Text('Unit',style: TextStyles.subhead,)),
-                          DataColumn(label: Text('Price',style: TextStyles.subhead,)),
-                          DataColumn(label: Text('QTY',style: TextStyles.subhead,)),
-                          DataColumn(label: Text('Total Amount',style: TextStyles.subhead,)),
-                          DataColumn(label: Text(' ')),
-                        ],
-                          rows: _selectedProducts.map((product) {
-                            int index = _selectedProducts.indexOf(product) + 1;
-                            return DataRow(cells: [
-                              DataCell(Text('$index')),
-                              DataCell(_buildProductSearchField(product)),
-                              DataCell(Text(product['categoryName'] ?? '')),
-                              DataCell(Text(product['baseUnit'] ?? '')),
-                              DataCell(Text(product['price'].toStringAsFixed(2))),
-                              DataCell(_buildQuantityField(product)),
-                              DataCell(Text((product['qty'] * product['price']).toStringAsFixed(2))),
-                              DataCell(IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  setState(() {
-                                    _selectedProducts.remove(product);
-                                  });
-                                },
-                              )),
-                            ]);
-                          }).toList(),
-                          // rows: _selectedProducts.map((product) {
-                          //         return DataRow(cells: [
-                          //           DataCell(Text('${1}')),
-                          //         DataCell(_buildProductSearchField(product)),
-                          //         DataCell(_buildQuantityField(product)),
-                          //           DataCell(_buildProductSearchField(product)),
-                          //           DataCell(_buildQuantityField(product)),
-                          //           DataCell(_buildProductSearchField(product)),
-                          //         DataCell(Text(product['price'].toString())),
-                          //         DataCell(Text((product['qty'] * product['price']).toStringAsFixed(2))),
-                          //         ]);
-                          //         }).toList(),
+                                                  _selectedProducts
+                                                      .add(newProduct);
+
+                                                  // Ensure a controller is initialized for the new product's quantity
+                                                  if (_controllers != null) {
+                                                    _controllers[newProduct] =
+                                                        TextEditingController(
+                                                            text: '0');
+                                                  }
+
+                                                  // Make the total visible
+                                                  _isTotalVisible = true;
+                                                });
+
+                                                // setState(() {
+                                                //   _selectedProducts.add({
+                                                //     'product': '',
+                                                //     'productDescription': '',
+                                                //     'categoryName': '',
+                                                //     'baseUnit': '',
+                                                //     'price': 0.0,
+                                                //     'qty': 0,
+                                                //   });
+                                                //   _controllers?
+                                                //   _isTotalVisible = true;
+                                                // });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    Colors.blue[800],
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                '+ Add Product',
+                                                style: TextStyles.button1,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        if (_isTotalVisible)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 165),
+                                            child: Text(
+                                                'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
+                                                // Display the total
+                                                style: TextStyles.subhead),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Padding(
+                            //   padding: const EdgeInsets.only(
+                            //       top: 40, left: 70, right: 50, bottom: 30),
+                            //   child: Container(
+                            //     //width: screenWidth * 0.8,
+                            //     decoration: BoxDecoration(
+                            //       color: const Color(0xFFFFFFFF),
+                            //       // background: #FFFFFF
+                            //       boxShadow: [
+                            //         const BoxShadow(
+                            //           offset: Offset(0, 3),
+                            //           blurRadius: 6,
+                            //           color: Color(
+                            //               0x29000000), // box-shadow: 0px 3px 6px #00000029
+                            //         )
+                            //       ],
+                            //       border: Border.all(
+                            //         // border: 2px
+                            //         color: const Color(
+                            //             0xFFB2C2D3), // border: #B2C2D3
+                            //       ),
+                            //       borderRadius: const BorderRadius.all(
+                            //           Radius.circular(8)), // border-radius: 8px
+                            //     ),
+                            //     child: Column(
+                            //
+                            //       crossAxisAlignment: CrossAxisAlignment.start,
+                            //       children: [
+                            //         const Padding(
+                            //           padding:
+                            //               EdgeInsets.only(top: 10, left: 30),
+                            //           child: Text(
+                            //             'Item Table',
+                            //             style: TextStyle(
+                            //                 fontSize: 19, color: Colors.black),
+                            //           ),
+                            //         ),
+                            //         const SizedBox(height: 10),
+                            //         Container(
+                            //           width: 1300,
+                            //           color: Colors.grey[100],
+                            //           child: DataTable(
+                            //
+                            //             //
+                            //              dataRowHeight: 57,
+                            //              headingRowHeight: 50,
+                            //             dataRowColor: MaterialStateProperty
+                            //                 .resolveWith<Color>(
+                            //               (Set<MaterialState> states) {
+                            //                 return Colors
+                            //                     .white; // Set row background to white
+                            //               },
+                            //             ),
+                            //             columns: [
+                            //               DataColumn(
+                            //                   label: Text(
+                            //                 'S.NO',
+                            //                 style: TextStyles.subhead,
+                            //               )),
+                            //               DataColumn(
+                            //                   label: Text(
+                            //                 'Product Name',
+                            //                 style: TextStyles.subhead,
+                            //               )),
+                            //               DataColumn(
+                            //                   label: Text(
+                            //                 'Category',
+                            //                 style: TextStyles.subhead,
+                            //               )),
+                            //               DataColumn(
+                            //                   label: Text(
+                            //                 'Unit',
+                            //                 style: TextStyles.subhead,
+                            //               )),
+                            //               DataColumn(
+                            //                   label: Text(
+                            //                 'Price',
+                            //                 style: TextStyles.subhead,
+                            //               )),
+                            //               DataColumn(
+                            //                   label: Text(
+                            //                 'Qty',
+                            //                 style: TextStyles.subhead,
+                            //               )),
+                            //               DataColumn(
+                            //                   label: Text(
+                            //                 'Total Amount',
+                            //                 style: TextStyles.subhead,
+                            //               )),
+                            //               DataColumn(label: Text(' ')),
+                            //             ],
+                            //             rows: _selectedProducts.map((product) {
+                            //               int index = _selectedProducts
+                            //                       .indexOf(product) +
+                            //                   1;
+                            //               return DataRow(cells: [
+                            //                 DataCell(Text('$index')),
+                            //                 DataCell(_buildProductSearchField(
+                            //                     product)),
+                            //                 DataCell(Text(
+                            //                     product['categoryName'] ?? '')),
+                            //                 DataCell(Text(
+                            //                     product['baseUnit'] ?? '')),
+                            //                 DataCell(Text(product['price']
+                            //                     .toStringAsFixed(2))),
+                            //                 DataCell(
+                            //                     _buildQuantityField(product)),
+                            //                 DataCell(Text((product['qty'] *
+                            //                         product['price'])
+                            //                     .toStringAsFixed(2))),
+                            //                 DataCell(IconButton(
+                            //                   icon: Icon(
+                            //                       Icons.remove_circle_outline,
+                            //                       color: Colors.grey),
+                            //                   onPressed: () {
+                            //                     setState(() {
+                            //                       _selectedProducts
+                            //                           .remove(product);
+                            //                     });
+                            //                   },
+                            //                 )),
+                            //               ]);
+                            //             }).toList(),
+                            //             // rows: _selectedProducts.map((product) {
+                            //             //         return DataRow(cells: [
+                            //             //           DataCell(Text('${1}')),
+                            //             //         DataCell(_buildProductSearchField(product)),
+                            //             //         DataCell(_buildQuantityField(product)),
+                            //             //           DataCell(_buildProductSearchField(product)),
+                            //             //           DataCell(_buildQuantityField(product)),
+                            //             //           DataCell(_buildProductSearchField(product)),
+                            //             //         DataCell(Text(product['price'].toString())),
+                            //             //         DataCell(Text((product['qty'] * product['price']).toStringAsFixed(2))),
+                            //             //         ]);
+                            //             //         }).toList(),
+                            //           ),
+                            //
+                            //         ),
+                            //         Row(
+                            //           children: [
+                            //             Padding(
+                            //               padding: const EdgeInsets.only(
+                            //                   left: 45, bottom: 20, top: 20),
+                            //               child: SizedBox(
+                            //                 width: 140,
+                            //                 child: ElevatedButton(
+                            //                   onPressed: () {
+                            //                     setState(() {
+                            //                       _selectedProducts.add({
+                            //                         'product': '',
+                            //                         'productDescription': '',
+                            //                         // Product name, initially empty
+                            //                         'categoryName': '',
+                            //                         // Default value for category
+                            //                         'baseUnit': '',
+                            //                         // Default value for unit
+                            //                         'price': 0.0,
+                            //                         // Default price
+                            //                         'qty': 1,
+                            //                         // Default quantity
+                            //                       });
+                            //                       _isTotalVisible = true;
+                            //                     });
+                            //                   },
+                            //                   style: ElevatedButton.styleFrom(
+                            //                       backgroundColor:
+                            //                       Colors.blue[800],
+                            //                       padding: null,
+                            //                       shape: RoundedRectangleBorder(
+                            //                           borderRadius:
+                            //                           BorderRadius.circular(
+                            //                               5))),
+                            //                   child: const Text(
+                            //                     '+ Add Product',
+                            //                     style: TextStyle(
+                            //                         color: Colors.white),
+                            //                   ),
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //             Spacer(),
+                            //             Text('Total: $_calculateTotal')
+                            //           ],
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
+                          ],
                         ),
+                      )),
+                    } else ...{
+                      SizedBox(
+                        height: maxHeight,
+                        child: AdaptiveScrollbar(
+                            position: ScrollbarPosition.bottom,
+                            controller: horizontalScroll,
+                            child: SingleChildScrollView(
+                              controller: horizontalScroll,
+                              scrollDirection: Axis.horizontal,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 3, right: 0),
+                                  child: Container(
+                                    color: Colors.grey[50],
+                                    width: 1500,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      //   mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 20, top: 10),
+                                          child: Row(
+                                            children: [
+                                              IconButton(
+                                                  onPressed: () {
+                                                    context.go(
+                                                        '/Customer_Order_List');
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.arrow_back,
+                                                    size: 20,
+                                                  )),
+                                              Text(
+                                                'Create Order',
+                                                style: TextStyles.header1,
+                                              ),
+                                              const Spacer(),
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 54,
+                                                              top: 5),
+                                                      child: OutlinedButton(
+                                                        onPressed: () async {
+
+                                                          if (_selectedProducts.isEmpty) {
+
+                                                            // Check if no products are selected
+
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+
+                                                              const SnackBar(
+
+                                                                content: Text('Please add a product before creating an order'),
+
+                                                                duration: Duration(seconds: 2),
+
+                                                              ),
+
+                                                            );
+
+                                                          } else if (_selectedProducts.any((product) => product['productDescription'] == null || product['productDescription'].isEmpty)) {
+
+                                                            // Check if any product has an empty or null productDescription
+
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+
+                                                              const SnackBar(
+
+                                                                content: Text('Each product must have a description'),
+
+                                                                duration: Duration(seconds: 2),
+
+                                                              ),
+
+                                                            );
+
+                                                          } else if (_selectedProducts.any((product) => product['qty'] == null || product['qty'] <= 0)) {
+
+                                                            // Check if any product has an invalid or zero quantity
+
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+
+                                                              const SnackBar(
+
+                                                                content: Text('Each product must have a valid quantity greater than zero'),
+
+                                                                duration: Duration(seconds: 2),
+
+                                                              ),
+
+                                                            );
+
+                                                          } else {
+
+                                                            // If all validations pass, proceed with API calls
+
+                                                            await fetchCustomerData(userId);
+
+                                                            await callApi();
+
+                                                          }
+
+                                                        },
+                                                        style: OutlinedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              Colors.blue[800],
+                                                          // Button background color
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5), // Rounded corners
+                                                          ),
+                                                          side: BorderSide
+                                                              .none, // No outline
+                                                        ),
+                                                        child: Text(
+                                                          ' Create Order',
+                                                          style: TextStyles
+                                                              .button1,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.only(top: 5),
+                                          height: 1,
+                                          width: 1900,
+                                          color: Colors.grey.shade300,
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 50),
+                                          child: SizedBox(
+                                            width: 250,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              // mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                      right: maxWidth * 0.08,
+                                                      top: 30,
+                                                      left: 20),
+                                                  child: Text(
+                                                    'Order Date',
+                                                    style: TextStyles.header3,
+                                                  ),
+                                                ),
+                                                //  ),
+                                                // SizedBox(height: 20.h),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 70,
+                                          ),
+                                          child: SizedBox(
+                                            height: 39,
+                                            width: 150,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Expanded(
+                                                  child: TextFormField(
+                                                    controller: _dateController,
+                                                    style: TextStyle(fontSize: maxWidth * 0.009),
+                                                    // Replace with your TextEditingController
+                                                    readOnly: true,
+                                                    decoration: InputDecoration(
+                                                      suffixIcon: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                right: 20),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 2,
+                                                                  left: 10),
+                                                          child: IconButton(
+                                                            icon: const Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          16),
+                                                              child: Icon(Icons
+                                                                  .calendar_month),
+                                                            ),
+                                                            iconSize: 20,
+                                                            onPressed: () {
+                                                              // _showDatePicker(context);
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      hintText:
+                                                          '        Select Date',
+
+                                                      fillColor: Colors.white,
+                                                      contentPadding:
+                                                          const EdgeInsets
+                                                              .symmetric(
+                                                              horizontal: 8,
+                                                              vertical: 8),
+                                                      border: InputBorder.none,
+                                                      filled: true,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 10,
+                                              left: 70,
+                                              right: 50,
+                                              bottom: 60),
+                                          child: Container(
+                                            width: 1500,
+                                            //height: 800,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              // color: const Color(0xFFFFFFFF),
+                                              boxShadow: [
+                                                const BoxShadow(
+                                                  offset: Offset(0, 3),
+                                                  blurRadius: 6,
+                                                  color: Color(
+                                                      0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                                )
+                                              ],
+                                              border: Border.all(
+                                                color: const Color(
+                                                    0xFFB2C2D3), // border: #B2C2D3
+                                              ),
+                                              borderRadius: const BorderRadius
+                                                  .all(Radius.circular(
+                                                      8)), // border-radius: 8px
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                      top: 20,
+                                                      left: 25,
+                                                      bottom: 20),
+                                                  child: Text(
+                                                    'Item Table',
+                                                    style: TextStyles.header3,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Container(
+                                                  width: 1600,
+                                                  color: Colors.grey[100],
+                                                  child: DataTable(
+                                                    dataRowHeight: 57,
+                                                    headingRowHeight: 50,
+                                                    dataRowColor:
+                                                        MaterialStateProperty
+                                                            .resolveWith<Color>(
+                                                      (Set<MaterialState>
+                                                          states) {
+                                                        return Colors
+                                                            .white; // Set row background to white
+                                                      },
+                                                    ),
+                                                    columns: [
+                                                      DataColumn(
+                                                          label: Text('S.NO',
+                                                              style: TextStyles
+                                                                  .subhead)),
+                                                      DataColumn(
+                                                          label: Text(
+                                                              'Product Name',
+                                                              style: TextStyles
+                                                                  .subhead)),
+                                                      DataColumn(
+                                                          label: Text(
+                                                              'Category',
+                                                              style: TextStyles
+                                                                  .subhead)),
+                                                      DataColumn(
+                                                          label: Text('Unit',
+                                                              style: TextStyles
+                                                                  .subhead)),
+                                                      DataColumn(
+                                                          label: Text('Price',
+                                                              style: TextStyles
+                                                                  .subhead)),
+                                                      DataColumn(
+                                                          label: Text('Qty',
+                                                              style: TextStyles
+                                                                  .subhead)),
+                                                      DataColumn(
+                                                          label: Text(
+                                                              'Total Amount',
+                                                              style: TextStyles
+                                                                  .subhead)),
+                                                      const DataColumn(
+                                                          label: Text(' ')),
+                                                    ],
+                                                    rows: _selectedProducts
+                                                        .map((product) {
+                                                      int index =
+                                                          _selectedProducts
+                                                                  .indexOf(
+                                                                      product) +
+                                                              1;
+                                                      return DataRow(cells: [
+                                                        DataCell(
+                                                            Text('$index')),
+                                                        DataCell(_buildProductSearchField(product)),
+                                                        DataCell(Text(product['categoryName'] ?? '')),
+                                                        DataCell(Text(product[
+                                                                'baseUnit'] ??
+                                                            '')),
+                                                        DataCell(Text(product[
+                                                                'price']
+                                                            .toStringAsFixed(
+                                                                2))),
+                                                        DataCell(
+                                                            _buildQuantityField(
+                                                                product,
+                                                                _controllers[
+                                                                    product]!)),
+                                                        DataCell(Text((product[
+                                                                    'qty'] *
+                                                                product[
+                                                                    'price'])
+                                                            .toStringAsFixed(
+                                                                2))),
+                                                        DataCell(IconButton(
+                                                          icon: const Icon(
+                                                              Icons
+                                                                  .remove_circle_outline,
+                                                              color:
+                                                                  Colors.grey),
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              _selectedProducts
+                                                                  .remove(
+                                                                      product);
+                                                            });
+                                                          },
+                                                        )),
+                                                      ]);
+                                                    }).toList(),
+                                                  ),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 45,
+                                                              bottom: 20,
+                                                              top: 20),
+                                                      child: SizedBox(
+                                                        width: 160,
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              // Add a new product with default values
+                                                              Map<String,
+                                                                      dynamic>
+                                                                  newProduct = {
+                                                                'product': '',
+                                                                'productDescription':
+                                                                    '',
+                                                                'categoryName':
+                                                                    '',
+                                                                'baseUnit': '',
+                                                                'price': 0.0,
+                                                                'qty': 0,
+                                                              };
+
+                                                              _selectedProducts
+                                                                  .add(
+                                                                      newProduct);
+
+                                                              // Ensure a controller is initialized for the new product's quantity
+                                                              if (_controllers !=
+                                                                  null) {
+                                                                _controllers[
+                                                                        newProduct] =
+                                                                    TextEditingController(
+                                                                        text:
+                                                                            '0');
+                                                              }
+
+                                                              // Make the total visible
+                                                              _isTotalVisible =
+                                                                  true;
+                                                            });
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .blue[800],
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5),
+                                                            ),
+                                                          ),
+                                                          child: Text(
+                                                            '+ Add Product',
+                                                            style: TextStyles
+                                                                .button1,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const Spacer(),
+                                                    if (_isTotalVisible)
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                right: 165),
+                                                        child: Text(
+                                                            'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
+                                                            // Display the total
+                                                            style: TextStyles
+                                                                .subhead),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        // Padding(
+                                        //   padding: const EdgeInsets.only(
+                                        //       top: 40, left: 70, right: 50, bottom: 30),
+                                        //   child: Container(
+                                        //     //width: screenWidth * 0.8,
+                                        //     decoration: BoxDecoration(
+                                        //       color: const Color(0xFFFFFFFF),
+                                        //       // background: #FFFFFF
+                                        //       boxShadow: [
+                                        //         const BoxShadow(
+                                        //           offset: Offset(0, 3),
+                                        //           blurRadius: 6,
+                                        //           color: Color(
+                                        //               0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                        //         )
+                                        //       ],
+                                        //       border: Border.all(
+                                        //         // border: 2px
+                                        //         color: const Color(
+                                        //             0xFFB2C2D3), // border: #B2C2D3
+                                        //       ),
+                                        //       borderRadius: const BorderRadius.all(
+                                        //           Radius.circular(8)), // border-radius: 8px
+                                        //     ),
+                                        //     child: Column(
+                                        //
+                                        //       crossAxisAlignment: CrossAxisAlignment.start,
+                                        //       children: [
+                                        //         const Padding(
+                                        //           padding:
+                                        //               EdgeInsets.only(top: 10, left: 30),
+                                        //           child: Text(
+                                        //             'Item Table',
+                                        //             style: TextStyle(
+                                        //                 fontSize: 19, color: Colors.black),
+                                        //           ),
+                                        //         ),
+                                        //         const SizedBox(height: 10),
+                                        //         Container(
+                                        //           width: 1300,
+                                        //           color: Colors.grey[100],
+                                        //           child: DataTable(
+                                        //
+                                        //             //
+                                        //              dataRowHeight: 57,
+                                        //              headingRowHeight: 50,
+                                        //             dataRowColor: MaterialStateProperty
+                                        //                 .resolveWith<Color>(
+                                        //               (Set<MaterialState> states) {
+                                        //                 return Colors
+                                        //                     .white; // Set row background to white
+                                        //               },
+                                        //             ),
+                                        //             columns: [
+                                        //               DataColumn(
+                                        //                   label: Text(
+                                        //                 'S.NO',
+                                        //                 style: TextStyles.subhead,
+                                        //               )),
+                                        //               DataColumn(
+                                        //                   label: Text(
+                                        //                 'Product Name',
+                                        //                 style: TextStyles.subhead,
+                                        //               )),
+                                        //               DataColumn(
+                                        //                   label: Text(
+                                        //                 'Category',
+                                        //                 style: TextStyles.subhead,
+                                        //               )),
+                                        //               DataColumn(
+                                        //                   label: Text(
+                                        //                 'Unit',
+                                        //                 style: TextStyles.subhead,
+                                        //               )),
+                                        //               DataColumn(
+                                        //                   label: Text(
+                                        //                 'Price',
+                                        //                 style: TextStyles.subhead,
+                                        //               )),
+                                        //               DataColumn(
+                                        //                   label: Text(
+                                        //                 'Qty',
+                                        //                 style: TextStyles.subhead,
+                                        //               )),
+                                        //               DataColumn(
+                                        //                   label: Text(
+                                        //                 'Total Amount',
+                                        //                 style: TextStyles.subhead,
+                                        //               )),
+                                        //               DataColumn(label: Text(' ')),
+                                        //             ],
+                                        //             rows: _selectedProducts.map((product) {
+                                        //               int index = _selectedProducts
+                                        //                       .indexOf(product) +
+                                        //                   1;
+                                        //               return DataRow(cells: [
+                                        //                 DataCell(Text('$index')),
+                                        //                 DataCell(_buildProductSearchField(
+                                        //                     product)),
+                                        //                 DataCell(Text(
+                                        //                     product['categoryName'] ?? '')),
+                                        //                 DataCell(Text(
+                                        //                     product['baseUnit'] ?? '')),
+                                        //                 DataCell(Text(product['price']
+                                        //                     .toStringAsFixed(2))),
+                                        //                 DataCell(
+                                        //                     _buildQuantityField(product)),
+                                        //                 DataCell(Text((product['qty'] *
+                                        //                         product['price'])
+                                        //                     .toStringAsFixed(2))),
+                                        //                 DataCell(IconButton(
+                                        //                   icon: Icon(
+                                        //                       Icons.remove_circle_outline,
+                                        //                       color: Colors.grey),
+                                        //                   onPressed: () {
+                                        //                     setState(() {
+                                        //                       _selectedProducts
+                                        //                           .remove(product);
+                                        //                     });
+                                        //                   },
+                                        //                 )),
+                                        //               ]);
+                                        //             }).toList(),
+                                        //             // rows: _selectedProducts.map((product) {
+                                        //             //         return DataRow(cells: [
+                                        //             //           DataCell(Text('${1}')),
+                                        //             //         DataCell(_buildProductSearchField(product)),
+                                        //             //         DataCell(_buildQuantityField(product)),
+                                        //             //           DataCell(_buildProductSearchField(product)),
+                                        //             //           DataCell(_buildQuantityField(product)),
+                                        //             //           DataCell(_buildProductSearchField(product)),
+                                        //             //         DataCell(Text(product['price'].toString())),
+                                        //             //         DataCell(Text((product['qty'] * product['price']).toStringAsFixed(2))),
+                                        //             //         ]);
+                                        //             //         }).toList(),
+                                        //           ),
+                                        //
+                                        //         ),
+                                        //         Row(
+                                        //           children: [
+                                        //             Padding(
+                                        //               padding: const EdgeInsets.only(
+                                        //                   left: 45, bottom: 20, top: 20),
+                                        //               child: SizedBox(
+                                        //                 width: 140,
+                                        //                 child: ElevatedButton(
+                                        //                   onPressed: () {
+                                        //                     setState(() {
+                                        //                       _selectedProducts.add({
+                                        //                         'product': '',
+                                        //                         'productDescription': '',
+                                        //                         // Product name, initially empty
+                                        //                         'categoryName': '',
+                                        //                         // Default value for category
+                                        //                         'baseUnit': '',
+                                        //                         // Default value for unit
+                                        //                         'price': 0.0,
+                                        //                         // Default price
+                                        //                         'qty': 1,
+                                        //                         // Default quantity
+                                        //                       });
+                                        //                       _isTotalVisible = true;
+                                        //                     });
+                                        //                   },
+                                        //                   style: ElevatedButton.styleFrom(
+                                        //                       backgroundColor:
+                                        //                       Colors.blue[800],
+                                        //                       padding: null,
+                                        //                       shape: RoundedRectangleBorder(
+                                        //                           borderRadius:
+                                        //                           BorderRadius.circular(
+                                        //                               5))),
+                                        //                   child: const Text(
+                                        //                     '+ Add Product',
+                                        //                     style: TextStyle(
+                                        //                         color: Colors.white),
+                                        //                   ),
+                                        //                 ),
+                                        //               ),
+                                        //             ),
+                                        //             Spacer(),
+                                        //             Text('Total: $_calculateTotal')
+                                        //           ],
+                                        //         ),
+                                        //       ],
+                                        //     ),
+                                        //   ),
+                                        // ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )),
                       )
-
-
-                    ],
-                  ),
-                ),
-              ),
-                    Padding(
-                     padding: const EdgeInsets.only(left: 45),
-                      child: SizedBox(
-                        width: 140,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedProducts.add({
-                                'product': '',
-                                'productDescription': '',// Product name, initially empty
-                                'categoryName': '',     // Default value for category
-                                'baseUnit': '',         // Default value for unit
-                                'price': 0.0,           // Default price
-                                'qty': 1,               // Default quantity
-                              });
-                            });
-                          },
-
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            padding: null,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5)
-                            )
-                          ),
-                          child:
-                          const Text('+ Add Product',style: TextStyle(color: Colors.white),),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 100),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.grey),
-                        ),
-                        width: 200,
-                          height: 150,
-                          child: const Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 30),
-                                child: Text('Sub Total:'),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-            ],),))
-        }else...{
-
-        }
-
+                    }
                   ],
                 ),
               ),
-
             ],
           );
         }),
@@ -1775,70 +2163,165 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
     );
   }
 
-
   Widget _buildProductSearchField(Map<String, dynamic> product) {
-    return Autocomplete<String>(
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text.isEmpty) {
-          return const Iterable<String>.empty();
-        }
-        return productList
-            .where((p) => p['productDescription']
-            .toLowerCase()
-            .contains(textEditingValue.text.toLowerCase()))
-            .map((p) => p['productDescription']);
-      },
-      onSelected: (String selection) {
-        final selectedProduct = productList.firstWhere((p) => p['productDescription'] == selection);
-        setState(() {
-          product['product'] = selectedProduct['product'];
-          product['categoryName'] = selectedProduct['categoryName'];
-          product['baseUnit'] = selectedProduct['baseUnit'];
-          product['price'] = selectedProduct['price'];
-          product['productDescription'] = selectedProduct['productDescription'];
-        });
-      },
-      fieldViewBuilder: (
+    return SizedBox(
+      height: 60,
+      width: 200,
+      child: Autocomplete<String>(
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text.isEmpty) {
+            return const Iterable<String>.empty();
+          }
+          return productList
+              .where((p) => p['productDescription']
+                  .toLowerCase()
+                  .contains(textEditingValue.text.toLowerCase()))
+              .map((p) => p['productDescription']);
+        },
+        onSelected: (String selection) {
+          final selectedProduct = productList
+              .firstWhere((p) => p['productDescription'] == selection);
+          setState(() {
+            product['product'] = selectedProduct['product'];
+            product['categoryName'] = selectedProduct['categoryName'];
+            product['baseUnit'] = selectedProduct['baseUnit'];
+            product['price'] = selectedProduct['price'];
+            product['productDescription'] =
+                selectedProduct['productDescription'];
+            product['currency'] = selectedProduct['currency'];
+            product['productType'] = selectedProduct['productType'];
+            product['standardPrice'] = selectedProduct['standardPrice'];
+          });
+        },
+        optionsViewBuilder: (context, onSelected, options) {
+          return Align(
+            alignment: Alignment.topLeft,
+            child: Material(
+              elevation: 4.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white, // Set background color to white
+                  borderRadius: BorderRadius.circular(8.0), // Set border radius
+                ),
+                width: 300, // Set the desired width of the dropdown
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  children: options.map((String option) {
+                    return ListTile(
+                      title: Text(option),
+                      onTap: () {
+                        onSelected(option);
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          );
+        },
+        fieldViewBuilder: (
           BuildContext context,
           TextEditingController textEditingController,
           FocusNode focusNode,
-         ord.VoidCallback onFieldSubmitted,
-          ) {
-        textEditingController.text = product['productDescription'] ?? '';
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            controller: textEditingController,
-            focusNode: focusNode,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Search Product',
+          ord.VoidCallback onFieldSubmitted,
+        ) {
+          textEditingController.text = product['productDescription'] ?? '';
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              textAlign: TextAlign.start,
+              controller: textEditingController,
+              focusNode: focusNode,
+              // maxLines: 1,
+              // minLines: 1,
+              //expands: true,
+              decoration: InputDecoration(
+                filled: true,
+                //  contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                fillColor: Colors.grey[100],
+                // contentPadding: EdgeInsets.symmetric(horizontal: 7),
+                border: InputBorder.none,
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                // Removes the border
+                hintText: 'Search Product',
+                hintStyle: TextStyles.body,
+              ),
             ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildQuantityField(Map<String, dynamic> product) {
-    return TextField(
-      keyboardType: TextInputType.number,
-      onChanged: (value) {
-        setState(() {
-          product['qty'] = int.tryParse(value) ?? 1;
-        });
-      },
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: 'Enter Qty',
+          );
+        },
       ),
     );
   }
 
+  String calculateTotalPrice(Map<String, dynamic> product) {
+    // Calculate total price
+    double total = product['qty'] * product['price'];
+    // Return formatted string
+    return total.toStringAsFixed(2);
+  }
 
+  Widget _buildQuantityField(
+      Map<String, dynamic> product, TextEditingController controller) {
+    // Only update the controller text if it doesn't match the current product quantity
+    if (controller.text != product['qty'].toString()) {
+      controller.text = product['qty'].toString();
+    }
 
+    return SizedBox(
+      width: 100,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 30, top: 8, bottom: 8, left: 8),
+        child: TextFormField(
+          controller: controller,
+          textAlign: TextAlign.start,
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            setState(() {
+              product['qty'] = double.tryParse(value) ?? 0;
+            });
+          },
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[100],
+            contentPadding:
+            const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            border: InputBorder.none,
+            hintStyle: TextStyles.body,
+          ),
+        ),
+      ),
+    );
+  }
 
-
+  // Widget _buildQuantityField(Map<String, dynamic> product, TextEditingController controller) {
+  //   controller.text = product['qty'].toString(); // Keep the controller updated with the product qty.
+  //
+  //   return SizedBox(
+  //     width: 100,
+  //     child: Padding(
+  //       padding: const EdgeInsets.only(right: 30, top: 8, bottom: 8, left: 8),
+  //       child: TextFormField(
+  //         controller: controller, // Use the controller
+  //         textAlign: TextAlign.start,
+  //         keyboardType: TextInputType.number,
+  //         onChanged: (value) {
+  //           setState(() {
+  //             product['qty'] = double.tryParse(value) ?? 0;
+  //           });
+  //         },
+  //         decoration: InputDecoration(
+  //           filled: true,
+  //           fillColor: Colors.grey[100],
+  //           contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 10),
+  //           border: InputBorder.none,
+  //           hintStyle: TextStyles.body,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget buildDataTable2() {
     if (isLoading) {
@@ -1866,7 +2349,7 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
             child: DataTable(
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
-                columns:  columns.map((column) {
+                columns: columns.map((column) {
                   return DataColumn(
                     label: Stack(
                       children: [
@@ -1901,8 +2384,8 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                 rows: []),
           ),
           Padding(
-            padding:
-            const EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            padding: const EdgeInsets.only(
+                top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
         ],
@@ -1916,7 +2399,6 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
         children: [
           Container(
             width: 1100,
-
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -1926,8 +2408,7 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                 headingRowHeight: 40,
                 columnSpacing: 35,
 // List.generate(5, (index)
-                columns:
-                columns.map((column) {
+                columns: columns.map((column) {
                   return DataColumn(
                     label: Stack(
                       children: [
@@ -1949,17 +2430,26 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                               ),
                               IconButton(
                                 icon:
-                                _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(width: 12,
-                                    child: Image.asset("images/sort.png",color: Colors.grey,))
-                                    : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                    _sortOrder[columns.indexOf(column)] == 'asc'
+                                        ? SizedBox(
+                                            width: 12,
+                                            child: Image.asset(
+                                              "images/sort.png",
+                                              color: Colors.grey,
+                                            ))
+                                        : SizedBox(
+                                            width: 12,
+                                            child: Image.asset(
+                                              "images/sort.png",
+                                              color: Colors.blue,
+                                            )),
                                 onPressed: () {
                                   setState(() {
                                     _sortOrder[columns.indexOf(column)] =
-                                    _sortOrder[columns.indexOf(column)] ==
-                                        'asc'
-                                        ? 'desc'
-                                        : 'asc';
+                                        _sortOrder[columns.indexOf(column)] ==
+                                                'asc'
+                                            ? 'desc'
+                                            : 'asc';
                                     _sortProducts(columns.indexOf(column),
                                         _sortOrder[columns.indexOf(column)]);
                                   });
@@ -1980,7 +2470,7 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                                             details.delta.dx;
                                         columnWidths[columns.indexOf(column)] =
                                             columnWidths[
-                                            columns.indexOf(column)]
+                                                    columns.indexOf(column)]
                                                 .clamp(151.0, 300.0);
                                       });
 // setState(() {
@@ -1991,8 +2481,8 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
 // });
                                     },
                                     child: const Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 10, bottom: 10),
+                                      padding:
+                                          EdgeInsets.only(top: 10, bottom: 10),
                                       child: Row(
                                         children: [
                                           VerticalDivider(
@@ -2018,102 +2508,104 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                 rows: List.generate(
                     math.min(itemsPerPage,
                         filteredData.length - (currentPage - 1) * itemsPerPage),
-                        (index) {
-                      final detail =
+                    (index) {
+                  final detail =
                       filteredData[(currentPage - 1) * itemsPerPage + index];
-                      final isSelected = _selectedProduct == detail;
-                      return DataRow(
-                          color: MaterialStateProperty.resolveWith<Color>((states) {
-                            if (states.contains(MaterialState.hovered)) {
-                              return Colors.blue.shade500.withOpacity(
-                                  0.8); // Add some opacity to the dark blue
-                            } else {
-                              return Colors.white.withOpacity(0.9);
-                            }
-                          }),
-                          cells: [
-                            DataCell(
-                              Container(
-                                width: columnWidths[0],
-                                // Same dynamic width as column headers
-                                child: Text(
-                                  detail.orderId.toString(),
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? Colors.deepOrange[200]
-                                        : const Color(0xFFFFB315),
-                                  ),
-                                ),
+                  final isSelected = _selectedProduct == detail;
+                  return DataRow(
+                      color: MaterialStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue.shade500.withOpacity(
+                              0.8); // Add some opacity to the dark blue
+                        } else {
+                          return Colors.white.withOpacity(0.9);
+                        }
+                      }),
+                      cells: [
+                        DataCell(
+                          Container(
+                            width: columnWidths[0],
+                            // Same dynamic width as column headers
+                            child: Text(
+                              detail.orderId.toString(),
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.deepOrange[200]
+                                    : const Color(0xFFFFB315),
                               ),
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[1],
-                                child: Text(
-                                  detail.orderDate!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[1],
+                            child: Text(
+                              detail.orderDate!,
+                              style: const TextStyle(
+                                color: Color(0xFFA6A6A6),
                               ),
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[2],
-                                child: Text(
-                                  detail.invoiceNo!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[2],
+                            child: Text(
+                              detail.invoiceNo!,
+                              style: const TextStyle(
+                                color: Color(0xFFA6A6A6),
                               ),
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[3],
-                                child: Text(
-                                  detail.total.toString(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[3],
+                            child: Text(
+                              detail.total.toString(),
+                              style: const TextStyle(
+                                color: Color(0xFFA6A6A6),
                               ),
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[4],
-                                child: Text(
-                                  detail.deliveryStatus.toString(),
-                                  style:  TextStyle(
-                                    color: detail.deliveryStatus == "In Progress" ? Colors.orange : detail.deliveryStatus == "Delivered" ? Colors.green : Colors.red,
-                                  ),
-                                ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[4],
+                            child: Text(
+                              detail.deliveryStatus.toString(),
+                              style: TextStyle(
+                                color: detail.deliveryStatus == "In Progress"
+                                    ? Colors.orange
+                                    : detail.deliveryStatus == "Delivered"
+                                        ? Colors.green
+                                        : Colors.red,
                               ),
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[4],
-                                child: Text(
-                                  detail.paymentStatus.toString(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[4],
+                            child: Text(
+                              detail.paymentStatus.toString(),
+                              style: const TextStyle(
+                                color: Color(0xFFA6A6A6),
                               ),
                             ),
-
-                          ],
-                          onSelectChanged: (selected) {
-                            if (selected != null && selected) {
-                              print('what is this');
-                              print(detail.invoiceNo);
-                              print(productList);
-                              print(detail.paymentStatus);
+                          ),
+                        ),
+                      ],
+                      onSelectChanged: (selected) {
+                        if (selected != null && selected) {
+                          print('what is this');
+                          print(detail.invoiceNo);
+                          print(productList);
+                          print(detail.paymentStatus);
 //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-
-                            }
-                          });
-                    })),
+                        }
+                      });
+                })),
           ),
         ],
       );
@@ -2138,7 +2630,7 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
       return Column(
         children: [
           Container(
-            width:  right-100,
+            width: right - 100,
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -2147,7 +2639,7 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
                 columnSpacing: 35,
-                columns:  columns.map((column) {
+                columns: columns.map((column) {
                   return DataColumn(
                     label: Stack(
                       children: [
@@ -2159,10 +2651,7 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
 //crossAxisAlignment: CrossAxisAlignment.end,
 //   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text(
-                                  column,
-                                  style: TextStyles.subhead
-                              ),
+                              Text(column, style: TextStyles.subhead),
                             ],
                           ),
                         ),
@@ -2176,8 +2665,8 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                 rows: []),
           ),
           Padding(
-            padding:
-            const EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            padding: const EdgeInsets.only(
+                top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
         ],
@@ -2191,7 +2680,6 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
         children: [
           Container(
             width: right - 100,
-
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -2201,8 +2689,7 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                 headingRowHeight: 40,
                 columnSpacing: 35,
 // List.generate(5, (index)
-                columns:
-                columns.map((column) {
+                columns: columns.map((column) {
                   return DataColumn(
                     label: Stack(
                       children: [
@@ -2214,23 +2701,29 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
 //crossAxisAlignment: CrossAxisAlignment.end,
 //   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text(
-                                  column,
-                                  style: TextStyles.subhead
-                              ),
+                              Text(column, style: TextStyles.subhead),
                               IconButton(
                                 icon:
-                                _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(width: 12,
-                                    child: Image.asset("images/sort.png",color: Colors.grey,))
-                                    : SizedBox(width: 12,child: Image.asset("images/sort.png",color: Colors.blue,)),
+                                    _sortOrder[columns.indexOf(column)] == 'asc'
+                                        ? SizedBox(
+                                            width: 12,
+                                            child: Image.asset(
+                                              "images/sort.png",
+                                              color: Colors.grey,
+                                            ))
+                                        : SizedBox(
+                                            width: 12,
+                                            child: Image.asset(
+                                              "images/sort.png",
+                                              color: Colors.blue,
+                                            )),
                                 onPressed: () {
                                   setState(() {
                                     _sortOrder[columns.indexOf(column)] =
-                                    _sortOrder[columns.indexOf(column)] ==
-                                        'asc'
-                                        ? 'desc'
-                                        : 'asc';
+                                        _sortOrder[columns.indexOf(column)] ==
+                                                'asc'
+                                            ? 'desc'
+                                            : 'asc';
                                     _sortProducts(columns.indexOf(column),
                                         _sortOrder[columns.indexOf(column)]);
                                   });
@@ -2254,89 +2747,86 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
                 rows: List.generate(
                     math.min(itemsPerPage,
                         filteredData.length - (currentPage - 1) * itemsPerPage),
-                        (index) {
-                      final detail =
+                    (index) {
+                  final detail =
                       filteredData[(currentPage - 1) * itemsPerPage + index];
-                      final isSelected = _selectedProduct == detail;
-                      return DataRow(
-                          color: MaterialStateProperty.resolveWith<Color>((states) {
-                            if (states.contains(MaterialState.hovered)) {
-                              return Colors.blue.shade500.withOpacity(
-                                  0.8); // Add some opacity to the dark blue
-                            } else {
-                              return Colors.white.withOpacity(0.9);
-                            }
-                          }),
-                          cells: [
-                            DataCell(
-                              Container(
-                                width: columnWidths[0],
-                                // Same dynamic width as column headers
-                                child: Text(
-                                  detail.orderId.toString(),
-                                  style: TextStyles.body,
-                                ),
-                              ),
+                  final isSelected = _selectedProduct == detail;
+                  return DataRow(
+                      color: MaterialStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue.shade500.withOpacity(
+                              0.8); // Add some opacity to the dark blue
+                        } else {
+                          return Colors.white.withOpacity(0.9);
+                        }
+                      }),
+                      cells: [
+                        DataCell(
+                          Container(
+                            width: columnWidths[0],
+                            // Same dynamic width as column headers
+                            child: Text(
+                              detail.orderId.toString(),
+                              style: TextStyles.body,
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[1],
-                                child: Text(
-                                  detail.orderDate,
-                                  style: TextStyles.body,
-                                ),
-                              ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[1],
+                            child: Text(
+                              detail.orderDate,
+                              style: TextStyles.body,
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[2],
-                                child: Text(
-                                  detail.invoiceNo!,
-                                  style: TextStyles.body,
-                                ),
-                              ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[2],
+                            child: Text(
+                              detail.invoiceNo!,
+                              style: TextStyles.body,
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[3],
-                                child: Text(
-                                  detail.total.toString(),
-                                  style: TextStyles.body,
-                                ),
-                              ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[3],
+                            child: Text(
+                              detail.total.toString(),
+                              style: TextStyles.body,
                             ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[4],
-                                child: Text(
-                                  detail.deliveryStatus.toString(),
-                                  style: TextStyles.body,
-                                ),
-                              ),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            width: columnWidths[4],
+                            child: Text(
+                              detail.deliveryStatus.toString(),
+                              style: TextStyles.body,
                             ),
-                            // DataCell(
-                            //   Container(
-                            //     width: columnWidths[4],
-                            //     child: Text(
-                            //       detail.paymentStatus.toString(),
-                            //       style: TextStyles.body,
-                            //     ),
-                            //   ),
-                            // ),
-
-                          ],
-                          onSelectChanged: (selected) {
-                            if (selected != null && selected) {
-                              print('what is this');
-                              print(detail.invoiceNo);
-                              print(productList);
-                              print(detail.paymentStatus);
+                          ),
+                        ),
+                        // DataCell(
+                        //   Container(
+                        //     width: columnWidths[4],
+                        //     child: Text(
+                        //       detail.paymentStatus.toString(),
+                        //       style: TextStyles.body,
+                        //     ),
+                        //   ),
+                        // ),
+                      ],
+                      onSelectChanged: (selected) {
+                        if (selected != null && selected) {
+                          print('what is this');
+                          print(detail.invoiceNo);
+                          print(productList);
+                          print(detail.paymentStatus);
 //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-
-
-                            }
-                          });
-                    })),
+                        }
+                      });
+                })),
           ),
         ],
       );
@@ -2347,7 +2837,9 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
     if (sortDirection == 'asc') {
       filteredData.sort((a, b) {
         if (columnIndex == 0) {
-          return a.paymentStatus!.toLowerCase().compareTo(b.paymentStatus!.toLowerCase());
+          return a.paymentStatus!
+              .toLowerCase()
+              .compareTo(b.paymentStatus!.toLowerCase());
         } else if (columnIndex == 1) {
           return a.orderId!.compareTo(b.orderId!);
         } else if (columnIndex == 2) {
@@ -2365,7 +2857,9 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
     } else {
       filteredData.sort((a, b) {
         if (columnIndex == 0) {
-          return b.paymentStatus!.toLowerCase().compareTo(a.paymentStatus!.toLowerCase());
+          return b.paymentStatus!
+              .toLowerCase()
+              .compareTo(a.paymentStatus!.toLowerCase());
         } else if (columnIndex == 1) {
           return b.orderId!.compareTo(a.orderId!);
         } else if (columnIndex == 2) {
@@ -2383,11 +2877,4 @@ class _CreateOrderState extends State<CreateOrder> with SingleTickerProviderStat
     }
     setState(() {});
   }
-
-
 }
-
-
-
-
-

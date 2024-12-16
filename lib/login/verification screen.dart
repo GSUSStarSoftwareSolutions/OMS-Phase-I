@@ -631,5 +631,3 @@ class ImageContainer1 extends StatelessWidget {
     );
   }
 }
-
-
