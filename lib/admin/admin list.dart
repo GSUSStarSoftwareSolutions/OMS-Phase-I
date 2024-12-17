@@ -899,7 +899,7 @@ class _AdminListState extends State<AdminList> {
                                                       child: SingleChildScrollView(
                                                         controller: _scrollController,
                                                         scrollDirection: Axis.horizontal,
-                                                        child: buildDataTable1(maxWidth,maxHeight),
+                                                        child: buildDataTable2(),
                                                       ),
                                                     ),
                                                   ),
@@ -1091,6 +1091,513 @@ class _AdminListState extends State<AdminList> {
       );
     });
   }
+  //
+  // Widget buildDataTable2() {
+  //   if (isLoading) {
+  //     var width = MediaQuery.of(context).size.width;
+  //     var height = MediaQuery.of(context).size.height;
+  //     // Show loading indicator while data is being fetched
+  //     return Padding(
+  //       padding: EdgeInsets.only(
+  //           top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
+  //       child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+  //     );
+  //   }
+  //
+  //   if (filteredData1.isEmpty) {
+  //     double right = MediaQuery.of(context).size.width;
+  //     return Column(
+  //       children: [
+  //         Container(
+  //           width: 1100,
+  //           // width: right * 0.78,
+  //           decoration: const BoxDecoration(
+  //               color: Color(0xFFF7F7F7),
+  //               border: Border.symmetric(
+  //                   horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+  //           child: DataTable(
+  //               showCheckboxColumn: false,
+  //               headingRowHeight: 40,
+  //               columnSpacing: 50,
+  //               columns: [
+  //                 DataColumn(
+  //                     label: Text(
+  //                       'User ID',
+  //                       style: TextStyle(
+  //                           color: Colors.indigo[900],
+  //                           fontSize: 13,
+  //                           fontWeight: FontWeight.bold),
+  //                     )),
+  //                 DataColumn(
+  //                     label: Text(
+  //                       'User Name',
+  //                       style: TextStyle(
+  //                           color: Colors.indigo[900],
+  //                           fontSize: 13,
+  //                           fontWeight: FontWeight.bold),
+  //                     )),
+  //                 DataColumn(
+  //                     label: Text(
+  //                       'Role',
+  //                       style: TextStyle(
+  //                           color: Colors.indigo[900],
+  //                           fontSize: 13,
+  //                           fontWeight: FontWeight.bold),
+  //                     )),
+  //                 DataColumn(
+  //                     label: Text(
+  //                       'Company Name',
+  //                       style: TextStyle(
+  //                           color: Colors.indigo[900],
+  //                           fontSize: 13,
+  //                           fontWeight: FontWeight.bold),
+  //                     )),
+  //                 DataColumn(
+  //                     label: Text(
+  //                       'Location',
+  //                       style: TextStyle(
+  //                           color: Colors.indigo[900],
+  //                           fontSize: 13,
+  //                           fontWeight: FontWeight.bold),
+  //                     )),
+  //                 DataColumn(
+  //                     label: Text(
+  //                       'Active',
+  //                       style: TextStyle(
+  //                           color: Colors.indigo[900],
+  //                           fontSize: 13,
+  //                           fontWeight: FontWeight.bold),
+  //                     )),
+  //               ],
+  //               rows: const []),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.only(top: 80, left: 130, right: 150),
+  //           child: CustomDatafound(),
+  //         ),
+  //       ],
+  //     );
+  //   }
+  //
+  //   void sortProducts(int columnIndex, String sortDirection) {
+  //     if (sortDirection == 'asc') {
+  //       filteredData1.sort((a, b) {
+  //         if (columnIndex == 0) {
+  //           return a.userId.compareTo(b.userId);
+  //         } else if (columnIndex == 1) {
+  //           return a.userName.compareTo(b.userName);
+  //         } else if (columnIndex == 2) {
+  //           return a.role.compareTo(b.role);
+  //         } else if (columnIndex == 3) {
+  //           return a.companyName.compareTo(b.companyName!);
+  //         } else if (columnIndex == 4) {
+  //           return a.location.compareTo(b.location);
+  //         } else {
+  //           return 0;
+  //         }
+  //       });
+  //     } else {
+  //       filteredData1.sort((a, b) {
+  //         if (columnIndex == 0) {
+  //           return b.userId.compareTo(a.userId); // Reverse the comparison
+  //         } else if (columnIndex == 1) {
+  //           return b.userName.compareTo(a.userName); // Reverse the comparison
+  //         } else if (columnIndex == 2) {
+  //           return b.role.compareTo(a.role); // Reverse the comparison
+  //         } else if (columnIndex == 3) {
+  //           return b.companyName
+  //               .compareTo(a.companyName); // Reverse the comparison
+  //         } else if (columnIndex == 4) {
+  //           return b.location.compareTo(a.location); // Reverse the comparison
+  //         } else {
+  //           return 0;
+  //         }
+  //       });
+  //     }
+  //     setState(() {});
+  //   }
+  //
+  //   return LayoutBuilder(builder: (context, constraints) {
+  //     // double padding = constraints.maxWidth * 0.065;
+  //     double right = MediaQuery.of(context).size.width;
+  //     return Column(
+  //       children: [
+  //         Container(
+  //           width: 1100,
+  //           decoration: const BoxDecoration(
+  //               color: Color(0xFFF7F7F7),
+  //               border: Border.symmetric(
+  //                   horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+  //           child: DataTable(
+  //               showCheckboxColumn: false,
+  //               headingRowHeight: 35,
+  //               columnSpacing: 20,
+  //               columns: columns.map((column) {
+  //                 return DataColumn(
+  //                   label: Stack(
+  //                     children: [
+  //                       SizedBox(
+  //                         //   padding: EdgeInsets.only(left: 5,right: 5),
+  //                         width: columnWidths[columns.indexOf(column)],
+  //                         // Dynamic width based on user interaction
+  //                         child: Row(
+  //                           mainAxisSize: MainAxisSize.min,
+  //                           //crossAxisAlignment: CrossAxisAlignment.end,
+  //                           //   mainAxisAlignment: MainAxisAlignment.end,
+  //                           children: [
+  //                             Text(
+  //                               column,
+  //                               overflow: TextOverflow.ellipsis,
+  //                               style: TextStyle(
+  //                                 fontWeight: FontWeight.bold,
+  //                                 color: Colors.indigo[900],
+  //                                 fontSize: 13,
+  //                               ),
+  //                             ),
+  //                             if (columns.indexOf(column) < columns.length - 1)
+  //                             // if (columns.indexOf(column) < 0)
+  //                               IconButton(
+  //                                 icon: _sortOrder[columns.indexOf(column)] ==
+  //                                     'asc'
+  //                                     ? SizedBox(
+  //                                     width: 12,
+  //                                     child: Image.asset(
+  //                                       "images/sort.png",
+  //                                       color: Colors.grey,
+  //                                     ))
+  //                                     : SizedBox(
+  //                                     width: 12,
+  //                                     child: Image.asset(
+  //                                       "images/sort.png",
+  //                                       color: Colors.blue,
+  //                                     )),
+  //                                 onPressed: () {
+  //                                   setState(() {
+  //                                     _sortOrder[columns.indexOf(column)] =
+  //                                     _sortOrder[columns.indexOf(column)] ==
+  //                                         'asc'
+  //                                         ? 'desc'
+  //                                         : 'asc';
+  //                                     sortProducts(columns.indexOf(column),
+  //                                         _sortOrder[columns.indexOf(column)]);
+  //                                   });
+  //                                 },
+  //                               ),
+  //                             if (columns.indexOf(column) < columns.length - 1)
+  //                               Spacer(),
+  //                             if (columns.indexOf(column) < columns.length - 1)
+  //                               MouseRegion(
+  //                                 cursor: SystemMouseCursors.resizeColumn,
+  //                                 child: GestureDetector(
+  //                                     onHorizontalDragUpdate: (details) {
+  //                                       // Update column width dynamically as user drags
+  //                                       setState(() {
+  //                                         columnWidths[
+  //                                         columns.indexOf(column)] +=
+  //                                             details.delta.dx;
+  //                                         columnWidths[columns
+  //                                             .indexOf(column)] = columnWidths[
+  //                                         columns.indexOf(column)]
+  //                                             .clamp(161.0, 300.0);
+  //                                       });
+  //                                     },
+  //                                     child: const Padding(
+  //                                       padding: EdgeInsets.only(
+  //                                           top: 10, bottom: 10),
+  //                                       child: Row(
+  //                                         children: [
+  //                                           VerticalDivider(
+  //                                             width: 5,
+  //                                             thickness: 4,
+  //                                             color: Colors.grey,
+  //                                           )
+  //                                         ],
+  //                                       ),
+  //                                     )),
+  //                               ),
+  //                             // ),
+  //                           ],
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   onSort: (columnIndex, ascending) {
+  //                     _sortOrder;
+  //                   },
+  //                 );
+  //               }).toList(),
+  //               rows: List.generate(
+  //                   math.min(
+  //                       itemsPerPage,
+  //                       filteredData1.length -
+  //                           (currentPage - 1) * itemsPerPage), (index) {
+  //                 final detail = filteredData1
+  //                     .skip((currentPage - 1) * itemsPerPage)
+  //                     .elementAt(index);
+  //                 final customerIndex =
+  //                     (currentPage - 1) * itemsPerPage + index;
+  //                 final isSelected = _selectedProduct == detail;
+  //                 return DataRow(
+  //                   color: MaterialStateProperty.resolveWith<Color>((states) {
+  //                     if (states.contains(MaterialState.hovered)) {
+  //                       return Colors.blue.shade500.withOpacity(
+  //                           0.8); // Add some opacity to the dark blue
+  //                     } else {
+  //                       return Colors.white.withOpacity(0.9);
+  //                     }
+  //                   }),
+  //                   cells: [
+  //                     DataCell(Text(
+  //                       detail.userId.toString(),
+  //                       style: TextStyle(
+  //                         //fontSize: 16,
+  //                         color: isSelected
+  //                             ? Colors.deepOrange[200]
+  //                             : const Color(0xFFFFB315),
+  //                       ),
+  //                     )),
+  //                     DataCell(Text(
+  //                       detail.userName,
+  //                       style: const TextStyle(
+  //                         // fontSize: 16,
+  //                           color: Colors.grey),
+  //                     )),
+  //                     DataCell(
+  //                       Text(detail.role,
+  //                           style: const TextStyle(
+  //                             // fontSize: 16,
+  //                               color: Colors.grey)),
+  //                     ),
+  //                     DataCell(
+  //                       Text(detail.companyName.toString(),
+  //                           style: const TextStyle(
+  //                             //fontSize: 16,
+  //                               color: Colors.grey)),
+  //                     ),
+  //                     DataCell(
+  //                       Text(detail.location.toString(),
+  //                           style: const TextStyle(
+  //                             //fontSize: 16,
+  //                               color: Colors.grey)),
+  //                     ),
+  //                     DataCell(
+  //                       Padding(
+  //                         padding: const EdgeInsets.only(top: 12, bottom: 7),
+  //                         child: Container(
+  //                           width: 98,
+  //                           decoration: BoxDecoration(
+  //                             borderRadius: BorderRadius.circular(5),
+  //                           ),
+  //                           child: DropdownButtonFormField2<String>(
+  //                             decoration: InputDecoration(
+  //                               contentPadding:
+  //                               EdgeInsets.only(bottom: 15, left: 9),
+  //                               hintText: detail.active == true
+  //                                   ? 'Active'
+  //                                   : 'In Active',
+  //                               hintStyle: TextStyle(
+  //                                   color: Colors.black, fontSize: 15),
+  //                               border: OutlineInputBorder(),
+  //                             ),
+  //                             items: const [
+  //                               DropdownMenuItem<String>(
+  //                                 value: 'Active',
+  //                                 //  enabled: false,
+  //                                 // Disable selection of "Active"
+  //                                 child: Text(
+  //                                   'Active',
+  //                                   style: TextStyle(
+  //                                       color: Colors
+  //                                           .grey), // Style the disabled item
+  //                                 ),
+  //                               ),
+  //                               DropdownMenuItem<String>(
+  //                                 value: 'In Active',
+  //                                 child: Text('In Active'),
+  //                               ),
+  //                             ],
+  //                             onChanged: (String? newValue) {
+  //                               if (newValue != null) {
+  //                                 setState(() {
+  //                                   detail.active = (newValue ==
+  //                                       'Active'); // Convert String to bool
+  //                                   updateRequestStatus(
+  //                                       detail.userId, newValue);
+  //                                 });
+  //                               }
+  //                             },
+  //                             dropdownStyleData: DropdownStyleData(
+  //                               decoration: BoxDecoration(
+  //                                 borderRadius: BorderRadius.circular(7),
+  //                                 color:
+  //                                 Colors.white, // Dropdown background color
+  //                               ),
+  //                               maxHeight: 200,
+  //                               width: 98,
+  //                               offset: const Offset(0, -10),
+  //                               padding: EdgeInsets.zero,
+  //                             ),
+  //                             iconStyleData: const IconStyleData(
+  //                               icon: Padding(
+  //                                 padding: EdgeInsets.only(right: 9, top: 5),
+  //                                 child: Icon(
+  //                                   Icons.arrow_drop_down,
+  //                                   color: Colors.indigo,
+  //                                   size: 17,
+  //                                 ),
+  //                               ),
+  //                               iconSize: 17,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //
+  //                     // DataCell(Text(
+  //                     //   detail.active.toString(),
+  //                     //   style: const TextStyle(
+  //                     //     // fontSize: 16,
+  //                     //       color: Colors.grey),
+  //                     // )),
+  //                     DataCell(Row(children: [
+  //                       IconButton(
+  //                         icon: Image.asset(
+  //                           "images/edit_icon.png",
+  //                           color: Color.fromRGBO(0, 83, 176, 1),
+  //                         ),
+  //                         onPressed: () {
+  //                           var selectedCustomer =
+  //                           filteredData1[customerIndex].toJson();
+  //                           print('select');
+  //                           print(selectedCustomer);
+  //                           context.go('/Edit_User', extra: {
+  //                             'EditUser': selectedCustomer,
+  //                           });
+  //                         },
+  //                       ),
+  //                       SizedBox(
+  //                         width: 10,
+  //                       ),
+  //                       IconButton(
+  //                         icon: Image.asset(
+  //                           "images/delete.png",
+  //                           color: Color.fromRGBO(250, 0, 0, 1),
+  //                         ),
+  //                         onPressed: () {
+  //                           showDialog(
+  //                             barrierDismissible: false,
+  //                             context: context,
+  //                             builder: (BuildContext context) {
+  //                               return AlertDialog(
+  //                                 shape: RoundedRectangleBorder(
+  //                                   borderRadius: BorderRadius.circular(15.0),
+  //                                 ),
+  //                                 contentPadding: EdgeInsets.zero,
+  //                                 content: Column(
+  //                                   mainAxisSize: MainAxisSize.min,
+  //                                   children: [
+  //                                     Padding(
+  //                                       padding: const EdgeInsets.all(16.0),
+  //                                       child: Column(
+  //                                         children: [
+  //                                           const Icon(Icons.warning,
+  //                                               color: Colors.orange, size: 50),
+  //                                           const SizedBox(height: 16),
+  //                                           const Text(
+  //                                             'Are You Sure',
+  //                                             style: TextStyle(
+  //                                               fontSize: 18,
+  //                                               fontWeight: FontWeight.bold,
+  //                                               color: Colors.black,
+  //                                             ),
+  //                                           ),
+  //                                           const SizedBox(height: 20),
+  //                                           Row(
+  //                                             mainAxisAlignment:
+  //                                             MainAxisAlignment.spaceEvenly,
+  //                                             children: [
+  //                                               ElevatedButton(
+  //                                                 onPressed: () {
+  //                                                   deleteRowAPI(detail.userId);
+  //                                                 },
+  //                                                 style:
+  //                                                 ElevatedButton.styleFrom(
+  //                                                   backgroundColor:
+  //                                                   Colors.green,
+  //                                                   side: const BorderSide(
+  //                                                       color: Colors.green),
+  //                                                   shape:
+  //                                                   RoundedRectangleBorder(
+  //                                                     borderRadius:
+  //                                                     BorderRadius.circular(
+  //                                                         10.0),
+  //                                                   ),
+  //                                                 ),
+  //                                                 child: const Text(
+  //                                                   'Yes',
+  //                                                   style: TextStyle(
+  //                                                       color: Colors.white),
+  //                                                 ),
+  //                                               ),
+  //                                               ElevatedButton(
+  //                                                 onPressed: () {
+  //                                                   Navigator.of(context).pop();
+  //                                                 },
+  //                                                 style:
+  //                                                 ElevatedButton.styleFrom(
+  //                                                   backgroundColor: Colors.red,
+  //                                                   side: const BorderSide(
+  //                                                       color: Colors.red),
+  //                                                   shape:
+  //                                                   RoundedRectangleBorder(
+  //                                                     borderRadius:
+  //                                                     BorderRadius.circular(
+  //                                                         10.0),
+  //                                                   ),
+  //                                                 ),
+  //                                                 child: const Text(
+  //                                                   'No',
+  //                                                   style: TextStyle(
+  //                                                       color: Colors.white),
+  //                                                 ),
+  //                                               ),
+  //                                             ],
+  //                                           ),
+  //                                         ],
+  //                                       ),
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                               );
+  //                             },
+  //                           );
+  //                         },
+  //                       ),
+  //                     ])),
+  //                   ],
+  //                 );
+  //                 // onSelectChanged: (selected) {
+  //                 //   if (selected != null && selected) {
+  //                 //     final orderId = detail
+  //                 //         .orderId; // Capture the orderId of the selected row
+  //                 //     final detail1 = filteredData.firstWhere(
+  //                 //         (element) => element.orderId == orderId);
+  //                 //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+  //                 //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+  //                 //
+  //                 //     if (filteredData1.length <= 9) {
+  //                 //
+  //                 //     } else {
+  //                 //
+  //                 //     }
+  //                 //   }
+  //                 // });
+  //               })),
+  //         ),
+  //       ],
+  //     );
+  //   });
+  // }
 
   Widget buildDataTable2() {
     if (isLoading) {
@@ -1109,8 +1616,7 @@ class _AdminListState extends State<AdminList> {
       return Column(
         children: [
           Container(
-            width: 1100,
-            // width: right * 0.78,
+            width: right - 270,
             decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -1220,385 +1726,342 @@ class _AdminListState extends State<AdminList> {
     return LayoutBuilder(builder: (context, constraints) {
       // double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width;
-      return Column(
-        children: [
-          Container(
-            width: 1100,
-            decoration: const BoxDecoration(
-                color: Color(0xFFF7F7F7),
-                border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 35,
-                columnSpacing: 20,
-                columns: columns.map((column) {
-                  return DataColumn(
-                    label: Stack(
-                      children: [
-                        SizedBox(
-                          //   padding: EdgeInsets.only(left: 5,right: 5),
-                          width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            //crossAxisAlignment: CrossAxisAlignment.end,
-                            //   mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                column,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
-                              ),
-                              if (columns.indexOf(column) < columns.length - 1)
-                              // if (columns.indexOf(column) < 0)
-                                IconButton(
-                                  icon: _sortOrder[columns.indexOf(column)] ==
+      double height = MediaQuery.of(context).size.height;
+      double maxWidth = constraints.maxWidth;
+      double maxHeight = constraints.maxHeight;
+      //print(width);
+      print(maxWidth);
+      return Container(
+        height: height,
+        width: 1200,//Responsive.scaleWidth(context),
+        decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border.symmetric(
+                horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+        child: DataTable(
+            headingRowColor:  MaterialStateProperty.all(Color(0xFFF7F7F7)),
+            showCheckboxColumn: false,
+            headingRowHeight: 35,
+            columnSpacing: 20,
+            columns: columns.map((column) {
+              return DataColumn(
+                label: Stack(
+                  children: [
+                    SizedBox(
+                      //   padding: EdgeInsets.only(left: 5,right: 5),
+                      width: columnWidths[columns.indexOf(column)],
+                      // Dynamic width based on user interaction
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        //crossAxisAlignment: CrossAxisAlignment.end,
+                        //   mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(column,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyles.subhead
+                            // TextStyle(
+                            //   fontWeight: FontWeight.bold,
+                            //   color: Color.fromRGBO(0, 83, 176, 1),
+                            //   fontSize: 13,
+                            // ),
+                          ),
+                          if (columns.indexOf(column) < columns.length - 1)
+                          // if (columns.indexOf(column) < 0)
+                            IconButton(
+                              icon: _sortOrder[columns.indexOf(column)] ==
+                                  'asc'
+                                  ? SizedBox(
+                                  width: 12,
+                                  child: Image.asset(
+                                    "images/ix_sort.png",
+                                    color:
+                                    Color.fromRGBO(0, 83, 176, 1),
+                                  ))
+                                  : SizedBox(
+                                  width: 12,
+                                  child: Image.asset(
+                                    "images/ix_sort.png",
+                                    color:
+                                    Color.fromRGBO(0, 83, 176, 1),
+                                  )),
+                              onPressed: () {
+                                setState(() {
+                                  _sortOrder[columns.indexOf(column)] =
+                                  _sortOrder[columns.indexOf(column)] ==
                                       'asc'
-                                      ? SizedBox(
-                                      width: 12,
-                                      child: Image.asset(
-                                        "images/sort.png",
-                                        color: Colors.grey,
-                                      ))
-                                      : SizedBox(
-                                      width: 12,
-                                      child: Image.asset(
-                                        "images/sort.png",
-                                        color: Colors.blue,
-                                      )),
-                                  onPressed: () {
-                                    setState(() {
-                                      _sortOrder[columns.indexOf(column)] =
-                                      _sortOrder[columns.indexOf(column)] ==
-                                          'asc'
-                                          ? 'desc'
-                                          : 'asc';
-                                      sortProducts(columns.indexOf(column),
-                                          _sortOrder[columns.indexOf(column)]);
-                                    });
-                                  },
-                                ),
-                              if (columns.indexOf(column) < columns.length - 1)
-                                Spacer(),
-                              if (columns.indexOf(column) < columns.length - 1)
-                                MouseRegion(
-                                  cursor: SystemMouseCursors.resizeColumn,
-                                  child: GestureDetector(
-                                      onHorizontalDragUpdate: (details) {
-                                        // Update column width dynamically as user drags
-                                        setState(() {
-                                          columnWidths[
-                                          columns.indexOf(column)] +=
-                                              details.delta.dx;
-                                          columnWidths[columns
-                                              .indexOf(column)] = columnWidths[
-                                          columns.indexOf(column)]
-                                              .clamp(161.0, 300.0);
-                                        });
-                                      },
-                                      child: const Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 10, bottom: 10),
-                                        child: Row(
-                                          children: [
-                                            VerticalDivider(
-                                              width: 5,
-                                              thickness: 4,
-                                              color: Colors.grey,
-                                            )
-                                          ],
-                                        ),
-                                      )),
-                                ),
-                              // ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    onSort: (columnIndex, ascending) {
-                      _sortOrder;
-                    },
-                  );
-                }).toList(),
-                rows: List.generate(
-                    math.min(
-                        itemsPerPage,
-                        filteredData1.length -
-                            (currentPage - 1) * itemsPerPage), (index) {
-                  final detail = filteredData1
-                      .skip((currentPage - 1) * itemsPerPage)
-                      .elementAt(index);
-                  final customerIndex =
-                      (currentPage - 1) * itemsPerPage + index;
-                  final isSelected = _selectedProduct == detail;
-                  return DataRow(
-                    color: MaterialStateProperty.resolveWith<Color>((states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.blue.shade500.withOpacity(
-                            0.8); // Add some opacity to the dark blue
-                      } else {
-                        return Colors.white.withOpacity(0.9);
-                      }
-                    }),
-                    cells: [
-                      DataCell(Text(
-                        detail.userId.toString(),
-                        style: TextStyle(
-                          //fontSize: 16,
-                          color: isSelected
-                              ? Colors.deepOrange[200]
-                              : const Color(0xFFFFB315),
-                        ),
-                      )),
-                      DataCell(Text(
-                        detail.userName,
-                        style: const TextStyle(
-                          // fontSize: 16,
-                            color: Colors.grey),
-                      )),
-                      DataCell(
-                        Text(detail.role,
-                            style: const TextStyle(
-                              // fontSize: 16,
-                                color: Colors.grey)),
-                      ),
-                      DataCell(
-                        Text(detail.companyName.toString(),
-                            style: const TextStyle(
-                              //fontSize: 16,
-                                color: Colors.grey)),
-                      ),
-                      DataCell(
-                        Text(detail.location.toString(),
-                            style: const TextStyle(
-                              //fontSize: 16,
-                                color: Colors.grey)),
-                      ),
-                      DataCell(
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12, bottom: 7),
-                          child: Container(
-                            width: 98,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: DropdownButtonFormField2<String>(
-                              decoration: InputDecoration(
-                                contentPadding:
-                                EdgeInsets.only(bottom: 15, left: 9),
-                                hintText: detail.active == true
-                                    ? 'Active'
-                                    : 'In Active',
-                                hintStyle: TextStyle(
-                                    color: Colors.black, fontSize: 15),
-                                border: OutlineInputBorder(),
-                              ),
-                              items: const [
-                                DropdownMenuItem<String>(
-                                  value: 'Active',
-                                  //  enabled: false,
-                                  // Disable selection of "Active"
-                                  child: Text(
-                                    'Active',
-                                    style: TextStyle(
-                                        color: Colors
-                                            .grey), // Style the disabled item
-                                  ),
-                                ),
-                                DropdownMenuItem<String>(
-                                  value: 'In Active',
-                                  child: Text('In Active'),
-                                ),
-                              ],
-                              onChanged: (String? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    detail.active = (newValue ==
-                                        'Active'); // Convert String to bool
-                                    updateRequestStatus(
-                                        detail.userId, newValue);
-                                  });
-                                }
+                                      ? 'desc'
+                                      : 'asc';
+                                  sortProducts(columns.indexOf(column),
+                                      _sortOrder[columns.indexOf(column)]);
+                                });
                               },
-                              dropdownStyleData: DropdownStyleData(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(7),
-                                  color:
-                                  Colors.white, // Dropdown background color
-                                ),
-                                maxHeight: 200,
-                                width: 98,
-                                offset: const Offset(0, -10),
-                                padding: EdgeInsets.zero,
-                              ),
-                              iconStyleData: const IconStyleData(
-                                icon: Padding(
-                                  padding: EdgeInsets.only(right: 9, top: 5),
-                                  child: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: Colors.indigo,
-                                    size: 17,
-                                  ),
-                                ),
-                                iconSize: 17,
+                            ),
+
+                          // ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                onSort: (columnIndex, ascending) {
+                  _sortOrder;
+                },
+              );
+            }).toList(),
+            rows: List.generate(
+                math.min(
+                    itemsPerPage,
+                    filteredData1.length -
+                        (currentPage - 1) * itemsPerPage), (index) {
+              final detail = filteredData1
+                  .skip((currentPage - 1) * itemsPerPage)
+                  .elementAt(index);
+              final customerIndex =
+                  (currentPage - 1) * itemsPerPage + index;
+              final isSelected = _selectedProduct == detail;
+              return DataRow(
+                color: MaterialStateProperty.resolveWith<Color>((states) {
+                  if (states.contains(MaterialState.hovered)) {
+                    return Colors.blue.shade500.withOpacity(
+                        0.8); // Add some opacity to the dark blue
+                  } else {
+                    return Colors.white.withOpacity(0.9);
+                  }
+                }),
+                cells: [
+                  DataCell(Text(
+                    detail.userId.toString(),
+                    style: TextStyles.body,
+                  )),
+                  DataCell(Text(
+                    detail.userName,
+                    style: TextStyles.body,
+                  )),
+                  DataCell(
+                    Text(
+                      detail.role,
+                      style: TextStyles.body,
+                    ),
+                  ),
+                  DataCell(
+                    Text(
+                      detail.companyName.toString(),
+                      style: TextStyles.body,
+                    ),
+                  ),
+                  DataCell(
+                    Text(
+                      detail.location.toString(),
+                      style: TextStyles.body,
+                    ),
+                  ),
+                  DataCell(
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12, bottom: 7),
+                      child: Container(
+                        width: 98,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: DropdownButtonFormField2<String>(
+                          value: detail.active ? 'Active' : 'In Active', // Ensure value is set correctly
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.only(bottom: 15),
+                            hintText: detail.active ? 'Active' : 'In Active',
+                            hintStyle: TextStyles.body,
+                            border: InputBorder.none,
+                          ),
+                          items: [
+                            DropdownMenuItem<String>(
+                              value: 'Active',
+                              child: Text(
+                                'Active',
+                                style: TextStyles.body,
                               ),
                             ),
+                            DropdownMenuItem<String>(
+                              value: 'In Active',
+                              child: Text(
+                                'In Active',
+                                style: TextStyles.body,
+                              ),
+                            ),
+                          ],
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              setState(() {
+                                detail.active = (newValue == 'Active'); // Convert String to bool
+                                updateRequestStatus(detail.userId, newValue);
+                              });
+                            }
+                          },
+                          dropdownStyleData: DropdownStyleData(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(7),
+                              color: Colors.white, // Dropdown background color
+                            ),
+                            maxHeight: 200,
+                            width: 98,
+                            offset: const Offset(0, -10),
+                            padding: EdgeInsets.zero,
+                          ),
+                          iconStyleData: const IconStyleData(
+                            icon: Padding(
+                              padding: EdgeInsets.only(right: 9, bottom: 3),
+                              child: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.indigo,
+                                size: 17,
+                              ),
+                            ),
+                            iconSize: 17,
                           ),
                         ),
                       ),
-
-                      // DataCell(Text(
-                      //   detail.active.toString(),
-                      //   style: const TextStyle(
-                      //     // fontSize: 16,
-                      //       color: Colors.grey),
-                      // )),
-                      DataCell(Row(children: [
-                        IconButton(
-                          icon: Image.asset(
-                            "images/edit_icon.png",
-                            color: Color.fromRGBO(0, 83, 176, 1),
-                          ),
-                          onPressed: () {
-                            var selectedCustomer =
-                            filteredData1[customerIndex].toJson();
-                            print('select');
-                            print(selectedCustomer);
-                            context.go('/Edit_User', extra: {
-                              'EditUser': selectedCustomer,
-                            });
-                          },
+                    ),
+                  ),
+                  // DataCell(Text(
+                  //   detail.active.toString(),
+                  //   style: const TextStyle(
+                  //     // fontSize: 16,
+                  //       color: Colors.grey),
+                  // )),
+                  DataCell(Row(children: [
+                    IconButton(
+                        icon: Image.asset(
+                          "images/edit_icon.png",
+                          color: Color.fromRGBO(0, 83, 176, 1),
                         ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        IconButton(
-                          icon: Image.asset(
-                            "images/delete.png",
-                            color: Color.fromRGBO(250, 0, 0, 1),
-                          ),
-                          onPressed: () {
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  contentPadding: EdgeInsets.zero,
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
+                        onPressed: () {
+                          var selectedCustomer =
+                          filteredData1[customerIndex].toJson();
+                          print('select');
+                          print(selectedCustomer);
+                          context.go('/Edit_User', extra: {
+                            'EditUser': selectedCustomer,
+                          });
+                        }),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    IconButton(
+                      icon: Image.asset(
+                        "images/delete.png",
+                        color: Color.fromRGBO(250, 0, 0, 1),
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              contentPadding: EdgeInsets.zero,
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      children: [
+                                        const Icon(Icons.warning,
+                                            color: Colors.orange, size: 50),
+                                        const SizedBox(height: 16),
+                                        const Text(
+                                          'Are You Sure',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                           children: [
-                                            const Icon(Icons.warning,
-                                                color: Colors.orange, size: 50),
-                                            const SizedBox(height: 16),
-                                            const Text(
-                                              'Are You Sure',
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                deleteRowAPI(detail.userId);
+                                              },
+                                              style:
+                                              ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                Colors.green,
+                                                side: const BorderSide(
+                                                    color: Colors.green),
+                                                shape:
+                                                RoundedRectangleBorder(
+                                                  borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0),
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                'Yes',
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               ),
                                             ),
-                                            const SizedBox(height: 20),
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    deleteRowAPI(detail.userId);
-                                                  },
-                                                  style:
-                                                  ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                    Colors.green,
-                                                    side: const BorderSide(
-                                                        color: Colors.green),
-                                                    shape:
-                                                    RoundedRectangleBorder(
-                                                      borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                    ),
-                                                  ),
-                                                  child: const Text(
-                                                    'Yes',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              style:
+                                              ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                                side: const BorderSide(
+                                                    color: Colors.red),
+                                                shape:
+                                                RoundedRectangleBorder(
+                                                  borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0),
                                                 ),
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  style:
-                                                  ElevatedButton.styleFrom(
-                                                    backgroundColor: Colors.red,
-                                                    side: const BorderSide(
-                                                        color: Colors.red),
-                                                    shape:
-                                                    RoundedRectangleBorder(
-                                                      borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                    ),
-                                                  ),
-                                                  child: const Text(
-                                                    'No',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                ),
-                                              ],
+                                              ),
+                                              child: const Text(
+                                                'No',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                );
-                              },
+                                ],
+                              ),
                             );
                           },
-                        ),
-                      ])),
-                    ],
-                  );
-                  // onSelectChanged: (selected) {
-                  //   if (selected != null && selected) {
-                  //     final orderId = detail
-                  //         .orderId; // Capture the orderId of the selected row
-                  //     final detail1 = filteredData.firstWhere(
-                  //         (element) => element.orderId == orderId);
-                  //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                  //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                  //
-                  //     if (filteredData1.length <= 9) {
-                  //
-                  //     } else {
-                  //
-                  //     }
-                  //   }
-                  // });
-                })),
-          ),
-        ],
+                        );
+                      },
+                    ),
+                  ])),
+                ],
+              );
+              // onSelectChanged: (selected) {
+              //   if (selected != null && selected) {
+              //     final orderId = detail
+              //         .orderId; // Capture the orderId of the selected row
+              //     final detail1 = filteredData.firstWhere(
+              //         (element) => element.orderId == orderId);
+              //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+              //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+              //
+              //     if (filteredData1.length <= 9) {
+              //
+              //     } else {
+              //
+              //     }
+              //   }
+              // });
+            })),
       );
     });
   }
-
   Widget buildDataTable1(double width , double height) {
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
@@ -1733,7 +2196,7 @@ class _AdminListState extends State<AdminList> {
       print(maxWidth);
       return Container(
         height: height,
-        width: Responsive.scaleWidth(context),
+        width: right - 240,//Responsive.scaleWidth(context),
         decoration: const BoxDecoration(
             color: Colors.white,
             border: Border.symmetric(
@@ -1907,7 +2370,7 @@ class _AdminListState extends State<AdminList> {
                           ),
                           iconStyleData: const IconStyleData(
                             icon: Padding(
-                              padding: EdgeInsets.only(right: 9, top: 5),
+                              padding: EdgeInsets.only(right: 9, bottom: 3),
                               child: Icon(
                                 Icons.arrow_drop_down,
                                 color: Colors.indigo,
@@ -1920,7 +2383,6 @@ class _AdminListState extends State<AdminList> {
                       ),
                     ),
                   ),
-
                   // DataCell(Text(
                   //   detail.active.toString(),
                   //   style: const TextStyle(

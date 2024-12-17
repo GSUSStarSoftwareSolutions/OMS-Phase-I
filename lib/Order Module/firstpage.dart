@@ -349,9 +349,6 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
       const SizedBox(
         height: 6,
       ),
-
-
-
     ];
   }
   List<Widget> _buildMenuItems1(BuildContext context) {
@@ -596,6 +593,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                   ],
                                 ),
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Padding(
                                         padding: const EdgeInsets.only(
@@ -704,6 +702,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                       ],
                                     ),
                                     Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Padding(
                                             padding: const EdgeInsets.only(
@@ -846,8 +845,9 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                     hintText: 'Search by Order ID or Customer Name',
                                     hintStyle:
                                     TextStyle(fontSize: 13, color: Colors.grey),
-                                    contentPadding:
-                                    EdgeInsets.only(bottom: 20, left: 10),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
+                                    // contentPadding:
+                                    // EdgeInsets.only(bottom: 20, left: 10),
                                     // adjusted padding
                                     border: InputBorder.none,
                                     suffixIcon: Padding(

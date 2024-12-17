@@ -877,65 +877,54 @@ class _CreateOrderState extends State<CreateOrder>
                                           right: 54, top: 5),
                                       child: OutlinedButton(
                                         onPressed: () async {
-
                                           if (_selectedProducts.isEmpty) {
-
                                             // Check if no products are selected
 
-                                            ScaffoldMessenger.of(context).showSnackBar(
-
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
                                               const SnackBar(
-
-                                                content: Text('Please add a product before creating an order'),
-
+                                                content: Text(
+                                                    'Please add a product before creating an order'),
                                                 duration: Duration(seconds: 2),
-
                                               ),
-
                                             );
-
-                                          } else if (_selectedProducts.any((product) => product['productDescription'] == null || product['productDescription'].isEmpty)) {
-
+                                          } else if (_selectedProducts.any(
+                                              (product) =>
+                                                  product['productDescription'] ==
+                                                      null ||
+                                                  product['productDescription']
+                                                      .isEmpty)) {
                                             // Check if any product has an empty or null productDescription
 
-                                            ScaffoldMessenger.of(context).showSnackBar(
-
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
                                               const SnackBar(
-
-                                                content: Text('Each product must have a description'),
-
+                                                content: Text(
+                                                    'Each product must have a description'),
                                                 duration: Duration(seconds: 2),
-
                                               ),
-
                                             );
-
-                                          } else if (_selectedProducts.any((product) => product['qty'] == null || product['qty'] <= 0)) {
-
+                                          } else if (_selectedProducts.any(
+                                              (product) =>
+                                                  product['qty'] == null ||
+                                                  product['qty'] <= 0)) {
                                             // Check if any product has an invalid or zero quantity
 
-                                            ScaffoldMessenger.of(context).showSnackBar(
-
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
                                               const SnackBar(
-
-                                                content: Text('Each product must have a valid quantity greater than zero'),
-
+                                                content: Text(
+                                                    'Each product must have a valid quantity greater than zero'),
                                                 duration: Duration(seconds: 2),
-
                                               ),
-
                                             );
-
                                           } else {
-
                                             // If all validations pass, proceed with API calls
 
                                             await fetchCustomerData(userId);
 
                                             await callApi();
-
                                           }
-
                                         },
                                         // onPressed: () async {
                                         //   if (_selectedProducts.isEmpty) {
@@ -1069,7 +1058,8 @@ class _CreateOrderState extends State<CreateOrder>
                                     Expanded(
                                       child: TextFormField(
                                         controller: _dateController,
-                                        style: TextStyle(fontSize: maxWidth * 0.009),
+                                        style: TextStyle(
+                                            fontSize: maxWidth * 0.009),
                                         // Replace with your TextEditingController
                                         readOnly: true,
                                         decoration: InputDecoration(
@@ -1144,7 +1134,7 @@ class _CreateOrderState extends State<CreateOrder>
                                       width: maxWidth,
                                       color: Colors.grey[100],
                                       child: DataTable(
-                                        dataRowHeight: 57,
+                                      //  dataRowHeight: 57,
                                         headingRowHeight: 50,
                                         dataRowColor: MaterialStateProperty
                                             .resolveWith<Color>(
@@ -1158,8 +1148,12 @@ class _CreateOrderState extends State<CreateOrder>
                                               label: Text('S.NO',
                                                   style: TextStyles.subhead)),
                                           DataColumn(
-                                              label: Text('Product Name',
-                                                  style: TextStyles.subhead)),
+                                              label: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text('Product Name',
+                                                style: TextStyles.subhead),
+                                          )),
                                           DataColumn(
                                               label: Text('Category',
                                                   style: TextStyles.subhead)),
@@ -1170,8 +1164,12 @@ class _CreateOrderState extends State<CreateOrder>
                                               label: Text('Price',
                                                   style: TextStyles.subhead)),
                                           DataColumn(
-                                              label: Text('Qty',
-                                                  style: TextStyles.subhead)),
+                                              label: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text('Qty',
+                                                style: TextStyles.subhead),
+                                          )),
                                           DataColumn(
                                               label: Text('Total Amount',
                                                   style: TextStyles.subhead)),
@@ -1283,15 +1281,34 @@ class _CreateOrderState extends State<CreateOrder>
                                           ),
                                         ),
                                         const Spacer(),
-                                        if (_isTotalVisible)
+                                        if (_isTotalVisible &&
+                                            _calculateTotal() != 0.00)
                                           Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: Container(
+                                                                                        decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.blue)),
+                                                                                        child: Padding(
                                             padding: const EdgeInsets.only(
-                                                right: 165),
-                                            child: Text(
+                                                right: 20,
+                                                bottom: 10,left: 10,
+                                                top: 10),
+                                            // Adjust padding to match alignment
+                                            child: Align(
+                                              alignment:
+                                                  Alignment.centerRight,
+                                              // Align text to the right
+                                              child: Text(
                                                 'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
-                                                // Display the total
-                                                style: TextStyles.subhead),
-                                          ),
+                                                style: TextStyles.subhead,
+                                                textAlign: TextAlign
+                                                    .right, // Ensure right-aligned text
+                                              ),
+                                            ),
+                                                                                        ),
+                                                                                      ),
+                                          )
                                       ],
                                     ),
                                   ],
@@ -1544,65 +1561,70 @@ class _CreateOrderState extends State<CreateOrder>
                                                               top: 5),
                                                       child: OutlinedButton(
                                                         onPressed: () async {
-
-                                                          if (_selectedProducts.isEmpty) {
-
+                                                          if (_selectedProducts
+                                                              .isEmpty) {
                                                             // Check if no products are selected
 
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
                                                               const SnackBar(
-
-                                                                content: Text('Please add a product before creating an order'),
-
-                                                                duration: Duration(seconds: 2),
-
+                                                                content: Text(
+                                                                    'Please add a product before creating an order'),
+                                                                duration:
+                                                                    Duration(
+                                                                        seconds:
+                                                                            2),
                                                               ),
-
                                                             );
-
-                                                          } else if (_selectedProducts.any((product) => product['productDescription'] == null || product['productDescription'].isEmpty)) {
-
+                                                          } else if (_selectedProducts
+                                                              .any((product) =>
+                                                                  product['productDescription'] ==
+                                                                      null ||
+                                                                  product['productDescription']
+                                                                      .isEmpty)) {
                                                             // Check if any product has an empty or null productDescription
 
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
                                                               const SnackBar(
-
-                                                                content: Text('Each product must have a description'),
-
-                                                                duration: Duration(seconds: 2),
-
+                                                                content: Text(
+                                                                    'Each product must have a description'),
+                                                                duration:
+                                                                    Duration(
+                                                                        seconds:
+                                                                            2),
                                                               ),
-
                                                             );
-
-                                                          } else if (_selectedProducts.any((product) => product['qty'] == null || product['qty'] <= 0)) {
-
+                                                          } else if (_selectedProducts
+                                                              .any((product) =>
+                                                                  product['qty'] ==
+                                                                      null ||
+                                                                  product['qty'] <=
+                                                                      0)) {
                                                             // Check if any product has an invalid or zero quantity
 
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
                                                               const SnackBar(
-
-                                                                content: Text('Each product must have a valid quantity greater than zero'),
-
-                                                                duration: Duration(seconds: 2),
-
+                                                                content: Text(
+                                                                    'Each product must have a valid quantity greater than zero'),
+                                                                duration:
+                                                                    Duration(
+                                                                        seconds:
+                                                                            2),
                                                               ),
-
                                                             );
-
                                                           } else {
-
                                                             // If all validations pass, proceed with API calls
 
-                                                            await fetchCustomerData(userId);
+                                                            await fetchCustomerData(
+                                                                userId);
 
                                                             await callApi();
-
                                                           }
-
                                                         },
                                                         style: OutlinedButton
                                                             .styleFrom(
@@ -1681,7 +1703,9 @@ class _CreateOrderState extends State<CreateOrder>
                                                 Expanded(
                                                   child: TextFormField(
                                                     controller: _dateController,
-                                                    style: TextStyle(fontSize: maxWidth * 0.009),
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            maxWidth * 0.009),
                                                     // Replace with your TextEditingController
                                                     readOnly: true,
                                                     decoration: InputDecoration(
@@ -1714,7 +1738,6 @@ class _CreateOrderState extends State<CreateOrder>
                                                       ),
                                                       hintText:
                                                           '        Select Date',
-
                                                       fillColor: Colors.white,
                                                       contentPadding:
                                                           const EdgeInsets
@@ -1794,10 +1817,13 @@ class _CreateOrderState extends State<CreateOrder>
                                                               style: TextStyles
                                                                   .subhead)),
                                                       DataColumn(
-                                                          label: Text(
-                                                              'Product Name',
-                                                              style: TextStyles
-                                                                  .subhead)),
+                                                          label: Padding(
+                                                            padding: const EdgeInsets.only(left: 10),
+                                                            child: Text(
+                                                                'Product Name',
+                                                                style: TextStyles
+                                                                    .subhead),
+                                                          )),
                                                       DataColumn(
                                                           label: Text(
                                                               'Category',
@@ -1812,9 +1838,12 @@ class _CreateOrderState extends State<CreateOrder>
                                                               style: TextStyles
                                                                   .subhead)),
                                                       DataColumn(
-                                                          label: Text('Qty',
-                                                              style: TextStyles
-                                                                  .subhead)),
+                                                          label: Padding(
+                                                            padding: const EdgeInsets.only(left: 10),
+                                                            child: Text('Qty',
+                                                                style: TextStyles
+                                                                    .subhead),
+                                                          )),
                                                       DataColumn(
                                                           label: Text(
                                                               'Total Amount',
@@ -1833,8 +1862,12 @@ class _CreateOrderState extends State<CreateOrder>
                                                       return DataRow(cells: [
                                                         DataCell(
                                                             Text('$index')),
-                                                        DataCell(_buildProductSearchField(product)),
-                                                        DataCell(Text(product['categoryName'] ?? '')),
+                                                        DataCell(
+                                                            _buildProductSearchField(
+                                                                product)),
+                                                        DataCell(Text(product[
+                                                                'categoryName'] ??
+                                                            '')),
                                                         DataCell(Text(product[
                                                                 'baseUnit'] ??
                                                             '')),
@@ -1939,18 +1972,34 @@ class _CreateOrderState extends State<CreateOrder>
                                                       ),
                                                     ),
                                                     const Spacer(),
-                                                    if (_isTotalVisible)
+                                                    if (_isTotalVisible &&
+                                                        _calculateTotal() != 0.00)
                                                       Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 165),
-                                                        child: Text(
-                                                            'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
-                                                            // Display the total
-                                                            style: TextStyles
-                                                                .subhead),
-                                                      ),
+                                                        padding: const EdgeInsets.only(right: 10),
+                                                        child: Container(
+                                                          decoration: BoxDecoration(
+                                                              border: Border.all(
+                                                                  color: Colors.blue)),
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                right: 20,
+                                                                bottom: 10,left: 10,
+                                                                top: 10),
+                                                            // Adjust padding to match alignment
+                                                            child: Align(
+                                                              alignment:
+                                                              Alignment.centerRight,
+                                                              // Align text to the right
+                                                              child: Text(
+                                                                'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
+                                                                style: TextStyles.subhead,
+                                                                textAlign: TextAlign
+                                                                    .right, // Ensure right-aligned text
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
                                                   ],
                                                 ),
                                               ],
@@ -2163,97 +2212,187 @@ class _CreateOrderState extends State<CreateOrder>
     );
   }
 
-  Widget _buildProductSearchField(Map<String, dynamic> product) {
-    return SizedBox(
-      height: 60,
-      width: 200,
-      child: Autocomplete<String>(
-        optionsBuilder: (TextEditingValue textEditingValue) {
-          if (textEditingValue.text.isEmpty) {
-            return const Iterable<String>.empty();
-          }
-          return productList
-              .where((p) => p['productDescription']
-                  .toLowerCase()
-                  .contains(textEditingValue.text.toLowerCase()))
-              .map((p) => p['productDescription']);
-        },
-        onSelected: (String selection) {
-          final selectedProduct = productList
-              .firstWhere((p) => p['productDescription'] == selection);
-          setState(() {
-            product['product'] = selectedProduct['product'];
-            product['categoryName'] = selectedProduct['categoryName'];
-            product['baseUnit'] = selectedProduct['baseUnit'];
-            product['price'] = selectedProduct['price'];
-            product['productDescription'] =
-                selectedProduct['productDescription'];
-            product['currency'] = selectedProduct['currency'];
-            product['productType'] = selectedProduct['productType'];
-            product['standardPrice'] = selectedProduct['standardPrice'];
-          });
-        },
-        optionsViewBuilder: (context, onSelected, options) {
-          return Align(
-            alignment: Alignment.topLeft,
-            child: Material(
-              elevation: 4.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white, // Set background color to white
-                  borderRadius: BorderRadius.circular(8.0), // Set border radius
-                ),
-                width: 300, // Set the desired width of the dropdown
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  children: options.map((String option) {
-                    return ListTile(
-                      title: Text(option),
-                      onTap: () {
-                        onSelected(option);
-                      },
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          );
-        },
-        fieldViewBuilder: (
-          BuildContext context,
-          TextEditingController textEditingController,
-          FocusNode focusNode,
-          ord.VoidCallback onFieldSubmitted,
-        ) {
-          textEditingController.text = product['productDescription'] ?? '';
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              textAlign: TextAlign.start,
-              controller: textEditingController,
-              focusNode: focusNode,
-              // maxLines: 1,
-              // minLines: 1,
-              //expands: true,
-              decoration: InputDecoration(
-                filled: true,
-                //  contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                fillColor: Colors.grey[100],
-                // contentPadding: EdgeInsets.symmetric(horizontal: 7),
-                border: InputBorder.none,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                // Removes the border
-                hintText: 'Search Product',
-                hintStyle: TextStyles.body,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+
+
+ Widget _buildProductSearchField(Map<String, dynamic> product) {
+   return SizedBox(
+     height: 65,
+     width: 200,
+     child: Autocomplete<String>(
+       optionsBuilder: (TextEditingValue textEditingValue) {
+         if (textEditingValue.text.isEmpty) {
+           return const Iterable<String>.empty();
+         }
+         return productList
+             .where((p) => p['productDescription']
+                 .toLowerCase()
+                 .contains(textEditingValue.text.toLowerCase()))
+             .map((p) => p['productDescription']);
+       },
+       onSelected: (String selection) {
+         final selectedProduct = productList
+             .firstWhere((p) => p['productDescription'] == selection);
+         setState(() {
+           product['product'] = selectedProduct['product'];
+           product['categoryName'] = selectedProduct['categoryName'];
+           product['baseUnit'] = selectedProduct['baseUnit'];
+           product['price'] = selectedProduct['price'];
+           product['productDescription'] =
+               selectedProduct['productDescription'];
+           product['currency'] = selectedProduct['currency'];
+           product['productType'] = selectedProduct['productType'];
+           product['standardPrice'] = selectedProduct['standardPrice'];
+         });
+       },
+       optionsViewBuilder: (context, onSelected, options) {
+         return Align(
+           alignment: Alignment.topLeft,
+           child: Material(
+             elevation: 4.0,
+             child: Container(
+               decoration: BoxDecoration(
+                 color: Colors.white, // Set background color to white
+                 borderRadius: BorderRadius.circular(8.0), // Set border radius
+               ),
+               width: 200, // Set the desired width of the dropdown
+               child: ListView(
+                 padding: EdgeInsets.zero,
+                 shrinkWrap: true,
+                 children: options.map((String option) {
+                   return ListTile(
+                     title: Text(option),
+                     onTap: () {
+                       onSelected(option);
+                     },
+                   );
+                 }).toList(),
+               ),
+             ),
+           ),
+         );
+       },
+         fieldViewBuilder: (
+             BuildContext context,
+             TextEditingController textEditingController,
+             FocusNode focusNode,
+             ord.VoidCallback onFieldSubmitted,
+             ) {
+           textEditingController.text = product['productDescription'] ?? '';
+           return Padding(
+             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8), // External padding for space around TextFormField
+             child: TextFormField(
+               textAlign: TextAlign.start,
+               controller: textEditingController,
+               focusNode: focusNode,
+               decoration: InputDecoration(
+                 filled: true,
+                 fillColor: Colors.grey[100],
+                 contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Internal padding for text area
+                 border: OutlineInputBorder( // Add an outline border to make the padding more visible
+                   borderRadius: BorderRadius.circular(8.0),
+                   borderSide: BorderSide.none, // Optional: Remove border for a cleaner look
+                 ),
+                 hintText: 'Search Product',
+                 hintStyle: TextStyles.body,
+               ),
+             ),
+           );
+         }
+     ),
+   );
+ }
+//original
+  // Widget _buildProductSearchField(Map<String, dynamic> product) {
+  //   return SizedBox(
+  //     height: 65,
+  //     width: 200,
+  //     child: Autocomplete<String>(
+  //       optionsBuilder: (TextEditingValue textEditingValue) {
+  //         if (textEditingValue.text.isEmpty) {
+  //           return const Iterable<String>.empty();
+  //         }
+  //         return productList
+  //             .where((p) => p['productDescription']
+  //                 .toLowerCase()
+  //                 .contains(textEditingValue.text.toLowerCase()))
+  //             .map((p) => p['productDescription']);
+  //       },
+  //       onSelected: (String selection) {
+  //         final selectedProduct = productList
+  //             .firstWhere((p) => p['productDescription'] == selection);
+  //         setState(() {
+  //           product['product'] = selectedProduct['product'];
+  //           product['categoryName'] = selectedProduct['categoryName'];
+  //           product['baseUnit'] = selectedProduct['baseUnit'];
+  //           product['price'] = selectedProduct['price'];
+  //           product['productDescription'] =
+  //               selectedProduct['productDescription'];
+  //           product['currency'] = selectedProduct['currency'];
+  //           product['productType'] = selectedProduct['productType'];
+  //           product['standardPrice'] = selectedProduct['standardPrice'];
+  //         });
+  //       },
+  //       optionsViewBuilder: (context, onSelected, options) {
+  //         return Align(
+  //           alignment: Alignment.topLeft,
+  //           child: Material(
+  //             elevation: 4.0,
+  //             child: Container(
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white, // Set background color to white
+  //                 borderRadius: BorderRadius.circular(8.0), // Set border radius
+  //               ),
+  //               width: 300, // Set the desired width of the dropdown
+  //               child: ListView(
+  //                 padding: EdgeInsets.zero,
+  //                 shrinkWrap: true,
+  //                 children: options.map((String option) {
+  //                   return ListTile(
+  //                     title: Text(option),
+  //                     onTap: () {
+  //                       onSelected(option);
+  //                     },
+  //                   );
+  //                 }).toList(),
+  //               ),
+  //             ),
+  //           ),
+  //         );
+  //       },
+  //       fieldViewBuilder: (
+  //         BuildContext context,
+  //         TextEditingController textEditingController,
+  //         FocusNode focusNode,
+  //         ord.VoidCallback onFieldSubmitted,
+  //       ) {
+  //         textEditingController.text = product['productDescription'] ?? '';
+  //         return Padding(
+  //           padding: const EdgeInsets.all(8.0),
+  //           child: TextFormField(
+  //             textAlign: TextAlign.start,
+  //             controller: textEditingController,
+  //             focusNode: focusNode,
+  //             // maxLines: 1,
+  //             // minLines: 1,
+  //             //expands: true,
+  //             decoration: InputDecoration(
+  //               filled: true,
+  //               //  contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+  //               fillColor: Colors.grey[100],
+  //               // contentPadding: EdgeInsets.symmetric(horizontal: 7),
+  //               border: InputBorder.none,
+  //               contentPadding:
+  //                   const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
+  //               // Removes the border
+  //               hintText: 'Search Product',
+  //               hintStyle: TextStyles.body,
+  //             ),
+  //           ),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 
   String calculateTotalPrice(Map<String, dynamic> product) {
     // Calculate total price
@@ -2262,6 +2401,7 @@ class _CreateOrderState extends State<CreateOrder>
     return total.toStringAsFixed(2);
   }
 
+
   Widget _buildQuantityField(
       Map<String, dynamic> product, TextEditingController controller) {
     // Only update the controller text if it doesn't match the current product quantity
@@ -2269,10 +2409,10 @@ class _CreateOrderState extends State<CreateOrder>
       controller.text = product['qty'].toString();
     }
 
-    return SizedBox(
-      width: 100,
-      child: Padding(
-        padding: const EdgeInsets.only(right: 30, top: 8, bottom: 8, left: 8),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5), // External padding
+      child: SizedBox(
+        width: 60, // Adjusted width for better spacing in DataTable
         child: TextFormField(
           controller: controller,
           textAlign: TextAlign.start,
@@ -2285,15 +2425,54 @@ class _CreateOrderState extends State<CreateOrder>
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.grey[100],
-            contentPadding:
-            const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 12, // Internal padding for better alignment of text
+              horizontal: 10,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide.none, // Optional: Remove border for cleaner look
+            ),
             hintStyle: TextStyles.body,
           ),
+          style: TextStyles.body, // Ensure consistent text style
         ),
       ),
     );
   }
+
+  // Widget _buildQuantityField(
+  //     Map<String, dynamic> product, TextEditingController controller) {
+  //   // Only update the controller text if it doesn't match the current product quantity
+  //   if (controller.text != product['qty'].toString()) {
+  //     controller.text = product['qty'].toString();
+  //   }
+  //
+  //   return SizedBox(
+  //     width: 100,
+  //     child: Padding(
+  //       padding: const EdgeInsets.only(right: 30, top: 8, bottom: 8, left: 8),
+  //       child: TextFormField(
+  //         controller: controller,
+  //         textAlign: TextAlign.start,
+  //         keyboardType: TextInputType.number,
+  //         onChanged: (value) {
+  //           setState(() {
+  //             product['qty'] = double.tryParse(value) ?? 0;
+  //           });
+  //         },
+  //         decoration: InputDecoration(
+  //           filled: true,
+  //           fillColor: Colors.grey[100],
+  //           contentPadding:
+  //               const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+  //           border: InputBorder.none,
+  //           hintStyle: TextStyles.body,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // Widget _buildQuantityField(Map<String, dynamic> product, TextEditingController controller) {
   //   controller.text = product['qty'].toString(); // Keep the controller updated with the product qty.

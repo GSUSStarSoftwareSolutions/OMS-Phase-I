@@ -581,6 +581,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                                     ],
                                   ),
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Padding(
                                           padding: const EdgeInsets.only(
@@ -690,6 +691,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                                         ],
                                       ),
                                       Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Padding(
                                               padding: const EdgeInsets.only(
@@ -833,7 +835,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                                   decoration:  InputDecoration(
                                     hintText: 'Search by product name',
                                     hintStyle: TextStyle(color: Colors.grey,fontSize: 13),
-                                    contentPadding: EdgeInsets.only(bottom: 20,left: 10),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
                                     border: InputBorder.none,
                                       suffixIcon: Padding(
                                         padding: const EdgeInsets.only(left: 10, right: 5),

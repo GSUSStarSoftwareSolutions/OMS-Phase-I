@@ -826,10 +826,12 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             ),
                                                                           ],
                                                                         ),
-                                                                        child: Image.asset("images/openorder.png"),
+                                                                        child: SizedBox(
+                                                                            width: 10,
+                                                                            height: 10,
+
+                                                                            child: Image.asset("images/open_order1.png",)),
                                                                       ),
-
-
                                                                     ),
                                                                     const SizedBox(
                                                                       height: 5,
@@ -860,7 +862,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             padding:const  EdgeInsets.only(
                                                                                 left: 10),
                                                                             child: Text(
-                                                                              'Open Orders',
+                                                                              'Open Orders1',
                                                                               style: TextStyle(
                                                                                 fontSize: maxWidth * 0.01,
                                                                                 color: Color(0xFF455A64),),
@@ -890,10 +892,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                               _isHovered5 = false;
                                                             });
                                                           },
-                                                          child: AnimatedScale(
-                                                            scale: _isHovered5
-                                                                ? 1.05
-                                                                : 1.0,
+                                                          child: AnimatedScale(scale: _isHovered5 ? 1.05 : 1.0,
                                                             duration:
                                                             const Duration(
                                                                 milliseconds:
@@ -2045,10 +2044,10 @@ class _DashboardPage1State extends State<DashboardPage1>
                     ),
                     child: TextFormField(
                       style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
-                      decoration: const InputDecoration(
+                      decoration:  InputDecoration(
                         hintText: 'Search by Order ID',
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                        contentPadding: EdgeInsets.only(bottom: 20, left: 10),
+                        hintStyle: TextStyles.body,
+                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
                         // adjusted padding
                         border: InputBorder.none,
                         suffixIcon: Padding(
@@ -2262,8 +2261,9 @@ class _DashboardPage1State extends State<DashboardPage1>
                           style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
                           decoration:  InputDecoration(
                               hintText: 'Search by Order ID',
-                              hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                              contentPadding: EdgeInsets.only(bottom: 20, left: 10),
+                              hintStyle: TextStyles.body,
+                              //hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+                              contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
                               // adjusted padding
                               border: InputBorder.none,
                               suffixIcon: Padding(
@@ -2708,7 +2708,7 @@ class _DashboardPage1State extends State<DashboardPage1>
       return Column(
         children: [
           Container(
-                  width: right - 200,
+            width: right - 200,
             decoration:  BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
@@ -3156,11 +3156,12 @@ class VerticalDividerWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 200,top: 61),
       child: Container(
-        width: 4, // Thickness of the vertical divider
-        height: height, // Height of the divider
-        color: color, // Color of the divider
+        width: 4,
+        height: height,
+        color: color,
       ),
     );
   }
 }
 
+//home page copy

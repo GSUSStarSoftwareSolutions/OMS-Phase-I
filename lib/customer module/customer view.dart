@@ -612,6 +612,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                   ],
                                 ),
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Padding(
                                         padding: const EdgeInsets.only(
@@ -719,6 +720,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                       ],
                                     ),
                                     Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Padding(
                                             padding: const EdgeInsets.only(

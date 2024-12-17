@@ -852,7 +852,7 @@ class _CusListState extends State<CusList> {
                                         ],
                                       ),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Padding(
                                               padding: const EdgeInsets.only(
@@ -961,8 +961,8 @@ class _CusListState extends State<CusList> {
 
                                             ],
                                           ),
-
                                           Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               Padding(
                                                   padding: const EdgeInsets.only(
@@ -1086,7 +1086,7 @@ class _CusListState extends State<CusList> {
                       padding: const EdgeInsets.all(8.0),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth * 0.261,
+                          maxWidth: constraints.maxWidth * 0.265,
                           maxHeight: 39,
                         ),
                         child: Container(
@@ -1102,7 +1102,8 @@ class _CusListState extends State<CusList> {
                             decoration:  InputDecoration(
                                 hintText: 'Search by Customer ID or Customer Name',
                                 hintStyle: const TextStyle(fontSize: 13,color: Colors.grey),
-                                contentPadding: const EdgeInsets.only(bottom: 20,left: 10), // adjusted padding
+                                contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
+                              //  contentPadding: const EdgeInsets.only(bottom: 20,left: 10), // adjusted padding
                                 border: InputBorder.none,
                                 suffixIcon: Padding(
                                   padding: const EdgeInsets.only(left: 10, right: 5), // Adjust image padding

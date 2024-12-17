@@ -762,7 +762,6 @@ class _OrderView2State extends State<OrderView2>
                   right:0,
                   bottom: 0,child:   SingleChildScrollView(
                   child: Align(
-                    // Added Align widget for the left side menu
                     alignment: Alignment.topLeft,
                     child: Padding(
                       padding: const EdgeInsets.only(top: 2),
@@ -922,7 +921,7 @@ class _OrderView2State extends State<OrderView2>
                                               int index = _selectedProducts.indexOf(product) + 1;
                                               return DataRow(cells: [
                                                 DataCell(Text('$index')), // Serial Number
-                                                DataCell(Text(product['product'] ?? '')), // Product Name
+                                                DataCell(Text(product['productDescription'] ?? '')), // Product Name
                                                 DataCell(Text(product['categoryName'] ?? '')), // Category
                                                 DataCell(Text(product['baseUnit'] ?? '')), // Unit
                                                 DataCell(Text(product['standardPrice']?.toStringAsFixed(2) ?? '0.00')), // Price
@@ -938,15 +937,42 @@ class _OrderView2State extends State<OrderView2>
                                           children: [
                                             Spacer(),
                                             Padding(
-                                              padding: const EdgeInsets.only(right: 100,top: 20,bottom: 40),
-                                              child: Text(
-                                                'Total: \₹${totalAmountController.text}',
-                                                // Display the total
-                                                style: TextStyles.subhead,
+                                              padding: const EdgeInsets.only(right: 10,bottom: 10),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.blue)),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(  right: 20,
+                                                      bottom: 10,left: 10,
+                                                      top: 10),
+                                                  child: Align(
+                                                    alignment:
+                                                    Alignment.centerRight,
+                                                    child: Text(
+                                                      'Total: \₹${totalAmountController.text}',
+                                                      // Display the total
+                                                      style: TextStyles.subhead,
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ],
                                         )
+                                        // Row(
+                                        //   children: [
+                                        //     Spacer(),
+                                        //     Padding(
+                                        //       padding: const EdgeInsets.only(right: 100,top: 20,bottom: 40),
+                                        //       child: Text(
+                                        //         'Total: \₹${totalAmountController.text}',
+                                        //         // Display the total
+                                        //         style: TextStyles.subhead,
+                                        //       ),
+                                        //     ),
+                                        //   ],
+                                        // )
 
                                       ],
                                     ),
@@ -1264,7 +1290,7 @@ class _OrderView2State extends State<OrderView2>
                                                         int index = _selectedProducts.indexOf(product) + 1;
                                                         return DataRow(cells: [
                                                           DataCell(Text('$index')), // Serial Number
-                                                          DataCell(Text(product['product'] ?? '')), // Product Name
+                                                          DataCell(Text(product['productDescription'] ?? '')), // Product Name
                                                           DataCell(Text(product['categoryName'] ?? '')), // Category
                                                           DataCell(Text(product['baseUnit'] ?? '')), // Unit
                                                           DataCell(Text(product['standardPrice']?.toStringAsFixed(2) ?? '0.00')), // Price
@@ -1276,15 +1302,30 @@ class _OrderView2State extends State<OrderView2>
                                                       }).toList(),
                                                     ),
                                                   ),
+
                                                   Row(
                                                     children: [
                                                       Spacer(),
                                                       Padding(
-                                                        padding: const EdgeInsets.only(right: 100,top: 20,bottom: 40),
-                                                        child: Text(
-                                                          'Total: \₹${totalAmountController.text}',
-                                                          // Display the total
-                                                          style: TextStyles.subhead,
+                                                        padding: const EdgeInsets.only(right: 10,bottom: 10),
+                                                        child: Container(
+                                                          decoration: BoxDecoration(
+                                                              border: Border.all(
+                                                                  color: Colors.blue)),
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(  right: 20,
+                                                                bottom: 10,left: 10,
+                                                                top: 10),
+                                                            child: Align(
+                                                              alignment:
+                                                              Alignment.centerRight,
+                                                              child: Text(
+                                                                'Total: \₹${totalAmountController.text}',
+                                                                // Display the total
+                                                                style: TextStyles.subhead,
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ),
                                                       ),
                                                     ],

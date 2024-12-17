@@ -2047,10 +2047,12 @@ right:0,
                     ),
                     child: TextFormField(
                       style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
-                      decoration: const InputDecoration(
+                      decoration:  InputDecoration(
                         hintText: 'Search by Order ID',
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                        contentPadding: EdgeInsets.only(bottom: 20, left: 10),
+                        hintStyle: TextStyles.body,
+                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
+                      //  hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+                    //    contentPadding: EdgeInsets.only(bottom: 20, left: 10),
                         // adjusted padding
                         border: InputBorder.none,
                         suffixIcon: Padding(
@@ -2264,8 +2266,9 @@ right:0,
                           style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
                           decoration:  InputDecoration(
                               hintText: 'Search by Order ID',
-                              hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                              contentPadding: EdgeInsets.only(bottom: 20, left: 10),
+                              hintStyle: TextStyles.body,
+                           //   hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+                              contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
                               // adjusted padding
                               border: InputBorder.none,
                               suffixIcon: Padding(
