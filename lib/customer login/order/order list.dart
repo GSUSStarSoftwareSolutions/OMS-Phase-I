@@ -1322,8 +1322,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                           width: columnWidths[columns.indexOf(column)],
                           // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(column, style: TextStyles.subhead),
                               IconButton(

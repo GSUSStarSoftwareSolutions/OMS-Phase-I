@@ -22,6 +22,9 @@ import 'package:btb/dashboard/dashboard.dart';
 import 'package:btb/dashboard/openinvoice%20screen.dart';
 import 'package:btb/dashboard/openorder%20screen.dart';
 import 'package:btb/dashboard/order%20completedlistscreen.dart';
+import 'package:btb/customer%20login/home/admin%20dash.dart';
+import 'package:btb/sample/notifier.dart';
+//import 'package:btb/customer%20login/home/order%20list.dart';
 import 'package:btb/widgets/productclass.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -33,8 +36,8 @@ import 'admin/create users.dart';
 import 'customer login/home/home.dart';
 import 'customer login/order/order list.dart';
 import 'customer login/order/order view screen.dart';
+import 'customer login/order/responsiveorder list.dart';
 import 'customer module/customer list.dart';
-
 
 void main() async {
   // configureApp();
@@ -46,7 +49,7 @@ void main() async {
   // final prefs = await SharedPreferences.getInstance();
   runApp(
     ChangeNotifierProvider(
-      create: (context) => UserRoleProvider(),
+      create: (context) => MenuProvider(),
       child: MyApp(),
     ),
 
@@ -191,7 +194,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: DashboardPage1(),
+            child: DashboardPage1(), //dashboard1
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -227,7 +230,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: CusOrderPage(),
+            child: CusOrderPage(),//cusorderpage
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -244,9 +247,24 @@ class MyApp extends StatelessWidget {
         path: '/Customer_Order_View',
         pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>?;
+          if (extra == null) {
+            return CustomTransitionPage(
+              child: CusOrderPage(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              transitionDuration: Duration(milliseconds: 5),
+            );
+          }
           return CustomTransitionPage(
             key: state.pageKey,
-            child: OrderView(orderId: extra!['orderId'] ?? '',),
+            child: OrderView(
+              orderId: extra!['orderId'] ?? '',
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -264,7 +282,9 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ProductPage(product: null,),
+            child: ProductPage(
+              product: null,
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -412,7 +432,9 @@ class MyApp extends StatelessWidget {
           final extraData = state.extra as Map<String, dynamic>? ?? {};
           return CustomTransitionPage(
             key: state.pageKey,
-            child: OrderView2(orderId: extraData['orderId'] ?? '',),
+            child: OrderView2(
+              orderId: extraData['orderId'] ?? '',
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -425,7 +447,6 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
-
       GoRoute(
         path: '/Added_to_cart',
         pageBuilder: (context, state) {
@@ -449,7 +470,7 @@ class MyApp extends StatelessWidget {
               );
             },
             transitionDuration:
-                Duration(milliseconds: 5), // Adjust the duration as needed
+            Duration(milliseconds: 5), // Adjust the duration as needed
           );
         },
       ),
@@ -509,7 +530,7 @@ class MyApp extends StatelessWidget {
           final products = (extra['products'] as List<dynamic>).cast<Product>();
           final data = extra['data'] as Map<String, dynamic>;
           final selectedProducts =
-              (extra['selectedProducts'] as List<dynamic>).cast<Product>();
+          (extra['selectedProducts'] as List<dynamic>).cast<Product>();
           final inputText = extra['inputText'] as String;
           final subText = extra['subText'] as String;
           final notselect = extra['notselect'] as String;
@@ -545,7 +566,7 @@ class MyApp extends StatelessWidget {
           final products = (extra['products'] as List<dynamic>).cast<Product>();
           final data = extra['data'] as Map<String, dynamic>;
           final selectedProducts =
-              (extra['selectedProducts'] as List<dynamic>).cast<Product>();
+          (extra['selectedProducts'] as List<dynamic>).cast<Product>();
           final inputText = extra['inputText'] as String;
           final subText = extra['subText'] as String;
           final notselect = extra['notselect'] as String;
@@ -606,12 +627,12 @@ class MyApp extends StatelessWidget {
                 );
               },
               transitionDuration:
-                  Duration(milliseconds: 300), // Adjust transition duration
+              Duration(milliseconds: 300), // Adjust transition duration
             );
           } else {
             final extra = state.extra as Map<String, dynamic>;
             Map<String, dynamic>? selectedProductsMap =
-                extra['selectedProducts'] as Map<String, dynamic>?;
+            extra['selectedProducts'] as Map<String, dynamic>?;
             return CustomTransitionPage(
               key: state.pageKey,
               child: SeventhPage(
@@ -655,10 +676,24 @@ class MyApp extends StatelessWidget {
         path: '/Cus_Details',
         pageBuilder: (context, state) {
           final data = state.extra as Map<String, dynamic>?;
+
+          if (data == null) {
+            return CustomTransitionPage(
+              child: CusList(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              transitionDuration: Duration(milliseconds: 5),
+            );
+          }
           return CustomTransitionPage(
             key: state.pageKey,
             child: CustomerDetails(
-              orderId: data!['orderId'],
+              orderId: data['orderId'],
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -799,7 +834,7 @@ class MyApp extends StatelessWidget {
               );
             },
             transitionDuration:
-                Duration(milliseconds: 200), // Adjust duration as needed
+            Duration(milliseconds: 200), // Adjust duration as needed
           );
         },
       ),
@@ -833,7 +868,7 @@ class MyApp extends StatelessWidget {
             key: state.pageKey,
             child: NextPage(
               selectedProducts:
-                  extra['selectedProducts'] as List<Product>? ?? [],
+              extra['selectedProducts'] as List<Product>? ?? [],
               // Provide an empty list if null
               product: extra['product'] as Product? ??
                   Product(
@@ -901,12 +936,12 @@ class MyApp extends StatelessWidget {
 class NoTransitionsBuilder extends PageTransitionsBuilder {
   @override
   Widget buildTransitions<T>(
-    PageRoute<T> route,
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
+      PageRoute<T> route,
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child,
+      ) {
     return child; // No animations, no swipe gestures
   }
 }
@@ -1348,3 +1383,4 @@ class UserRoleProvider with ChangeNotifier {
     notifyListeners();
   }
 }
+//main file carefully handle it

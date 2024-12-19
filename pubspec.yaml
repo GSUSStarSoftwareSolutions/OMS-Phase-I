@@ -110,7 +110,6 @@ flutter:
      - images/file.png
      - images/ikyam1.png
      - images/Final-Ikyam-Logo.png
-     - images/open.png
      - images/nk1.png
      - images/template.pdf
      - images/loadind.gif
@@ -127,6 +126,8 @@ flutter:
      - images/search.png
      - images/open_order1.png
      - images/openorder.png
+     - images/open2.png
+     - images/openorders.png
 
 
 

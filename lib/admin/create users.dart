@@ -43,7 +43,7 @@ class _CreateusrState extends State<Createusr> {
   List<String> items = [
     'Admin',
     'Employee',
-    'Customer',
+    //'Customer',
   ];
   String? selectedValue;
 

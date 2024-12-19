@@ -812,20 +812,20 @@ right:0,
                                                                         decoration: BoxDecoration(
                                                                           shape: BoxShape.circle,
                                                                           border: Border.all(
-                                                                            color: const Color(0xFFF33C3DB), // Border color
+                                                                            color: const Color(0xffffac8c), // Border color
                                                                             width: 1.5,
                                                                           ),
-                                                                          color: const Color(0xFFB3F9FF), // Set the background color to match the border
+                                                                          color:  Color(0xffffac8c).withOpacity(0.2), // Set the background color to match the border
                                                                           boxShadow: [
                                                                             BoxShadow(
-                                                                              color: const Color(0xFF418CFC33).withOpacity(0.1), // Soft grey shadow
+                                                                              color: const Color(0xffffac8c).withOpacity(0.1), // Soft grey shadow
                                                                               spreadRadius: 1,
                                                                               blurRadius: 3,
                                                                               offset: const Offset(0, 1),
                                                                             ),
                                                                           ],
                                                                         ),
-                                                                        child: Image.asset("images/openorder.png"),
+                                                                        child: Image.asset("images/openorders.png"),
                                                                       ),
 
 
@@ -929,12 +929,12 @@ right:0,
                                                                                   0xFF9F86FF),
                                                                               width: 1.5),
                                                                           color: const Color(
-                                                                              0xFFFFF9F7),
+                                                                              0xFF9F86FF).withOpacity(0.1),
 
                                                                           boxShadow: [
                                                                             BoxShadow(
                                                                               color: const Color(
-                                                                                  0xFF418CFC33)
+                                                                                  0xFF9F86FF)
                                                                                   .withOpacity(
                                                                                   0.1),
                                                                               // Soft grey shadow
@@ -1043,12 +1043,12 @@ right:0,
                                                                                   0xFF0388AB),
                                                                               width: 1.5),
                                                                           color: const Color(
-                                                                              0xFFF8F6FF),
+                                                                              0xffB8EFFC).withOpacity(0.1),
 
                                                                           boxShadow: [
                                                                             BoxShadow(
                                                                               color: const Color(
-                                                                                  0xFF418CFC33)
+                                                                                  0xFF0388AB)
                                                                                   .withOpacity(
                                                                                   0.1),
                                                                               // Soft grey shadow
@@ -1406,20 +1406,20 @@ right:0,
                                                                                   decoration: BoxDecoration(
                                                                                     shape: BoxShape.circle,
                                                                                     border: Border.all(
-                                                                                      color: const Color(0xFFF33C3DB), // Border color
+                                                                                      color: const Color(0xffffac8c), // Border color
                                                                                       width: 1.5,
                                                                                     ),
-                                                                                    color: const Color(0xFFB3F9FF), // Set the background color to match the border
+                                                                                    color:  Color(0xffffac8c).withOpacity(0.2), // Set the background color to match the border
                                                                                     boxShadow: [
                                                                                       BoxShadow(
-                                                                                        color: const Color(0xFF418CFC33).withOpacity(0.1), // Soft grey shadow
+                                                                                        color: const Color(0xffffac8c).withOpacity(0.1), // Soft grey shadow
                                                                                         spreadRadius: 1,
                                                                                         blurRadius: 3,
                                                                                         offset: const Offset(0, 1),
                                                                                       ),
                                                                                     ],
                                                                                   ),
-                                                                                  child: Image.asset("images/openorder.png"),
+                                                                                  child: Image.asset("images/openorders.png"),
                                                                                 ),
 
 
@@ -1525,12 +1525,12 @@ right:0,
                                                                                         0xFF9F86FF),
                                                                                     width: 1.5),
                                                                                 color: const Color(
-                                                                                    0xFFFFF9F7),
+                                                                                    0xFF9F86FF).withOpacity(0.1),
 
                                                                                 boxShadow: [
                                                                                   BoxShadow(
                                                                                     color: const Color(
-                                                                                        0xFF418CFC33)
+                                                                                        0xFF9F86FF)
                                                                                         .withOpacity(
                                                                                         0.1),
                                                                                     // Soft grey shadow
@@ -1639,12 +1639,12 @@ right:0,
                                                                                         0xFF0388AB),
                                                                                     width: 1.5),
                                                                                 color: const Color(
-                                                                                    0xFFF8F6FF),
+                                                                                    0xffB8EFFC).withOpacity(0.1),
 
                                                                                 boxShadow: [
                                                                                   BoxShadow(
                                                                                     color: const Color(
-                                                                                        0xFF418CFC33)
+                                                                                        0xFF0388AB)
                                                                                         .withOpacity(
                                                                                         0.1),
                                                                                     // Soft grey shadow

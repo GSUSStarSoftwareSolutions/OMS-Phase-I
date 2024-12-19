@@ -932,16 +932,33 @@ class _OrderViewState extends State<OrderView>
                                           children: [
                                             Spacer(),
                                             Padding(
-                                              padding: const EdgeInsets.only(right: 100,top: 20,bottom: 40),
-                                              child: Text(
-                                                'Total: \₹${totalAmountController.text}',
-                                                // Display the total
-                                                  style: TextStyles.subhead,
+                                              padding: const EdgeInsets.only(right: 10,bottom: 10),
+                                              //children: [
+
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.blue)),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      right: 20,
+                                                      bottom: 10,left: 10,
+                                                      top: 10),
+                                                  child: Align(
+                                                    alignment:
+                                                    Alignment.topRight,
+                                                    child: Text(
+                                                      'Total: \₹${totalAmountController.text}',
+                                                      // Display the total
+                                                      style: TextStyles.subhead,
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
+                                              // ],
                                             ),
                                           ],
                                         )
-
                                       ],
                                     ),
                                   ),
@@ -1085,12 +1102,30 @@ class _OrderViewState extends State<OrderView>
                                                     children: [
                                                       Spacer(),
                                                       Padding(
-                                                        padding: const EdgeInsets.only(right: 100,top: 20,bottom: 40),
-                                                        child: Text(
-                                                          'Total: \₹${totalAmountController.text}',
-                                                          // Display the total
-                                                          style: TextStyles.subhead,
+                                                        padding: const EdgeInsets.only(right: 10,bottom: 10),
+                                                        //children: [
+
+                                                        child: Container(
+                                                          decoration: BoxDecoration(
+                                                              border: Border.all(
+                                                                  color: Colors.blue)),
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                right: 20,
+                                                                bottom: 10,left: 10,
+                                                                top: 10),
+                                                            child: Align(
+                                                              alignment:
+                                                              Alignment.topRight,
+                                                              child: Text(
+                                                                'Total: \₹${totalAmountController.text}',
+                                                                // Display the total
+                                                                style: TextStyles.subhead,
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ),
+                                                        // ],
                                                       ),
                                                     ],
                                                   )
