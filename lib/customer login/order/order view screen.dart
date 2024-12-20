@@ -208,72 +208,6 @@ class _OrderViewState extends State<OrderView>
 
 
 
-
-
-  // Future<void> GetCustomerData(int page, int itemsPerPage) async {
-  //   if (isLoading) return;
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //
-  //   try {
-  //     final response = await http.get(
-  //       Uri.parse(
-  //         '$apicall/user_master/get_all_customer_data?page=$page&limit=$itemsPerPage', // Adjusted for API call
-  //       ),
-  //       headers: {
-  //         "Content-type": "application/json",
-  //         "Authorization": 'Bearer $token',
-  //       },
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       final jsonData = jsonDecode(response.body);
-  //       List<ord.BusinessPartnerData> products = [];
-  //
-  //       if (jsonData != null && jsonData.containsKey('d') && jsonData['d'].containsKey('results')) {
-  //         var results = jsonData['d']['results'];
-  //         // Mapping the relevant fields for each product
-  //         products = results.map<ord.BusinessPartnerData>((item) {
-  //           return ord.BusinessPartnerData(
-  //             businessPartner: item['BusinessPartner'] ?? '',
-  //             businessPartnerName: item['BusinessPartnerName'] ?? '',
-  //             customer: item['Customer'] ?? '',
-  //             addressID: item['AddressID'] ?? '',
-  //             cityName: item['CityName'] ?? '',
-  //             postalCode: item['PostalCode'] ?? '',
-  //             streetName: item['StreetName'] ?? '',
-  //             region: item['Region'] ?? '',
-  //             telephoneNumber1: item['TelephoneNumber1'] ?? '',
-  //             country: item['Country'] ?? '',
-  //             districtName: item['DistrictName'] ?? '',
-  //             emailAddress: item['EmailAddress'] ?? '',
-  //             mobilePhoneNumber: item['MobilePhoneNumber'] ?? '',
-  //           );
-  //         }).toList();
-  //
-  //         setState(() {
-  //           //productList = products;
-  //           totalPages = (results.length / itemsPerPage).ceil();  // Update total pages based on new structure
-  //           print(totalPages);  // Debugging output
-  //           //_filterAndPaginateProducts();
-  //         });
-  //       }
-  //     } else {
-  //       throw Exception('Failed to load data');
-  //     }
-  //   } catch (e) {
-  //     print('Error decoding JSON: $e');
-  //     // Optionally, show an error message to the user
-  //   } finally {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
-
-  // final List<Map<String, dynamic>> _selectedProducts = [];
-
   Future<void> callApi() async {
     List<Map<String, dynamic>> items = [];
 
@@ -376,16 +310,7 @@ class _OrderViewState extends State<OrderView>
     }
   }
 
-  void _onSearchTextChanged(String text) {
-    if (_searchDebounceTimer != null) {
-      _searchDebounceTimer!.cancel(); // Cancel the previous timer
-    }
-    _searchDebounceTimer = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _searchText = text;
-      });
-    });
-  }
+
 
   int itemsPerPage = 10;
   int totalItems = 0;
@@ -525,29 +450,6 @@ class _OrderViewState extends State<OrderView>
     }
   }
 
-  void _goToPreviousPage() {
-    print("previos");
-    if (currentPage > 1) {
-      if (filteredData.length > itemsPerPage) {
-        setState(() {
-          currentPage--;
-        });
-      }
-    }
-  }
-
-  void _goToNextPage() {
-    print('nextpage');
-
-    if (currentPage < totalPages) {
-      if (filteredData.length > currentPage * itemsPerPage) {
-        setState(() {
-          currentPage++;
-        });
-      }
-    }
-//_filterAndPaginateProducts();
-  }
 
   Map<String, bool> _isHovered = {
     'Home': false,

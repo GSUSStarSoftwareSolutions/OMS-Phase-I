@@ -924,129 +924,196 @@ class _OrderListResponsiveState extends State<OrderListResponsive>
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.vertical,
                                           child:  width <= 850
-                                              ? SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal, // Horizontal scroll when width <= 850
-                                            child: DataTable(
-                                                showCheckboxColumn: false,
-                                                headingRowHeight: 40,
-                                                columnSpacing: 35,
-                                                headingRowColor:
-                                                MaterialStateProperty.all(
-                                                    Color(0xFFF7F7F7)),
-                                                // List.generate(5, (index)
-                                                columns: columns.map((column) {
-                                                  return DataColumn(
-                                                    label: Stack(
-                                                      children: [
-                                                        Container(
-                                                          padding: null,
-                                                          width: columnWidths[columns.indexOf(column)],
-                                                          // Dynamic width based on user interaction
-                                                          child: Row(
-                                                            children: [
-                                                              Text(column, style: TextStyles.subhead),
-                                                              IconButton(
-                                                                icon:
-                                                                _sortOrder[columns.indexOf(column)] == 'asc'
-                                                                    ? SizedBox(
-                                                                    width: 12,
-                                                                    child: Image.asset(
-                                                                      "images/ix_sort.png",
-                                                                      color: Colors.blue,
-                                                                    ))
-                                                                    : SizedBox(
-                                                                    width: 12,
-                                                                    child: Image.asset(
-                                                                      "images/ix_sort.png",
-                                                                      color: Colors.blue,
-                                                                    )),
-                                                                onPressed: () {
-                                                                  setState(() {
-                                                                    _sortOrder[columns.indexOf(column)] =
-                                                                    _sortOrder[columns.indexOf(column)] ==
-                                                                        'asc'
-                                                                        ? 'desc'
-                                                                        : 'asc';
-                                                                    _sortProducts(columns.indexOf(column),
-                                                                        _sortOrder[columns.indexOf(column)]);
-                                                                  });
-                                                                },
-                                                              ),
-                                                              //SizedBox(width: 50,),
-                                                              //Padding(
-                                                              //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-                                                              //  child:
-                                                              // ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    onSort: (columnIndex, ascending) {
-                                                      _sortOrder;
-                                                    },
-                                                  );
-                                                }).toList(),
-                                                rows: List.generate(
-                                                    math.min(itemsPerPage,
-                                                        filteredData.length - (currentPage - 1) * itemsPerPage),
-                                                        (index) {
-                                                      final detail =
-                                                      filteredData[(currentPage - 1) * itemsPerPage + index];
-                                                      final isSelected = _selectedProduct == detail;
-                                                      return DataRow(
-                                                          color: MaterialStateProperty.resolveWith<Color>((states) {
-                                                            if (states.contains(MaterialState.hovered)) {
-                                                              return Colors.blue.shade500.withOpacity(
-                                                                  0.8); // Add some opacity to the dark blue
-                                                            } else {
-                                                              return Colors.white.withOpacity(0.9);
-                                                            }
-                                                          }),
-                                                          cells: [
-                                                            DataCell(
-                                                                Text(detail.customer,   style: TextStyles.body,)),
-                                                            DataCell(
-                                                              Text(detail.customerName,   style: TextStyles.body,),
-                                                            ),
-                                                            DataCell(
-                                                              Text(detail.cityName,   style: TextStyles.body,),
-                                                            ),
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[3],
-                                                                child: Text(detail.telephoneNumber1.toString(),   style: TextStyles.body,),
-                                                              ),
-                                                            ),
-                                                            DataCell(
-                                                              Text(detail.emailAddress.toString(),   style: TextStyles.body,),
-                                                            ),
-                                                            // DataCell(
-                                                            //   Container(
-                                                            //     width: columnWidths[4],
-                                                            //     child: Text(
-                                                            //       detail.paymentStatus.toString(),
-                                                            //       style: TextStyles.body,
-                                                            //     ),
-                                                            //   ),
-                                                            // ),
-                                                          ],
-                                                          onSelectChanged: (selected){
-                                                            if(selected != null && selected){
-                                                              //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                                                              if (filteredData.length <= 9) {
-                                                                context.go('/Cus_Details',extra:{
-                                                                  'orderId': detail.customer
-                                                                });
-                                                              } else {
-                                                                context.go('/Cus_Details',extra:{
-                                                                  'orderId': detail.customer
-                                                                });
+                                              ?
+                                          ListView.builder(
+                                            shrinkWrap: true,
+                                            physics: NeverScrollableScrollPhysics(),
+                                            itemCount: math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage),
+                                            itemBuilder: (context, index) {
+                                              final product = filteredData[(currentPage - 1) * itemsPerPage + index];
+                                              return Container(
+                                                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                decoration:BoxDecoration(
+                                                  //   border: Border.all(color: Colors.grey),
+                                                  color: Colors.white,
+                                                  border: Border.all(color: Color(0x29000000)),
+                                                  borderRadius: BorderRadius.circular(15),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(16.0),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        product.customer.length > 25
+                                                            ? '${product.customer.substring(0, 25)}...'
+                                                            : product.customer,
+                                                        style: TextStyles.subhead.copyWith(fontWeight: FontWeight.bold),
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text('Customer Name:', style: TextStyles.body),
+                                                          Text(product.customerName, style: TextStyles.body),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text('City:', style: TextStyles.body),
+                                                          Text(product.cityName, style: TextStyles.body),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text('Mobile No:', style: TextStyles.body),
+                                                          Text('${product.mobilePhoneNumber.toString()}', style: TextStyles.body),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text('Email ID Unit:', style: TextStyles.body),
+                                                          Text(product.emailAddress.toString(), style: TextStyles.body),
+                                                        ],
+                                                      ),
 
-                                                              };
-                                                            }
-                                                          });
-                                                    })),) : DataTable(
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          )
+                                          // SingleChildScrollView(
+                                          //   scrollDirection: Axis.horizontal, // Horizontal scroll when width <= 850
+                                          //   child: DataTable(
+                                          //       showCheckboxColumn: false,
+                                          //       headingRowHeight: 40,
+                                          //       columnSpacing: 35,
+                                          //       headingRowColor:
+                                          //       MaterialStateProperty.all(
+                                          //           Color(0xFFF7F7F7)),
+                                          //       // List.generate(5, (index)
+                                          //       columns: columns.map((column) {
+                                          //         return DataColumn(
+                                          //           label: Stack(
+                                          //             children: [
+                                          //               Container(
+                                          //                 padding: null,
+                                          //                 width: columnWidths[columns.indexOf(column)],
+                                          //                 // Dynamic width based on user interaction
+                                          //                 child: Row(
+                                          //                   children: [
+                                          //                     Text(column, style: TextStyles.subhead),
+                                          //                     IconButton(
+                                          //                       icon:
+                                          //                       _sortOrder[columns.indexOf(column)] == 'asc'
+                                          //                           ? SizedBox(
+                                          //                           width: 12,
+                                          //                           child: Image.asset(
+                                          //                             "images/ix_sort.png",
+                                          //                             color: Colors.blue,
+                                          //                           ))
+                                          //                           : SizedBox(
+                                          //                           width: 12,
+                                          //                           child: Image.asset(
+                                          //                             "images/ix_sort.png",
+                                          //                             color: Colors.blue,
+                                          //                           )),
+                                          //                       onPressed: () {
+                                          //                         setState(() {
+                                          //                           _sortOrder[columns.indexOf(column)] =
+                                          //                           _sortOrder[columns.indexOf(column)] ==
+                                          //                               'asc'
+                                          //                               ? 'desc'
+                                          //                               : 'asc';
+                                          //                           _sortProducts(columns.indexOf(column),
+                                          //                               _sortOrder[columns.indexOf(column)]);
+                                          //                         });
+                                          //                       },
+                                          //                     ),
+                                          //                     //SizedBox(width: 50,),
+                                          //                     //Padding(
+                                          //                     //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
+                                          //                     //  child:
+                                          //                     // ),
+                                          //                   ],
+                                          //                 ),
+                                          //               ),
+                                          //             ],
+                                          //           ),
+                                          //           onSort: (columnIndex, ascending) {
+                                          //             _sortOrder;
+                                          //           },
+                                          //         );
+                                          //       }).toList(),
+                                          //       rows: List.generate(
+                                          //           math.min(itemsPerPage,
+                                          //               filteredData.length - (currentPage - 1) * itemsPerPage),
+                                          //               (index) {
+                                          //             final detail =
+                                          //             filteredData[(currentPage - 1) * itemsPerPage + index];
+                                          //             final isSelected = _selectedProduct == detail;
+                                          //             return DataRow(
+                                          //                 color: MaterialStateProperty.resolveWith<Color>((states) {
+                                          //                   if (states.contains(MaterialState.hovered)) {
+                                          //                     return Colors.blue.shade500.withOpacity(
+                                          //                         0.8); // Add some opacity to the dark blue
+                                          //                   } else {
+                                          //                     return Colors.white.withOpacity(0.9);
+                                          //                   }
+                                          //                 }),
+                                          //                 cells: [
+                                          //                   DataCell(
+                                          //                       Text(detail.customer,   style: TextStyles.body,)),
+                                          //                   DataCell(
+                                          //                     Text(detail.customerName,   style: TextStyles.body,),
+                                          //                   ),
+                                          //                   DataCell(
+                                          //                     Text(detail.cityName,   style: TextStyles.body,),
+                                          //                   ),
+                                          //                   DataCell(
+                                          //                     Container(
+                                          //                       width: columnWidths[3],
+                                          //                       child: Text(detail.telephoneNumber1.toString(),   style: TextStyles.body,),
+                                          //                     ),
+                                          //                   ),
+                                          //                   DataCell(
+                                          //                     Text(detail.emailAddress.toString(),   style: TextStyles.body,),
+                                          //                   ),
+                                          //                   // DataCell(
+                                          //                   //   Container(
+                                          //                   //     width: columnWidths[4],
+                                          //                   //     child: Text(
+                                          //                   //       detail.paymentStatus.toString(),
+                                          //                   //       style: TextStyles.body,
+                                          //                   //     ),
+                                          //                   //   ),
+                                          //                   // ),
+                                          //                 ],
+                                          //                 onSelectChanged: (selected){
+                                          //                   if(selected != null && selected){
+                                          //                     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
+                                          //                     if (filteredData.length <= 9) {
+                                          //                       context.go('/Cus_Details',extra:{
+                                          //                         'orderId': detail.customer
+                                          //                       });
+                                          //                     } else {
+                                          //                       context.go('/Cus_Details',extra:{
+                                          //                         'orderId': detail.customer
+                                          //                       });
+                                          //
+                                          //                     };
+                                          //                   }
+                                          //                 });
+                                          //           })),)
+                                              :
+                                          DataTable(
                                               showCheckboxColumn: false,
                                               headingRowHeight: 40,
                                               columnSpacing: 35,

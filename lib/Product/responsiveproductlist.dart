@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'dart:math'as math;
+import 'dart:math' as math;
 import '../widgets/productsap.dart' as ord;
 import 'dart:typed_data';
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
@@ -32,16 +32,15 @@ import 'dart:html';
 
 import 'package:btb/Order%20Module/firstpage.dart' as ors;
 
-
 void main() => runApp(MaterialApp(
-  debugShowCheckedModeBanner: false,
-  home: MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (context) => MenuProvider())
-    ],
-    child: ResponsiveEmpproductPage(),
-  ),
-));
+      debugShowCheckedModeBanner: false,
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => MenuProvider())
+        ],
+        child: ResponsiveEmpproductPage(),
+      ),
+    ));
 
 class ResponsiveEmpproductPage extends StatelessWidget {
   const ResponsiveEmpproductPage({super.key});
@@ -77,15 +76,13 @@ class ResponsiveEmpproductPage extends StatelessWidget {
           ),
         ),
       ),
-
       key: context.read<MenuProvider>().scaffoldKey,
       drawer: SideMenu(),
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            if (Responsive.isDesktop(context) )
+            if (Responsive.isDesktop(context))
               Expanded(flex: 1, child: SideMenu()),
             Expanded(flex: 5, child: ProductListResponsive()),
           ],
@@ -165,61 +162,58 @@ class _SideMenuState extends State<SideMenu> {
   Widget build(BuildContext context) {
     final maxHeight = MediaQuery.of(context).size.height;
 
-    return
-      Drawer(
-        // width: 200,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        child: ListView(
-          padding: const EdgeInsets.only(left: 15, right: 15, top: 30),
-          children: [
-            // Sidebar Menu Items
-            _buildMenuItem(
-              context,
-              'Home',
-              Icons.home_outlined,
-              Colors.blue[900]!,
-              '/Home',
-            ),
-            Container(
-              height: 42,
-              margin: const EdgeInsets.only(bottom: 5, right: 20),
-              decoration: const BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  bottomLeft: Radius.circular(8),
-                  bottomRight: Radius.circular(8),
-                ),
-              ),
-              child: _buildMenuItem(
-                context,
-                'Product',
-                Icons.production_quantity_limits,
-                Colors.white,
-                '/Product_List',
+    return Drawer(
+      // width: 200,
+      elevation: 0,
+      backgroundColor: Colors.white,
+      child: ListView(
+        padding: const EdgeInsets.only(left: 15, right: 15, top: 30),
+        children: [
+          // Sidebar Menu Items
+          _buildMenuItem(
+            context,
+            'Home',
+            Icons.home_outlined,
+            Colors.blue[900]!,
+            '/Home',
+          ),
+          Container(
+            height: 42,
+            margin: const EdgeInsets.only(bottom: 5, right: 20),
+            decoration: const BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8),
+                bottomLeft: Radius.circular(8),
+                bottomRight: Radius.circular(8),
               ),
             ),
-            _buildMenuItem(
+            child: _buildMenuItem(
               context,
-              'Customer',
-              Icons.account_circle_outlined,
-              Colors.blue[900]!,
-              '/Customer',
+              'Product',
+              Icons.production_quantity_limits,
+              Colors.white,
+              '/Product_List',
             ),
+          ),
+          _buildMenuItem(
+            context,
+            'Customer',
+            Icons.account_circle_outlined,
+            Colors.blue[900]!,
+            '/Customer',
+          ),
 
-            _buildMenuItem(
-              context,
-              'Order',
-              Icons.warehouse_outlined,
-              Colors.blue[900]!,
-              '/Order_List',
-            ),
-
-
-          ],
-        ),
-      );
+          _buildMenuItem(
+            context,
+            'Order',
+            Icons.warehouse_outlined,
+            Colors.blue[900]!,
+            '/Order_List',
+          ),
+        ],
+      ),
+    );
   }
 
   /// Reusable Menu Item Widget
@@ -267,7 +261,6 @@ class _SideMenuState extends State<SideMenu> {
     );
   }
 }
-
 
 // class SideMenu extends StatelessWidget {
 //   const SideMenu({
@@ -365,9 +358,15 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
     with SingleTickerProviderStateMixin {
   Product? _selectedProduct;
   List<String> _sortOrder = List.generate(5, (index) => 'asc');
-  List<String> columns = ['Product Name', 'Category Name','Product Type','Price','Base Unit'];
+  List<String> columns = [
+    'Product Name',
+    'Category Name',
+    'Product Type',
+    'Price',
+    'Base Unit'
+  ];
   List<double> columnWidths = [135, 120, 125, 80, 100];
-  List<bool> columnSortState = [true, true, true,true,true];
+  List<bool> columnSortState = [true, true, true, true, true];
   late ord.ProductData productData;
   bool isHomeSelected = false;
 
@@ -412,12 +411,10 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
 
   double size = 200;
 
-
-
   void _updateSearch(String searchText) {
     setState(() {
       _searchText = searchText;
-      currentPage = 1;  // Reset to first page when searching
+      currentPage = 1; // Reset to first page when searching
       _filterAndPaginateProducts();
       // _clearSearch();
     });
@@ -477,7 +474,7 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
     print("previos");
 
     if (currentPage > 1) {
-      if(filteredProducts.length > itemsPerPage) {
+      if (filteredProducts.length > itemsPerPage) {
         setState(() {
           currentPage--;
           //  fetchProducts(currentPage, itemsPerPage);
@@ -492,7 +489,7 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
     print('nextpage');
 
     if (currentPage < totalPages) {
-      if(filteredProducts.length > currentPage * itemsPerPage) {
+      if (filteredProducts.length > currentPage * itemsPerPage) {
         setState(() {
           currentPage++;
         });
@@ -500,10 +497,7 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
     }
   }
 
-
-
   // String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJUZXN0IEN1c3RvbWVyIiwiUm9sZXMiOlt7ImF1dGhvcml0eSI6IkN1c3RvbWVyIn1dLCJleHAiOjE3MzQ1MTA1MDEsImlhdCI6MTczNDUwMzMwMX0.89Y1_HthjVIJQpKcBIEAke5lIrM1yn0vtrc8xzu_TsK2JbSPPJjkwfTylSFfexUCDszjmKdKXzUE2n1LxrPYNA';
-
 
   Future<void> fetchProducts(int page, int itemsPerPage) async {
     if (isLoading) return;
@@ -537,14 +531,16 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
               productType: item['productType'] ?? '',
               baseUnit: item['baseUnit'] ?? '',
               productDescription: item['productDescription'] ?? '',
-              standardPrice: item['standardPrice'] ?? 0, // Default value if not present
+              standardPrice: item['standardPrice'] ?? 0,
+              // Default value if not present
               currency: item['currency'] ?? 'INR', // Default to INR
             );
           }).toList();
 
           setState(() {
             productList = products;
-            totalPages = (products.length / itemsPerPage).ceil(); // Update total pages
+            totalPages =
+                (products.length / itemsPerPage).ceil(); // Update total pages
             print(totalPages); // Debugging output
             _filterAndPaginateProducts();
           });
@@ -562,13 +558,14 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
     }
   }
 
-
   void _sortProducts(int columnIndex, String sortOrder) {
     if (sortOrder == 'asc') {
       filteredProducts.sort((a, b) {
         switch (columnIndex) {
           case 0:
-            return a.productDescription.toLowerCase().compareTo(b.productDescription.toLowerCase());
+            return a.productDescription
+                .toLowerCase()
+                .compareTo(b.productDescription.toLowerCase());
           case 1:
             return a.categoryName.compareTo(b.categoryName);
           case 2:
@@ -585,7 +582,9 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
       filteredProducts.sort((a, b) {
         switch (columnIndex) {
           case 0:
-            return b.productDescription.toLowerCase().compareTo(a.productDescription.toLowerCase());
+            return b.productDescription
+                .toLowerCase()
+                .compareTo(a.productDescription.toLowerCase());
           case 1:
             return b.categoryName.compareTo(a.categoryName);
           case 2:
@@ -602,15 +601,11 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
     setState(() {});
   }
 
-
-
-
   @override
   void initState() {
     super.initState();
     //_getDashboardCounts();
     //   fetchOrders();
-
 
 // Define the shake animation (values will oscillate between -5.0 and 5.0)
 
@@ -620,10 +615,6 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
     // _dateController.text = formattedDate;
     fetchProducts(currentPage, itemsPerPage);
   }
-
-
-
-
 
   @override
   void dispose() {
@@ -647,901 +638,1156 @@ class _ProductListResponsiveState extends State<ProductListResponsive>
       trackRadius: const Radius.circular(2),
       child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  if (!Responsive.isDesktop(context)) ...{
-                    IconButton(
-                        onPressed: () {
-                          context.read<MenuProvider>().controlMenu();
-                        },
-                        icon: Icon(
-                          Icons.menu,
-                        )),
-                  },
-
-
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding:
+              if (!Responsive.isDesktop(context)) ...{
+                IconButton(
+                    onPressed: () {
+                      context.read<MenuProvider>().controlMenu();
+                    },
+                    icon: Icon(
+                      Icons.menu,
+                    )),
+              },
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding:
                     const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                    child: Text(
-                      'Product List',
-                      style: TextStyles.header1,
-                    ),
-                  ),
-                ],
+                child: Text(
+                  'Product List',
+                  style: TextStyles.header1,
+                ),
               ),
-              Row(
-                children: [
-                  Expanded(
-                      flex: 5,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(30),
-                            child: Container(
-                              //height: 800,
-                              //  padding: const EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                //   border: Border.all(color: Colors.grey),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(2),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.1),
-                                    // Soft grey shadow
-                                    spreadRadius: 3,
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                  flex: 5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(30),
+                        child: Container(
+                          //height: 800,
+                          //  padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            //   border: Border.all(color: Colors.grey),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                // Soft grey shadow
+                                spreadRadius: 3,
+                                blurRadius: 3,
+                                offset: const Offset(0, 3),
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.only(
-                                      left: 20,
-                                      right: 20,
-                                      top: 10,
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(
+                                  left: 20,
+                                  right: 20,
+                                  top: 10,
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            // Search Field
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: ConstrainedBox(
-                                                constraints: BoxConstraints(
-                                                  maxWidth: width * 0.261,
-                                                  maxHeight: 39,
-                                                ),
-                                                child: Container(
-                                                  // width: constraints.maxWidth * 0.252, // reduced width
+                                      children: [
+                                        // Search Field
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              maxWidth: width * 0.261,
+                                              maxHeight: 39,
+                                            ),
+                                            child: Container(
+                                              // width: constraints.maxWidth * 0.252, // reduced width
 
-                                                  height: 35, // reduced height
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius: BorderRadius.circular(2),
-                                                    border: Border.all(color: Colors.grey),
-                                                  ),
-                                                  child: TextFormField(
-                                                    style: GoogleFonts.inter(
-                                                        color: Colors.black, fontSize: 13),
-                                                    decoration: InputDecoration(
-                                                        hintText:
+                                              height: 35, // reduced height
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(2),
+                                                border: Border.all(
+                                                    color: Colors.grey),
+                                              ),
+                                              child: TextFormField(
+                                                style: GoogleFonts.inter(
+                                                    color: Colors.black,
+                                                    fontSize: 13),
+                                                decoration: InputDecoration(
+                                                    hintText:
                                                         'Search by Product Name',
-                                                        hintStyle: TextStyles.body,
-                                                        contentPadding: EdgeInsets.symmetric(
-                                                            vertical: 3, horizontal: 5),
-                                                        // contentPadding:
-                                                        // EdgeInsets.only(bottom: 20, left: 10),
-                                                        // adjusted padding
-                                                        border: InputBorder.none,
-                                                        suffixIcon: Padding(
-                                                          padding: const EdgeInsets.only(
-                                                              left: 10, right: 5),
-                                                          // Adjust image padding
+                                                    hintStyle: TextStyles.body,
+                                                    contentPadding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 3,
+                                                            horizontal: 5),
+                                                    // contentPadding:
+                                                    // EdgeInsets.only(bottom: 20, left: 10),
+                                                    // adjusted padding
+                                                    border: InputBorder.none,
+                                                    suffixIcon: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 10,
+                                                              right: 5),
+                                                      // Adjust image padding
+                                                      child: Image.asset(
+                                                        'images/search.png', // Replace with your image asset path
+                                                      ),
+                                                    )),
+                                                onChanged: _updateSearch,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
+                                        //  Spacer(),
+                                        // Padding(
+                                        //   padding: const EdgeInsets.all(16),
+                                        //   child: Column(
+                                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                                        //     children: [
+                                        //       //  const SizedBox(height: 8),
+                                        //       Padding(
+                                        //         padding: const EdgeInsets.only(left: 30,top: 20),
+                                        //         child: Container(
+                                        //           width: width * 0.1, // reduced width
+                                        //           height: 40, // reduced height
+                                        //           decoration: BoxDecoration(
+                                        //             color: Colors.white,
+                                        //             borderRadius: BorderRadius.circular(2),
+                                        //             border: Border.all(color: Colors.grey),
+                                        //           ),
+                                        //           child: DropdownButtonFormField2<String>(
+                                        //             decoration: const InputDecoration(
+                                        //               contentPadding: EdgeInsets.only(
+                                        //                   bottom: 15, left: 9), // Custom padding
+                                        //               border: InputBorder.none, // No default border
+                                        //               filled: true,
+                                        //               fillColor: Colors.white, // Background color
+                                        //             ),
+                                        //             isExpanded: true,
+                                        //             // Ensures dropdown takes full width
+                                        //             value: dropdownValue1,
+                                        //             onChanged: (String? newValue) {
+                                        //               setState(() {
+                                        //                 dropdownValue1 = newValue;
+                                        //                 status = newValue ?? '';
+                                        //                 _filterAndPaginateProducts();
+                                        //               });
+                                        //             },
+                                        //             items: <String>[
+                                        //               'Delivery Status',
+                                        //               'Not Started',
+                                        //               'In Progress',
+                                        //               'Delivered',
+                                        //             ].map<DropdownMenuItem<String>>((String value) {
+                                        //               return DropdownMenuItem<String>(
+                                        //                 value: value,
+                                        //                 child: Text(
+                                        //                   value,
+                                        //                   style: TextStyle(
+                                        //                     fontSize: 13,
+                                        //                     color: value == 'Delivery Status'
+                                        //                         ? Colors.grey
+                                        //                         : Colors.black,
+                                        //                   ),
+                                        //                 ),
+                                        //               );
+                                        //             }).toList(),
+                                        //             iconStyleData: const IconStyleData(
+                                        //               icon: Icon(
+                                        //                 Icons.keyboard_arrow_down,
+                                        //                 color: Colors.indigo,
+                                        //                 size: 16,
+                                        //               ),
+                                        //               iconSize: 16,
+                                        //             ),
+                                        //             buttonStyleData: const ButtonStyleData(
+                                        //               height: 50, // Button height
+                                        //               padding: EdgeInsets.only(
+                                        //                   left: 10, right: 10), // Button padding
+                                        //             ),
+                                        //             dropdownStyleData: DropdownStyleData(
+                                        //               decoration: BoxDecoration(
+                                        //                 borderRadius: BorderRadius.circular(7),
+                                        //                 // Rounded corners
+                                        //                 color: Colors.white, // Dropdown background color
+                                        //               ),
+                                        //               maxHeight: 200, // Max height for dropdown items
+                                        //               width: width * 0.1, // Dropdown width
+                                        //               offset: const Offset(0, -20),
+                                        //             ),
+                                        //           ),
+                                        //         ),
+                                        //       ),
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 8.0),
+                              // DataTable with ConstrainedBox to avoid overflow
+                              if (Responsive.isMobile(context)) ...{
+                                if (filteredProducts.isEmpty) ...{
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        // height: 600,
+                                        width: width,
+                                        decoration: BoxDecoration(
+                                            color: Color(0xFFF7F7F7),
+                                            border: Border.symmetric(
+                                                horizontal: BorderSide(
+                                                    color: Colors.grey,
+                                                    width: 0.5))),
+                                        child: DataTable(
+                                            showCheckboxColumn: false,
+                                            headingRowHeight: 40,
+                                            columnSpacing: 50,
+                                            headingRowColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.grey.shade300),
+                                            columns: columns.map((column) {
+                                              return DataColumn(
+                                                label: Stack(
+                                                  children: [
+                                                    Container(
+                                                      padding: null,
+                                                      width: columnWidths[
+                                                          columns
+                                                              .indexOf(column)],
+                                                      // Dynamic width based on user interaction
+                                                      child: Row(
+//crossAxisAlignment: CrossAxisAlignment.end,
+//   mainAxisAlignment: MainAxisAlignment.end,
+                                                        children: [
+                                                          Text(column,
+                                                              style: TextStyles
+                                                                  .subhead),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                onSort:
+                                                    (columnIndex, ascending) {
+                                                  _sortOrder;
+                                                },
+                                              );
+                                            }).toList(),
+                                            rows: const []),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 5, left: 130, right: 150),
+                                        child: CustomDatafound(),
+                                      ),
+                                    ],
+                                  ),
+                                }
+                                else ...{
+                                  SizedBox(
+                                    height: height,
+                                    width: width,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.vertical,
+                                      child: width <= 850
+                                          ? ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount: math.min(itemsPerPage, filteredProducts.length - (currentPage - 1) * itemsPerPage),
+                                        itemBuilder: (context, index) {
+                                          final product = filteredProducts[(currentPage - 1) * itemsPerPage + index];
+                                          return Container(
+                                            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                            decoration:BoxDecoration(
+                                              //   border: Border.all(color: Colors.grey),
+                                              color: Colors.white,
+                                              border: Border.all(color: Color(0x29000000)),
+                                              borderRadius: BorderRadius.circular(15),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(16.0),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    product.productDescription.length > 25
+                                                        ? '${product.productDescription.substring(0, 25)}...'
+                                                        : product.productDescription,
+                                                    style: TextStyles.subhead.copyWith(fontWeight: FontWeight.bold),
+                                                  ),
+                                                  SizedBox(height: 8),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text('Category:', style: TextStyles.body),
+                                                      Text(product.categoryName, style: TextStyles.body),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 8),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text('Type:', style: TextStyles.body),
+                                                      Text(product.productType, style: TextStyles.body),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 8),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text('Price:', style: TextStyles.body),
+                                                      Text('\₹${product.standardPrice.toString()}', style: TextStyles.body),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 8),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text('Base Unit:', style: TextStyles.body),
+                                                      Text(product.baseUnit.toString(), style: TextStyles.body),
+                                                    ],
+                                                  ),
+
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      )
+                                          : DataTable(
+                                        showCheckboxColumn: false,
+                                        headingRowHeight: 40,
+                                        columnSpacing: 35,
+                                        headingRowColor: MaterialStateProperty.all(Color(0xFFF7F7F7)),
+                                        columns: columns.map((column) {
+                                          return DataColumn(
+                                            label: Stack(
+                                              children: [
+                                                Container(
+                                                  padding: null,
+                                                  width: columnWidths[columns.indexOf(column)],
+                                                  child: Row(
+                                                    children: [
+                                                      Text(column, style: TextStyles.subhead),
+                                                      IconButton(
+                                                        icon: _sortOrder[columns.indexOf(column)] == 'asc'
+                                                            ? SizedBox(
+                                                          width: 12,
                                                           child: Image.asset(
-                                                            'images/search.png', // Replace with your image asset path
+                                                            "images/ix_sort.png",
+                                                            color: Colors.blue,
                                                           ),
-                                                        )),
-                                                    onChanged: _updateSearch,
+                                                        )
+                                                            : SizedBox(
+                                                          width: 12,
+                                                          child: Image.asset(
+                                                            "images/ix_sort.png",
+                                                            color: Colors.blue,
+                                                          ),
+                                                        ),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            _sortOrder[columns.indexOf(column)] =
+                                                            _sortOrder[columns.indexOf(column)] == 'asc' ? 'desc' : 'asc';
+                                                            _sortProducts(columns.indexOf(column), _sortOrder[columns.indexOf(column)]);
+                                                          });
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            onSort: (columnIndex, ascending) {
+                                              _sortOrder;
+                                            },
+                                          );
+                                        }).toList(),
+                                        rows: List.generate(
+                                            math.min(itemsPerPage, filteredProducts.length - (currentPage - 1) * itemsPerPage), (index) {
+                                          final product = filteredProducts[(currentPage - 1) * itemsPerPage + index];
+                                          return DataRow(
+                                            color: MaterialStateProperty.resolveWith<Color>((states) {
+                                              if (states.contains(MaterialState.hovered)) {
+                                                return Colors.blue.shade500.withOpacity(0.8);
+                                              } else {
+                                                return Colors.white.withOpacity(0.9);
+                                              }
+                                            }),
+                                            cells: [
+                                              DataCell(
+                                                Container(
+                                                  width: columnWidths[0],
+                                                  child: Text(
+                                                    product.productDescription.length > 25
+                                                        ? '${product.productDescription.substring(0, 25)}...'
+                                                        : product.productDescription,
+                                                    style: TextStyles.body,
                                                   ),
                                                 ),
                                               ),
-                                            ),
-
-                                            //  Spacer(),
-                                            // Padding(
-                                            //   padding: const EdgeInsets.all(16),
-                                            //   child: Column(
-                                            //     crossAxisAlignment: CrossAxisAlignment.start,
-                                            //     children: [
-                                            //       //  const SizedBox(height: 8),
-                                            //       Padding(
-                                            //         padding: const EdgeInsets.only(left: 30,top: 20),
-                                            //         child: Container(
-                                            //           width: width * 0.1, // reduced width
-                                            //           height: 40, // reduced height
-                                            //           decoration: BoxDecoration(
-                                            //             color: Colors.white,
-                                            //             borderRadius: BorderRadius.circular(2),
-                                            //             border: Border.all(color: Colors.grey),
-                                            //           ),
-                                            //           child: DropdownButtonFormField2<String>(
-                                            //             decoration: const InputDecoration(
-                                            //               contentPadding: EdgeInsets.only(
-                                            //                   bottom: 15, left: 9), // Custom padding
-                                            //               border: InputBorder.none, // No default border
-                                            //               filled: true,
-                                            //               fillColor: Colors.white, // Background color
-                                            //             ),
-                                            //             isExpanded: true,
-                                            //             // Ensures dropdown takes full width
-                                            //             value: dropdownValue1,
-                                            //             onChanged: (String? newValue) {
-                                            //               setState(() {
-                                            //                 dropdownValue1 = newValue;
-                                            //                 status = newValue ?? '';
-                                            //                 _filterAndPaginateProducts();
-                                            //               });
-                                            //             },
-                                            //             items: <String>[
-                                            //               'Delivery Status',
-                                            //               'Not Started',
-                                            //               'In Progress',
-                                            //               'Delivered',
-                                            //             ].map<DropdownMenuItem<String>>((String value) {
-                                            //               return DropdownMenuItem<String>(
-                                            //                 value: value,
-                                            //                 child: Text(
-                                            //                   value,
-                                            //                   style: TextStyle(
-                                            //                     fontSize: 13,
-                                            //                     color: value == 'Delivery Status'
-                                            //                         ? Colors.grey
-                                            //                         : Colors.black,
-                                            //                   ),
-                                            //                 ),
-                                            //               );
-                                            //             }).toList(),
-                                            //             iconStyleData: const IconStyleData(
-                                            //               icon: Icon(
-                                            //                 Icons.keyboard_arrow_down,
-                                            //                 color: Colors.indigo,
-                                            //                 size: 16,
-                                            //               ),
-                                            //               iconSize: 16,
-                                            //             ),
-                                            //             buttonStyleData: const ButtonStyleData(
-                                            //               height: 50, // Button height
-                                            //               padding: EdgeInsets.only(
-                                            //                   left: 10, right: 10), // Button padding
-                                            //             ),
-                                            //             dropdownStyleData: DropdownStyleData(
-                                            //               decoration: BoxDecoration(
-                                            //                 borderRadius: BorderRadius.circular(7),
-                                            //                 // Rounded corners
-                                            //                 color: Colors.white, // Dropdown background color
-                                            //               ),
-                                            //               maxHeight: 200, // Max height for dropdown items
-                                            //               width: width * 0.1, // Dropdown width
-                                            //               offset: const Offset(0, -20),
-                                            //             ),
-                                            //           ),
-                                            //         ),
-                                            //       ),
-                                            //     ],
-                                            //   ),
-                                            // ),
-                                          ],
+                                              DataCell(
+                                                Container(
+                                                  width: columnWidths[1],
+                                                  child: Text(product.categoryName, style: TextStyles.body),
+                                                ),
+                                              ),
+                                              DataCell(
+                                                Container(
+                                                  width: columnWidths[2],
+                                                  child: Text(product.productType, style: TextStyles.body),
+                                                ),
+                                              ),
+                                              DataCell(
+                                                Container(
+                                                  width: columnWidths[3],
+                                                  child: Text(product.standardPrice.toString(), style: TextStyles.body),
+                                                ),
+                                              ),
+                                              DataCell(
+                                                Container(
+                                                  width: columnWidths[4],
+                                                  child: Text(product.baseUnit.toString(), style: TextStyles.body),
+                                                ),
+                                              ),
+                                            ],
+                                            // onSelectChanged: (selected) {
+                                            //   if (selected != null && selected) {
+                                            //     print('Selected product: ${product.productDescription}');
+                                            //     setState(() {
+                                            //       _selectedProduct = product;
+                                            //     });
+                                            //   }
+                                            // },
+                                          );
+                                        }),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        PaginationControls(
+                                          currentPage: currentPage,
+                                          totalPages: filteredProducts.length >
+                                              itemsPerPage
+                                              ? totalPages
+                                              : 1,
+                                          onPreviousPage: _goToPreviousPage,
+                                          onNextPage: _goToNextPage,
+                                          // onLastPage: _goToLastPage,
                                         ),
                                       ],
                                     ),
                                   ),
-
-                                  const SizedBox(height: 8.0),
-                                  // DataTable with ConstrainedBox to avoid overflow
-                                  if (Responsive.isMobile(context)) ...{
-                                    if (filteredProducts.isEmpty) ...{
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            // height: 600,
-                                            width: width,
-                                            decoration: BoxDecoration(
-                                                color: Color(0xFFF7F7F7),
-                                                border: Border.symmetric(
-                                                    horizontal: BorderSide(
-                                                        color: Colors.grey,
-                                                        width: 0.5))),
-                                            child: DataTable(
-                                                showCheckboxColumn: false,
-                                                headingRowHeight: 40,
-                                                columnSpacing: 50,
-                                                headingRowColor:
-                                                MaterialStateProperty.all(
-                                                    Colors.grey.shade300),
-                                                columns: columns.map((column) {
-                                                  return DataColumn(
-                                                    label: Stack(
-                                                      children: [
-                                                        Container(
-                                                          padding: null,
-                                                          width: columnWidths[columns.indexOf(column)],
-                                                          // Dynamic width based on user interaction
-                                                          child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
-                                                            children: [
-                                                              Text(column, style: TextStyles.subhead),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    onSort: (columnIndex, ascending) {
-                                                      _sortOrder;
-                                                    },
-                                                  );
-                                                }).toList(),
-                                                rows: const []),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 5, left: 130, right: 150),
-                                            child: CustomDatafound(),
-                                          ),
-                                        ],
-                                      ),
-                                    }else...{
-                                      SizedBox(
-                                        height: height,
+                                }
+                                // else ...{
+                                //
+                                //   // SizedBox(
+                                //   //   height: height,
+                                //   //   width: width,
+                                //   //   child: SingleChildScrollView(
+                                //   //     scrollDirection: Axis.vertical,
+                                //   //     child:  width <= 850
+                                //   //         ? SingleChildScrollView(
+                                //   //       scrollDirection: Axis.horizontal, // Horizontal scroll when width <= 850
+                                //   //       child: DataTable(
+                                //   //           showCheckboxColumn: false,
+                                //   //           headingRowHeight: 40,
+                                //   //           columnSpacing: 35,
+                                //   //           headingRowColor:
+                                //   //           MaterialStateProperty.all(
+                                //   //               Color(0xFFF7F7F7)),
+                                //   //           // List.generate(5, (index)
+                                //   //           columns: columns.map((column) {
+                                //   //             return DataColumn(
+                                //   //               label: Stack(
+                                //   //                 children: [
+                                //   //                   Container(
+                                //   //                     padding: null,
+                                //   //                     width: columnWidths[columns.indexOf(column)],
+                                //   //                     // Dynamic width based on user interaction
+                                //   //                     child: Row(
+                                //   //                       children: [
+                                //   //                         Text(column, style: TextStyles.subhead),
+                                //   //                         IconButton(
+                                //   //                           icon:
+                                //   //                           _sortOrder[columns.indexOf(column)] == 'asc'
+                                //   //                               ? SizedBox(
+                                //   //                               width: 12,
+                                //   //                               child: Image.asset(
+                                //   //                                 "images/ix_sort.png",
+                                //   //                                 color: Colors.blue,
+                                //   //                               ))
+                                //   //                               : SizedBox(
+                                //   //                               width: 12,
+                                //   //                               child: Image.asset(
+                                //   //                                 "images/ix_sort.png",
+                                //   //                                 color: Colors.blue,
+                                //   //                               )),
+                                //   //                           onPressed: () {
+                                //   //                             setState(() {
+                                //   //                               _sortOrder[columns.indexOf(column)] =
+                                //   //                               _sortOrder[columns.indexOf(column)] ==
+                                //   //                                   'asc'
+                                //   //                                   ? 'desc'
+                                //   //                                   : 'asc';
+                                //   //                               _sortProducts(columns.indexOf(column),
+                                //   //                                   _sortOrder[columns.indexOf(column)]);
+                                //   //                             });
+                                //   //                           },
+                                //   //                         ),
+                                //   //                         //SizedBox(width: 50,),
+                                //   //                         //Padding(
+                                //   //                         //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
+                                //   //                         //  child:
+                                //   //                         // ),
+                                //   //                       ],
+                                //   //                     ),
+                                //   //                   ),
+                                //   //                 ],
+                                //   //               ),
+                                //   //               onSort: (columnIndex, ascending) {
+                                //   //                 _sortOrder;
+                                //   //               },
+                                //   //             );
+                                //   //           }).toList(),
+                                //   //           rows: List.generate(
+                                //   //               math.min(itemsPerPage, filteredProducts.length - (currentPage - 1) * itemsPerPage),(index)
+                                //   //           {
+                                //   //             final product = filteredProducts[(currentPage - 1) * itemsPerPage + index];
+                                //   //             final isSelected = _selectedProduct == product;
+                                //   //             return DataRow(
+                                //   //                     color: MaterialStateProperty.resolveWith<Color>((states) {
+                                //   //                       if (states.contains(MaterialState.hovered)) {
+                                //   //                         return Colors.blue.shade500.withOpacity(
+                                //   //                             0.8); // Add some opacity to the dark blue
+                                //   //                       } else {
+                                //   //                         return Colors.white.withOpacity(0.9);
+                                //   //                       }
+                                //   //                     }),
+                                //   //                     cells: [
+                                //   //                       DataCell(
+                                //   //                         Container(
+                                //   //                           width: columnWidths[0], // Same dynamic width as column headers
+                                //   //                           child: Text(
+                                //   //                             product.productDescription.length > 25
+                                //   //                                 ? '${product.productDescription.substring(0, 25)}...'
+                                //   //                                 : product.productDescription,
+                                //   //                             style: TextStyles.body,
+                                //   //                           ),
+                                //   //                         ),
+                                //   //                       ),
+                                //   //                       DataCell(
+                                //   //                         Container(
+                                //   //                           width: columnWidths[1],
+                                //   //                           child: Text(product.categoryName,
+                                //   //                             style: TextStyles.body,),
+                                //   //                         ),
+                                //   //                       ),
+                                //   //                       DataCell(
+                                //   //                         Container(
+                                //   //                           width: columnWidths[2],
+                                //   //                           child: Text(product.productType,
+                                //   //                             style: TextStyles.body,),
+                                //   //                         ),
+                                //   //                       ),
+                                //   //                       DataCell(
+                                //   //                         Container(
+                                //   //                           width: columnWidths[3],
+                                //   //                           child: Text(product.standardPrice.toString(),style: TextStyles.body,),
+                                //   //                         ),
+                                //   //                       ),
+                                //   //                       DataCell(
+                                //   //                         Container(
+                                //   //                           width: columnWidths[4],
+                                //   //                           child: Text(product.baseUnit.toString(),
+                                //   //                             style: TextStyles.body,),
+                                //   //                         ),
+                                //   //                       ),
+                                //   //                       // DataCell(
+                                //   //                       //   Container(
+                                //   //                       //     width: columnWidths[4],
+                                //   //                       //     child: Text(
+                                //   //                       //       detail.paymentStatus.toString(),
+                                //   //                       //       style: TextStyles.body,
+                                //   //                       //     ),
+                                //   //                       //   ),
+                                //   //                       // ),
+                                //   //                     ],
+                                //   //               onSelectChanged: (selected) {
+                                //   //                 if (selected != null && selected) {
+                                //   //                   print('from first page');
+                                //   //                   print(filteredProducts);
+                                //   //                   print(product);
+                                //   //
+                                //   //                   if(filteredProducts.length <=9){
+                                //   //
+                                //   //                   }else {
+                                //   //
+                                //   //                   }
+                                //   //
+                                //   //
+                                //   //                 }
+                                //   //               },
+                                //   //                     );
+                                //   //               })),) : DataTable(
+                                //   //         showCheckboxColumn: false,
+                                //   //         headingRowHeight: 40,
+                                //   //         columnSpacing: 35,
+                                //   //         headingRowColor:
+                                //   //         MaterialStateProperty.all(
+                                //   //             Color(0xFFF7F7F7)),
+                                //   //         // List.generate(5, (index)
+                                //   //         columns: columns.map((column) {
+                                //   //           return DataColumn(
+                                //   //             label: Stack(
+                                //   //               children: [
+                                //   //                 Container(
+                                //   //                   padding: null,
+                                //   //                   width: columnWidths[columns.indexOf(column)],
+                                //   //                   // Dynamic width based on user interaction
+                                //   //                   child: Row(
+                                //   //                     children: [
+                                //   //                       Text(column, style: TextStyles.subhead),
+                                //   //                       IconButton(
+                                //   //                         icon:
+                                //   //                         _sortOrder[columns.indexOf(column)] == 'asc'
+                                //   //                             ? SizedBox(
+                                //   //                             width: 12,
+                                //   //                             child: Image.asset(
+                                //   //                               "images/ix_sort.png",
+                                //   //                               color: Colors.blue,
+                                //   //                             ))
+                                //   //                             : SizedBox(
+                                //   //                             width: 12,
+                                //   //                             child: Image.asset(
+                                //   //                               "images/ix_sort.png",
+                                //   //                               color: Colors.blue,
+                                //   //                             )),
+                                //   //                         onPressed: () {
+                                //   //                           setState(() {
+                                //   //                             _sortOrder[columns.indexOf(column)] =
+                                //   //                             _sortOrder[columns.indexOf(column)] ==
+                                //   //                                 'asc'
+                                //   //                                 ? 'desc'
+                                //   //                                 : 'asc';
+                                //   //                             _sortProducts(columns.indexOf(column),
+                                //   //                                 _sortOrder[columns.indexOf(column)]);
+                                //   //                           });
+                                //   //                         },
+                                //   //                       ),
+                                //   //                       //SizedBox(width: 50,),
+                                //   //                       //Padding(
+                                //   //                       //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
+                                //   //                       //  child:
+                                //   //                       // ),
+                                //   //                     ],
+                                //   //                   ),
+                                //   //                 ),
+                                //   //               ],
+                                //   //             ),
+                                //   //             onSort: (columnIndex, ascending) {
+                                //   //               _sortOrder;
+                                //   //             },
+                                //   //           );
+                                //   //         }).toList(),
+                                //   //         rows: List.generate(
+                                //   //             math.min(itemsPerPage, filteredProducts.length - (currentPage - 1) * itemsPerPage),(index)
+                                //   //         {
+                                //   //           final product = filteredProducts[(currentPage - 1) * itemsPerPage + index];
+                                //   //           final isSelected = _selectedProduct == product;
+                                //   //           return DataRow(
+                                //   //                   color: MaterialStateProperty.resolveWith<Color>((states) {
+                                //   //                     if (states.contains(MaterialState.hovered)) {
+                                //   //                       return Colors.blue.shade500.withOpacity(
+                                //   //                           0.8); // Add some opacity to the dark blue
+                                //   //                     } else {
+                                //   //                       return Colors.white.withOpacity(0.9);
+                                //   //                     }
+                                //   //                   }),
+                                //   //                   cells: [
+                                //   //                     DataCell(
+                                //   //                       Container(
+                                //   //                         width: columnWidths[0], // Same dynamic width as column headers
+                                //   //                         child: Text(
+                                //   //                           product.productDescription.length > 25
+                                //   //                               ? '${product.productDescription.substring(0, 25)}...'
+                                //   //                               : product.productDescription,
+                                //   //                           style: TextStyles.body,
+                                //   //                         ),
+                                //   //                       ),
+                                //   //                     ),
+                                //   //                     DataCell(
+                                //   //                       Container(
+                                //   //                         width: columnWidths[1],
+                                //   //                         child: Text(product.categoryName,
+                                //   //                           style: TextStyles.body,),
+                                //   //                       ),
+                                //   //                     ),
+                                //   //                     DataCell(
+                                //   //                       Container(
+                                //   //                         width: columnWidths[2],
+                                //   //                         child: Text(product.productType,
+                                //   //                           style: TextStyles.body,),
+                                //   //                       ),
+                                //   //                     ),
+                                //   //                     DataCell(
+                                //   //                       Container(
+                                //   //                         width: columnWidths[3],
+                                //   //                         child: Text(product.standardPrice.toString(),style: TextStyles.body,),
+                                //   //                       ),
+                                //   //                     ),
+                                //   //                     DataCell(
+                                //   //                       Container(
+                                //   //                         width: columnWidths[4],
+                                //   //                         child: Text(product.baseUnit.toString(),
+                                //   //                           style: TextStyles.body,),
+                                //   //                       ),
+                                //   //                     ),
+                                //   //                     // DataCell(
+                                //   //                     //   Container(
+                                //   //                     //     width: columnWidths[4],
+                                //   //                     //     child: Text(
+                                //   //                     //       detail.paymentStatus.toString(),
+                                //   //                     //       style: TextStyles.body,
+                                //   //                     //     ),
+                                //   //                     //   ),
+                                //   //                     // ),
+                                //   //                   ],
+                                //   //             onSelectChanged: (selected) {
+                                //   //               if (selected != null && selected) {
+                                //   //                 print('from first page');
+                                //   //                 print(filteredProducts);
+                                //   //                 print(product);
+                                //   //
+                                //   //                 if(filteredProducts.length <=9){
+                                //   //
+                                //   //                 }else {
+                                //   //
+                                //   //                 }
+                                //   //
+                                //   //
+                                //   //               }
+                                //   //             },
+                                //   //               );
+                                //   //             })),
+                                //   //   ),
+                                //   // ),
+                                // }
+                              } else ...{
+                                if (filteredProducts.isEmpty) ...{
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        // height: 600,
                                         width: width,
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.vertical,
-                                          child:  width <= 850
-                                              ? SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal, // Horizontal scroll when width <= 850
-                                            child: DataTable(
-                                                showCheckboxColumn: false,
-                                                headingRowHeight: 40,
-                                                columnSpacing: 35,
-                                                headingRowColor:
+                                        decoration: BoxDecoration(
+                                            color: Color(0xFFF7F7F7),
+                                            border: Border.symmetric(
+                                                horizontal: BorderSide(
+                                                    color: Colors.grey,
+                                                    width: 0.5))),
+                                        child: DataTable(
+                                            headingRowColor:
                                                 MaterialStateProperty.all(
                                                     Color(0xFFF7F7F7)),
-                                                // List.generate(5, (index)
-                                                columns: columns.map((column) {
-                                                  return DataColumn(
-                                                    label: Stack(
-                                                      children: [
-                                                        Container(
-                                                          padding: null,
-                                                          width: columnWidths[columns.indexOf(column)],
-                                                          // Dynamic width based on user interaction
-                                                          child: Row(
-                                                            children: [
-                                                              Text(column, style: TextStyles.subhead),
-                                                              IconButton(
-                                                                icon:
-                                                                _sortOrder[columns.indexOf(column)] == 'asc'
-                                                                    ? SizedBox(
-                                                                    width: 12,
-                                                                    child: Image.asset(
-                                                                      "images/ix_sort.png",
-                                                                      color: Colors.blue,
-                                                                    ))
-                                                                    : SizedBox(
-                                                                    width: 12,
-                                                                    child: Image.asset(
-                                                                      "images/ix_sort.png",
-                                                                      color: Colors.blue,
-                                                                    )),
-                                                                onPressed: () {
-                                                                  setState(() {
-                                                                    _sortOrder[columns.indexOf(column)] =
-                                                                    _sortOrder[columns.indexOf(column)] ==
-                                                                        'asc'
-                                                                        ? 'desc'
-                                                                        : 'asc';
-                                                                    _sortProducts(columns.indexOf(column),
-                                                                        _sortOrder[columns.indexOf(column)]);
-                                                                  });
-                                                                },
-                                                              ),
-                                                              //SizedBox(width: 50,),
-                                                              //Padding(
-                                                              //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-                                                              //  child:
-                                                              // ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    onSort: (columnIndex, ascending) {
-                                                      _sortOrder;
-                                                    },
-                                                  );
-                                                }).toList(),
-                                                rows: List.generate(
-                                                    math.min(itemsPerPage, filteredProducts.length - (currentPage - 1) * itemsPerPage),(index)
-                                                {
-                                                  final product = filteredProducts[(currentPage - 1) * itemsPerPage + index];
-                                                  final isSelected = _selectedProduct == product;
-                                                  return DataRow(
-                                                          color: MaterialStateProperty.resolveWith<Color>((states) {
-                                                            if (states.contains(MaterialState.hovered)) {
-                                                              return Colors.blue.shade500.withOpacity(
-                                                                  0.8); // Add some opacity to the dark blue
-                                                            } else {
-                                                              return Colors.white.withOpacity(0.9);
-                                                            }
-                                                          }),
-                                                          cells: [
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[0], // Same dynamic width as column headers
-                                                                child: Text(
-                                                                  product.productDescription.length > 25
-                                                                      ? '${product.productDescription.substring(0, 25)}...'
-                                                                      : product.productDescription,
-                                                                  style: TextStyles.body,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[1],
-                                                                child: Text(product.categoryName,
-                                                                  style: TextStyles.body,),
-                                                              ),
-                                                            ),
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[2],
-                                                                child: Text(product.productType,
-                                                                  style: TextStyles.body,),
-                                                              ),
-                                                            ),
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[3],
-                                                                child: Text(product.standardPrice.toString(),style: TextStyles.body,),
-                                                              ),
-                                                            ),
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[4],
-                                                                child: Text(product.baseUnit.toString(),
-                                                                  style: TextStyles.body,),
-                                                              ),
-                                                            ),
-                                                            // DataCell(
-                                                            //   Container(
-                                                            //     width: columnWidths[4],
-                                                            //     child: Text(
-                                                            //       detail.paymentStatus.toString(),
-                                                            //       style: TextStyles.body,
-                                                            //     ),
-                                                            //   ),
-                                                            // ),
-                                                          ],
-                                                    onSelectChanged: (selected) {
-                                                      if (selected != null && selected) {
-                                                        print('from first page');
-                                                        print(filteredProducts);
-                                                        print(product);
-
-                                                        if(filteredProducts.length <=9){
-
-                                                        }else {
-
-                                                        }
-
-
-                                                      }
-                                                    },
-                                                          );
-                                                    })),) : DataTable(
-                                              showCheckboxColumn: false,
-                                              headingRowHeight: 40,
-                                              columnSpacing: 35,
-                                              headingRowColor:
-                                              MaterialStateProperty.all(
-                                                  Color(0xFFF7F7F7)),
-                                              // List.generate(5, (index)
-                                              columns: columns.map((column) {
-                                                return DataColumn(
-                                                  label: Stack(
-                                                    children: [
-                                                      Container(
-                                                        padding: null,
-                                                        width: columnWidths[columns.indexOf(column)],
-                                                        // Dynamic width based on user interaction
-                                                        child: Row(
-                                                          children: [
-                                                            Text(column, style: TextStyles.subhead),
-                                                            IconButton(
-                                                              icon:
-                                                              _sortOrder[columns.indexOf(column)] == 'asc'
-                                                                  ? SizedBox(
-                                                                  width: 12,
-                                                                  child: Image.asset(
-                                                                    "images/ix_sort.png",
-                                                                    color: Colors.blue,
-                                                                  ))
-                                                                  : SizedBox(
-                                                                  width: 12,
-                                                                  child: Image.asset(
-                                                                    "images/ix_sort.png",
-                                                                    color: Colors.blue,
-                                                                  )),
-                                                              onPressed: () {
-                                                                setState(() {
-                                                                  _sortOrder[columns.indexOf(column)] =
-                                                                  _sortOrder[columns.indexOf(column)] ==
-                                                                      'asc'
-                                                                      ? 'desc'
-                                                                      : 'asc';
-                                                                  _sortProducts(columns.indexOf(column),
-                                                                      _sortOrder[columns.indexOf(column)]);
-                                                                });
-                                                              },
-                                                            ),
-                                                            //SizedBox(width: 50,),
-                                                            //Padding(
-                                                            //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-                                                            //  child:
-                                                            // ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  onSort: (columnIndex, ascending) {
-                                                    _sortOrder;
-                                                  },
-                                                );
-                                              }).toList(),
-                                              rows: List.generate(
-                                                  math.min(itemsPerPage, filteredProducts.length - (currentPage - 1) * itemsPerPage),(index)
-                                              {
-                                                final product = filteredProducts[(currentPage - 1) * itemsPerPage + index];
-                                                final isSelected = _selectedProduct == product;
-                                                return DataRow(
-                                                        color: MaterialStateProperty.resolveWith<Color>((states) {
-                                                          if (states.contains(MaterialState.hovered)) {
-                                                            return Colors.blue.shade500.withOpacity(
-                                                                0.8); // Add some opacity to the dark blue
-                                                          } else {
-                                                            return Colors.white.withOpacity(0.9);
-                                                          }
-                                                        }),
-                                                        cells: [
-                                                          DataCell(
-                                                            Container(
-                                                              width: columnWidths[0], // Same dynamic width as column headers
-                                                              child: Text(
-                                                                product.productDescription.length > 25
-                                                                    ? '${product.productDescription.substring(0, 25)}...'
-                                                                    : product.productDescription,
-                                                                style: TextStyles.body,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          DataCell(
-                                                            Container(
-                                                              width: columnWidths[1],
-                                                              child: Text(product.categoryName,
-                                                                style: TextStyles.body,),
-                                                            ),
-                                                          ),
-                                                          DataCell(
-                                                            Container(
-                                                              width: columnWidths[2],
-                                                              child: Text(product.productType,
-                                                                style: TextStyles.body,),
-                                                            ),
-                                                          ),
-                                                          DataCell(
-                                                            Container(
-                                                              width: columnWidths[3],
-                                                              child: Text(product.standardPrice.toString(),style: TextStyles.body,),
-                                                            ),
-                                                          ),
-                                                          DataCell(
-                                                            Container(
-                                                              width: columnWidths[4],
-                                                              child: Text(product.baseUnit.toString(),
-                                                                style: TextStyles.body,),
-                                                            ),
-                                                          ),
-                                                          // DataCell(
-                                                          //   Container(
-                                                          //     width: columnWidths[4],
-                                                          //     child: Text(
-                                                          //       detail.paymentStatus.toString(),
-                                                          //       style: TextStyles.body,
-                                                          //     ),
-                                                          //   ),
-                                                          // ),
-                                                        ],
-                                                  onSelectChanged: (selected) {
-                                                    if (selected != null && selected) {
-                                                      print('from first page');
-                                                      print(filteredProducts);
-                                                      print(product);
-
-                                                      if(filteredProducts.length <=9){
-
-                                                      }else {
-
-                                                      }
-
-
-                                                    }
-                                                  },
-                                                    );
-                                                  })),
-                                        ),
-                                      ),
-                                    }
-                                  } else ...{
-                                    if(filteredProducts.isEmpty)...{
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            // height: 600,
-                                            width: width,
-                                            decoration: BoxDecoration(
-                                                color: Color(0xFFF7F7F7),
-                                                border: Border.symmetric(
-                                                    horizontal: BorderSide(
-                                                        color: Colors.grey,
-                                                        width: 0.5))),
-                                            child: DataTable(
-                                                headingRowColor:
-                                                MaterialStateProperty.all(
-                                                    Color(0xFFF7F7F7)),
-                                                showCheckboxColumn: false,
-                                                headingRowHeight: 40,
-                                                columnSpacing: 50,
-                                                columns: columns.map((column) {
-                                                  return DataColumn(
-                                                    label: Stack(
-                                                      children: [
-                                                        Container(
-                                                          padding: null,
-                                                          width: columnWidths[columns.indexOf(column)],
-                                                          // Dynamic width based on user interaction
-                                                          child: Row(
+                                            showCheckboxColumn: false,
+                                            headingRowHeight: 40,
+                                            columnSpacing: 50,
+                                            columns: columns.map((column) {
+                                              return DataColumn(
+                                                label: Stack(
+                                                  children: [
+                                                    Container(
+                                                      padding: null,
+                                                      width: columnWidths[
+                                                          columns
+                                                              .indexOf(column)],
+                                                      // Dynamic width based on user interaction
+                                                      child: Row(
 //crossAxisAlignment: CrossAxisAlignment.end,
 //   mainAxisAlignment: MainAxisAlignment.end,
-                                                            children: [
-                                                              Text(column, style: TextStyles.subhead),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
+                                                        children: [
+                                                          Text(column,
+                                                              style: TextStyles
+                                                                  .subhead),
+                                                        ],
+                                                      ),
                                                     ),
-                                                    onSort: (columnIndex, ascending) {
-                                                      _sortOrder;
-                                                    },
-                                                  );
-                                                }).toList(),
-                                                rows: const []),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 5, left: 130, right: 150),
-                                            child: CustomDatafound(),
-                                          ),
-                                        ],
+                                                  ],
+                                                ),
+                                                onSort:
+                                                    (columnIndex, ascending) {
+                                                  _sortOrder;
+                                                },
+                                              );
+                                            }).toList(),
+                                            rows: const []),
                                       ),
-                                    }else...{
-                                      Column(children: [
-                                        SizedBox(
-                                          height: 500,
-                                          width: width,
-                                          child: SingleChildScrollView(
-                                            scrollDirection: Axis.vertical,
-                                            child: DataTable(
-                                                headingRowColor:
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 5, left: 130, right: 150),
+                                        child: CustomDatafound(),
+                                      ),
+                                    ],
+                                  ),
+                                } else ...{
+                                  Column(children: [
+                                    SizedBox(
+                                      height: 500,
+                                      width: width,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: DataTable(
+                                            headingRowColor:
                                                 MaterialStateProperty.all(
                                                     Color(0xFFF7F7F7)),
-                                                showCheckboxColumn: false,
-                                                headingRowHeight: 40,
-                                                columnSpacing: 35,
+                                            showCheckboxColumn: false,
+                                            headingRowHeight: 40,
+                                            columnSpacing: 35,
 // List.generate(5, (index)
-                                                columns: columns.map((column) {
-                                                  return DataColumn(
-                                                    label: Stack(
-                                                      children: [
-                                                        Container(
-                                                          padding: null,
-                                                          width: columnWidths[columns.indexOf(column)],
-                                                          // Dynamic width based on user interaction
-                                                          child: Row(
-                                                            children: [
-                                                              Text(column, style: TextStyles.subhead),
-                                                              IconButton(
-                                                                icon:
-                                                                _sortOrder[columns.indexOf(column)] == 'asc'
-                                                                    ? SizedBox(
+                                            columns: columns.map((column) {
+                                              return DataColumn(
+                                                label: Stack(
+                                                  children: [
+                                                    Container(
+                                                      padding: null,
+                                                      width: columnWidths[
+                                                          columns
+                                                              .indexOf(column)],
+                                                      // Dynamic width based on user interaction
+                                                      child: Row(
+                                                        children: [
+                                                          Text(column,
+                                                              style: TextStyles
+                                                                  .subhead),
+                                                          IconButton(
+                                                            icon: _sortOrder[columns
+                                                                        .indexOf(
+                                                                            column)] ==
+                                                                    'asc'
+                                                                ? SizedBox(
                                                                     width: 12,
-                                                                    child: Image.asset(
+                                                                    child: Image
+                                                                        .asset(
                                                                       "images/ix_sort.png",
-                                                                      color: Colors.blue,
+                                                                      color: Colors
+                                                                          .blue,
                                                                     ))
-                                                                    : SizedBox(
+                                                                : SizedBox(
                                                                     width: 12,
-                                                                    child: Image.asset(
+                                                                    child: Image
+                                                                        .asset(
                                                                       "images/ix_sort.png",
-                                                                      color: Colors.blue,
+                                                                      color: Colors
+                                                                          .blue,
                                                                     )),
-                                                                onPressed: () {
-                                                                  setState(() {
-                                                                    _sortOrder[columns.indexOf(column)] =
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                _sortOrder[columns
+                                                                        .indexOf(
+                                                                            column)] =
                                                                     _sortOrder[columns.indexOf(column)] ==
-                                                                        'asc'
+                                                                            'asc'
                                                                         ? 'desc'
                                                                         : 'asc';
-                                                                    _sortProducts(columns.indexOf(column),
-                                                                        _sortOrder[columns.indexOf(column)]);
-                                                                  });
-                                                                },
-                                                              ),
+                                                                _sortProducts(
+                                                                    columns.indexOf(
+                                                                        column),
+                                                                    _sortOrder[columns
+                                                                        .indexOf(
+                                                                            column)]);
+                                                              });
+                                                            },
+                                                          ),
 //SizedBox(width: 50,),
 //Padding(
 //  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
 //  child:
 // ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
+                                                        ],
+                                                      ),
                                                     ),
-                                                    onSort: (columnIndex, ascending) {
-                                                      _sortOrder;
-                                                    },
-                                                  );
-                                                }).toList(),
-                                                rows: List.generate(
-                                                    math.min(
-                                                        itemsPerPage,
-                                                        filteredProducts.length -
-                                                            (currentPage - 1) * itemsPerPage), (index) {
-                                                  final product = filteredProducts[
-                                                  (currentPage - 1) * itemsPerPage + index];
-                                                  final isSelected = _selectedProduct == product;
-                                                  return DataRow(
-                                                          color: MaterialStateProperty.resolveWith<Color>((states) {
-                                                            if (states.contains(MaterialState.hovered)) {
-                                                              return Colors.blue.shade500.withOpacity(
-                                                                  0.8); // Add some opacity to the dark blue
-                                                            } else {
-                                                              return Colors.white.withOpacity(0.9);
-                                                            }
-                                                          }),
-                                                          cells: [
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[0],
-                                                                // Same dynamic width as column headers
-                                                                child: Text(
-                                                                  product.productDescription.length > 25
-                                                                      ? '${product.productDescription.substring(0, 25)}...'
-                                                                      : product.productDescription,
-                                                                  style: TextStyles.body,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[1],
-                                                                child: Text(
-                                                                  product.categoryName,
-                                                                  style: TextStyles.body,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[2],
-                                                                child: Text(
-                                                                  product.productType,
-                                                                  style: TextStyles.body,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[3],
-                                                                child: Text(
-                                                                  product.standardPrice.toString(),
-                                                                  style: TextStyles.body,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            DataCell(
-                                                              Container(
-                                                                width: columnWidths[4],
-                                                                child: Text(
-                                                                  product.baseUnit.toString(),
-                                                                  style: TextStyles.body,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            // DataCell(
-                                                            //   Container(
-                                                            //     width: columnWidths[4],
-                                                            //     child: Text(
-                                                            //       detail.paymentStatus.toString(),
-                                                            //       style: TextStyles.body,
-                                                            //     ),
-                                                            //   ),
-                                                            // ),
-                                                          ],
-                                                        onSelectChanged: (selected) {
-                                                          if (selected != null && selected) {
-                                                            print('from first page');
-                                                            print(filteredProducts);
-                                                            print(product);
+                                                  ],
+                                                ),
+                                                onSort:
+                                                    (columnIndex, ascending) {
+                                                  _sortOrder;
+                                                },
+                                              );
+                                            }).toList(),
+                                            rows: List.generate(
+                                                math.min(
+                                                    itemsPerPage,
+                                                    filteredProducts.length -
+                                                        (currentPage - 1) *
+                                                            itemsPerPage),
+                                                (index) {
+                                              final product = filteredProducts[
+                                                  (currentPage - 1) *
+                                                          itemsPerPage +
+                                                      index];
+                                              final isSelected =
+                                                  _selectedProduct == product;
+                                              return DataRow(
+                                                color: MaterialStateProperty
+                                                    .resolveWith<Color>(
+                                                        (states) {
+                                                  if (states.contains(
+                                                      MaterialState.hovered)) {
+                                                    return Colors.blue.shade500
+                                                        .withOpacity(
+                                                            0.8); // Add some opacity to the dark blue
+                                                  } else {
+                                                    return Colors.white
+                                                        .withOpacity(0.9);
+                                                  }
+                                                }),
+                                                cells: [
+                                                  DataCell(
+                                                    Container(
+                                                      width: columnWidths[0],
+                                                      // Same dynamic width as column headers
+                                                      child: Text(
+                                                        product.productDescription
+                                                                    .length >
+                                                                25
+                                                            ? '${product.productDescription.substring(0, 25)}...'
+                                                            : product
+                                                                .productDescription,
+                                                        style: TextStyles.body,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    Container(
+                                                      width: columnWidths[1],
+                                                      child: Text(
+                                                        product.categoryName,
+                                                        style: TextStyles.body,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    Container(
+                                                      width: columnWidths[2],
+                                                      child: Text(
+                                                        product.productType,
+                                                        style: TextStyles.body,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    Container(
+                                                      width: columnWidths[3],
+                                                      child: Text(
+                                                        product.standardPrice
+                                                            .toString(),
+                                                        style: TextStyles.body,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    Container(
+                                                      width: columnWidths[4],
+                                                      child: Text(
+                                                        product.baseUnit
+                                                            .toString(),
+                                                        style: TextStyles.body,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // DataCell(
+                                                  //   Container(
+                                                  //     width: columnWidths[4],
+                                                  //     child: Text(
+                                                  //       detail.paymentStatus.toString(),
+                                                  //       style: TextStyles.body,
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
+                                                ],
+                                                onSelectChanged: (selected) {
+                                                  if (selected != null &&
+                                                      selected) {
+                                                    print('from first page');
+                                                    print(filteredProducts);
+                                                    print(product);
 
-                                                            if (filteredProducts.length <= 9) {
-                                                            } else {}
-                                                          }
-                                                        },);
-                                                    })),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 30),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: [
-                                              PaginationControls(
-                                                currentPage: currentPage,
-                                                totalPages: filteredProducts.length >
-                                                    itemsPerPage
+                                                    if (filteredProducts
+                                                            .length <=
+                                                        9) {
+                                                    } else {}
+                                                  }
+                                                },
+                                              );
+                                            })),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 30),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          PaginationControls(
+                                            currentPage: currentPage,
+                                            totalPages:
+                                                filteredProducts.length >
+                                                        itemsPerPage
                                                     ? totalPages
                                                     : 1,
-                                                onPreviousPage: _goToPreviousPage,
-                                                onNextPage: _goToNextPage,
-                                                // onLastPage: _goToLastPage,
-                                              ),
-                                            ],
+                                            onPreviousPage: _goToPreviousPage,
+                                            onNextPage: _goToNextPage,
+                                            // onLastPage: _goToLastPage,
                                           ),
-                                        ),
-                                      ])
-                                    }
-                                  }
-                                ],
-                              ),
-                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ])
+                                }
+                              }
+                            ],
                           ),
-                          //buildDataTable2(),
-                          // Padding(
-                          //   padding: const EdgeInsets.all(15.0),
-                          //   child: Container(
-                          //     padding: EdgeInsets.all(20),
-                          //     decoration: BoxDecoration(
-                          //       color: Colors.orange,
-                          //       border: Border.all(color: Colors.grey),
-                          //       borderRadius: BorderRadius.circular(12),
-                          //     ),
-                          //     height: 500,
-                          //     child: Column(
-                          //       children: [
-                          //         SizedBox(
-                          //           width: double.infinity,
-                          //           child: DataTable(
-                          //             // horizontalMargin: 5,
-                          //             headingRowColor:
-                          //             MaterialStateProperty.all(Colors.grey[300]),
-                          //             columns: const [
-                          //               DataColumn(
-                          //                   label: Text('ID',
-                          //                       style: TextStyle(
-                          //                           fontWeight: FontWeight
-                          //                               .bold))),
-                          //               DataColumn(
-                          //                   label: Text('Name',
-                          //                       style: TextStyle(
-                          //                           fontWeight: FontWeight
-                          //                               .bold))),
-                          //               DataColumn(
-                          //                   label: Text('Age',
-                          //                       style: TextStyle(
-                          //                           fontWeight: FontWeight
-                          //                               .bold))),
-                          //               DataColumn(
-                          //                   label: Text('Country',
-                          //                       style: TextStyle(
-                          //                           fontWeight: FontWeight
-                          //                               .bold))),
-                          //               DataColumn(
-                          //                   label: Text('Department',
-                          //                       style: TextStyle(
-                          //                           fontWeight: FontWeight
-                          //                               .bold))),
-                          //               DataColumn(
-                          //                   label: Text('Salary',
-                          //                       style: TextStyle(
-                          //                           fontWeight: FontWeight
-                          //                               .bold))),
-                          //               DataColumn(
-                          //                   label: Text('Status',
-                          //                       style: TextStyle(
-                          //                           fontWeight: FontWeight
-                          //                               .bold))),
-                          //             ],
-                          //             rows: dummyData.map((data) {
-                          //               return DataRow(
-                          //                 cells: [
-                          //                   DataCell(Text(data['ID'].toString())),
-                          //                   DataCell(Text(data['Name'])),
-                          //                   DataCell(
-                          //                       Text(data['Age'].toString())),
-                          //                   DataCell(Text(data['Country'])),
-                          //                   DataCell(Text(data['Department'])),
-                          //                   DataCell(Text(data['Salary'])),
-                          //                   DataCell(Text(data['Status'])),
-                          //                 ],
-                          //               );
-                          //             }).toList(),
-                          //           ),
-                          //         )
-                          //         // Text('Recent Files',style: TextStyle(color: Colors.grey),)
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
-                        ],
-                      ))
-                ],
-              ),
-
-              //         Row(
-              //           crossAxisAlignment: CrossAxisAlignment.start,
-              //           children: [
-              //             Expanded(
-              //                 child: Column(
-              //                   children: [
-              //                     Row(
-              //                       children: [
-              // Text('My file'),
-              //
-              //                       ],
-              //                     )
-              //                   ],
-              //                 )),
-              //             SizedBox(
-              //               height: 60,
-              //             ),
-              //
-              //
-              //
-              //           ],
-              //         ),
+                        ),
+                      ),
+                      //buildDataTable2(),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(15.0),
+                      //   child: Container(
+                      //     padding: EdgeInsets.all(20),
+                      //     decoration: BoxDecoration(
+                      //       color: Colors.orange,
+                      //       border: Border.all(color: Colors.grey),
+                      //       borderRadius: BorderRadius.circular(12),
+                      //     ),
+                      //     height: 500,
+                      //     child: Column(
+                      //       children: [
+                      //         SizedBox(
+                      //           width: double.infinity,
+                      //           child: DataTable(
+                      //             // horizontalMargin: 5,
+                      //             headingRowColor:
+                      //             MaterialStateProperty.all(Colors.grey[300]),
+                      //             columns: const [
+                      //               DataColumn(
+                      //                   label: Text('ID',
+                      //                       style: TextStyle(
+                      //                           fontWeight: FontWeight
+                      //                               .bold))),
+                      //               DataColumn(
+                      //                   label: Text('Name',
+                      //                       style: TextStyle(
+                      //                           fontWeight: FontWeight
+                      //                               .bold))),
+                      //               DataColumn(
+                      //                   label: Text('Age',
+                      //                       style: TextStyle(
+                      //                           fontWeight: FontWeight
+                      //                               .bold))),
+                      //               DataColumn(
+                      //                   label: Text('Country',
+                      //                       style: TextStyle(
+                      //                           fontWeight: FontWeight
+                      //                               .bold))),
+                      //               DataColumn(
+                      //                   label: Text('Department',
+                      //                       style: TextStyle(
+                      //                           fontWeight: FontWeight
+                      //                               .bold))),
+                      //               DataColumn(
+                      //                   label: Text('Salary',
+                      //                       style: TextStyle(
+                      //                           fontWeight: FontWeight
+                      //                               .bold))),
+                      //               DataColumn(
+                      //                   label: Text('Status',
+                      //                       style: TextStyle(
+                      //                           fontWeight: FontWeight
+                      //                               .bold))),
+                      //             ],
+                      //             rows: dummyData.map((data) {
+                      //               return DataRow(
+                      //                 cells: [
+                      //                   DataCell(Text(data['ID'].toString())),
+                      //                   DataCell(Text(data['Name'])),
+                      //                   DataCell(
+                      //                       Text(data['Age'].toString())),
+                      //                   DataCell(Text(data['Country'])),
+                      //                   DataCell(Text(data['Department'])),
+                      //                   DataCell(Text(data['Salary'])),
+                      //                   DataCell(Text(data['Status'])),
+                      //                 ],
+                      //               );
+                      //             }).toList(),
+                      //           ),
+                      //         )
+                      //         // Text('Recent Files',style: TextStyle(color: Colors.grey),)
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ))
             ],
-          )),
+          ),
+
+          //         Row(
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           children: [
+          //             Expanded(
+          //                 child: Column(
+          //                   children: [
+          //                     Row(
+          //                       children: [
+          // Text('My file'),
+          //
+          //                       ],
+          //                     )
+          //                   ],
+          //                 )),
+          //             SizedBox(
+          //               height: 60,
+          //             ),
+          //
+          //
+          //
+          //           ],
+          //         ),
+        ],
+      )),
     );
   }
-
 }

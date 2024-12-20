@@ -5,33 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-// import '../../Order Module/firstpage.dart';
-// import 'home.dart';
-// import '../../widgets/confirmdialog.dart';
-// import '../../widgets/custom loading.dart';
-// import '../../widgets/layout size.dart';
-// import '../../widgets/pagination.dart';
-// import '../../widgets/text_style.dart';
-// import '../../sample/grid view connection.dart';
-// import '../../sample/notifier.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
-import 'dart:ui' as ord;
 import 'dart:math' as math;
-
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart';
-
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:btb/widgets/productclass.dart' as ord;
 import 'package:btb/Order%20Module/firstpage.dart' as ors;
-import 'package:responsive_framework/responsive_framework.dart';
-
 import '../../../widgets/confirmdialog.dart';
 import '../../../widgets/no datafound.dart';
 import '../../../widgets/text_style.dart';
@@ -1077,6 +1061,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             mobile: GridView1(
                               // openorders: dashboardCounts.openorders,
                               crossAxisCount: _size.width <= 1080 ? 2 : 4,
+                              crossAxisSpacing:  _size.width <= 1080 ? 20 : 50,
                               childAspectRatio: _size.width < 1080 ? 1.4 : 1.1,
                             ),
                             desktop: GridView1(
@@ -1685,12 +1670,15 @@ class _DashboardScreenState extends State<DashboardScreen>
 
 class GridView1 extends StatefulWidget {
   final int? openorders;
+
+  final double? crossAxisSpacing;
   final int crossAxisCount;
   final double childAspectRatio;
 
   const GridView1({
     Key? key,
     this.openorders,
+    this.crossAxisSpacing = 50,
     this.crossAxisCount = 4,
     this.childAspectRatio = 3,
   }) : super(key: key);

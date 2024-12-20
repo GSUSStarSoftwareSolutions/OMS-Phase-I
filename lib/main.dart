@@ -4,6 +4,7 @@ import 'package:btb/admin/admin%20edit.dart';
 import 'package:btb/admin/admin%20list.dart';
 import 'package:btb/admin/create%20login.dart';
 import 'package:btb/customer%20login/order/create%20order.dart';
+import 'package:btb/customer%20login/order/order%20view%20responsive.dart';
 import 'package:btb/customer%20module/create%20customer.dart';
 import 'package:btb/customer%20module/customer%20view.dart';
 import 'package:btb/dashboard/pay%20complete.dart';
@@ -24,20 +25,27 @@ import 'package:btb/dashboard/openorder%20screen.dart';
 import 'package:btb/dashboard/order%20completedlistscreen.dart';
 import 'package:btb/customer%20login/home/admin%20dash.dart';
 import 'package:btb/sample/notifier.dart';
+import 'package:btb/sample/size.dart';
 //import 'package:btb/customer%20login/home/order%20list.dart';
 import 'package:btb/widgets/productclass.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'Order Module/responsive order view.dart';
+import 'Order Module/responsiveorderfirstpage.dart';
 import 'Product/product list.dart';
+import 'Product/responsiveproductlist.dart';
 import 'admin/admin.dart';
 import 'admin/create users.dart';
 import 'customer login/home/home.dart';
+import 'customer login/order/create order responsive.dart';
 import 'customer login/order/order list.dart';
 import 'customer login/order/order view screen.dart';
 import 'customer login/order/responsiveorder list.dart';
 import 'customer module/customer list.dart';
+import 'customer module/responsivecustomerlist.dart';
+import 'dashboard/responsivedashboard.dart';
 
 void main() async {
   // configureApp();
@@ -194,7 +202,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: DashboardPage1(), //dashboard1
+            child: MainScreen(), //dashboard1
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -212,7 +220,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: CreateOrder(),
+            child: ResponsivecreateOrdersPage(),//CreateOrder
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -230,7 +238,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: CusOrderPage(),//cusorderpage
+            child: ResponsiveOrdersPage(),//cusorderpage
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -262,9 +270,13 @@ class MyApp extends StatelessWidget {
           }
           return CustomTransitionPage(
             key: state.pageKey,
-            child: OrderView(
-              orderId: extra!['orderId'] ?? '',
+            child:
+            ResponsiveeditOrdersPage(
+              orderId: extra['orderId'] ?? '',
             ),
+            // OrderView(
+            //   orderId: extra!['orderId'] ?? '',
+            // ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -282,9 +294,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ProductPage(
-              product: null,
-            ),
+            child: ResponsiveEmpproductPage(),//ProductPage(product: null,)
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -302,7 +312,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: CusList(),
+            child: ResponsiveEmpcustomerPage(),//CusList
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -395,7 +405,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: DashboardPage(),
+            child: ResponsiveEmpdashboard(),//DashboardPage
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -413,7 +423,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: Orderspage(),
+            child: ResponsiveEmpOrdersPage(),//Orderspage
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -432,9 +442,13 @@ class MyApp extends StatelessWidget {
           final extraData = state.extra as Map<String, dynamic>? ?? {};
           return CustomTransitionPage(
             key: state.pageKey,
-            child: OrderView2(
+            child: ResponsiveeditviewOrdersPage(
               orderId: extraData['orderId'] ?? '',
             ),
+
+            // OrderView2(
+            //   orderId: extraData['orderId'] ?? '',
+            // ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -1383,4 +1397,4 @@ class UserRoleProvider with ChangeNotifier {
     notifyListeners();
   }
 }
-//main file carefully handle it
+// responsive workon main file carefully handle 2

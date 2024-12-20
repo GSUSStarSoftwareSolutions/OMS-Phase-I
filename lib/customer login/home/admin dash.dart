@@ -70,8 +70,8 @@ class MainScreen extends StatelessWidget {
         //elevation: 2.0,
         // shadowColor: const Color(0xFFFFFFFF),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
+          const Padding(
+            padding: EdgeInsets.only(top: 10),
             child: AccountMenu(),
           ),
         ],
@@ -1108,7 +1108,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                               hintText: 'Search by Order ID',
                                               hintStyle: TextStyles.body,
                                               contentPadding:
-                                                  EdgeInsets.symmetric(
+                                                  const EdgeInsets.symmetric(
                                                       vertical: 3,
                                                       horizontal: 5),
                                               // adjusted padding
@@ -1205,7 +1205,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                 headingRowHeight: 40,
                                                 headingRowColor:
                                                     MaterialStateProperty.all(
-                                    Color(0xFFF7F7F7)),
+                                    const Color(0xFFF7F7F7)),
                                                 columns: columns.map((column) {
                                                   return DataColumn(
                                                     label: Stack(
@@ -1426,11 +1426,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                     style: TextStyles.subhead,
                                                   ))),
                                                   DataColumn(
-                                                      label: Container(
-                                                          child: Text(
-                                                    'Status',
-                                                    style: TextStyles.subhead,
-                                                  ))),
+                                                      label: Text(
+                                                                                                          'Status',
+                                                                                                          style: TextStyles.subhead,
+                                                                                                        )),
                                                 ],
                                                 rows: const []),
                                           ),
@@ -1454,7 +1453,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                 headingRowHeight: 40,
                                                 headingRowColor:
                                                     MaterialStateProperty.all(
-                                                        Color(0xFFF7F7F7)),
+                                                        const Color(0xFFF7F7F7)),
                                                 columns: columns.map((column) {
                                                   return DataColumn(
                                                     label: Stack(

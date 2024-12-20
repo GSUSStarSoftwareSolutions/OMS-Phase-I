@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
-import 'dart:ui' as ord;
 import 'dart:math' as math;
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart';
 import 'package:btb/widgets/custom%20loading.dart';
 import 'package:btb/widgets/pagination.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -627,12 +625,12 @@ class _DashboardPageState extends State<DashboardPage>
                           ),
                         ),
                         const Spacer(),
-                        Row(
+                        const Row(
                           children: [
-                            const SizedBox(width: 10),
+                            SizedBox(width: 10),
                             Padding(
                               padding:
-                              const EdgeInsets.only(right: 10, top: 10),
+                              EdgeInsets.only(right: 10, top: 10),
                               // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
@@ -680,7 +678,7 @@ right:0,
                 ),),
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               }
               else ...{
@@ -703,7 +701,7 @@ right:0,
                 ),
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
 
               },
@@ -795,7 +793,7 @@ right:0,
                                                                 const EdgeInsets.all(16),
                                                                 decoration: BoxDecoration(
                                                                   color: Colors.white,
-                                                                  border: Border.all(color: Color(0x29000000),),
+                                                                  border: Border.all(color: const Color(0x29000000),),
                                                                   borderRadius: BorderRadius.circular(15),
                                                                 ),
                                                                 child: Row(
@@ -815,7 +813,7 @@ right:0,
                                                                             color: const Color(0xffffac8c), // Border color
                                                                             width: 1.5,
                                                                           ),
-                                                                          color:  Color(0xffffac8c).withOpacity(0.2), // Set the background color to match the border
+                                                                          color:  const Color(0xffffac8c).withOpacity(0.2), // Set the background color to match the border
                                                                           boxShadow: [
                                                                             BoxShadow(
                                                                               color: const Color(0xffffac8c).withOpacity(0.1), // Soft grey shadow
@@ -837,7 +835,7 @@ right:0,
                                                                         crossAxisAlignment:
                                                                         CrossAxisAlignment.start,
                                                                         children: [
-                                                                          SizedBox(height: 10),
+                                                                          const SizedBox(height: 10),
                                                                           Padding(
                                                                             padding:
                                                                             const EdgeInsets.only(
@@ -862,7 +860,7 @@ right:0,
                                                                               'Open Orders',
                                                                               style: TextStyle(
                                                                                 fontSize: maxWidth * 0.01,
-                                                                                color: Color(0xFF455A64),),
+                                                                                color: const Color(0xFF455A64),),
                                                                             ),
                                                                           ),
                                                                         ]
@@ -908,7 +906,7 @@ right:0,
                                                                 padding: const EdgeInsets.all(16),
                                                                 decoration: BoxDecoration(
                                                                   color: Colors.white,
-                                                                  border: Border.all(color: Color(0x29000000),),
+                                                                  border: Border.all(color: const Color(0x29000000),),
                                                                   borderRadius: BorderRadius.circular(15),
                                                                 ),
                                                                 child: Row(
@@ -959,7 +957,7 @@ right:0,
                                                                         crossAxisAlignment:
                                                                         CrossAxisAlignment.start,
                                                                         children: [
-                                                                          SizedBox(height: 10),
+                                                                          const SizedBox(height: 10),
                                                                           Padding(
                                                                             padding: const EdgeInsets.only(
                                                                                 left: 10),
@@ -977,13 +975,13 @@ right:0,
                                                                             ),
                                                                           ),
                                                                            Padding(
-                                                                            padding: EdgeInsets.only(
+                                                                            padding: const EdgeInsets.only(
                                                                                 left: 10),
                                                                             child: Text(
                                                                               'Picked Orders',
                                                                               style: TextStyle(
                                                                                 fontSize: maxWidth * 0.01,
-                                                                                color: Color(0xFF455A64),),
+                                                                                color: const Color(0xFF455A64),),
                                                                             ),
                                                                           )
                                                                         ]
@@ -1022,7 +1020,7 @@ right:0,
                                                                 padding: const EdgeInsets.all(16),
                                                                 decoration: BoxDecoration(
                                                                   color: Colors.white,
-                                                                  border: Border.all(color: Color(0x29000000),),
+                                                                  border: Border.all(color: const Color(0x29000000),),
                                                                   borderRadius: BorderRadius.circular(15),
                                                                 ),
                                                                 child: Row(
@@ -1073,7 +1071,7 @@ right:0,
                                                                         crossAxisAlignment:
                                                                         CrossAxisAlignment.start,
                                                                         children: [
-                                                                          SizedBox(height: 10),
+                                                                          const SizedBox(height: 10),
                                                                           Padding(
                                                                             padding:
                                                                             const EdgeInsets.only(
@@ -1097,7 +1095,7 @@ right:0,
                                                                               'Order Delivered',
                                                                               style: TextStyle(
                                                                                 fontSize: maxWidth * 0.01,
-                                                                                color: Color(0xFF455A64), // Dark grey-blue
+                                                                                color: const Color(0xFF455A64), // Dark grey-blue
                                                                                 fontWeight: FontWeight.w500,
                                                                                 letterSpacing: 0.5,
                                                                               ),
@@ -1140,7 +1138,7 @@ right:0,
                                                                 const EdgeInsets.all(16),
                                                                 decoration: BoxDecoration(
                                                                   color: Colors.white,
-                                                                  border: Border.all(color: Color(0x29000000),),
+                                                                  border: Border.all(color: const Color(0x29000000),),
                                                                   borderRadius: BorderRadius.circular(15),
                                                                 ),
                                                                 child: Row(
@@ -1193,7 +1191,7 @@ right:0,
                                                                         crossAxisAlignment:
                                                                         CrossAxisAlignment.start,
                                                                         children: [
-                                                                          SizedBox(height: 10),
+                                                                          const SizedBox(height: 10),
                                                                           Padding(
                                                                             padding:
                                                                             const EdgeInsets.only(
@@ -1387,7 +1385,7 @@ right:0,
                                                                       const EdgeInsets.all(16),
                                                                       decoration: BoxDecoration(
                                                                         color: Colors.white,
-                                                                        border: Border.all(color: Color(0x29000000),),
+                                                                        border: Border.all(color: const Color(0x29000000),),
                                                                         borderRadius: BorderRadius.circular(15),
                                                                       ),
                                                                       child: Column(
@@ -1409,7 +1407,7 @@ right:0,
                                                                                       color: const Color(0xffffac8c), // Border color
                                                                                       width: 1.5,
                                                                                     ),
-                                                                                    color:  Color(0xffffac8c).withOpacity(0.2), // Set the background color to match the border
+                                                                                    color:  const Color(0xffffac8c).withOpacity(0.2), // Set the background color to match the border
                                                                                     boxShadow: [
                                                                                       BoxShadow(
                                                                                         color: const Color(0xffffac8c).withOpacity(0.1), // Soft grey shadow
@@ -1431,7 +1429,7 @@ right:0,
                                                                                   crossAxisAlignment:
                                                                                   CrossAxisAlignment.start,
                                                                                   children: [
-                                                                                    SizedBox(height: 10),
+                                                                                    const SizedBox(height: 10),
                                                                                     Padding(
                                                                                       padding:
                                                                                       const EdgeInsets.only(
@@ -1449,7 +1447,7 @@ right:0,
                                                                                                 .bold),
                                                                                       ),
                                                                                     ),
-                                                                                    Padding(
+                                                                                    const Padding(
                                                                                       padding: EdgeInsets.only(
                                                                                           left: 10),
                                                                                       child: Text(
@@ -1504,7 +1502,7 @@ right:0,
                                                                       padding: const EdgeInsets.all(16),
                                                                       decoration: BoxDecoration(
                                                                         color: Colors.white,
-                                                                        border: Border.all(color: Color(0x29000000),),
+                                                                        border: Border.all(color: const Color(0x29000000),),
                                                                         borderRadius: BorderRadius.circular(15),
                                                                       ),
                                                                       child: Row(
@@ -1555,7 +1553,7 @@ right:0,
                                                                               crossAxisAlignment:
                                                                               CrossAxisAlignment.start,
                                                                               children: [
-                                                                                SizedBox(height: 10),
+                                                                                const SizedBox(height: 10),
                                                                                 Padding(
                                                                                   padding: const EdgeInsets.only(
                                                                                       left: 10),
@@ -1572,7 +1570,7 @@ right:0,
                                                                                             .bold),
                                                                                   ),
                                                                                 ),
-                                                                                Padding(
+                                                                                const Padding(
                                                                                   padding: EdgeInsets.only(
                                                                                       left: 10),
                                                                                   child: Text(
@@ -1618,7 +1616,7 @@ right:0,
                                                                       padding: const EdgeInsets.all(16),
                                                                       decoration: BoxDecoration(
                                                                         color: Colors.white,
-                                                                        border: Border.all(color: Color(0x29000000),),
+                                                                        border: Border.all(color: const Color(0x29000000),),
                                                                         borderRadius: BorderRadius.circular(15),
                                                                       ),
                                                                       child: Row(
@@ -1669,7 +1667,7 @@ right:0,
                                                                               crossAxisAlignment:
                                                                               CrossAxisAlignment.start,
                                                                               children: [
-                                                                                SizedBox(height: 10),
+                                                                                const SizedBox(height: 10),
                                                                                 Padding(
                                                                                   padding:
                                                                                   const EdgeInsets.only(
@@ -1686,7 +1684,7 @@ right:0,
                                                                                         FontWeight.bold),
                                                                                   ),
                                                                                 ),
-                                                                                Padding(
+                                                                                const Padding(
                                                                                   padding: EdgeInsets.only(
                                                                                       left: 10),
                                                                                   child: Text(
@@ -1737,7 +1735,7 @@ right:0,
                                                                       const EdgeInsets.all(16),
                                                                       decoration: BoxDecoration(
                                                                         color: Colors.white,
-                                                                        border: Border.all(color: Color(0x29000000),),
+                                                                        border: Border.all(color: const Color(0x29000000),),
                                                                         borderRadius: BorderRadius.circular(15),
                                                                       ),
                                                                       child: Row(
@@ -1790,7 +1788,7 @@ right:0,
                                                                               crossAxisAlignment:
                                                                               CrossAxisAlignment.start,
                                                                               children: [
-                                                                                SizedBox(height: 10),
+                                                                                const SizedBox(height: 10),
                                                                                 Padding(
                                                                                   padding:
                                                                                   const EdgeInsets.only(
@@ -1808,14 +1806,14 @@ right:0,
                                                                                             .bold),
                                                                                   ),
                                                                                 ),
-                                                                                Padding(
-                                                                                  padding: const EdgeInsets.only(
+                                                                                const Padding(
+                                                                                  padding: EdgeInsets.only(
                                                                                       left: 10),
                                                                                   child: Text(
                                                                                     'Order Completed',
                                                                                     style: TextStyle(
                                                                                       fontSize:13,
-                                                                                      color: const Color(0xFF455A64),),
+                                                                                      color: Color(0xFF455A64),),
                                                                                   ),
                                                                                 )
                                                                               ]
@@ -2050,12 +2048,12 @@ right:0,
                       decoration:  InputDecoration(
                         hintText: 'Search by Order ID',
                         hintStyle: TextStyles.body,
-                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 5),
                       //  hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
                     //    contentPadding: EdgeInsets.only(bottom: 20, left: 10),
                         // adjusted padding
                         border: InputBorder.none,
-                        suffixIcon: Padding(
+                        suffixIcon: const Padding(
                           padding: EdgeInsets.only(right: 2),
                           child: Icon(
                             Icons.search_outlined,
@@ -2268,7 +2266,7 @@ right:0,
                               hintText: 'Search by Order ID',
                               hintStyle: TextStyles.body,
                            //   hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                              contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 5),
                               // adjusted padding
                               border: InputBorder.none,
                               suffixIcon: Padding(
@@ -2395,7 +2393,7 @@ right:0,
         children: [
           Container(
             width: 1200,
-            decoration:  BoxDecoration(
+            decoration:  const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),
@@ -2714,7 +2712,7 @@ right:0,
         children: [
           Container(
             width: right - 200,
-            decoration:  BoxDecoration(
+            decoration:  const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),
