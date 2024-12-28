@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:html';
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart' as ord;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

@@ -1,35 +1,28 @@
 import 'dart:convert';
-import 'dart:html';
-
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/login/login.dart';
-import 'package:btb/main.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-
 import '../widgets/text_style.dart';
 
-void main() => runApp(MaterialApp(
-  home: createscr(),
-));
 
-class createscr extends StatefulWidget {
-  const createscr({super.key});
+
+class Createscr extends StatefulWidget {
+  const Createscr({super.key});
 
   @override
-  State<createscr> createState() => _createscrState();
+  State<Createscr> createState() => _CreatescrState();
 }
 
-class _createscrState extends State<createscr> {
+class _CreatescrState extends State<Createscr> {
   final userName = TextEditingController();
-  final Email = TextEditingController();
-  final Password = TextEditingController();
-  final ConfirmPassword = TextEditingController();
+  final email = TextEditingController();
+  final password = TextEditingController();
+  final confirmPassword = TextEditingController();
   bool _obscureText = true;
   bool _obscureText1 = true;
 
@@ -45,9 +38,8 @@ class _createscrState extends State<createscr> {
     });
   }
 
-  Future<String?> checkLogin(String Email, String password) async {
-    String url = '$apicall/public/user_master/add_password/$Email/$password';
-    //   'https://mjl9lz64l7.execute-api.ap-south-1.amazonaws.com/stage1/api/user_master/add_password/$Email/$password';
+  Future<String?> checkLogin(String email, String password) async {
+    String url = '$apicall/public/user_master/add_password/$email/$password';
     final response = await http.put(Uri.parse(url), headers: {
       "Content-Type": "application/json",
     });
@@ -74,7 +66,7 @@ class _createscrState extends State<createscr> {
         showDialog(
           barrierDismissible: false,
           context: context,
-          builder: (BuildContext context) {
+          builder: (BuildContext context)  {
             return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
@@ -130,11 +122,11 @@ class _createscrState extends State<createscr> {
         );
       }
     } else {
-      // Handle non-200 responses
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Invalid response from server")),
       );
     }
+    return null;
   }
 
   @override
@@ -144,14 +136,12 @@ class _createscrState extends State<createscr> {
         return Scaffold(
           body: Container(
             constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
-            // 80% of screen width
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: constraints.maxHeight * 0.18),
-                // 10% of screen height
                 Align(
-                  alignment: Alignment(0.05, 0.0),
+                  alignment: const Alignment(0.05, 0.0),
                   child: Text(
                       'Create an Account',
                       style: TextStyles.login(context)
@@ -159,7 +149,7 @@ class _createscrState extends State<createscr> {
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03),
                 Align(
-                  alignment: Alignment(0.9, 0.4),
+                  alignment: const Alignment(0.9, 0.4),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -172,12 +162,12 @@ class _createscrState extends State<createscr> {
                           )),
                       const SizedBox(height: 10),
                       Align(
-                        alignment: Alignment(0.1, 0.0),
+                        alignment: const Alignment(0.1, 0.0),
                         child: SizedBox(
                           height: 40,
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
-                            controller: Email,
+                            controller: email,
                             style: GoogleFonts.inter(
                                 color: Colors.black,
                                 fontSize: 13),
@@ -191,7 +181,7 @@ class _createscrState extends State<createscr> {
                               ),
                             ),
                             inputFormatters: [
-                              FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9@._]')), // Allows lowercase, digits, and common email symbols
+                              FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9@._]')),
                             ],
                           ),
 
@@ -206,12 +196,12 @@ class _createscrState extends State<createscr> {
                           )),
                       const SizedBox(height: 10),
                       Align(
-                        alignment: Alignment(0.1, 0.0),
+                        alignment: const Alignment(0.1, 0.0),
                         child: SizedBox(
                           height: 40,
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
-                            controller: Password,
+                            controller: password,
                             style: GoogleFonts.inter(
                                 color: Colors.black,
                                 fontSize: 13),
@@ -219,8 +209,8 @@ class _createscrState extends State<createscr> {
                             decoration: InputDecoration(
                               border: const OutlineInputBorder(),
                               hintText: 'Enter your new password',
-                              hintStyle: TextStyle(fontSize: 13),
-                              contentPadding: EdgeInsets.symmetric(
+                              hintStyle: const TextStyle(fontSize: 13),
+                              contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 8,
                               ),
@@ -252,16 +242,16 @@ class _createscrState extends State<createscr> {
                           height: 40,
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
-                            controller: ConfirmPassword,
+                            controller: confirmPassword,
                             style: GoogleFonts.inter(
                                 color: Colors.black,
                                 fontSize: 13),
                             obscureText: _obscureText,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                               hintText: 'Enter your confirm password',
-                              hintStyle: TextStyle(fontSize: 13),
-                              contentPadding: EdgeInsets.symmetric(
+                              hintStyle: const TextStyle(fontSize: 13),
+                              contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 8,
                               ),
@@ -288,49 +278,42 @@ class _createscrState extends State<createscr> {
                           width: constraints.maxWidth * 0.25,
                           child: ElevatedButton(
                             onPressed: () async {
-                              if (Password.text.isEmpty &&
-                                  ConfirmPassword.text.isEmpty) {
+                              if (password.text.isEmpty &&
+                                  confirmPassword.text.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text(
                                           "Password & Confirm Password can't be empty")),
                                 );
-                              } else if (Password.text.isEmpty &&
-                                  ConfirmPassword.text.isNotEmpty) {
+                              } else if (password.text.isEmpty &&
+                                  confirmPassword.text.isNotEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text("Please Enter Password")),
                                 );
-                              } else if (Password.text.isNotEmpty &&
-                                  ConfirmPassword.text.isEmpty) {
+                              } else if (password.text.isNotEmpty &&
+                                  confirmPassword.text.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text(
                                           "Please Enter Confirm Password")),
                                 );
-                              } else if (Password.text !=
-                                  ConfirmPassword.text) {
+                              } else if (password.text !=
+                                  confirmPassword.text) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text("Password doesn't match")),
                                 );
-                              } else if (Email.text.isEmpty &&
-                                  Password.text == ConfirmPassword.text) {
+                              } else if (email.text.isEmpty &&
+                                  password.text == confirmPassword.text) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content:
                                       Text("Please Enter Email Address")),
                                 );
                               } else {
-                                await checkLogin(Email.text, Password.text);
+                                await checkLogin(email.text, password.text);
                               }
-                              // bool isValid = await checkLogin(userName.text, Password.text);
-                              // if (isValid) {
-                              //   context.go('/Home');
-                              //   ScaffoldMessenger.of(context).showSnackBar(
-                              //     const SnackBar(content: Text("Something went wrong")),
-                              //   );
-                              // }
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[800],
@@ -367,7 +350,7 @@ class _createscrState extends State<createscr> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => LoginScr()),
+                                          builder: (context) =>  LoginScr()),
                                     );
                                   },
                               ),
@@ -420,3 +403,4 @@ class ImageContainer1 extends StatelessWidget {
     );
   }
 }
+

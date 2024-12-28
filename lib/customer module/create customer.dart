@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:io' as io;
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

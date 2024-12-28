@@ -6,22 +6,10 @@ import 'package:btb/admin/create%20login.dart';
 import 'package:btb/customer%20login/order/create%20order.dart';
 import 'package:btb/customer%20module/create%20customer.dart';
 import 'package:btb/customer%20module/customer%20view.dart';
-import 'package:btb/dashboard/pay%20complete.dart';
 import 'package:btb/login/login.dart';
 import 'dart:html' as html;
-import 'package:btb/Order%20Module/add%20productmaster%20sample.dart';
-import 'package:btb/Order%20Module/eighthpage.dart';
-import 'package:btb/Order%20Module/fifthpage.dart';
 import 'package:btb/Order%20Module/firstpage.dart';
-import 'package:btb/Order%20Module/fourthpage.dart';
-import 'package:btb/Order%20Module/secondpage.dart';
-import 'package:btb/Order%20Module/seventhpage%20.dart';
-import 'package:btb/Order%20Module/sixthpage.dart';
-import 'package:btb/Order%20Module/thirdpage.dart';
 import 'package:btb/dashboard/dashboard.dart';
-import 'package:btb/dashboard/openinvoice%20screen.dart';
-import 'package:btb/dashboard/openorder%20screen.dart';
-import 'package:btb/dashboard/order%20completedlistscreen.dart';
 import 'package:btb/customer%20login/home/admin%20dash.dart';
 import 'package:btb/sample/notifier.dart';
 
@@ -38,7 +26,6 @@ import 'admin/sign up.dart';
 import 'customer login/home/home.dart';
 import 'customer login/order/order list.dart';
 import 'customer login/order/order view screen.dart';
-import 'customer login/order/responsiveorder list.dart';
 import 'customer module/customer list.dart';
 
 void main() async {
@@ -216,8 +203,8 @@ class MyApp extends StatelessWidget {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return CustomTransitionPage(
             key: state.pageKey,
-            child: userEdit(
-              EditUser: extra['EditUser' ?? ''] ?? {},
+            child: useredit(
+              edituser: extra['EditUser' ?? ''] ?? {},
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -357,81 +344,7 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
-      GoRoute(
-        path: '/Open_Order',
-        pageBuilder: (context, state) {
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: OpenorderList(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Picked_order',
-        pageBuilder: (context, state) {
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: OpenpickList(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Pay_Complete',
-        pageBuilder: (context, state) {
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: PayCompleteList(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Order_Complete',
-        pageBuilder: (context, state) {
-          final cameFromRoute = state.extra != null
-              ? (state.extra as Map<String, dynamic>)['cameFromRoute'] ?? false
-              : false;
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: OrderList(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
+
       GoRoute(
         path: '/Home',
         pageBuilder: (context, state) {
@@ -490,213 +403,6 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
-        path: '/Added_to_cart',
-        pageBuilder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>? ?? {};
-          final selectedProducts =
-              extraData['selectedProducts'] as List<Product>? ?? [];
-          final data = extraData['data'] as Map<String, dynamic>? ?? {};
-
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: FifthPage(
-              selectedProducts: selectedProducts,
-              data: data,
-              select: '',
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration:
-                Duration(milliseconds: 5), // Adjust the duration as needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Documents',
-        pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          // Map<String, dynamic>? selectedProductsMap;
-          // final extra = state.extra as Map<String, dynamic>;
-
-          if (extra == null) {
-            return CustomTransitionPage(
-              child: Orderspage(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-              transitionDuration: Duration(milliseconds: 5),
-            );
-          }
-
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: EighthPage(
-              // string: extra!['string'] ?? '',
-              selectedProductMap: extra!['selectedProudctMap'] ?? {},
-              deliveryStatus: extra['deliveryStatus'] ?? '',
-              paymentStatus: extra['paymentStatus'] ?? {},
-              InvNo: extra['InvNo'] ?? '',
-              Location: extra['Location'] ?? '',
-              Date: extra['Date'] ?? '',
-              Total: extra['Total'] ?? '',
-              contactNo: extra['contactNo'] ?? '',
-              orderId: extra['orderId'] ?? '',
-              orderDetails: List<OrderDetail>.from(extra!['orderDetails']),
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Cart_Selected_Products',
-        pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          final product = extra['product'] as Product;
-          final products = (extra['products'] as List<dynamic>).cast<Product>();
-          final data = extra['data'] as Map<String, dynamic>;
-          final selectedProducts =
-              (extra['selectedProducts'] as List<dynamic>).cast<Product>();
-          final inputText = extra['inputText'] as String;
-          final subText = extra['subText'] as String;
-          final notselect = extra['notselect'] as String;
-
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: NextPage(
-              product: product,
-              products: products,
-              data: data,
-              selectedProducts: selectedProducts,
-              inputText: inputText,
-              subText: subText,
-              notselect: notselect,
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Add_Products',
-        pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          final product = extra['product'] as Product;
-          final products = (extra['products'] as List<dynamic>).cast<Product>();
-          final data = extra['data'] as Map<String, dynamic>;
-          final selectedProducts =
-              (extra['selectedProducts'] as List<dynamic>).cast<Product>();
-          final inputText = extra['inputText'] as String;
-          final subText = extra['subText'] as String;
-          final notselect = extra['notselect'] as String;
-
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: NextPage(
-              product: product,
-              products: products,
-              data: data,
-              selectedProducts: selectedProducts,
-              inputText: inputText,
-              subText: subText,
-              notselect: notselect,
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
-          path: '/Edit',
-          pageBuilder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            return CustomTransitionPage(
-              key: state.pageKey,
-              child: SelectedProductPage(
-                selectedProducts: extra['selectedProducts'],
-                data: extra['data'],
-              ),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-            );
-          }),
-      GoRoute(
-        path: '/View_Order',
-        pageBuilder: (context, state) {
-          if (state.extra == null) {
-            return CustomTransitionPage(
-              child: Orderspage(), // Navigate to OrdersPage on refresh
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-              transitionDuration:
-                  Duration(milliseconds: 300), // Adjust transition duration
-            );
-          } else {
-            final extra = state.extra as Map<String, dynamic>;
-            Map<String, dynamic>? selectedProductsMap =
-                extra['selectedProducts'] as Map<String, dynamic>?;
-            return CustomTransitionPage(
-              key: state.pageKey,
-              child: SeventhPage(
-                selectedProducts: selectedProductsMap ?? {},
-                product: null,
-                orderId: extra['orderId'] as String,
-                orderDetails: List<OrderDetail>.from(extra['orderDetails']),
-              ),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-              transitionDuration: Duration(
-                  milliseconds: 5), // Adjust transition duration if needed
-            );
-          }
-        },
-      ),
-      GoRoute(
         path: '/Order_List',
         pageBuilder: (context, state) {
           return CustomTransitionPage(
@@ -749,90 +455,7 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
-      GoRoute(
-        path: '/Search_For_Products_',
-        pageBuilder: (context, state) {
-          final data = state.extra as Map<String, dynamic>?;
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: OrderPage3(
-              data: data ?? {},
-              string: 'arrow_back',
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Search_For_Products',
-        pageBuilder: (context, state) {
-          final data = state.extra as Map<String, dynamic>?;
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: OrderPage3(
-              data: data ?? {},
-              string: '',
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Edit_Order',
-        pageBuilder: (context, state) {
-          final data = state.extra as Map<String, dynamic>?;
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: SelectedProductPage(
-              data: data ?? {}, // If data is null, use an empty map
-              selectedProducts: const [],
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Create_New_Order',
-        pageBuilder: (context, state) {
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: OrdersSecond(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
+
       GoRoute(
         path: '/Create_Cus',
         pageBuilder: (context, state) {
@@ -851,109 +474,7 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
-      GoRoute(
-        path: '/Order_Placed',
-        pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>? ?? {};
-          // Extracting the passed arguments
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: SixthPage(
-              InvNo: extra['InvNo'] ?? '',
-              status: extra['status'] ?? '',
-              paymentStatus: extra['paymentStatus'] ?? {},
-              product: extra['product'] as detail?,
-              item: extra['item'] as List<Map<String, dynamic>>?,
-              body: extra['body'] as Map<String, dynamic>,
-              itemsList: extra['itemsList'] as List<Map<String, dynamic>>,
-              orderDetails: List<OrderDetail>.from(extra['orderDetails']),
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration:
-                Duration(milliseconds: 200), // Adjust duration as needed
-          );
-        },
-      ),
-      GoRoute(
-        path: '/Selected_Products',
-        pageBuilder: (context, state) {
-          // Check if the 'extra' parameter is null
-          final extra = state.extra as Map<String, dynamic>?;
 
-          if (extra == null) {
-            return CustomTransitionPage(
-              key: state.pageKey,
-              child: OrderPage3(
-                data: {},
-                string: '',
-              ),
-              // Navigate to the different page when refreshed
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-              transitionDuration: Duration(
-                  milliseconds: 300), // Adjust transition duration if needed
-            );
-          }
-
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: NextPage(
-              selectedProducts:
-                  extra['selectedProducts'] as List<Product>? ?? [],
-              // Provide an empty list if null
-              product: extra['product'] as Product? ??
-                  Product(
-                      prodId: '',
-                      productName: '',
-                      imageId: '',
-                      subCategory: '',
-                      selectedUOM: '',
-                      selectedVariation: '',
-                      totalamount: 0,
-                      total: 0,
-                      tax: '',
-                      totalAmount: 0,
-                      unit: '',
-                      discount: '',
-                      category: '',
-                      price: 0,
-                      qty: 0,
-                      quantity: 0),
-              // Provide a default Product if null
-              data: extra['data'] as Map<String, dynamic>? ?? {},
-              // Provide an empty map if null
-              inputText: extra['inputText'] as String? ?? '',
-              // Provide an empty string if null
-              subText: extra['subText'] as String? ?? '',
-              // Provide an empty string if null
-              products: extra['products'] as List<Product>? ?? [],
-              // Provide an empty list if null
-              notselect: extra['notselect'] as String? ??
-                  '', // Provide an empty string if null
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: Duration(
-                milliseconds: 5), // Adjust transition duration if needed
-          );
-        },
-      ),
     ],
     redirect: (context, state) {
       final bool isLoggedIn = window.sessionStorage.containsKey('token');

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:math' as math;
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
 import 'package:btb/widgets/productclass.dart';
@@ -14,8 +14,6 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
 import '../dashboard/dashboard.dart';
 import '../main.dart';
 import '../widgets/custom loading.dart';
@@ -127,10 +125,10 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                       child: Column(
                         children: [
                           // Warning Icon
-                          Icon(Icons.warning, color: Colors.orange, size: 50),
-                          SizedBox(height: 16),
+                          const Icon(Icons.warning, color: Colors.orange, size: 50),
+                          const SizedBox(height: 16),
                           // Confirmation Message
-                          Text(
+                          const Text(
                             'Session Expired',
                             style: TextStyle(
                               fontSize: 16,
@@ -138,12 +136,12 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               color: Colors.black,
                             ),
                           ),
-                          Text("Please log in again to continue",style: TextStyle(
+                          const Text("Please log in again to continue",style: TextStyle(
                             fontSize: 12,
 
                             color: Colors.black,
                           ),),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           // Buttons
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -156,12 +154,12 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
-                                  side: BorderSide(color: Colors.blue),
+                                  side: const BorderSide(color: Colors.blue),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
                                 ),
-                                child: Text(
+                                child: const Text(
                                   'ok',
                                   style: TextStyle(
                                     color: Colors.blue,
@@ -488,12 +486,12 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                           ),
                         ),
                         const Spacer(),
-                        Row(
+                        const Row(
                           children: [
-                            const SizedBox(width: 10),
+                            SizedBox(width: 10),
                             Padding(
                               padding:
-                              const EdgeInsets.only(right: 10, top: 10),
+                              EdgeInsets.only(right: 10, top: 10),
                               // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
@@ -542,7 +540,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
 
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               }
               else ...{
@@ -565,7 +563,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                 ),
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               },
 
@@ -845,8 +843,8 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                 decoration: InputDecoration(
                                     hintText: 'Search by Order ID or Customer Name',
                                     hintStyle:
-                                    TextStyle(fontSize: 13, color: Colors.grey),
-                                    contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 5),
+                                    const TextStyle(fontSize: 13, color: Colors.grey),
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 5),
                                     // contentPadding:
                                     // EdgeInsets.only(bottom: 20, left: 10),
                                     // adjusted padding
@@ -865,7 +863,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                         ),
                       ],
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1055,7 +1053,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
           ),
           Padding(
             padding:
-            EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            const EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
         ],
@@ -1155,7 +1153,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                           }),
                           cells: [
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[0],
                                 // Same dynamic width as column headers
                                 child: Text(
@@ -1165,7 +1163,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[2],
                                 child: Text(
                                   detail.contactPerson!,
@@ -1174,7 +1172,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[1],
                                 child: Text(
                                   detail.orderDate,
@@ -1183,7 +1181,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[3],
                                 child: Text(
                                   detail.total.toString(),
@@ -1192,7 +1190,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[4],
                                 child: Text(
                                   detail.deliveryStatus.toString(),
@@ -1213,12 +1211,6 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                           ],
                           onSelectChanged: (selected) {
                             if (selected != null && selected) {
-                              print('what is this');
-                              print(detail.invoiceNo);
-                              print(productList);
-                              print(detail.orderId);
-                              print(detail.paymentStatus);
-//final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
 
                               if (filteredData.length <= 9) {
                                 PaymentMap = {
@@ -1228,8 +1220,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                                   'paymentdate': detail.paymentDate,
                                   'paidamount': detail.paidAmount,
                                 };
-                                print(detail.orderId);
-                             //   print(detail.orderId);
+
                                 context.go('/Order_View', extra: {
                                   'orderId': detail.orderId
                                 });
@@ -1341,7 +1332,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
           ),
           Padding(
             padding:
-            EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            const EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
         ],
@@ -1442,7 +1433,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                           }),
                           cells: [
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[0],
                                 // Same dynamic width as column headers
                                 child: Text(
@@ -1452,7 +1443,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[2],
                                 child: Text(
                                   detail.contactPerson!,
@@ -1461,7 +1452,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[1],
                                 child: Text(
                                   detail.orderDate,
@@ -1470,7 +1461,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[3],
                                 child: Text(
                                   detail.total.toString(),
@@ -1479,7 +1470,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[4],
                                 child: Text(
                                   detail.deliveryStatus.toString(),

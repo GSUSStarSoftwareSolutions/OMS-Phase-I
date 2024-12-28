@@ -5,7 +5,7 @@ import 'dart:ui' as order;
 import 'dart:math' as math;
 import 'dart:ui' as ord;
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
 import 'package:btb/widgets/productclass.dart';

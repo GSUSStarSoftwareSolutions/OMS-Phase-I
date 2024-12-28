@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'dart:html';
-import 'package:btb/admin/Api%20name.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,11 +8,6 @@ import 'package:http/http.dart' as http;
 import '../login/login screen.dart';
 import '../widgets/text_style.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: comLog(),
-  ));
-}
 
 class comLog extends StatefulWidget {
   comLog({
@@ -191,7 +183,7 @@ class _ComUIState extends State<ComUI> {
                 SizedBox(height: constraints.maxHeight * 0.1),
                 // 10% of screen height
                 Align(
-                  alignment: Alignment(-0.14, 0.0),
+                  alignment: const Alignment(-0.14, 0.0),
                   child: Text(
                     'Sign Up to Get Started!',
                     // style: TextStyles.Login,
@@ -201,7 +193,7 @@ class _ComUIState extends State<ComUI> {
                 SizedBox(height: constraints.maxHeight * 0.03),
                 // 5% of screen height
                 Align(
-                  alignment: Alignment(-0.05, 0.0),
+                  alignment: const Alignment(-0.05, 0.0),
                   child: Text(
                     'Simplify your orders and take control with ease.',
                     // style: TextStyles.,
@@ -217,7 +209,7 @@ class _ComUIState extends State<ComUI> {
                     children: [
                       SizedBox(height: constraints.maxHeight * 0.04),
                       Align(
-                          alignment: Alignment(-0.4, 0.0),
+                          alignment: const Alignment(-0.4, 0.0),
                           child: Text(
                             'Company Name',
                             style: TextStyles.header4,
@@ -243,9 +235,10 @@ class _ComUIState extends State<ComUI> {
                               ),
                             ),
                             onFieldSubmitted: (value) async {
-                              print('username');
+                              if (!mounted) return;
                               String? role =
                               await checkLogin();
+
                               if (role != null) {
                                 if(role == 'Employee'){
                                   context.go('/Home');
@@ -254,6 +247,7 @@ class _ComUIState extends State<ComUI> {
                                 }else if(role == 'Admin'){
                                   context.go('/User_List');
                                 }else if(userName.text.isNotEmpty && Password.text.isEmpty){
+                                  if (!mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                         content:
@@ -268,7 +262,7 @@ class _ComUIState extends State<ComUI> {
                       ),
                       const SizedBox(height: 10),
                       Align(
-                          alignment: Alignment(-0.42, 0.0),
+                          alignment: const Alignment(-0.42, 0.0),
                           child: Text(
                             'Email Address',
                             style: TextStyles.header4,
@@ -318,7 +312,7 @@ class _ComUIState extends State<ComUI> {
                       ),
                       const SizedBox(height: 10),
                       Align(
-                          alignment: Alignment(-0.42, 0.0),
+                          alignment: const Alignment(-0.42, 0.0),
                           child: Text(
                             'Mobile Number',
                             style: TextStyles.header4,
@@ -373,7 +367,7 @@ class _ComUIState extends State<ComUI> {
                       ),
                       const SizedBox(height: 10),
                       Align(
-                          alignment: Alignment(-0.43, 0.0),
+                          alignment: const Alignment(-0.43, 0.0),
                           child: Text(
                             'User Name',
                             style: TextStyles.header4,
@@ -442,9 +436,9 @@ class _ComUIState extends State<ComUI> {
                                 fontSize: 13),
                             obscureText: _obscureText,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                               hintText: 'Enter your Password',
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 8,
                               ),
@@ -530,7 +524,7 @@ class _ComUIState extends State<ComUI> {
                               ),
                             ),
                             child:  Align(
-                                alignment: Alignment(0.0, 0.0),
+                                alignment: const Alignment(0.0, 0.0),
                                 child: Text(
                                     'Sign Up',
                                     style: TextStyles.button1
@@ -556,7 +550,7 @@ class _ComUIState extends State<ComUI> {
                   SizedBox(height: constraints.maxHeight * 0.1),
                   // 10% of screen height
                   Align(
-                    alignment: Alignment(-0.14, 0.0),
+                    alignment: const Alignment(-0.14, 0.0),
                     child: Text(
                       'Sign Up to Get Started!',
                       // style: TextStyles.Login,
@@ -566,7 +560,7 @@ class _ComUIState extends State<ComUI> {
                   SizedBox(height: constraints.maxHeight * 0.03),
                   // 5% of screen height
                   Align(
-                    alignment: Alignment(-0.05, 0.0),
+                    alignment: const Alignment(-0.05, 0.0),
                     child: Text(
                       'Simplify your orders and take control with ease.',
                       // style: TextStyles.,
@@ -582,7 +576,7 @@ class _ComUIState extends State<ComUI> {
                       children: [
                         SizedBox(height: constraints.maxHeight * 0.04),
                         Align(
-                            alignment: Alignment(-0.4, 0.0),
+                            alignment: const Alignment(-0.4, 0.0),
                             child: Text(
                               'Company Name',
                               style: TextStyles.header4,
@@ -608,7 +602,7 @@ class _ComUIState extends State<ComUI> {
                                 ),
                               ),
                               onFieldSubmitted: (value) async {
-                                print('username');
+
                                 String? role =
                                 await checkLogin();
                                 if (role != null) {
@@ -633,7 +627,7 @@ class _ComUIState extends State<ComUI> {
                         ),
                         const SizedBox(height: 10),
                         Align(
-                            alignment: Alignment(-0.42, 0.0),
+                            alignment: const Alignment(-0.42, 0.0),
                             child: Text(
                               'Email Address',
                               style: TextStyles.header4,
@@ -684,7 +678,7 @@ class _ComUIState extends State<ComUI> {
                         ),
                         const SizedBox(height: 10),
                         Align(
-                            alignment: Alignment(-0.42, 0.0),
+                            alignment: const Alignment(-0.42, 0.0),
                             child: Text(
                               'Mobile Number',
                               style: TextStyles.header4,
@@ -739,7 +733,7 @@ class _ComUIState extends State<ComUI> {
                         ),
                         const SizedBox(height: 10),
                         Align(
-                            alignment: Alignment(-0.43, 0.0),
+                            alignment: const Alignment(-0.43, 0.0),
                             child: Text(
                               'User Name',
                               style: TextStyles.header4,
@@ -782,7 +776,6 @@ class _ComUIState extends State<ComUI> {
                                           Text("Please enter password")),
                                     );
                                   }
-
                                 }
                               },
                             ),
@@ -808,9 +801,9 @@ class _ComUIState extends State<ComUI> {
                                   fontSize: 13),
                               obscureText: _obscureText,
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(),
+                                border: const OutlineInputBorder(),
                                 hintText: 'Enter your Password',
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 10,
                                   vertical: 8,
                                 ),
@@ -896,7 +889,7 @@ class _ComUIState extends State<ComUI> {
                                 ),
                               ),
                               child:  Align(
-                                  alignment: Alignment(0.0, 0.0),
+                                  alignment: const Alignment(0.0, 0.0),
                                   child: Text(
                                       'Sign Up',
                                       style: TextStyles.button1

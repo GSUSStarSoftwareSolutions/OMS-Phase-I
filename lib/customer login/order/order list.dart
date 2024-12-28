@@ -3,27 +3,22 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:math' as math;
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
 import 'package:btb/widgets/productclass.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-
 import '../../Order Module/firstpage.dart';
 import '../../dashboard/dashboard.dart';
 import '../../widgets/custom loading.dart';
 import '../../widgets/no datafound.dart';
 import '../../widgets/text_style.dart';
 
-void main() {
-  runApp(const CusOrderPage());
-}
+
 
 class CusOrderPage extends StatefulWidget {
   const CusOrderPage({super.key});
@@ -34,7 +29,7 @@ class CusOrderPage extends StatefulWidget {
 
 class _CusOrderPageState extends State<CusOrderPage>
     with SingleTickerProviderStateMixin {
-  List<String> _sortOrder = List.generate(5, (index) => 'asc');
+  final List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Order ID',
     'Customer Name',
@@ -50,7 +45,6 @@ class _CusOrderPageState extends State<CusOrderPage>
   Timer? _searchDebounceTimer;
   String _searchText = '';
   bool isOrdersSelected = false;
-  bool _loading = false;
   detail? _selectedProduct;
   late TextEditingController _dateController;
   Map<String, dynamic> PaymentMap = {};
@@ -68,7 +62,7 @@ class _CusOrderPageState extends State<CusOrderPage>
   String searchQuery = '';
   List<detail> filteredData = [];
   late AnimationController _controller;
-  bool _isHovered1 = false;
+  final bool _isHovered1 = false;
   late Animation<double> _shakeAnimation;
   String status = '';
   String selectDate = '';
@@ -76,16 +70,6 @@ class _CusOrderPageState extends State<CusOrderPage>
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
 
-  void _onSearchTextChanged(String text) {
-    if (_searchDebounceTimer != null) {
-      _searchDebounceTimer!.cancel(); // Cancel the previous timer
-    }
-    _searchDebounceTimer = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _searchText = text;
-      });
-    });
-  }
 
   static final TextStyle filter = GoogleFonts.inter(
     fontSize: 13.0, // Font size in px
@@ -134,10 +118,10 @@ class _CusOrderPageState extends State<CusOrderPage>
                     child: Column(
                       children: [
                         // Warning Icon
-                        Icon(Icons.warning, color: Colors.orange, size: 50),
-                        SizedBox(height: 16),
+                        const Icon(Icons.warning, color: Colors.orange, size: 50),
+                        const SizedBox(height: 16),
                         // Confirmation Message
-                        Text(
+                        const Text(
                           'Session Expired',
                           style: TextStyle(
                             fontSize: 16,
@@ -145,14 +129,14 @@ class _CusOrderPageState extends State<CusOrderPage>
                             color: Colors.black,
                           ),
                         ),
-                        Text(
+                        const Text(
                           "Please log in again to continue",
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         // Buttons
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -165,12 +149,12 @@ class _CusOrderPageState extends State<CusOrderPage>
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                side: BorderSide(color: Colors.blue),
+                                side: const BorderSide(color: Colors.blue),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'ok',
                                 style: TextStyle(
                                   color: Colors.blue,
@@ -223,39 +207,8 @@ class _CusOrderPageState extends State<CusOrderPage>
           throw Exception('Failed to load data');
         }
       }
-      // else {
-      //   if (response.statusCode == 200) {
-      //     final jsonData = jsonDecode(response.body);
-      //     List<detail> products = [];
-      //     if (jsonData != null) {
-      //       if (jsonData is List) {
-      //         products = jsonData.map((item) => detail.fromJson(item)).toList();
-      //       } else if (jsonData is Map && jsonData.containsKey('body')) {
-      //         products = (jsonData['body'] as List)
-      //             .map((item) => detail.fromJson(item))
-      //             .toList();
-      //         totalItems =
-      //             jsonData['totalItems'] ?? 0; // Get the total number of items
-      //       }
-      //
-      //       if (mounted) {
-      //         setState(() {
-      //           totalPages = (products.length / itemsPerPage).ceil();
-      //           print('pages');
-      //           print(totalPages);
-      //           productList = products;
-      //           print(productList);
-      //           _filterAndPaginateProducts();
-      //         });
-      //       }
-      //     }
-      //   } else {
-      //     throw Exception('Failed to load data');
-      //   }
-      // }
     } catch (e) {
       print('Error decoding JSON: $e');
-// Optionally, show an error message to the user
     } finally {
       if (mounted) {
         setState(() {
@@ -265,104 +218,18 @@ class _CusOrderPageState extends State<CusOrderPage>
     }
   }
 
-  Widget _buildMenuItems1(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(
-          height: 10,
-        ),
-        _buildMenuItem1(Icons.home_outlined, Colors.blue[900]!, '/Home'),
-        Container(
-          height: 42,
-          decoration: BoxDecoration(
-            color: Colors.blue[800],
-            // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-            // color: Color.fromRGBO(224, 59, 48, 1.0),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(8),
-              // Radius for top-left corner
-              topRight: Radius.circular(8),
-              // No radius for top-right corner
-              bottomLeft: Radius.circular(8),
-              // Radius for bottom-left corner
-              bottomRight:
-                  Radius.circular(8), // No radius for bottom-right corner
-            ),
-          ),
-          child: _buildMenuItem1(
-              Icons.production_quantity_limits, Colors.white, '/Customer'),
-        ),
-        _buildMenuItem1(
-            Icons.account_circle_outlined, Colors.white, '/Customer'),
-        _buildMenuItem1(
-            Icons.production_quantity_limits, Colors.blue[900]!, '/Order_List'),
-        IconButton(
-            onPressed: () {
-              setState(() {
-                size = 200;
-              });
-            },
-            icon: Icon(Icons.arrow_back_ios))
-      ],
-    );
-    // const SizedBox(
-    //   height: 6,
-    // ),
-  }
 
-  Widget _buildMenuItem1(IconData icon, Color iconColor, String route) {
-    iconColor = _isHovered[route] == true ? Colors.blue : Colors.black87;
-    route == '/Product_List'
-        ? _isHovered[route] = false
-        : _isHovered[route] = false;
-    route == '/Product_List' ? iconColor = Colors.white : Colors.black;
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(
-        () => _isHovered[route] = true,
-      ),
-      onExit: (_) => setState(() => _isHovered[route] = false),
-      child: GestureDetector(
-        onTap: () {
-          context.go(route);
-        },
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 5, right: 20),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: _isHovered[route]! ? Colors.black12 : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 10, top: 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(
-                  icon,
-                  color: iconColor,
-                  size: 20,
-                ),
-                const SizedBox(width: 10),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   void _updateSearch(String searchText) {
     setState(() {
       _searchText = searchText;
-      currentPage = 1; // Reset to first page when searching
+      currentPage = 1;
       _filterAndPaginateProducts();
-// _clearSearch();
+
     });
   }
 
   void _goToPreviousPage() {
-    print("previos");
     if (currentPage > 1) {
       if (filteredData.length > itemsPerPage) {
         setState(() {
@@ -373,8 +240,6 @@ class _CusOrderPageState extends State<CusOrderPage>
   }
 
   void _goToNextPage() {
-    print('nextpage');
-
     if (currentPage < totalPages) {
       if (filteredData.length > currentPage * itemsPerPage) {
         setState(() {
@@ -382,10 +247,9 @@ class _CusOrderPageState extends State<CusOrderPage>
         });
       }
     }
-//_filterAndPaginateProducts();
   }
 
-  Map<String, bool> _isHovered = {
+  final Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
     'Products': false,
@@ -405,36 +269,17 @@ class _CusOrderPageState extends State<CusOrderPage>
             height: 42,
             decoration: BoxDecoration(
               color: Colors.blue[800],
-              // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-              // color: Color.fromRGBO(224, 59, 48, 1.0),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(8),
-                // Radius for top-left corner
                 topRight: Radius.circular(8),
-                // No radius for top-right corner
                 bottomLeft: Radius.circular(8),
-                // Radius for bottom-left corner
                 bottomRight:
-                    Radius.circular(8), // No radius for bottom-right corner
+                    Radius.circular(8),
               ),
             ),
             child: _buildMenuItem('Orders', Icons.warehouse_outlined,
                 Colors.blue[800]!, '/Customer_Order_List')),
-        // Align(
-        //   alignment: Alignment.bottomRight,
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.end,
-        //     children: [
-        //       IconButton(
-        //           onPressed: () {
-        //             setState(() {
-        //               size = 80;
-        //             });
-        //           },
-        //           icon: Icon(Icons.arrow_back_ios)),
-        //     ],
-        //   ),
-        // ),
+
       ],
     ),
       const SizedBox(
@@ -524,7 +369,6 @@ class _CusOrderPageState extends State<CusOrderPage>
 
   @override
   Widget build(BuildContext context) {
-    //String? role = Provider.of<UserRoleProvider>(context).role;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -553,11 +397,11 @@ class _CusOrderPageState extends State<CusOrderPage>
                           ),
                         ),
                         const Spacer(),
-                        Row(
+                        const Row(
                           children: [
                             Padding(
                               padding:
-                                  const EdgeInsets.only(right: 10, top: 10),
+                                  EdgeInsets.only(right: 10, top: 10),
                               // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
@@ -606,7 +450,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                 ),
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               } else ...{
                 Align(
@@ -627,7 +471,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                 ),
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               },
               Positioned(
@@ -645,7 +489,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                           // mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Row(
-                              //  mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Padding(
                                   padding:
@@ -663,7 +506,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                                     onPressed: () {
                                       context.go('/Cus_Create_Order',
                                           extra: {'testing': 'hi'});
-                                      //context.go('/Home/Orders/Create_Order');
                                     },
                                     style: OutlinedButton.styleFrom(
                                       backgroundColor: Colors.blue[800],
@@ -671,7 +513,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                                         borderRadius: BorderRadius.circular(
                                             5), // Rounded corners
                                       ),
-                                      side: BorderSide.none, // No outline
+                                      side: BorderSide.none,
                                     ),
                                     child: Text('Create',
                                         style: TextStyles.button),
@@ -692,19 +534,16 @@ class _CusOrderPageState extends State<CusOrderPage>
                                       height: 755,
                                       width: maxWidth * 0.8,
                                       decoration: BoxDecoration(
-                                        //   border: Border.all(color: Colors.grey),
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(2),
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.grey.withOpacity(0.1),
-                                            // Soft grey shadow
                                             spreadRadius: 3,
                                             blurRadius: 3,
                                             offset: const Offset(0, 3),
                                           ),
                                         ],
-                                        //  border: Border.all(color: Color(0x29000000)),
                                       ),
                                       child: SizedBox(
                                         child: Column(
@@ -775,7 +614,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    // crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
@@ -927,13 +765,11 @@ class _CusOrderPageState extends State<CusOrderPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-//    const SizedBox(height: 8),
                 Row(
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-//  const SizedBox(height: 8),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: ConstrainedBox(
@@ -942,7 +778,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                               maxHeight: 39,
                             ),
                             child: Container(
-// width: constraints.maxWidth * 0.252, // reduced width
                               height: 35, // reduced height
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -956,16 +791,12 @@ class _CusOrderPageState extends State<CusOrderPage>
                                     hintText:
                                         'Search by Order ID or Customer Name',
                                     hintStyle: TextStyles.body,
-                                    contentPadding: EdgeInsets.symmetric(
+                                    contentPadding: const EdgeInsets.symmetric(
                                         vertical: 3, horizontal: 5),
-                                    // contentPadding:
-                                    // EdgeInsets.only(bottom: 20, left: 10),
-                                    // adjusted padding
                                     border: InputBorder.none,
                                     suffixIcon: Padding(
                                       padding: const EdgeInsets.only(
                                           left: 10, right: 5),
-                                      // Adjust image padding
                                       child: Image.asset(
                                         'images/search.png', // Replace with your image asset path
                                       ),
@@ -989,10 +820,8 @@ class _CusOrderPageState extends State<CusOrderPage>
 
   Widget buildDataTable2() {
     if (isLoading) {
-      _loading = true;
       var width = MediaQuery.of(context).size.width;
       var Height = MediaQuery.of(context).size.height;
-// Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
             top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
@@ -1020,10 +849,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
                                 column,
@@ -1041,11 +867,11 @@ class _CusOrderPageState extends State<CusOrderPage>
                     },
                   );
                 }).toList(),
-                rows: []),
+                rows: const []),
           ),
           Padding(
             padding:
-                EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+                const EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
         ],
@@ -1089,7 +915,6 @@ class _CusOrderPageState extends State<CusOrderPage>
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-// double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width * 0.92;
 
       return Column(
@@ -1114,8 +939,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                           width: columnWidths[columns.indexOf(column)],
                           // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(column, style: TextStyles.subhead),
                               IconButton(
@@ -1173,7 +996,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                       }),
                       cells: [
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[0],
                             // Same dynamic width as column headers
                             child: Text(
@@ -1183,7 +1006,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[1],
                             child: Text(
                               detail.contactPerson!,
@@ -1192,7 +1015,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[2],
                             child: Text(
                               detail.orderDate!,
@@ -1201,7 +1024,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[3],
                             child: Text(
                               detail.total.toString(),
@@ -1210,7 +1033,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[4],
                             child: Text(
                               detail.deliveryStatus.toString(),
@@ -1224,7 +1047,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                           context.go('/Customer_Order_View', extra: {
                             'orderId': detail.orderId,
                           });
-//final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
                         }
                       });
                 })),
@@ -1236,10 +1058,9 @@ class _CusOrderPageState extends State<CusOrderPage>
 
   Widget buildDataTable() {
     if (isLoading) {
-      _loading = true;
       var width = MediaQuery.of(context).size.width;
       var Height = MediaQuery.of(context).size.height;
-// Show loading indicator while data is being fetched
+
       return Padding(
         padding: EdgeInsets.only(
             top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
@@ -1305,10 +1126,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(column, style: TextStyles.subhead),
                             ],
@@ -1325,7 +1143,7 @@ class _CusOrderPageState extends State<CusOrderPage>
           ),
           Padding(
             padding:
-                EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+                const EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
         ],
@@ -1333,7 +1151,6 @@ class _CusOrderPageState extends State<CusOrderPage>
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-// double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width * 0.92;
 
       return Column(
@@ -1356,7 +1173,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
                             children: [
                               Text(column, style: TextStyles.subhead),
@@ -1387,11 +1203,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                                   });
                                 },
                               ),
-//SizedBox(width: 50,),
-//Padding(
-//  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-//  child:
-// ),
                             ],
                           ),
                         ),
@@ -1420,7 +1231,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                       }),
                       cells: [
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[0],
                             // Same dynamic width as column headers
                             child: Text(
@@ -1430,7 +1241,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[1],
                             child: Text(
                               detail.contactPerson!,
@@ -1439,7 +1250,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[2],
                             child: Text(
                               detail.orderDate!,
@@ -1448,7 +1259,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[3],
                             child: Text(
                               detail.total.toString(),
@@ -1457,7 +1268,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[4],
                             child: Text(
                               detail.deliveryStatus.toString(),
@@ -1465,15 +1276,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                             ),
                           ),
                         ),
-                        // DataCell(
-                        //   Container(
-                        //     width: columnWidths[4],
-                        //     child: Text(
-                        //       detail.paymentStatus.toString(),
-                        //       style: TextStyles.body,
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                       onSelectChanged: (selected) {
                         context.go('/Customer_Order_View', extra: {
@@ -1494,18 +1296,16 @@ class _CusOrderPageState extends State<CusOrderPage>
               product.contactPerson!
                   .toLowerCase()
                   .contains(_searchText.toLowerCase());
-// print('-----');
-// print(product.orderDate);
+
       String orderYear = '';
       if (product.orderDate.contains('/')) {
         final dateParts = product.orderDate.split('/');
         if (dateParts.length == 3) {
-          orderYear = dateParts[2]; // Extract the year
+          orderYear = dateParts[2];
         }
       }
-// final orderYear = element.orderDate.substring(5,9);
       if (status.isEmpty && selectDate.isEmpty) {
-        return matchesSearchText; // Include all products that match the search text
+        return matchesSearchText;
       }
       if (status == 'Status' && selectDate == 'Select Year') {
         return matchesSearchText;
@@ -1518,27 +1318,27 @@ class _CusOrderPageState extends State<CusOrderPage>
       }
       if (status == 'Status' && selectDate.isNotEmpty) {
         return matchesSearchText &&
-            orderYear == selectDate; // Include all products
+            orderYear == selectDate;
       }
       if (status.isNotEmpty && selectDate == 'Select Year') {
         return matchesSearchText &&
-            product.deliveryStatus == status; // Include all products
+            product.deliveryStatus == status;
       }
       if (status.isEmpty && selectDate.isNotEmpty) {
         return matchesSearchText &&
-            orderYear == selectDate; // Include all products
+            orderYear == selectDate;
       }
 
       if (status.isNotEmpty && selectDate.isEmpty) {
         return matchesSearchText &&
-            product.deliveryStatus == status; // Include all products
+            product.deliveryStatus == status;
       }
       return matchesSearchText &&
           (product.deliveryStatus == status && orderYear == selectDate);
-//  return false;
+
     }).toList();
     totalPages = (filteredData.length / itemsPerPage).ceil();
-//totalPages = (productList.length / itemsPerPage).ceil();
+
     setState(() {
       currentPage = 1;
     });

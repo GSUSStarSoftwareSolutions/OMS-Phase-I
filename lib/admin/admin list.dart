@@ -3,33 +3,21 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:math' as math;
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart';
 import 'package:btb/widgets/custom%20loading.dart';
 import 'package:btb/widgets/pagination.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:btb/widgets/productclass.dart' as ord;
 import 'package:btb/Order%20Module/firstpage.dart' as ors;
-
-import '../customer module/customer list.dart';
 import '../dashboard/dashboard.dart';
 import '../widgets/confirmdialog.dart';
-import '../widgets/layout size.dart';
 import '../widgets/no datafound.dart';
 import '../widgets/text_style.dart';
-
-void main() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: AdminList(),
-  ));
-}
 
 class AdminList extends StatefulWidget {
   const AdminList({
@@ -37,19 +25,17 @@ class AdminList extends StatefulWidget {
   });
 
   @override
-  State<AdminList> createState() => _AdminListState();
+  State<AdminList> createState() => AdminListState();
 }
 
-class _AdminListState extends State<AdminList> {
-  String _Role = '';
+class AdminListState extends State<AdminList> {
+  String role = '';
   bool _hasShownPopup = false;
   bool isHomeSelected = false;
   final ScrollController _scrollController = ScrollController();
   Timer? _searchDebounceTimer;
   String _searchText = '';
   final ScrollController horizontalScroll = ScrollController();
-  String _searchText1 = '';
-  DashboardCounts? _dashboardCounts;
   DateTime? _selectedDate;
   late TextEditingController _dateController;
   int startIndex = 0;
@@ -58,14 +44,13 @@ class _AdminListState extends State<AdminList> {
   String status = '';
   String selectDate = '';
   String deliverystatus = '';
-  Map<String, dynamic> PaymentMap = {};
+  Map<String, dynamic> paymentMap = {};
   String? dropdownValue1 = 'Delivery Status';
   String searchQuery = '';
   String companyname = window.sessionStorage["company"] ?? " ";
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Role';
   int currentPage = 1;
-  ord.Product? _selectedProduct;
   int itemsPerPage = 10;
   int totalItems = 0;
   int totalPages = 0;
@@ -74,7 +59,7 @@ class _AdminListState extends State<AdminList> {
   List<ors.detail> filteredData = [];
   List<UserResponse> productList = [];
 
-  List<String> _sortOrder = List.generate(6, (index) => 'asc');
+  final List<String> _sortOrder = List.generate(6, (index) => 'asc');
   List<String> columns = [
     'User ID',
     'User Name',
@@ -94,9 +79,9 @@ class _AdminListState extends State<AdminList> {
     30,
   ];
 
-  Future<void> deleteRowAPI(String TypeId) async {
+  Future<void> deleteRowAPI(String typeId) async {
     try {
-      String apiUri = '$apicall/public/user/delete_usermaster_by_id/$TypeId';
+      String apiUri = '$apicall/public/user/delete_usermaster_by_id/$typeId';
 
       Map<String, String> headers = {
         'Content-Type': 'application/json',
@@ -125,7 +110,8 @@ class _AdminListState extends State<AdminList> {
                     child: Column(
                       children: [
                         // Warning Icon
-                        const Icon(Icons.warning, color: Colors.orange, size: 50),
+                        const Icon(Icons.warning,
+                            color: Colors.orange, size: 50),
                         const SizedBox(height: 16),
                         // Confirmation Message
                         const Text(
@@ -150,9 +136,7 @@ class _AdminListState extends State<AdminList> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Handle Yes action
                                 context.go('/');
-                                // Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
@@ -193,9 +177,6 @@ class _AdminListState extends State<AdminList> {
     }
   }
 
-  // List<bool> columnSortState = [true, true, true, true, true, true];
-  // Product? product1;
-
   Future<void> fetchProducts(int page, int itemsPerPage) async {
     if (isLoading) return;
     if (!mounted) return;
@@ -229,10 +210,9 @@ class _AdminListState extends State<AdminList> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        // Warning Icon
-                        const Icon(Icons.warning, color: Colors.orange, size: 50),
+                        const Icon(Icons.warning,
+                            color: Colors.orange, size: 50),
                         const SizedBox(height: 16),
-                        // Confirmation Message
                         const Text(
                           'Session Expired',
                           style: TextStyle(
@@ -255,9 +235,7 @@ class _AdminListState extends State<AdminList> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Handle Yes action
                                 context.go('/');
-                                // Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
@@ -334,9 +312,8 @@ class _AdminListState extends State<AdminList> {
   void _updateSearch(String searchText) {
     setState(() {
       _searchText = searchText;
-      currentPage = 1; // Reset to first page when searching
+      currentPage = 1;
       _filterAndPaginateProducts();
-      // _clearSearch();
     });
   }
 
@@ -366,141 +343,141 @@ class _AdminListState extends State<AdminList> {
         : (status == 'In Active')
         ? false
         : null;
-    //  bool isActive = status == 'Active';
-
-    //  String status = 'false';
     final String apiUrl =
         '$apicall/public/user_master/update_user_status/$userId/$isActive';
+
     try {
       final response = await http.put(
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer $token',
         },
       );
-      if (token == " ") {
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              contentPadding: EdgeInsets.zero,
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        // Warning Icon
-                        const Icon(Icons.warning, color: Colors.orange, size: 50),
-                        const SizedBox(height: 16),
-                        // Confirmation Message
-                        const Text(
-                          'Session Expired',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const Text(
-                          "Please log in again to continue",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        // Buttons
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                // Handle Yes action
-                                context.go('/');
-                                // Navigator.of(context).pop();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                side: const BorderSide(color: Colors.blue),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                              ),
-                              child: const Text(
-                                'ok',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ).whenComplete(() {
-          _hasShownPopup = false;
-        });
+
+      if (token.trim().isEmpty) {
+        if (!mounted) return; // Ensure the widget is still in the widget tree
+        _showSessionExpiredDialog();
       } else {
         if (response.statusCode == 200) {
           if (status == 'Completed') {
-            // _getCustomers(currentPage, itemsPerPage);
+            // Handle status completion logic
           }
-        } else {}
+        } else {
+          // Handle other status codes
+        }
       }
     } catch (e) {
       print('Error: $e');
     }
   }
 
+  void _showSessionExpiredDialog() {
+    if (!mounted) return; // Ensure the widget is still in the widget tree
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const Icon(Icons.warning, color: Colors.orange, size: 50),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Session Expired',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const Text(
+                      "Please log in again to continue",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            context.go('/'); // Navigate to login
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.blue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: const Text(
+                            'Ok',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ).whenComplete(() {
+      _hasShownPopup = false;
+    });
+  }
+
+
   void _filterAndPaginateProducts() {
     filteredData1 = productList.where((product) {
       final matchesSearchText = product.userId
-          .toLowerCase()
-          .contains(_searchText.toLowerCase()) ||
+              .toLowerCase()
+              .contains(_searchText.toLowerCase()) ||
           product.userName.toLowerCase().contains(_searchText.toLowerCase());
-      if (_Role.isEmpty) {
+      if (role.isEmpty) {
         return matchesSearchText;
       }
-      if (_Role == 'Role') {
+      if (role == 'Role') {
         return matchesSearchText;
       }
-      if (_Role.isNotEmpty) {
-        return matchesSearchText && product.role == _Role;
+      if (role.isNotEmpty) {
+        return matchesSearchText && product.role == role;
       }
 
-      return matchesSearchText && product.role == _Role;
+      return matchesSearchText && product.role == role;
     }).toList();
     setState(() {
       currentPage = 1;
     });
   }
 
-  Map<String, bool> _isHovered = {
-    'Home': false,
-  };
-
   List<Widget> _buildMenuItems(BuildContext context, constraints) {
-    double maxWidth = constraints.maxWidth;
     return [
       Column(
         children: [
-          const SizedBox(height: 10,),
+          const SizedBox(
+            height: 10,
+          ),
           Container(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-                //width: maxWidth * 0.11,
                 height: 42,
                 decoration: BoxDecoration(
                   color: Colors.blue[800],
@@ -565,8 +542,6 @@ class _AdminListState extends State<AdminList> {
   @override
   void initState() {
     super.initState();
-    print('company');
-    print(companyname);
     _dateController = TextEditingController();
     _selectedDate = DateTime.now();
     String formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate!);
@@ -576,8 +551,7 @@ class _AdminListState extends State<AdminList> {
 
   @override
   void dispose() {
-    _searchDebounceTimer
-        ?.cancel(); // Cancel the timer when the widget is disposed
+    _searchDebounceTimer?.cancel();
     super.dispose();
   }
 
@@ -586,8 +560,7 @@ class _AdminListState extends State<AdminList> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Colors.grey[50],
-        //  backgroundColor: Color.fromRGBO(21, 101, 192, 0.07),
+          backgroundColor: Colors.grey[50],
           body: LayoutBuilder(builder: (context, BoxConstraints constraints) {
             double maxWidth = constraints.maxWidth;
             double maxHeight = constraints.maxHeight;
@@ -603,15 +576,11 @@ class _AdminListState extends State<AdminList> {
                           color: Color(0x29000000), // Bottom border color
                           width: 3.0, // Thickness of the bottom border
                         ),
-                      )
-                  ),
-                  // White background color
-                  //height: 62.0, // Total height including bottom shadow
+                      )),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        // crossAxisAlignment:CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Padding(
@@ -619,17 +588,13 @@ class _AdminListState extends State<AdminList> {
                             child: Image.asset(
                               "images/Final-Ikyam-Logo.png",
                               height: 35.0,
-                              // Adjusted to better match proportions
                             ),
                           ),
                           const Spacer(),
                           const Row(
                             children: [
                               Padding(
-                                padding: EdgeInsets.only(
-                                  right: 10,top: 10
-                                ),
-                                // Adjust padding for better spacing
+                                padding: EdgeInsets.only(right: 10, top: 10),
                                 child: AccountMenu(),
                               ),
                             ],
@@ -645,16 +610,17 @@ class _AdminListState extends State<AdminList> {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    child:  SingleChildScrollView(
+                    child: SingleChildScrollView(
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 0),
                           child: Container(
                             height: 1400,
-                            padding:    const EdgeInsets.only(left: 15, top: 10, right: 15),
+                            padding: const EdgeInsets.only(
+                                left: 15, top: 10, right: 15),
                             width: 200,
-                            color:  Colors.white,
+                            color: Colors.white,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: _buildMenuItems(context, constraints),
@@ -676,17 +642,17 @@ class _AdminListState extends State<AdminList> {
                       child: Container(
                         height: maxHeight,
                         padding:
-                        const EdgeInsets.only(left: 15, top: 10, right: 15),
+                            const EdgeInsets.only(left: 15, top: 10, right: 15),
                         width: 200,
                         decoration: const BoxDecoration(
-                            color:  Colors.white,
+                            color: Colors.white,
                             border: Border(
                               left: BorderSide(
-                                color: Color(0x29000000), // Bottom border color
+                                color: Color(0x29000000),
+                                // Bottom border color
                                 width: 1.0, // Thickness of the bottom border
                               ),
-                            )
-                        ),
+                            )),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: _buildMenuItems(context, constraints),
@@ -708,242 +674,255 @@ class _AdminListState extends State<AdminList> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if(constraints.maxWidth >=1350)...{
+                      if (constraints.maxWidth >= 1350) ...{
                         Expanded(
                             child: SingleChildScrollView(
-                              child: Column(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  const SizedBox(height: 20),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 30, top: 10),
-                                        child: Text(
-                                          'User Management',
-                                          style: TextStyles.heading,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Padding(
-                                        padding: const EdgeInsets.only(right: 20, top: 10),
-                                        child: OutlinedButton(
-                                          style: OutlinedButton.styleFrom(
-                                            backgroundColor: Colors.blue[800],
-                                            // Button background color
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                  5), // Rounded corners
-                                            ),
-                                            side: BorderSide.none, // No outline
-                                          ),
-                                          onPressed: () {
-                                            context.go('/Create_User');
-                                          },
-                                          child:  Text(
-                                            'New User',
-                                            style: TextStyles.button,
-                                          ), // add your button press logic here
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                   Padding(
-                                      padding: EdgeInsets.only(
-                                        left: maxWidth * 0.01,
-                                        top: maxHeight * 0.02,
-                                        right: maxWidth * 0.015,
+                                    padding: const EdgeInsets.only(
+                                        left: 30, top: 10),
+                                    child: Text(
+                                      'User Management',
+                                      style: TextStyles.heading,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 20, top: 10),
+                                    child: OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        backgroundColor: Colors.blue[800],
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              5), // Rounded corners
+                                        ),
+                                        side: BorderSide.none, // No outline
                                       ),
-                                      child: Container(
-                                        width: maxWidth,
-                                        height: maxHeight * 0.77,
-                                        decoration: BoxDecoration(
-                                          //   border: Border.all(color: Colors.grey),
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(2),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.grey.withOpacity(0.1),
-                                              // Soft grey shadow
-                                              spreadRadius: 3,
-                                              blurRadius: 3,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-                                        child: SizedBox(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              buildSearchField1(),
-                                              const SizedBox(height: 10),
-                                              Expanded(
-                                                child: Scrollbar(
-                                                  controller: _scrollController,
-                                                  thickness: 6,
-                                                  thumbVisibility: true,
-                                                  child: SingleChildScrollView(
-                                                    controller: _scrollController,
-                                                    scrollDirection: Axis.horizontal,
-                                                    child: buildDataTable1(maxWidth,maxHeight),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: 1,
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(right: 30),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.end,
-                                                  children: [
-                                                    PaginationControls(
-                                                      currentPage: currentPage,
-                                                      totalPages: filteredData1.length >
-                                                          itemsPerPage
-                                                          ? totalPages
-                                                          : 1,
-                                                      onPreviousPage: _goToPreviousPage,
-                                                      onNextPage: _goToNextPage,
-                                                      // onLastPage: _goToLastPage,
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      )),
+                                      onPressed: () {
+                                        context.go('/Create_User');
+                                      },
+                                      child: Text(
+                                        'New User',
+                                        style: TextStyles.button,
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
-                            )),
-
-                      }else...{
-                        Expanded(
-                          child: AdaptiveScrollbar(
-                              position: ScrollbarPosition.bottom,
-                              controller: horizontalScroll,
-                              child: SingleChildScrollView(
-                                controller: horizontalScroll,
-                                scrollDirection: Axis.horizontal,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 20),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                              Padding(
+                                  padding: EdgeInsets.only(
+                                    left: maxWidth * 0.01,
+                                    top: maxHeight * 0.02,
+                                    right: maxWidth * 0.015,
+                                  ),
+                                  child: Container(
+                                    width: maxWidth,
+                                    height: maxHeight * 0.77,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(2),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          spreadRadius: 3,
+                                          blurRadius: 3,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: SizedBox(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 30, top: 10),
-                                            child: Text(
-                                              'User Management',
-                                              style: TextStyles.heading,
-                                            ),
-                                          ),
-
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 895, top: 10),
-                                            child: OutlinedButton(
-                                              style: OutlinedButton.styleFrom(
-                                                backgroundColor: Colors.blue[800],
-                                                // Button background color
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(
-                                                      5), // Rounded corners
-                                                ),
-                                                side: BorderSide.none, // No outline
+                                          buildSearchField1(),
+                                          const SizedBox(height: 10),
+                                          Expanded(
+                                            child: Scrollbar(
+                                              controller: _scrollController,
+                                              thickness: 6,
+                                              thumbVisibility: true,
+                                              child: SingleChildScrollView(
+                                                controller: _scrollController,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: buildDataTable1(
+                                                    maxWidth, maxHeight),
                                               ),
-                                              onPressed: () {
-                                                context.go('/Create_User');
-                                              },
-                                              child:  Text(
-                                                'New User',
-                                                style: TextStyles.button,
-                                              ), // add your button press logic here
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                      Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 30,
-                                            top: maxHeight * 0.02,
-                                            right: 30,
+                                          const SizedBox(
+                                            height: 1,
                                           ),
-                                          child: Container(
-                                            width: 1200,
-                                            height: maxHeight * 0.77,
-                                            decoration: BoxDecoration(
-                                              //   border: Border.all(color: Colors.grey),
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(2),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey.withOpacity(0.1),
-                                                  // Soft grey shadow
-                                                  spreadRadius: 3,
-                                                  blurRadius: 3,
-                                                  offset: const Offset(0, 3),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 30),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                PaginationControls(
+                                                  currentPage: currentPage,
+                                                  totalPages:
+                                                      filteredData1.length >
+                                                              itemsPerPage
+                                                          ? totalPages
+                                                          : 1,
+                                                  onPreviousPage:
+                                                      _goToPreviousPage,
+                                                  onNextPage: _goToNextPage,
                                                 ),
                                               ],
                                             ),
-                                            child: SizedBox(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  buildSearchField1(),
-                                                  const SizedBox(height: 10),
-                                                  Expanded(
-                                                    child: Scrollbar(
-                                                      controller: _scrollController,
-                                                      thickness: 6,
-                                                      thumbVisibility: true,
-                                                      child: SingleChildScrollView(
-                                                        controller: _scrollController,
-                                                        scrollDirection: Axis.horizontal,
-                                                        child: buildDataTable2(),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 1,
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(right: 30),
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.end,
-                                                      children: [
-                                                        PaginationControls(
-                                                          currentPage: currentPage,
-                                                          totalPages: filteredData1.length >
-                                                              itemsPerPage
-                                                              ? totalPages
-                                                              : 1,
-                                                          onPreviousPage: _goToPreviousPage,
-                                                          onNextPage: _goToNextPage,
-                                                          // onLastPage: _goToLastPage,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  )
-                                                ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )),
+                            ],
+                          ),
+                        )),
+                      } else ...{
+                        Expanded(
+                            child: AdaptiveScrollbar(
+                                position: ScrollbarPosition.bottom,
+                                controller: horizontalScroll,
+                                child: SingleChildScrollView(
+                                  controller: horizontalScroll,
+                                  scrollDirection: Axis.horizontal,
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 20),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 30, top: 10),
+                                              child: Text(
+                                                'User Management',
+                                                style: TextStyles.heading,
                                               ),
                                             ),
-                                          )),
-                                    ],
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 895, top: 10),
+                                              child: OutlinedButton(
+                                                style: OutlinedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.blue[800],
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  side: BorderSide.none,
+                                                ),
+                                                onPressed: () {
+                                                  context.go('/Create_User');
+                                                },
+                                                child: Text(
+                                                  'New User',
+                                                  style: TextStyles.button,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Padding(
+                                            padding: EdgeInsets.only(
+                                              left: 30,
+                                              top: maxHeight * 0.02,
+                                              right: 30,
+                                            ),
+                                            child: Container(
+                                              width: 1200,
+                                              height: maxHeight * 0.77,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(2),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.1),
+                                                    spreadRadius: 3,
+                                                    blurRadius: 3,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: SizedBox(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    buildSearchField1(),
+                                                    const SizedBox(height: 10),
+                                                    Expanded(
+                                                      child: Scrollbar(
+                                                        controller:
+                                                            _scrollController,
+                                                        thickness: 6,
+                                                        thumbVisibility: true,
+                                                        child:
+                                                            SingleChildScrollView(
+                                                          controller:
+                                                              _scrollController,
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          child:
+                                                              buildDataTable2(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 1,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 30),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          PaginationControls(
+                                                            currentPage:
+                                                                currentPage,
+                                                            totalPages: filteredData1
+                                                                        .length >
+                                                                    itemsPerPage
+                                                                ? totalPages
+                                                                : 1,
+                                                            onPreviousPage:
+                                                                _goToPreviousPage,
+                                                            onNextPage:
+                                                                _goToNextPage,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            )),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              )
-                          )
-                        ),
-
-
-
-
-
+                                ))),
                       }
-
                     ],
                   ),
                 )
@@ -978,14 +957,13 @@ class _AdminListState extends State<AdminList> {
                       decoration: InputDecoration(
                           hintText: 'Search by User ID and User Name',
                           hintStyle: TextStyles.body1,
-                          contentPadding: const EdgeInsets.only(bottom: 20, left: 10),
-                          // adjusted padding
+                          contentPadding:
+                              const EdgeInsets.only(bottom: 20, left: 10),
                           border: InputBorder.none,
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(left: 10, right: 5),
-                            // Adjust image padding
                             child: Image.asset(
-                              'images/search.png', // Replace with your image asset path
+                              'images/search.png',
                             ),
                           )),
                       onChanged: _updateSearch,
@@ -994,15 +972,12 @@ class _AdminListState extends State<AdminList> {
                 ),
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Row(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    //  const SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: Container(
@@ -1016,18 +991,16 @@ class _AdminListState extends State<AdminList> {
                         child: DropdownButtonFormField2<String>(
                           decoration: const InputDecoration(
                             contentPadding:
-                            EdgeInsets.only(bottom: 20, left: 2),
-                            // adjusted padding
+                                EdgeInsets.only(bottom: 20, left: 2),
                             border: InputBorder.none,
                             filled: true,
                             fillColor: Colors.white,
                           ),
-                          //   icon: Container(),
                           value: dropdownValue2,
                           onChanged: (String? newValue) {
                             setState(() {
                               dropdownValue2 = newValue;
-                              _Role = newValue ?? '';
+                              role = newValue ?? '';
                               _filterAndPaginateProducts();
                             });
                           },
@@ -1044,13 +1017,7 @@ class _AdminListState extends State<AdminList> {
                                       color: value == 'Role'
                                           ? Colors.grey
                                           : Colors.black,
-                                      fontSize: 13)
-                                // TextStyle(
-                                //     color: value == 'Role'
-                                //         ? Colors.grey
-                                //         : Colors.black,
-                                //     fontSize: 12)
-                              ),
+                                      fontSize: 13)),
                             );
                           }).toList(),
                           isExpanded: true,
@@ -1063,8 +1030,6 @@ class _AdminListState extends State<AdminList> {
                             iconSize: 16,
                           ),
                           buttonStyleData: const ButtonStyleData(
-                            // overlayColor: C,
-                            //focusColor: Color(0xFFF0F4F8),
                             height: 50, // Button height
                             padding: EdgeInsets.only(
                                 left: 10, right: 10), // Button padding
@@ -1072,21 +1037,17 @@ class _AdminListState extends State<AdminList> {
                           dropdownStyleData: DropdownStyleData(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(7),
-                              // Rounded corners
-                              color: Colors.white, // Dropdown background color
+                              color: Colors.white,
                             ),
                             maxHeight: 200,
                             width: constraints.maxWidth * 0.235,
-                            // Dropdown width
                             offset: const Offset(0, -10),
                           ),
-                          // focusColor: Color(0xFFF0F4F8),
                         ),
                       ),
                     ),
                   ],
                 ),
-                // const SizedBox(width: 16),
               ],
             ),
           ],
@@ -1094,519 +1055,12 @@ class _AdminListState extends State<AdminList> {
       );
     });
   }
-  //
-  // Widget buildDataTable2() {
-  //   if (isLoading) {
-  //     var width = MediaQuery.of(context).size.width;
-  //     var height = MediaQuery.of(context).size.height;
-  //     // Show loading indicator while data is being fetched
-  //     return Padding(
-  //       padding: EdgeInsets.only(
-  //           top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
-  //       child: CustomLoadingIcon(), // Replace this with your custom GIF widget
-  //     );
-  //   }
-  //
-  //   if (filteredData1.isEmpty) {
-  //     double right = MediaQuery.of(context).size.width;
-  //     return Column(
-  //       children: [
-  //         Container(
-  //           width: 1100,
-  //           // width: right * 0.78,
-  //           decoration: const BoxDecoration(
-  //               color: Color(0xFFF7F7F7),
-  //               border: Border.symmetric(
-  //                   horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-  //           child: DataTable(
-  //               showCheckboxColumn: false,
-  //               headingRowHeight: 40,
-  //               columnSpacing: 50,
-  //               columns: [
-  //                 DataColumn(
-  //                     label: Text(
-  //                       'User ID',
-  //                       style: TextStyle(
-  //                           color: Colors.indigo[900],
-  //                           fontSize: 13,
-  //                           fontWeight: FontWeight.bold),
-  //                     )),
-  //                 DataColumn(
-  //                     label: Text(
-  //                       'User Name',
-  //                       style: TextStyle(
-  //                           color: Colors.indigo[900],
-  //                           fontSize: 13,
-  //                           fontWeight: FontWeight.bold),
-  //                     )),
-  //                 DataColumn(
-  //                     label: Text(
-  //                       'Role',
-  //                       style: TextStyle(
-  //                           color: Colors.indigo[900],
-  //                           fontSize: 13,
-  //                           fontWeight: FontWeight.bold),
-  //                     )),
-  //                 DataColumn(
-  //                     label: Text(
-  //                       'Company Name',
-  //                       style: TextStyle(
-  //                           color: Colors.indigo[900],
-  //                           fontSize: 13,
-  //                           fontWeight: FontWeight.bold),
-  //                     )),
-  //                 DataColumn(
-  //                     label: Text(
-  //                       'Location',
-  //                       style: TextStyle(
-  //                           color: Colors.indigo[900],
-  //                           fontSize: 13,
-  //                           fontWeight: FontWeight.bold),
-  //                     )),
-  //                 DataColumn(
-  //                     label: Text(
-  //                       'Active',
-  //                       style: TextStyle(
-  //                           color: Colors.indigo[900],
-  //                           fontSize: 13,
-  //                           fontWeight: FontWeight.bold),
-  //                     )),
-  //               ],
-  //               rows: const []),
-  //         ),
-  //         Padding(
-  //           padding: const EdgeInsets.only(top: 80, left: 130, right: 150),
-  //           child: CustomDatafound(),
-  //         ),
-  //       ],
-  //     );
-  //   }
-  //
-  //   void sortProducts(int columnIndex, String sortDirection) {
-  //     if (sortDirection == 'asc') {
-  //       filteredData1.sort((a, b) {
-  //         if (columnIndex == 0) {
-  //           return a.userId.compareTo(b.userId);
-  //         } else if (columnIndex == 1) {
-  //           return a.userName.compareTo(b.userName);
-  //         } else if (columnIndex == 2) {
-  //           return a.role.compareTo(b.role);
-  //         } else if (columnIndex == 3) {
-  //           return a.companyName.compareTo(b.companyName!);
-  //         } else if (columnIndex == 4) {
-  //           return a.location.compareTo(b.location);
-  //         } else {
-  //           return 0;
-  //         }
-  //       });
-  //     } else {
-  //       filteredData1.sort((a, b) {
-  //         if (columnIndex == 0) {
-  //           return b.userId.compareTo(a.userId); // Reverse the comparison
-  //         } else if (columnIndex == 1) {
-  //           return b.userName.compareTo(a.userName); // Reverse the comparison
-  //         } else if (columnIndex == 2) {
-  //           return b.role.compareTo(a.role); // Reverse the comparison
-  //         } else if (columnIndex == 3) {
-  //           return b.companyName
-  //               .compareTo(a.companyName); // Reverse the comparison
-  //         } else if (columnIndex == 4) {
-  //           return b.location.compareTo(a.location); // Reverse the comparison
-  //         } else {
-  //           return 0;
-  //         }
-  //       });
-  //     }
-  //     setState(() {});
-  //   }
-  //
-  //   return LayoutBuilder(builder: (context, constraints) {
-  //     // double padding = constraints.maxWidth * 0.065;
-  //     double right = MediaQuery.of(context).size.width;
-  //     return Column(
-  //       children: [
-  //         Container(
-  //           width: 1100,
-  //           decoration: const BoxDecoration(
-  //               color: Color(0xFFF7F7F7),
-  //               border: Border.symmetric(
-  //                   horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-  //           child: DataTable(
-  //               showCheckboxColumn: false,
-  //               headingRowHeight: 35,
-  //               columnSpacing: 20,
-  //               columns: columns.map((column) {
-  //                 return DataColumn(
-  //                   label: Stack(
-  //                     children: [
-  //                       SizedBox(
-  //                         //   padding: EdgeInsets.only(left: 5,right: 5),
-  //                         width: columnWidths[columns.indexOf(column)],
-  //                         // Dynamic width based on user interaction
-  //                         child: Row(
-  //                           mainAxisSize: MainAxisSize.min,
-  //                           //crossAxisAlignment: CrossAxisAlignment.end,
-  //                           //   mainAxisAlignment: MainAxisAlignment.end,
-  //                           children: [
-  //                             Text(
-  //                               column,
-  //                               overflow: TextOverflow.ellipsis,
-  //                               style: TextStyle(
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: Colors.indigo[900],
-  //                                 fontSize: 13,
-  //                               ),
-  //                             ),
-  //                             if (columns.indexOf(column) < columns.length - 1)
-  //                             // if (columns.indexOf(column) < 0)
-  //                               IconButton(
-  //                                 icon: _sortOrder[columns.indexOf(column)] ==
-  //                                     'asc'
-  //                                     ? SizedBox(
-  //                                     width: 12,
-  //                                     child: Image.asset(
-  //                                       "images/sort.png",
-  //                                       color: Colors.grey,
-  //                                     ))
-  //                                     : SizedBox(
-  //                                     width: 12,
-  //                                     child: Image.asset(
-  //                                       "images/sort.png",
-  //                                       color: Colors.blue,
-  //                                     )),
-  //                                 onPressed: () {
-  //                                   setState(() {
-  //                                     _sortOrder[columns.indexOf(column)] =
-  //                                     _sortOrder[columns.indexOf(column)] ==
-  //                                         'asc'
-  //                                         ? 'desc'
-  //                                         : 'asc';
-  //                                     sortProducts(columns.indexOf(column),
-  //                                         _sortOrder[columns.indexOf(column)]);
-  //                                   });
-  //                                 },
-  //                               ),
-  //                             if (columns.indexOf(column) < columns.length - 1)
-  //                               Spacer(),
-  //                             if (columns.indexOf(column) < columns.length - 1)
-  //                               MouseRegion(
-  //                                 cursor: SystemMouseCursors.resizeColumn,
-  //                                 child: GestureDetector(
-  //                                     onHorizontalDragUpdate: (details) {
-  //                                       // Update column width dynamically as user drags
-  //                                       setState(() {
-  //                                         columnWidths[
-  //                                         columns.indexOf(column)] +=
-  //                                             details.delta.dx;
-  //                                         columnWidths[columns
-  //                                             .indexOf(column)] = columnWidths[
-  //                                         columns.indexOf(column)]
-  //                                             .clamp(161.0, 300.0);
-  //                                       });
-  //                                     },
-  //                                     child: const Padding(
-  //                                       padding: EdgeInsets.only(
-  //                                           top: 10, bottom: 10),
-  //                                       child: Row(
-  //                                         children: [
-  //                                           VerticalDivider(
-  //                                             width: 5,
-  //                                             thickness: 4,
-  //                                             color: Colors.grey,
-  //                                           )
-  //                                         ],
-  //                                       ),
-  //                                     )),
-  //                               ),
-  //                             // ),
-  //                           ],
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   onSort: (columnIndex, ascending) {
-  //                     _sortOrder;
-  //                   },
-  //                 );
-  //               }).toList(),
-  //               rows: List.generate(
-  //                   math.min(
-  //                       itemsPerPage,
-  //                       filteredData1.length -
-  //                           (currentPage - 1) * itemsPerPage), (index) {
-  //                 final detail = filteredData1
-  //                     .skip((currentPage - 1) * itemsPerPage)
-  //                     .elementAt(index);
-  //                 final customerIndex =
-  //                     (currentPage - 1) * itemsPerPage + index;
-  //                 final isSelected = _selectedProduct == detail;
-  //                 return DataRow(
-  //                   color: MaterialStateProperty.resolveWith<Color>((states) {
-  //                     if (states.contains(MaterialState.hovered)) {
-  //                       return Colors.blue.shade500.withOpacity(
-  //                           0.8); // Add some opacity to the dark blue
-  //                     } else {
-  //                       return Colors.white.withOpacity(0.9);
-  //                     }
-  //                   }),
-  //                   cells: [
-  //                     DataCell(Text(
-  //                       detail.userId.toString(),
-  //                       style: TextStyle(
-  //                         //fontSize: 16,
-  //                         color: isSelected
-  //                             ? Colors.deepOrange[200]
-  //                             : const Color(0xFFFFB315),
-  //                       ),
-  //                     )),
-  //                     DataCell(Text(
-  //                       detail.userName,
-  //                       style: const TextStyle(
-  //                         // fontSize: 16,
-  //                           color: Colors.grey),
-  //                     )),
-  //                     DataCell(
-  //                       Text(detail.role,
-  //                           style: const TextStyle(
-  //                             // fontSize: 16,
-  //                               color: Colors.grey)),
-  //                     ),
-  //                     DataCell(
-  //                       Text(detail.companyName.toString(),
-  //                           style: const TextStyle(
-  //                             //fontSize: 16,
-  //                               color: Colors.grey)),
-  //                     ),
-  //                     DataCell(
-  //                       Text(detail.location.toString(),
-  //                           style: const TextStyle(
-  //                             //fontSize: 16,
-  //                               color: Colors.grey)),
-  //                     ),
-  //                     DataCell(
-  //                       Padding(
-  //                         padding: const EdgeInsets.only(top: 12, bottom: 7),
-  //                         child: Container(
-  //                           width: 98,
-  //                           decoration: BoxDecoration(
-  //                             borderRadius: BorderRadius.circular(5),
-  //                           ),
-  //                           child: DropdownButtonFormField2<String>(
-  //                             decoration: InputDecoration(
-  //                               contentPadding:
-  //                               EdgeInsets.only(bottom: 15, left: 9),
-  //                               hintText: detail.active == true
-  //                                   ? 'Active'
-  //                                   : 'In Active',
-  //                               hintStyle: TextStyle(
-  //                                   color: Colors.black, fontSize: 15),
-  //                               border: OutlineInputBorder(),
-  //                             ),
-  //                             items: const [
-  //                               DropdownMenuItem<String>(
-  //                                 value: 'Active',
-  //                                 //  enabled: false,
-  //                                 // Disable selection of "Active"
-  //                                 child: Text(
-  //                                   'Active',
-  //                                   style: TextStyle(
-  //                                       color: Colors
-  //                                           .grey), // Style the disabled item
-  //                                 ),
-  //                               ),
-  //                               DropdownMenuItem<String>(
-  //                                 value: 'In Active',
-  //                                 child: Text('In Active'),
-  //                               ),
-  //                             ],
-  //                             onChanged: (String? newValue) {
-  //                               if (newValue != null) {
-  //                                 setState(() {
-  //                                   detail.active = (newValue ==
-  //                                       'Active'); // Convert String to bool
-  //                                   updateRequestStatus(
-  //                                       detail.userId, newValue);
-  //                                 });
-  //                               }
-  //                             },
-  //                             dropdownStyleData: DropdownStyleData(
-  //                               decoration: BoxDecoration(
-  //                                 borderRadius: BorderRadius.circular(7),
-  //                                 color:
-  //                                 Colors.white, // Dropdown background color
-  //                               ),
-  //                               maxHeight: 200,
-  //                               width: 98,
-  //                               offset: const Offset(0, -10),
-  //                               padding: EdgeInsets.zero,
-  //                             ),
-  //                             iconStyleData: const IconStyleData(
-  //                               icon: Padding(
-  //                                 padding: EdgeInsets.only(right: 9, top: 5),
-  //                                 child: Icon(
-  //                                   Icons.arrow_drop_down,
-  //                                   color: Colors.indigo,
-  //                                   size: 17,
-  //                                 ),
-  //                               ),
-  //                               iconSize: 17,
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ),
-  //
-  //                     // DataCell(Text(
-  //                     //   detail.active.toString(),
-  //                     //   style: const TextStyle(
-  //                     //     // fontSize: 16,
-  //                     //       color: Colors.grey),
-  //                     // )),
-  //                     DataCell(Row(children: [
-  //                       IconButton(
-  //                         icon: Image.asset(
-  //                           "images/edit_icon.png",
-  //                           color: Color.fromRGBO(0, 83, 176, 1),
-  //                         ),
-  //                         onPressed: () {
-  //                           var selectedCustomer =
-  //                           filteredData1[customerIndex].toJson();
-  //                           print('select');
-  //                           print(selectedCustomer);
-  //                           context.go('/Edit_User', extra: {
-  //                             'EditUser': selectedCustomer,
-  //                           });
-  //                         },
-  //                       ),
-  //                       SizedBox(
-  //                         width: 10,
-  //                       ),
-  //                       IconButton(
-  //                         icon: Image.asset(
-  //                           "images/delete.png",
-  //                           color: Color.fromRGBO(250, 0, 0, 1),
-  //                         ),
-  //                         onPressed: () {
-  //                           showDialog(
-  //                             barrierDismissible: false,
-  //                             context: context,
-  //                             builder: (BuildContext context) {
-  //                               return AlertDialog(
-  //                                 shape: RoundedRectangleBorder(
-  //                                   borderRadius: BorderRadius.circular(15.0),
-  //                                 ),
-  //                                 contentPadding: EdgeInsets.zero,
-  //                                 content: Column(
-  //                                   mainAxisSize: MainAxisSize.min,
-  //                                   children: [
-  //                                     Padding(
-  //                                       padding: const EdgeInsets.all(16.0),
-  //                                       child: Column(
-  //                                         children: [
-  //                                           const Icon(Icons.warning,
-  //                                               color: Colors.orange, size: 50),
-  //                                           const SizedBox(height: 16),
-  //                                           const Text(
-  //                                             'Are You Sure',
-  //                                             style: TextStyle(
-  //                                               fontSize: 18,
-  //                                               fontWeight: FontWeight.bold,
-  //                                               color: Colors.black,
-  //                                             ),
-  //                                           ),
-  //                                           const SizedBox(height: 20),
-  //                                           Row(
-  //                                             mainAxisAlignment:
-  //                                             MainAxisAlignment.spaceEvenly,
-  //                                             children: [
-  //                                               ElevatedButton(
-  //                                                 onPressed: () {
-  //                                                   deleteRowAPI(detail.userId);
-  //                                                 },
-  //                                                 style:
-  //                                                 ElevatedButton.styleFrom(
-  //                                                   backgroundColor:
-  //                                                   Colors.green,
-  //                                                   side: const BorderSide(
-  //                                                       color: Colors.green),
-  //                                                   shape:
-  //                                                   RoundedRectangleBorder(
-  //                                                     borderRadius:
-  //                                                     BorderRadius.circular(
-  //                                                         10.0),
-  //                                                   ),
-  //                                                 ),
-  //                                                 child: const Text(
-  //                                                   'Yes',
-  //                                                   style: TextStyle(
-  //                                                       color: Colors.white),
-  //                                                 ),
-  //                                               ),
-  //                                               ElevatedButton(
-  //                                                 onPressed: () {
-  //                                                   Navigator.of(context).pop();
-  //                                                 },
-  //                                                 style:
-  //                                                 ElevatedButton.styleFrom(
-  //                                                   backgroundColor: Colors.red,
-  //                                                   side: const BorderSide(
-  //                                                       color: Colors.red),
-  //                                                   shape:
-  //                                                   RoundedRectangleBorder(
-  //                                                     borderRadius:
-  //                                                     BorderRadius.circular(
-  //                                                         10.0),
-  //                                                   ),
-  //                                                 ),
-  //                                                 child: const Text(
-  //                                                   'No',
-  //                                                   style: TextStyle(
-  //                                                       color: Colors.white),
-  //                                                 ),
-  //                                               ),
-  //                                             ],
-  //                                           ),
-  //                                         ],
-  //                                       ),
-  //                                     ),
-  //                                   ],
-  //                                 ),
-  //                               );
-  //                             },
-  //                           );
-  //                         },
-  //                       ),
-  //                     ])),
-  //                   ],
-  //                 );
-  //                 // onSelectChanged: (selected) {
-  //                 //   if (selected != null && selected) {
-  //                 //     final orderId = detail
-  //                 //         .orderId; // Capture the orderId of the selected row
-  //                 //     final detail1 = filteredData.firstWhere(
-  //                 //         (element) => element.orderId == orderId);
-  //                 //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-  //                 //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-  //                 //
-  //                 //     if (filteredData1.length <= 9) {
-  //                 //
-  //                 //     } else {
-  //                 //
-  //                 //     }
-  //                 //   }
-  //                 // });
-  //               })),
-  //         ),
-  //       ],
-  //     );
-  //   });
-  // }
+
 
   Widget buildDataTable2() {
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
       var height = MediaQuery.of(context).size.height;
-      // Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
             top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
@@ -1631,52 +1085,52 @@ class _AdminListState extends State<AdminList> {
                 columns: [
                   DataColumn(
                       label: Text(
-                        'User ID',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'User ID',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'User Name',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'User Name',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'Role',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'Role',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'Company Name',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'Company Name',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'Location',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'Location',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'Active',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'Active',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                 ],
                 rows: const []),
           ),
@@ -1698,7 +1152,7 @@ class _AdminListState extends State<AdminList> {
           } else if (columnIndex == 2) {
             return a.role.compareTo(b.role);
           } else if (columnIndex == 3) {
-            return a.companyName.compareTo(b.companyName!);
+            return a.companyName.compareTo(b.companyName);
           } else if (columnIndex == 4) {
             return a.location.compareTo(b.location);
           } else {
@@ -1727,22 +1181,17 @@ class _AdminListState extends State<AdminList> {
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-      // double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width;
       double height = MediaQuery.of(context).size.height;
-      double maxWidth = constraints.maxWidth;
-      double maxHeight = constraints.maxHeight;
-      //print(width);
-      print(maxWidth);
+
       return Container(
         height: height,
-        width: 1200,//Responsive.scaleWidth(context),
+        width: 1200,
         decoration: const BoxDecoration(
             color: Colors.white,
             border: Border.symmetric(
                 horizontal: BorderSide(color: Colors.grey, width: 0.5))),
         child: DataTable(
-            headingRowColor:  MaterialStateProperty.all(const Color(0xFFF7F7F7)),
+            headingRowColor: MaterialStateProperty.all(const Color(0xFFF7F7F7)),
             showCheckboxColumn: false,
             headingRowHeight: 35,
             columnSpacing: 20,
@@ -1751,56 +1200,43 @@ class _AdminListState extends State<AdminList> {
                 label: Stack(
                   children: [
                     SizedBox(
-                      //   padding: EdgeInsets.only(left: 5,right: 5),
                       width: columnWidths[columns.indexOf(column)],
-                      // Dynamic width based on user interaction
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        //crossAxisAlignment: CrossAxisAlignment.end,
-                        //   mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(column,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyles.subhead
-                            // TextStyle(
-                            //   fontWeight: FontWeight.bold,
-                            //   color: Color.fromRGBO(0, 83, 176, 1),
-                            //   fontSize: 13,
-                            // ),
-                          ),
+                              ),
                           if (columns.indexOf(column) < columns.length - 1)
-                          // if (columns.indexOf(column) < 0)
                             IconButton(
-                              icon: _sortOrder[columns.indexOf(column)] ==
-                                  'asc'
+                              icon: _sortOrder[columns.indexOf(column)] == 'asc'
                                   ? SizedBox(
-                                  width: 12,
-                                  child: Image.asset(
-                                    "images/ix_sort.png",
-                                    color:
-                                    const Color.fromRGBO(0, 83, 176, 1),
-                                  ))
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color:
+                                            const Color.fromRGBO(0, 83, 176, 1),
+                                      ))
                                   : SizedBox(
-                                  width: 12,
-                                  child: Image.asset(
-                                    "images/ix_sort.png",
-                                    color:
-                                    const Color.fromRGBO(0, 83, 176, 1),
-                                  )),
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color:
+                                            const Color.fromRGBO(0, 83, 176, 1),
+                                      )),
                               onPressed: () {
                                 setState(() {
                                   _sortOrder[columns.indexOf(column)] =
-                                  _sortOrder[columns.indexOf(column)] ==
-                                      'asc'
-                                      ? 'desc'
-                                      : 'asc';
+                                      _sortOrder[columns.indexOf(column)] ==
+                                              'asc'
+                                          ? 'desc'
+                                          : 'asc';
                                   sortProducts(columns.indexOf(column),
                                       _sortOrder[columns.indexOf(column)]);
                                 });
                               },
                             ),
-
-                          // ),
                         ],
                       ),
                     ),
@@ -1812,21 +1248,18 @@ class _AdminListState extends State<AdminList> {
               );
             }).toList(),
             rows: List.generate(
-                math.min(
-                    itemsPerPage,
-                    filteredData1.length -
-                        (currentPage - 1) * itemsPerPage), (index) {
+                math.min(itemsPerPage,
+                    filteredData1.length - (currentPage - 1) * itemsPerPage),
+                (index) {
               final detail = filteredData1
                   .skip((currentPage - 1) * itemsPerPage)
                   .elementAt(index);
-              final customerIndex =
-                  (currentPage - 1) * itemsPerPage + index;
-              final isSelected = _selectedProduct == detail;
+              final customerIndex = (currentPage - 1) * itemsPerPage + index;
               return DataRow(
                 color: MaterialStateProperty.resolveWith<Color>((states) {
                   if (states.contains(MaterialState.hovered)) {
-                    return Colors.blue.shade500.withOpacity(
-                        0.8); // Add some opacity to the dark blue
+                    return Colors.blue.shade500
+                        .withOpacity(0.8); // Add some opacity to the dark blue
                   } else {
                     return Colors.white.withOpacity(0.9);
                   }
@@ -1867,7 +1300,8 @@ class _AdminListState extends State<AdminList> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: DropdownButtonFormField2<String>(
-                          value: detail.active ? 'Active' : 'In Active', // Ensure value is set correctly
+                          value: detail.active ? 'Active' : 'In Active',
+                          // Ensure value is set correctly
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.only(bottom: 15),
                             hintText: detail.active ? 'Active' : 'In Active',
@@ -1893,7 +1327,8 @@ class _AdminListState extends State<AdminList> {
                           onChanged: (String? newValue) {
                             if (newValue != null) {
                               setState(() {
-                                detail.active = (newValue == 'Active'); // Convert String to bool
+                                detail.active = (newValue ==
+                                    'Active'); // Convert String to bool
                                 updateRequestStatus(detail.userId, newValue);
                               });
                             }
@@ -1923,12 +1358,6 @@ class _AdminListState extends State<AdminList> {
                       ),
                     ),
                   ),
-                  // DataCell(Text(
-                  //   detail.active.toString(),
-                  //   style: const TextStyle(
-                  //     // fontSize: 16,
-                  //       color: Colors.grey),
-                  // )),
                   DataCell(Row(children: [
                     IconButton(
                         icon: Image.asset(
@@ -1937,9 +1366,8 @@ class _AdminListState extends State<AdminList> {
                         ),
                         onPressed: () {
                           var selectedCustomer =
-                          filteredData1[customerIndex].toJson();
-                          print('select');
-                          print(selectedCustomer);
+                              filteredData1[customerIndex].toJson();
+
                           context.go('/Edit_User', extra: {
                             'EditUser': selectedCustomer,
                           });
@@ -1983,23 +1411,20 @@ class _AdminListState extends State<AdminList> {
                                         const SizedBox(height: 20),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                              MainAxisAlignment.spaceEvenly,
                                           children: [
                                             ElevatedButton(
                                               onPressed: () {
                                                 deleteRowAPI(detail.userId);
                                               },
-                                              style:
-                                              ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                Colors.green,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green,
                                                 side: const BorderSide(
                                                     color: Colors.green),
-                                                shape:
-                                                RoundedRectangleBorder(
+                                                shape: RoundedRectangleBorder(
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                      10.0),
+                                                      BorderRadius.circular(
+                                                          10.0),
                                                 ),
                                               ),
                                               child: const Text(
@@ -2012,16 +1437,14 @@ class _AdminListState extends State<AdminList> {
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                               },
-                                              style:
-                                              ElevatedButton.styleFrom(
+                                              style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.red,
                                                 side: const BorderSide(
                                                     color: Colors.red),
-                                                shape:
-                                                RoundedRectangleBorder(
+                                                shape: RoundedRectangleBorder(
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                      10.0),
+                                                      BorderRadius.circular(
+                                                          10.0),
                                                 ),
                                               ),
                                               child: const Text(
@@ -2045,35 +1468,19 @@ class _AdminListState extends State<AdminList> {
                   ])),
                 ],
               );
-              // onSelectChanged: (selected) {
-              //   if (selected != null && selected) {
-              //     final orderId = detail
-              //         .orderId; // Capture the orderId of the selected row
-              //     final detail1 = filteredData.firstWhere(
-              //         (element) => element.orderId == orderId);
-              //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-              //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-              //
-              //     if (filteredData1.length <= 9) {
-              //
-              //     } else {
-              //
-              //     }
-              //   }
-              // });
             })),
       );
     });
   }
-  Widget buildDataTable1(double width , double height) {
+
+  Widget buildDataTable1(double width, double height) {
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
       var height = MediaQuery.of(context).size.height;
-      // Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
             top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+        child: CustomLoadingIcon(),
       );
     }
 
@@ -2094,52 +1501,52 @@ class _AdminListState extends State<AdminList> {
                 columns: [
                   DataColumn(
                       label: Text(
-                        'User ID',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'User ID',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'User Name',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'User Name',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'Role',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'Role',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'Company Name',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'Company Name',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'Location',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'Location',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                   DataColumn(
                       label: Text(
-                        'Active',
-                        style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    'Active',
+                    style: TextStyle(
+                        color: Colors.indigo[900],
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  )),
                 ],
                 rows: const []),
           ),
@@ -2161,7 +1568,7 @@ class _AdminListState extends State<AdminList> {
           } else if (columnIndex == 2) {
             return a.role.compareTo(b.role);
           } else if (columnIndex == 3) {
-            return a.companyName.compareTo(b.companyName!);
+            return a.companyName.compareTo(b.companyName);
           } else if (columnIndex == 4) {
             return a.location.compareTo(b.location);
           } else {
@@ -2171,16 +1578,16 @@ class _AdminListState extends State<AdminList> {
       } else {
         filteredData1.sort((a, b) {
           if (columnIndex == 0) {
-            return b.userId.compareTo(a.userId); // Reverse the comparison
+            return b.userId.compareTo(a.userId);
           } else if (columnIndex == 1) {
-            return b.userName.compareTo(a.userName); // Reverse the comparison
+            return b.userName.compareTo(a.userName);
           } else if (columnIndex == 2) {
-            return b.role.compareTo(a.role); // Reverse the comparison
+            return b.role.compareTo(a.role);
           } else if (columnIndex == 3) {
             return b.companyName
-                .compareTo(a.companyName); // Reverse the comparison
+                .compareTo(a.companyName);
           } else if (columnIndex == 4) {
-            return b.location.compareTo(a.location); // Reverse the comparison
+            return b.location.compareTo(a.location);
           } else {
             return 0;
           }
@@ -2190,22 +1597,18 @@ class _AdminListState extends State<AdminList> {
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-      // double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width;
       double height = MediaQuery.of(context).size.height;
-      double maxWidth = constraints.maxWidth;
-      double maxHeight = constraints.maxHeight;
-      print(width);
-      print(maxWidth);
+
       return Container(
         height: height,
-        width: right - 240,//Responsive.scaleWidth(context),
+        width: right - 240,
         decoration: const BoxDecoration(
             color: Colors.white,
             border: Border.symmetric(
                 horizontal: BorderSide(color: Colors.grey, width: 0.5))),
         child: DataTable(
-          headingRowColor:  MaterialStateProperty.all(const Color(0xFFF7F7F7)),
+            headingRowColor: MaterialStateProperty.all(const Color(0xFFF7F7F7)),
             showCheckboxColumn: false,
             headingRowHeight: 35,
             columnSpacing: 20,
@@ -2214,49 +1617,38 @@ class _AdminListState extends State<AdminList> {
                 label: Stack(
                   children: [
                     SizedBox(
-                      //   padding: EdgeInsets.only(left: 5,right: 5),
                       width: columnWidths[columns.indexOf(column)],
-                      // Dynamic width based on user interaction
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        //crossAxisAlignment: CrossAxisAlignment.end,
-                        //   mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(column,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyles.subhead
-                            // TextStyle(
-                            //   fontWeight: FontWeight.bold,
-                            //   color: Color.fromRGBO(0, 83, 176, 1),
-                            //   fontSize: 13,
-                            // ),
-                          ),
+                              ),
                           if (columns.indexOf(column) < columns.length - 1)
-                          // if (columns.indexOf(column) < 0)
                             IconButton(
-                              icon: _sortOrder[columns.indexOf(column)] ==
-                                  'asc'
+                              icon: _sortOrder[columns.indexOf(column)] == 'asc'
                                   ? SizedBox(
-                                  width: 12,
-                                  child: Image.asset(
-                                    "images/ix_sort.png",
-                                    color:
-                                    const Color.fromRGBO(0, 83, 176, 1),
-                                  ))
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color:
+                                            const Color.fromRGBO(0, 83, 176, 1),
+                                      ))
                                   : SizedBox(
-                                  width: 12,
-                                  child: Image.asset(
-                                    "images/ix_sort.png",
-                                    color:
-                                    const Color.fromRGBO(0, 83, 176, 1),
-                                  )),
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color:
+                                            const Color.fromRGBO(0, 83, 176, 1),
+                                      )),
                               onPressed: () {
                                 setState(() {
                                   _sortOrder[columns.indexOf(column)] =
-                                  _sortOrder[columns.indexOf(column)] ==
-                                      'asc'
-                                      ? 'desc'
-                                      : 'asc';
+                                      _sortOrder[columns.indexOf(column)] ==
+                                              'asc'
+                                          ? 'desc'
+                                          : 'asc';
                                   sortProducts(columns.indexOf(column),
                                       _sortOrder[columns.indexOf(column)]);
                                 });
@@ -2275,21 +1667,18 @@ class _AdminListState extends State<AdminList> {
               );
             }).toList(),
             rows: List.generate(
-                math.min(
-                    itemsPerPage,
-                    filteredData1.length -
-                        (currentPage - 1) * itemsPerPage), (index) {
+                math.min(itemsPerPage,
+                    filteredData1.length - (currentPage - 1) * itemsPerPage),
+                (index) {
               final detail = filteredData1
                   .skip((currentPage - 1) * itemsPerPage)
                   .elementAt(index);
-              final customerIndex =
-                  (currentPage - 1) * itemsPerPage + index;
-              final isSelected = _selectedProduct == detail;
+              final customerIndex = (currentPage - 1) * itemsPerPage + index;
               return DataRow(
                 color: MaterialStateProperty.resolveWith<Color>((states) {
                   if (states.contains(MaterialState.hovered)) {
-                    return Colors.blue.shade500.withOpacity(
-                        0.8); // Add some opacity to the dark blue
+                    return Colors.blue.shade500
+                        .withOpacity(0.8); // Add some opacity to the dark blue
                   } else {
                     return Colors.white.withOpacity(0.9);
                   }
@@ -2330,7 +1719,7 @@ class _AdminListState extends State<AdminList> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: DropdownButtonFormField2<String>(
-                          value: detail.active ? 'Active' : 'In Active', // Ensure value is set correctly
+                          value: detail.active ? 'Active' : 'In Active',
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.only(bottom: 15),
                             hintText: detail.active ? 'Active' : 'In Active',
@@ -2356,7 +1745,8 @@ class _AdminListState extends State<AdminList> {
                           onChanged: (String? newValue) {
                             if (newValue != null) {
                               setState(() {
-                                detail.active = (newValue == 'Active'); // Convert String to bool
+                                detail.active = (newValue ==
+                                    'Active'); // Convert String to bool
                                 updateRequestStatus(detail.userId, newValue);
                               });
                             }
@@ -2386,12 +1776,6 @@ class _AdminListState extends State<AdminList> {
                       ),
                     ),
                   ),
-                  // DataCell(Text(
-                  //   detail.active.toString(),
-                  //   style: const TextStyle(
-                  //     // fontSize: 16,
-                  //       color: Colors.grey),
-                  // )),
                   DataCell(Row(children: [
                     IconButton(
                         icon: Image.asset(
@@ -2400,9 +1784,8 @@ class _AdminListState extends State<AdminList> {
                         ),
                         onPressed: () {
                           var selectedCustomer =
-                          filteredData1[customerIndex].toJson();
-                          print('select');
-                          print(selectedCustomer);
+                              filteredData1[customerIndex].toJson();
+
                           context.go('/Edit_User', extra: {
                             'EditUser': selectedCustomer,
                           });
@@ -2446,23 +1829,20 @@ class _AdminListState extends State<AdminList> {
                                         const SizedBox(height: 20),
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                              MainAxisAlignment.spaceEvenly,
                                           children: [
                                             ElevatedButton(
                                               onPressed: () {
                                                 deleteRowAPI(detail.userId);
                                               },
-                                              style:
-                                              ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                Colors.green,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green,
                                                 side: const BorderSide(
                                                     color: Colors.green),
-                                                shape:
-                                                RoundedRectangleBorder(
+                                                shape: RoundedRectangleBorder(
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                      10.0),
+                                                      BorderRadius.circular(
+                                                          10.0),
                                                 ),
                                               ),
                                               child: const Text(
@@ -2475,16 +1855,14 @@ class _AdminListState extends State<AdminList> {
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                               },
-                                              style:
-                                              ElevatedButton.styleFrom(
+                                              style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.red,
                                                 side: const BorderSide(
                                                     color: Colors.red),
-                                                shape:
-                                                RoundedRectangleBorder(
+                                                shape: RoundedRectangleBorder(
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                      10.0),
+                                                      BorderRadius.circular(
+                                                          10.0),
                                                 ),
                                               ),
                                               child: const Text(
@@ -2508,22 +1886,7 @@ class _AdminListState extends State<AdminList> {
                   ])),
                 ],
               );
-              // onSelectChanged: (selected) {
-              //   if (selected != null && selected) {
-              //     final orderId = detail
-              //         .orderId; // Capture the orderId of the selected row
-              //     final detail1 = filteredData.firstWhere(
-              //         (element) => element.orderId == orderId);
-              //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-              //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-              //
-              //     if (filteredData1.length <= 9) {
-              //
-              //     } else {
-              //
-              //     }
-              //   }
-              // });
+
             })),
       );
     });
@@ -2592,6 +1955,3 @@ class UserResponse {
 
   static empty() {}
 }
-
-
- 

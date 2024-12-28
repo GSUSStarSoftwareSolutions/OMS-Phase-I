@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/login/confirm%20password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

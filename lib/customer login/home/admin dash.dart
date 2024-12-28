@@ -21,7 +21,7 @@ import 'dart:html';
 import 'dart:ui' as ord;
 import 'dart:math' as math;
 
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart';
 
 import 'package:go_router/go_router.dart';

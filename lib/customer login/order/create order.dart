@@ -1,28 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
-import 'dart:ui' as order;
 import 'dart:math' as math;
 import 'dart:ui' as ord;
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
-import 'package:btb/widgets/pagination.dart';
 import 'package:btb/widgets/productclass.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-
 import '../../Order Module/firstpage.dart';
 import '../../dashboard/dashboard.dart';
 import '../../widgets/custom loading.dart';
 import '../../widgets/no datafound.dart';
-import '../../widgets/productsap.dart' as ord;
 import '../../widgets/text_style.dart';
 
 void main() {
@@ -38,7 +30,7 @@ class CreateOrder extends StatefulWidget {
 
 class _CreateOrderState extends State<CreateOrder>
     with SingleTickerProviderStateMixin {
-  List<String> _sortOrder = List.generate(5, (index) => 'asc');
+  final List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Order ID',
     'Customer ID',
@@ -46,18 +38,15 @@ class _CreateOrderState extends State<CreateOrder>
     'Total',
     'Status',
   ];
-  bool _hasShownPopup = false;
   List<double> columnWidths = [95, 110, 110, 95, 150, 140];
   List<bool> columnSortState = [true, true, true, true, true, true];
   Timer? _searchDebounceTimer;
-  String _searchText = '';
   bool isOrdersSelected = false;
-  Map<Map<String, dynamic>, TextEditingController> _controllers = {};
+  final Map<Map<String, dynamic>, TextEditingController> _controllers = {};
 
-  bool _loading = false;
   detail? _selectedProduct;
   late TextEditingController _dateController;
-  Map<String, dynamic> PaymentMap = {};
+  Map<String, dynamic> paymentMap = {};
 
   int startIndex = 0;
   List<Product> filteredProducts = [];
@@ -69,7 +58,6 @@ class _CreateOrderState extends State<CreateOrder>
 
   // List<ord.ProductData> productList = [];
 
-  final ScrollController _scrollController = ScrollController();
   List<dynamic> detailJson = [];
   String searchQuery = '';
   final TextEditingController businessPartnerController =
@@ -96,7 +84,6 @@ class _CreateOrderState extends State<CreateOrder>
   List<detail> filteredData = [];
   bool _isTotalVisible = false;
   late AnimationController _controller;
-  bool _isHovered1 = false;
   late Animation<double> _shakeAnimation;
   String status = '';
   String selectDate = '';
@@ -108,11 +95,7 @@ class _CreateOrderState extends State<CreateOrder>
   List<Map<String, dynamic>> productList = [];
   final List<Map<String, dynamic>> _selectedProducts = [];
 
-  final List<Map<String, dynamic>> _products = [
-    {'name': 'Product 1', 'price': 100},
-    {'name': 'Product 2', 'price': 200},
-    {'name': 'Product 3', 'price': 300},
-  ];
+
 
   Future<void> fetchProducts(int page, int itemsPerPage) async {
     if (isLoading) return;
@@ -134,7 +117,6 @@ class _CreateOrderState extends State<CreateOrder>
         final jsonData = jsonDecode(response.body);
         if (jsonData != null) {
           //var results = jsonData['d']['results'];
-          print(jsonData);
 
           // Update the product list
           setState(() {
@@ -199,7 +181,7 @@ class _CreateOrderState extends State<CreateOrder>
           );
 
           if (result != null) {
-            // Assigning values to controllers
+
             businessPartnerController.text = result['BusinessPartner'] ?? '';
             businessPartnerNameController.text = result['customerName'] ?? '';
             customerController.text = result['customer'] ?? '';
@@ -215,19 +197,6 @@ class _CreateOrderState extends State<CreateOrder>
             mobilePhoneNumberController.text =
                 result['mobilePhoneNumber'] ?? '';
 
-            print(businessPartnerController.text);
-            print(businessPartnerNameController.text);
-            print(customerController.text);
-            print(addressIDController.text);
-            print(cityNameController.text);
-            print(postalCodeController.text);
-            print(streetNameController.text);
-            print(regionController.text);
-            print(telephoneNumber1Controller.text);
-            print(countryController.text);
-            print(districtNameController.text);
-            print(emailAddressController.text);
-            print(mobilePhoneNumberController.text);
           } else {
             throw Exception('Customer data not found for userId: $userId');
           }
@@ -247,69 +216,6 @@ class _CreateOrderState extends State<CreateOrder>
     }
   }
 
-  // Future<void> GetCustomerData(int page, int itemsPerPage) async {
-  //   if (isLoading) return;
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //
-  //   try {
-  //     final response = await http.get(
-  //       Uri.parse(
-  //         '$apicall/user_master/get_all_customer_data?page=$page&limit=$itemsPerPage', // Adjusted for API call
-  //       ),
-  //       headers: {
-  //         "Content-type": "application/json",
-  //         "Authorization": 'Bearer $token',
-  //       },
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       final jsonData = jsonDecode(response.body);
-  //       List<ord.BusinessPartnerData> products = [];
-  //
-  //       if (jsonData != null && jsonData.containsKey('d') && jsonData['d'].containsKey('results')) {
-  //         var results = jsonData['d']['results'];
-  //         // Mapping the relevant fields for each product
-  //         products = results.map<ord.BusinessPartnerData>((item) {
-  //           return ord.BusinessPartnerData(
-  //             businessPartner: item['BusinessPartner'] ?? '',
-  //             businessPartnerName: item['BusinessPartnerName'] ?? '',
-  //             customer: item['Customer'] ?? '',
-  //             addressID: item['AddressID'] ?? '',
-  //             cityName: item['CityName'] ?? '',
-  //             postalCode: item['PostalCode'] ?? '',
-  //             streetName: item['StreetName'] ?? '',
-  //             region: item['Region'] ?? '',
-  //             telephoneNumber1: item['TelephoneNumber1'] ?? '',
-  //             country: item['Country'] ?? '',
-  //             districtName: item['DistrictName'] ?? '',
-  //             emailAddress: item['EmailAddress'] ?? '',
-  //             mobilePhoneNumber: item['MobilePhoneNumber'] ?? '',
-  //           );
-  //         }).toList();
-  //
-  //         setState(() {
-  //           //productList = products;
-  //           totalPages = (results.length / itemsPerPage).ceil();  // Update total pages based on new structure
-  //           print(totalPages);  // Debugging output
-  //           //_filterAndPaginateProducts();
-  //         });
-  //       }
-  //     } else {
-  //       throw Exception('Failed to load data');
-  //     }
-  //   } catch (e) {
-  //     print('Error decoding JSON: $e');
-  //     // Optionally, show an error message to the user
-  //   } finally {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
-
-  // final List<Map<String, dynamic>> _selectedProducts = [];
 
   Future<void> callApi() async {
     List<Map<String, dynamic>> items = [];
@@ -341,41 +247,35 @@ class _CreateOrderState extends State<CreateOrder>
 
     // Dummy data for the main payload
     final url =
-        '$apicall/${companyName}/order_master/add_order_master'; // Replace with your API endpoint
+        '$apicall/$companyName/order_master/add_order_master';
     final headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token', // Dummy token
+      'Authorization': 'Bearer $token',
     };
     final body = {
       "deliveryLocation": cityNameController.text,
-      //  "deliveryAddress": "123 Dummy Street, City",
       "contactPerson": businessPartnerNameController.text,
-      //  "contactNumber": "1234567890",
-      // "comments": "This is a dummy order comment.",
-      // "status": "Not Started",
       "customerId": customerController.text,
-      "orderDate": _dateController.text, // 2024-11-17T00:00:00
-      "postalCode": postalCodeController.text, //
-      "region": regionController.text, //
-      "streetName": streetNameController.text, //
-      "telephoneNumber": telephoneNumber1Controller.text, //
-      "total": _calculateTotal(), // Dummy total amount
-      "items": items, // Rows data processed above
+      "orderDate": _dateController.text,
+      "postalCode": postalCodeController.text,
+      "region": regionController.text,
+      "streetName": streetNameController.text,
+      "telephoneNumber": telephoneNumber1Controller.text,
+      "total": _calculateTotal(),
+      "items": items,
     };
 
     try {
-      // Make the POST API call
+
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
         body: json.encode(body),
       );
 
-      // Handle the response
       if (response.statusCode == 200) {
-        print('API call successful');
         final responseData = json.decode(response.body);
-        print('Response: $responseData');
+
         showDialog(
           barrierDismissible: false,
           context: context,
@@ -386,7 +286,7 @@ class _CreateOrderState extends State<CreateOrder>
                 color: Colors.green,
                 size: 25,
               ),
-              content: Row(
+              content: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('Order Placed'),
@@ -403,7 +303,6 @@ class _CreateOrderState extends State<CreateOrder>
             );
           },
         );
-        // You can handle navigation or further logic here
       } else {
         print('API call failed with status code: ${response.statusCode}');
         print('Response: ${response.body}');
@@ -413,180 +312,16 @@ class _CreateOrderState extends State<CreateOrder>
     }
   }
 
-  void _onSearchTextChanged(String text) {
-    if (_searchDebounceTimer != null) {
-      _searchDebounceTimer!.cancel(); // Cancel the previous timer
-    }
-    _searchDebounceTimer = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _searchText = text;
-      });
-    });
-  }
 
   int itemsPerPage = 10;
   int totalItems = 0;
   int totalPages = 0;
   bool isLoading = false;
 
-  Future<void> fetchProducts1(int page, int itemsPerPage) async {
-    if (isLoading) return;
-    if (!mounted) return;
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
-        ),
-        headers: {
-          "Content-type": "application/json",
-          "Authorization": 'Bearer $token',
-        },
-      );
-      // if(token == " ")
-      // {
-      //   showDialog(
-      //     barrierDismissible: false,
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return
-      //         AlertDialog(
-      //           shape: RoundedRectangleBorder(
-      //             borderRadius: BorderRadius.circular(15.0),
-      //           ),
-      //           contentPadding: EdgeInsets.zero,
-      //           content: Column(
-      //             mainAxisSize: MainAxisSize.min,
-      //             children: [
-      //               Padding(
-      //                 padding: const EdgeInsets.all(16.0),
-      //                 child: Column(
-      //                   children: [
-      //                     // Warning Icon
-      //                     Icon(Icons.warning, color: Colors.orange, size: 50),
-      //                     SizedBox(height: 16),
-      //                     // Confirmation Message
-      //                     Text(
-      //                       'Session Expired',
-      //                       style: TextStyle(
-      //                         fontSize: 16,
-      //                         fontWeight: FontWeight.bold,
-      //                         color: Colors.black,
-      //                       ),
-      //                     ),
-      //                     Text("Please log in again to continue",style: TextStyle(
-      //                       fontSize: 12,
-      //
-      //                       color: Colors.black,
-      //                     ),),
-      //                     SizedBox(height: 20),
-      //                     // Buttons
-      //                     Row(
-      //                       mainAxisAlignment: MainAxisAlignment.center,
-      //                       children: [
-      //                         ElevatedButton(
-      //                           onPressed: () {
-      //                             // Handle Yes action
-      //                             context.go('/');
-      //                             // Navigator.of(context).pop();
-      //                           },
-      //                           style: ElevatedButton.styleFrom(
-      //                             backgroundColor: Colors.white,
-      //                             side: BorderSide(color: Colors.blue),
-      //                             shape: RoundedRectangleBorder(
-      //                               borderRadius: BorderRadius.circular(10.0),
-      //                             ),
-      //                           ),
-      //                           child: Text(
-      //                             'ok',
-      //                             style: TextStyle(
-      //                               color: Colors.blue,
-      //                             ),
-      //                           ),
-      //                         ),
-      //                       ],
-      //                     ),
-      //                   ],
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         );
-      //     },
-      //   ).whenComplete(() {
-      //     _hasShownPopup = false;
-      //   });
-      //
-      // }
-      // else{
-      //   if (response.statusCode == 200) {
-      //     final jsonData = jsonDecode(response.body);
-      //     List<detail> products = [];
-      //     if (jsonData != null) {
-      //       if (jsonData is List) {
-      //         products = jsonData.map((item) => detail.fromJson(item)).toList();
-      //       } else if (jsonData is Map && jsonData.containsKey('body')) {
-      //         products = (jsonData['body'] as List)
-      //             .map((item) => detail.fromJson(item))
-      //             .toList();
-      //         totalItems =
-      //             jsonData['totalItems'] ?? 0; // Get the total number of items
-      //       }
-      //
-      //       if (mounted) {
-      //         setState(() {
-      //           totalPages = (products.length / itemsPerPage).ceil();
-      //           print('pages');
-      //           print(totalPages);
-      //           productList = products;
-      //           print(productList);
-      //           _filterAndPaginateProducts();
-      //         });
-      //       }
-      //     }
-      //   } else {
-      //     throw Exception('Failed to load data');
-      //   }
-      // }
-    } catch (e) {
-      print('Error decoding JSON: $e');
-// Optionally, show an error message to the user
-    } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
 
-  void _goToPreviousPage() {
-    print("previos");
-    if (currentPage > 1) {
-      if (filteredData.length > itemsPerPage) {
-        setState(() {
-          currentPage--;
-        });
-      }
-    }
-  }
 
-  void _goToNextPage() {
-    print('nextpage');
 
-    if (currentPage < totalPages) {
-      if (filteredData.length > currentPage * itemsPerPage) {
-        setState(() {
-          currentPage++;
-        });
-      }
-    }
-//_filterAndPaginateProducts();
-  }
-
-  Map<String, bool> _isHovered = {
+  final Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
     'Products': false,
@@ -606,17 +341,15 @@ class _CreateOrderState extends State<CreateOrder>
               height: 42,
               decoration: BoxDecoration(
                 color: Colors.blue[800],
-                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-                // color: Color.fromRGBO(224, 59, 48, 1.0),
+
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
-                  // Radius for top-left corner
+
                   topRight: Radius.circular(8),
-                  // No radius for top-right corner
+
                   bottomLeft: Radius.circular(8),
-                  // Radius for bottom-left corner
                   bottomRight:
-                      Radius.circular(8), // No radius for bottom-right corner
+                      Radius.circular(8),
                 ),
               ),
               child: _buildMenuItem('Orders', Icons.warehouse_outlined,
@@ -681,10 +414,7 @@ class _CreateOrderState extends State<CreateOrder>
   @override
   void initState() {
     super.initState();
-    print(userId ?? '');
-    //  fetchProducts
-
-    fetchProducts(currentPage, itemsPerPage);
+      fetchProducts(currentPage, itemsPerPage);
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
@@ -701,7 +431,7 @@ class _CreateOrderState extends State<CreateOrder>
           _controller.forward();
         }
       });
-    //_dateController = TextEditingController();
+
     _dateController = TextEditingController();
     _selectedDate = DateTime.now();
 
@@ -719,26 +449,16 @@ class _CreateOrderState extends State<CreateOrder>
     super.dispose();
   }
 
-  // double calculateTotalAmount(List<Map<String, dynamic>> products) {
-  //   double total = 0.0;
-  //   for (var product in products) {
-  //     total += product['qty'] * product['price'];
-  //   }
-  //   return total;
-  // }
+
 
   @override
   Widget build(BuildContext context) {
-    //   double totalAmount = calculateTotalAmount(productList);
-    // double overallTotal = productList
-    //     .map((product) => product['qty'] * product['price'])
-    //     .fold(0.0, (sum, total) => sum + total);
-    //String? role = Provider.of<UserRoleProvider>(context).role;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.grey[50],
-        //backgroundColor: const Color.fromRGBO(21, 101, 192, 0.07),
+
         body: LayoutBuilder(builder: (context, constraints) {
           double maxWidth = constraints.maxWidth;
           double maxHeight = constraints.maxHeight;
@@ -762,11 +482,11 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         const Spacer(),
-                        Row(
+                        const Row(
                           children: [
                             Padding(
                               padding:
-                                  const EdgeInsets.only(right: 10, top: 10),
+                                  EdgeInsets.only(right: 10, top: 10),
                               // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
@@ -814,7 +534,7 @@ class _CreateOrderState extends State<CreateOrder>
                 ),
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               } else ...{
                 Align(
@@ -879,9 +599,7 @@ class _CreateOrderState extends State<CreateOrder>
                                       child: OutlinedButton(
                                         onPressed: () async {
                                           if (_selectedProducts.isEmpty) {
-                                            // Check if no products are selected
-
-                                            ScaffoldMessenger.of(context)
+                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
                                                 content: Text(
@@ -895,9 +613,7 @@ class _CreateOrderState extends State<CreateOrder>
                                                       null ||
                                                   product['productDescription']
                                                       .isEmpty)) {
-                                            // Check if any product has an empty or null productDescription
-
-                                            ScaffoldMessenger.of(context)
+                                          ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
                                                 content: Text(
@@ -920,85 +636,19 @@ class _CreateOrderState extends State<CreateOrder>
                                               ),
                                             );
                                           } else {
-                                            // If all validations pass, proceed with API calls
-
                                             await fetchCustomerData(userId);
 
                                             await callApi();
                                           }
                                         },
-                                        // onPressed: () async {
-                                        //   if (_selectedProducts.isEmpty) {
-                                        //     ScaffoldMessenger.of(context)
-                                        //         .showSnackBar(
-                                        //       const SnackBar(
-                                        //         content: Text(
-                                        //             'Please add a product before creating an order'),
-                                        //         duration: Duration(
-                                        //             seconds:
-                                        //                 2), // Optional duration
-                                        //       ),
-                                        //     );
-                                        //   } else {
-                                        //     // Validate that all products have a name and quantity entered
-                                        //     bool isValid = true;
-                                        //     for (var product
-                                        //         in _selectedProducts) {
-                                        //       // Check if the product name is empty
-                                        //       String productName =
-                                        //           product['productName'] ?? '';
-                                        //       if (productName.isEmpty) {
-                                        //         isValid = false;
-                                        //         break; // Exit the loop if validation fails
-                                        //       }
-                                        //
-                                        //       // Check if quantity is entered (greater than 0)
-                                        //       int quantity =
-                                        //           product['qty'] ?? 0;
-                                        //       if (quantity <= 0) {
-                                        //         isValid = false;
-                                        //         break; // Exit the loop if validation fails
-                                        //       }
-                                        //     }
-                                        //
-                                        //     if (!isValid) {
-                                        //       ScaffoldMessenger.of(context)
-                                        //           .showSnackBar(
-                                        //         const SnackBar(
-                                        //           content: Text(
-                                        //               'Please make sure all products have a name and quantity'),
-                                        //           duration: Duration(
-                                        //               seconds:
-                                        //                   2), // Optional duration
-                                        //         ),
-                                        //       );
-                                        //     } else {
-                                        //       // Proceed with fetching customer data and calling the API
-                                        //       await fetchCustomerData(userId);
-                                        //       await callApi();
-                                        //     }
-                                        //   }
-                                        //
-                                        //   // if(_selectedProducts.isEmpty){
-                                        //   //   ScaffoldMessenger.of(context).showSnackBar(
-                                        //   //     const SnackBar(
-                                        //   //       content: Text('Please add a product before creating an order'),
-                                        //   //       duration: Duration(seconds: 2), // Optional duration
-                                        //   //     ),
-                                        //   //   );
-                                        //   // }else{
-                                        //   //   await fetchCustomerData(userId);
-                                        //   //   await callApi();
-                                        //   // }
-                                        // },
+
                                         style: OutlinedButton.styleFrom(
                                           backgroundColor: Colors.blue[800],
                                           // Button background color
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
-                                                5), // Rounded corners
-                                          ),
-                                          side: BorderSide.none, // No outline
+                                                5),),
+                                          side: BorderSide.none,
                                         ),
                                         child: Text(
                                           ' Create Order',
@@ -1024,7 +674,6 @@ class _CreateOrderState extends State<CreateOrder>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
-                                  // mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Padding(
                                       padding: EdgeInsets.only(
@@ -1104,8 +753,8 @@ class _CreateOrderState extends State<CreateOrder>
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFFFFFF),
-                                  boxShadow: [
-                                    const BoxShadow(
+                                  boxShadow: const [
+                                    BoxShadow(
                                       offset: Offset(0, 3),
                                       blurRadius: 6,
                                       color: Color(
@@ -1123,7 +772,7 @@ class _CreateOrderState extends State<CreateOrder>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Padding(
-                                      padding: EdgeInsets.only(
+                                      padding: const EdgeInsets.only(
                                           top: 20, left: 25, bottom: 20),
                                       child: Text(
                                         'Item Table',
@@ -1141,7 +790,7 @@ class _CreateOrderState extends State<CreateOrder>
                                             .resolveWith<Color>(
                                           (Set<MaterialState> states) {
                                             return Colors
-                                                .white; // Set row background to white
+                                                .white;
                                           },
                                         ),
                                         columns: [
@@ -1241,30 +890,14 @@ class _CreateOrderState extends State<CreateOrder>
 
                                                   _selectedProducts
                                                       .add(newProduct);
-
-                                                  // Ensure a controller is initialized for the new product's quantity
                                                   if (_controllers != null) {
                                                     _controllers[newProduct] =
                                                         TextEditingController(
                                                             text: '0');
                                                   }
-
-                                                  // Make the total visible
                                                   _isTotalVisible = true;
                                                 });
 
-                                                // setState(() {
-                                                //   _selectedProducts.add({
-                                                //     'product': '',
-                                                //     'productDescription': '',
-                                                //     'categoryName': '',
-                                                //     'baseUnit': '',
-                                                //     'price': 0.0,
-                                                //     'qty': 0,
-                                                //   });
-                                                //   _controllers?
-                                                //   _isTotalVisible = true;
-                                                // });
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor:
@@ -1301,7 +934,7 @@ class _CreateOrderState extends State<CreateOrder>
                                                   Alignment.centerRight,
                                               // Align text to the right
                                               child: Text(
-                                                'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
+                                                'Total: ₹${_calculateTotal().toStringAsFixed(2)}',
                                                 style: TextStyles.subhead,
                                                 textAlign: TextAlign
                                                     .right, // Ensure right-aligned text
@@ -1316,194 +949,7 @@ class _CreateOrderState extends State<CreateOrder>
                                 ),
                               ),
                             ),
-                            // Padding(
-                            //   padding: const EdgeInsets.only(
-                            //       top: 40, left: 70, right: 50, bottom: 30),
-                            //   child: Container(
-                            //     //width: screenWidth * 0.8,
-                            //     decoration: BoxDecoration(
-                            //       color: const Color(0xFFFFFFFF),
-                            //       // background: #FFFFFF
-                            //       boxShadow: [
-                            //         const BoxShadow(
-                            //           offset: Offset(0, 3),
-                            //           blurRadius: 6,
-                            //           color: Color(
-                            //               0x29000000), // box-shadow: 0px 3px 6px #00000029
-                            //         )
-                            //       ],
-                            //       border: Border.all(
-                            //         // border: 2px
-                            //         color: const Color(
-                            //             0xFFB2C2D3), // border: #B2C2D3
-                            //       ),
-                            //       borderRadius: const BorderRadius.all(
-                            //           Radius.circular(8)), // border-radius: 8px
-                            //     ),
-                            //     child: Column(
-                            //
-                            //       crossAxisAlignment: CrossAxisAlignment.start,
-                            //       children: [
-                            //         const Padding(
-                            //           padding:
-                            //               EdgeInsets.only(top: 10, left: 30),
-                            //           child: Text(
-                            //             'Item Table',
-                            //             style: TextStyle(
-                            //                 fontSize: 19, color: Colors.black),
-                            //           ),
-                            //         ),
-                            //         const SizedBox(height: 10),
-                            //         Container(
-                            //           width: 1300,
-                            //           color: Colors.grey[100],
-                            //           child: DataTable(
-                            //
-                            //             //
-                            //              dataRowHeight: 57,
-                            //              headingRowHeight: 50,
-                            //             dataRowColor: MaterialStateProperty
-                            //                 .resolveWith<Color>(
-                            //               (Set<MaterialState> states) {
-                            //                 return Colors
-                            //                     .white; // Set row background to white
-                            //               },
-                            //             ),
-                            //             columns: [
-                            //               DataColumn(
-                            //                   label: Text(
-                            //                 'S.NO',
-                            //                 style: TextStyles.subhead,
-                            //               )),
-                            //               DataColumn(
-                            //                   label: Text(
-                            //                 'Product Name',
-                            //                 style: TextStyles.subhead,
-                            //               )),
-                            //               DataColumn(
-                            //                   label: Text(
-                            //                 'Category',
-                            //                 style: TextStyles.subhead,
-                            //               )),
-                            //               DataColumn(
-                            //                   label: Text(
-                            //                 'Unit',
-                            //                 style: TextStyles.subhead,
-                            //               )),
-                            //               DataColumn(
-                            //                   label: Text(
-                            //                 'Price',
-                            //                 style: TextStyles.subhead,
-                            //               )),
-                            //               DataColumn(
-                            //                   label: Text(
-                            //                 'Qty',
-                            //                 style: TextStyles.subhead,
-                            //               )),
-                            //               DataColumn(
-                            //                   label: Text(
-                            //                 'Total Amount',
-                            //                 style: TextStyles.subhead,
-                            //               )),
-                            //               DataColumn(label: Text(' ')),
-                            //             ],
-                            //             rows: _selectedProducts.map((product) {
-                            //               int index = _selectedProducts
-                            //                       .indexOf(product) +
-                            //                   1;
-                            //               return DataRow(cells: [
-                            //                 DataCell(Text('$index')),
-                            //                 DataCell(_buildProductSearchField(
-                            //                     product)),
-                            //                 DataCell(Text(
-                            //                     product['categoryName'] ?? '')),
-                            //                 DataCell(Text(
-                            //                     product['baseUnit'] ?? '')),
-                            //                 DataCell(Text(product['price']
-                            //                     .toStringAsFixed(2))),
-                            //                 DataCell(
-                            //                     _buildQuantityField(product)),
-                            //                 DataCell(Text((product['qty'] *
-                            //                         product['price'])
-                            //                     .toStringAsFixed(2))),
-                            //                 DataCell(IconButton(
-                            //                   icon: Icon(
-                            //                       Icons.remove_circle_outline,
-                            //                       color: Colors.grey),
-                            //                   onPressed: () {
-                            //                     setState(() {
-                            //                       _selectedProducts
-                            //                           .remove(product);
-                            //                     });
-                            //                   },
-                            //                 )),
-                            //               ]);
-                            //             }).toList(),
-                            //             // rows: _selectedProducts.map((product) {
-                            //             //         return DataRow(cells: [
-                            //             //           DataCell(Text('${1}')),
-                            //             //         DataCell(_buildProductSearchField(product)),
-                            //             //         DataCell(_buildQuantityField(product)),
-                            //             //           DataCell(_buildProductSearchField(product)),
-                            //             //           DataCell(_buildQuantityField(product)),
-                            //             //           DataCell(_buildProductSearchField(product)),
-                            //             //         DataCell(Text(product['price'].toString())),
-                            //             //         DataCell(Text((product['qty'] * product['price']).toStringAsFixed(2))),
-                            //             //         ]);
-                            //             //         }).toList(),
-                            //           ),
-                            //
-                            //         ),
-                            //         Row(
-                            //           children: [
-                            //             Padding(
-                            //               padding: const EdgeInsets.only(
-                            //                   left: 45, bottom: 20, top: 20),
-                            //               child: SizedBox(
-                            //                 width: 140,
-                            //                 child: ElevatedButton(
-                            //                   onPressed: () {
-                            //                     setState(() {
-                            //                       _selectedProducts.add({
-                            //                         'product': '',
-                            //                         'productDescription': '',
-                            //                         // Product name, initially empty
-                            //                         'categoryName': '',
-                            //                         // Default value for category
-                            //                         'baseUnit': '',
-                            //                         // Default value for unit
-                            //                         'price': 0.0,
-                            //                         // Default price
-                            //                         'qty': 1,
-                            //                         // Default quantity
-                            //                       });
-                            //                       _isTotalVisible = true;
-                            //                     });
-                            //                   },
-                            //                   style: ElevatedButton.styleFrom(
-                            //                       backgroundColor:
-                            //                       Colors.blue[800],
-                            //                       padding: null,
-                            //                       shape: RoundedRectangleBorder(
-                            //                           borderRadius:
-                            //                           BorderRadius.circular(
-                            //                               5))),
-                            //                   child: const Text(
-                            //                     '+ Add Product',
-                            //                     style: TextStyle(
-                            //                         color: Colors.white),
-                            //                   ),
-                            //                 ),
-                            //               ),
-                            //             ),
-                            //             Spacer(),
-                            //             Text('Total: $_calculateTotal')
-                            //           ],
-                            //         ),
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
+
                           ],
                         ),
                       )),
@@ -1564,8 +1010,6 @@ class _CreateOrderState extends State<CreateOrder>
                                                         onPressed: () async {
                                                           if (_selectedProducts
                                                               .isEmpty) {
-                                                            // Check if no products are selected
-
                                                             ScaffoldMessenger
                                                                     .of(context)
                                                                 .showSnackBar(
@@ -1604,8 +1048,6 @@ class _CreateOrderState extends State<CreateOrder>
                                                                       null ||
                                                                   product['qty'] <=
                                                                       0)) {
-                                                            // Check if any product has an invalid or zero quantity
-
                                                             ScaffoldMessenger
                                                                     .of(context)
                                                                 .showSnackBar(
@@ -1619,9 +1061,7 @@ class _CreateOrderState extends State<CreateOrder>
                                                               ),
                                                             );
                                                           } else {
-                                                            // If all validations pass, proceed with API calls
-
-                                                            await fetchCustomerData(
+                                                          await fetchCustomerData(
                                                                 userId);
 
                                                             await callApi();
@@ -1631,16 +1071,15 @@ class _CreateOrderState extends State<CreateOrder>
                                                             .styleFrom(
                                                           backgroundColor:
                                                               Colors.blue[800],
-                                                          // Button background color
                                                           shape:
                                                               RoundedRectangleBorder(
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
-                                                                        5), // Rounded corners
+                                                                        5),
                                                           ),
                                                           side: BorderSide
-                                                              .none, // No outline
+                                                              .none,
                                                         ),
                                                         child: Text(
                                                           ' Create Order',
@@ -1669,7 +1108,6 @@ class _CreateOrderState extends State<CreateOrder>
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
-                                              // mainAxisAlignment: MainAxisAlignment.start,
                                               children: [
                                                 Padding(
                                                   padding: EdgeInsets.only(
@@ -1681,8 +1119,6 @@ class _CreateOrderState extends State<CreateOrder>
                                                     style: TextStyles.header3,
                                                   ),
                                                 ),
-                                                //  ),
-                                                // SizedBox(height: 20.h),
                                               ],
                                             ),
                                           ),
@@ -1707,7 +1143,6 @@ class _CreateOrderState extends State<CreateOrder>
                                                     style: TextStyle(
                                                         fontSize:
                                                             maxWidth * 0.009),
-                                                    // Replace with your TextEditingController
                                                     readOnly: true,
                                                     decoration: InputDecoration(
                                                       suffixIcon: Padding(
@@ -1732,7 +1167,6 @@ class _CreateOrderState extends State<CreateOrder>
                                                             ),
                                                             iconSize: 20,
                                                             onPressed: () {
-                                                              // _showDatePicker(context);
                                                             },
                                                           ),
                                                         ),
@@ -1766,8 +1200,8 @@ class _CreateOrderState extends State<CreateOrder>
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               // color: const Color(0xFFFFFFFF),
-                                              boxShadow: [
-                                                const BoxShadow(
+                                              boxShadow: const [
+                                                BoxShadow(
                                                   offset: Offset(0, 3),
                                                   blurRadius: 6,
                                                   color: Color(
@@ -1787,7 +1221,7 @@ class _CreateOrderState extends State<CreateOrder>
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Padding(
-                                                  padding: EdgeInsets.only(
+                                                  padding: const EdgeInsets.only(
                                                       top: 20,
                                                       left: 25,
                                                       bottom: 20),
@@ -1935,10 +1369,7 @@ class _CreateOrderState extends State<CreateOrder>
                                                               _selectedProducts
                                                                   .add(
                                                                       newProduct);
-
-                                                              // Ensure a controller is initialized for the new product's quantity
-                                                              if (_controllers !=
-                                                                  null) {
+                                                              if (_controllers != null) {
                                                                 _controllers[
                                                                         newProduct] =
                                                                     TextEditingController(
@@ -1992,7 +1423,7 @@ class _CreateOrderState extends State<CreateOrder>
                                                               Alignment.centerRight,
                                                               // Align text to the right
                                                               child: Text(
-                                                                'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
+                                                                'Total: ₹${_calculateTotal().toStringAsFixed(2)}',
                                                                 style: TextStyles.subhead,
                                                                 textAlign: TextAlign
                                                                     .right, // Ensure right-aligned text
@@ -2007,194 +1438,7 @@ class _CreateOrderState extends State<CreateOrder>
                                             ),
                                           ),
                                         ),
-                                        // Padding(
-                                        //   padding: const EdgeInsets.only(
-                                        //       top: 40, left: 70, right: 50, bottom: 30),
-                                        //   child: Container(
-                                        //     //width: screenWidth * 0.8,
-                                        //     decoration: BoxDecoration(
-                                        //       color: const Color(0xFFFFFFFF),
-                                        //       // background: #FFFFFF
-                                        //       boxShadow: [
-                                        //         const BoxShadow(
-                                        //           offset: Offset(0, 3),
-                                        //           blurRadius: 6,
-                                        //           color: Color(
-                                        //               0x29000000), // box-shadow: 0px 3px 6px #00000029
-                                        //         )
-                                        //       ],
-                                        //       border: Border.all(
-                                        //         // border: 2px
-                                        //         color: const Color(
-                                        //             0xFFB2C2D3), // border: #B2C2D3
-                                        //       ),
-                                        //       borderRadius: const BorderRadius.all(
-                                        //           Radius.circular(8)), // border-radius: 8px
-                                        //     ),
-                                        //     child: Column(
-                                        //
-                                        //       crossAxisAlignment: CrossAxisAlignment.start,
-                                        //       children: [
-                                        //         const Padding(
-                                        //           padding:
-                                        //               EdgeInsets.only(top: 10, left: 30),
-                                        //           child: Text(
-                                        //             'Item Table',
-                                        //             style: TextStyle(
-                                        //                 fontSize: 19, color: Colors.black),
-                                        //           ),
-                                        //         ),
-                                        //         const SizedBox(height: 10),
-                                        //         Container(
-                                        //           width: 1300,
-                                        //           color: Colors.grey[100],
-                                        //           child: DataTable(
-                                        //
-                                        //             //
-                                        //              dataRowHeight: 57,
-                                        //              headingRowHeight: 50,
-                                        //             dataRowColor: MaterialStateProperty
-                                        //                 .resolveWith<Color>(
-                                        //               (Set<MaterialState> states) {
-                                        //                 return Colors
-                                        //                     .white; // Set row background to white
-                                        //               },
-                                        //             ),
-                                        //             columns: [
-                                        //               DataColumn(
-                                        //                   label: Text(
-                                        //                 'S.NO',
-                                        //                 style: TextStyles.subhead,
-                                        //               )),
-                                        //               DataColumn(
-                                        //                   label: Text(
-                                        //                 'Product Name',
-                                        //                 style: TextStyles.subhead,
-                                        //               )),
-                                        //               DataColumn(
-                                        //                   label: Text(
-                                        //                 'Category',
-                                        //                 style: TextStyles.subhead,
-                                        //               )),
-                                        //               DataColumn(
-                                        //                   label: Text(
-                                        //                 'Unit',
-                                        //                 style: TextStyles.subhead,
-                                        //               )),
-                                        //               DataColumn(
-                                        //                   label: Text(
-                                        //                 'Price',
-                                        //                 style: TextStyles.subhead,
-                                        //               )),
-                                        //               DataColumn(
-                                        //                   label: Text(
-                                        //                 'Qty',
-                                        //                 style: TextStyles.subhead,
-                                        //               )),
-                                        //               DataColumn(
-                                        //                   label: Text(
-                                        //                 'Total Amount',
-                                        //                 style: TextStyles.subhead,
-                                        //               )),
-                                        //               DataColumn(label: Text(' ')),
-                                        //             ],
-                                        //             rows: _selectedProducts.map((product) {
-                                        //               int index = _selectedProducts
-                                        //                       .indexOf(product) +
-                                        //                   1;
-                                        //               return DataRow(cells: [
-                                        //                 DataCell(Text('$index')),
-                                        //                 DataCell(_buildProductSearchField(
-                                        //                     product)),
-                                        //                 DataCell(Text(
-                                        //                     product['categoryName'] ?? '')),
-                                        //                 DataCell(Text(
-                                        //                     product['baseUnit'] ?? '')),
-                                        //                 DataCell(Text(product['price']
-                                        //                     .toStringAsFixed(2))),
-                                        //                 DataCell(
-                                        //                     _buildQuantityField(product)),
-                                        //                 DataCell(Text((product['qty'] *
-                                        //                         product['price'])
-                                        //                     .toStringAsFixed(2))),
-                                        //                 DataCell(IconButton(
-                                        //                   icon: Icon(
-                                        //                       Icons.remove_circle_outline,
-                                        //                       color: Colors.grey),
-                                        //                   onPressed: () {
-                                        //                     setState(() {
-                                        //                       _selectedProducts
-                                        //                           .remove(product);
-                                        //                     });
-                                        //                   },
-                                        //                 )),
-                                        //               ]);
-                                        //             }).toList(),
-                                        //             // rows: _selectedProducts.map((product) {
-                                        //             //         return DataRow(cells: [
-                                        //             //           DataCell(Text('${1}')),
-                                        //             //         DataCell(_buildProductSearchField(product)),
-                                        //             //         DataCell(_buildQuantityField(product)),
-                                        //             //           DataCell(_buildProductSearchField(product)),
-                                        //             //           DataCell(_buildQuantityField(product)),
-                                        //             //           DataCell(_buildProductSearchField(product)),
-                                        //             //         DataCell(Text(product['price'].toString())),
-                                        //             //         DataCell(Text((product['qty'] * product['price']).toStringAsFixed(2))),
-                                        //             //         ]);
-                                        //             //         }).toList(),
-                                        //           ),
-                                        //
-                                        //         ),
-                                        //         Row(
-                                        //           children: [
-                                        //             Padding(
-                                        //               padding: const EdgeInsets.only(
-                                        //                   left: 45, bottom: 20, top: 20),
-                                        //               child: SizedBox(
-                                        //                 width: 140,
-                                        //                 child: ElevatedButton(
-                                        //                   onPressed: () {
-                                        //                     setState(() {
-                                        //                       _selectedProducts.add({
-                                        //                         'product': '',
-                                        //                         'productDescription': '',
-                                        //                         // Product name, initially empty
-                                        //                         'categoryName': '',
-                                        //                         // Default value for category
-                                        //                         'baseUnit': '',
-                                        //                         // Default value for unit
-                                        //                         'price': 0.0,
-                                        //                         // Default price
-                                        //                         'qty': 1,
-                                        //                         // Default quantity
-                                        //                       });
-                                        //                       _isTotalVisible = true;
-                                        //                     });
-                                        //                   },
-                                        //                   style: ElevatedButton.styleFrom(
-                                        //                       backgroundColor:
-                                        //                       Colors.blue[800],
-                                        //                       padding: null,
-                                        //                       shape: RoundedRectangleBorder(
-                                        //                           borderRadius:
-                                        //                           BorderRadius.circular(
-                                        //                               5))),
-                                        //                   child: const Text(
-                                        //                     '+ Add Product',
-                                        //                     style: TextStyle(
-                                        //                         color: Colors.white),
-                                        //                   ),
-                                        //                 ),
-                                        //               ),
-                                        //             ),
-                                        //             Spacer(),
-                                        //             Text('Total: $_calculateTotal')
-                                        //           ],
-                                        //         ),
-                                        //       ],
-                                        //     ),
-                                        //   ),
-                                        // ),
+
                                       ],
                                     ),
                                   ),
@@ -2302,109 +1546,18 @@ class _CreateOrderState extends State<CreateOrder>
      ),
    );
  }
-//original
-  // Widget _buildProductSearchField(Map<String, dynamic> product) {
-  //   return SizedBox(
-  //     height: 65,
-  //     width: 200,
-  //     child: Autocomplete<String>(
-  //       optionsBuilder: (TextEditingValue textEditingValue) {
-  //         if (textEditingValue.text.isEmpty) {
-  //           return const Iterable<String>.empty();
-  //         }
-  //         return productList
-  //             .where((p) => p['productDescription']
-  //                 .toLowerCase()
-  //                 .contains(textEditingValue.text.toLowerCase()))
-  //             .map((p) => p['productDescription']);
-  //       },
-  //       onSelected: (String selection) {
-  //         final selectedProduct = productList
-  //             .firstWhere((p) => p['productDescription'] == selection);
-  //         setState(() {
-  //           product['product'] = selectedProduct['product'];
-  //           product['categoryName'] = selectedProduct['categoryName'];
-  //           product['baseUnit'] = selectedProduct['baseUnit'];
-  //           product['price'] = selectedProduct['price'];
-  //           product['productDescription'] =
-  //               selectedProduct['productDescription'];
-  //           product['currency'] = selectedProduct['currency'];
-  //           product['productType'] = selectedProduct['productType'];
-  //           product['standardPrice'] = selectedProduct['standardPrice'];
-  //         });
-  //       },
-  //       optionsViewBuilder: (context, onSelected, options) {
-  //         return Align(
-  //           alignment: Alignment.topLeft,
-  //           child: Material(
-  //             elevation: 4.0,
-  //             child: Container(
-  //               decoration: BoxDecoration(
-  //                 color: Colors.white, // Set background color to white
-  //                 borderRadius: BorderRadius.circular(8.0), // Set border radius
-  //               ),
-  //               width: 300, // Set the desired width of the dropdown
-  //               child: ListView(
-  //                 padding: EdgeInsets.zero,
-  //                 shrinkWrap: true,
-  //                 children: options.map((String option) {
-  //                   return ListTile(
-  //                     title: Text(option),
-  //                     onTap: () {
-  //                       onSelected(option);
-  //                     },
-  //                   );
-  //                 }).toList(),
-  //               ),
-  //             ),
-  //           ),
-  //         );
-  //       },
-  //       fieldViewBuilder: (
-  //         BuildContext context,
-  //         TextEditingController textEditingController,
-  //         FocusNode focusNode,
-  //         ord.VoidCallback onFieldSubmitted,
-  //       ) {
-  //         textEditingController.text = product['productDescription'] ?? '';
-  //         return Padding(
-  //           padding: const EdgeInsets.all(8.0),
-  //           child: TextFormField(
-  //             textAlign: TextAlign.start,
-  //             controller: textEditingController,
-  //             focusNode: focusNode,
-  //             // maxLines: 1,
-  //             // minLines: 1,
-  //             //expands: true,
-  //             decoration: InputDecoration(
-  //               filled: true,
-  //               //  contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-  //               fillColor: Colors.grey[100],
-  //               // contentPadding: EdgeInsets.symmetric(horizontal: 7),
-  //               border: InputBorder.none,
-  //               contentPadding:
-  //                   const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-  //               // Removes the border
-  //               hintText: 'Search Product',
-  //               hintStyle: TextStyles.body,
-  //             ),
-  //           ),
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
+
 
   String calculateTotalPrice(Map<String, dynamic> product) {
-    // Calculate total price
+
     double total = product['qty'] * product['price'];
-    // Return formatted string
+
     return total.toStringAsFixed(2);
   }
 
   Widget _buildQuantityField(
       Map<String, dynamic> product, TextEditingController controller) {
-    // Sync controller's text with product['qty'] if needed
+
     if (controller.text != product['qty'].toString()) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final newText = product['qty']?.toString() ?? '';
@@ -2418,18 +1571,17 @@ class _CreateOrderState extends State<CreateOrder>
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5), // External padding
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
       child: SizedBox(
-        width: 60, // Adjusted width for better spacing in DataTable
+        width: 60,
         child: TextFormField(
           controller: controller,
           textAlign: TextAlign.start,
           keyboardType: TextInputType.number,
           onChanged: (value) {
-            // Update product quantity dynamically while user types
             setState(() {
               if (value.isEmpty) {
-                product['qty'] = 0; // Handle empty input gracefully
+                product['qty'] = 0;
               } else {
                 final parsedValue = double.tryParse(value);
                 if (parsedValue != null) {
@@ -2442,142 +1594,35 @@ class _CreateOrderState extends State<CreateOrder>
             filled: true,
             fillColor: Colors.grey[100],
             contentPadding: const EdgeInsets.symmetric(
-              vertical: 12, // Internal padding for better alignment of text
+              vertical: 12,
               horizontal: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none, // Optional: Remove border for cleaner look
+              borderSide: BorderSide.none,
             ),
-            hintText: 'Qty', // Optional: Provide a placeholder text
+            hintText: 'Qty',
             hintStyle: TextStyles.body,
           ),
-          style: TextStyles.body, // Ensure consistent text style
+          style: TextStyles.body,
         ),
       ),
     );
   }
 
 
-
-
-  //original
-  // Widget _buildQuantityField(
-  //     Map<String, dynamic> product, TextEditingController controller) {
-  //   // Only update the controller text if it doesn't match the current product quantity
-  //   if (controller.text != product['qty'].toString()) {
-  //     controller.text = product['qty'].toString();
-  //   }
-  //
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5), // External padding
-  //     child: SizedBox(
-  //       width: 60, // Adjusted width for better spacing in DataTable
-  //       child: TextFormField(
-  //         controller: controller,
-  //         textAlign: TextAlign.start,
-  //         keyboardType: TextInputType.number,
-  //         onChanged: (value) {
-  //           setState(() {
-  //             product['qty'] = double.tryParse(value) ?? 0;
-  //           });
-  //         },
-  //         decoration: InputDecoration(
-  //           filled: true,
-  //           fillColor: Colors.grey[100],
-  //           contentPadding: const EdgeInsets.symmetric(
-  //             vertical: 12, // Internal padding for better alignment of text
-  //             horizontal: 10,
-  //           ),
-  //           border: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(8.0),
-  //             borderSide: BorderSide.none, // Optional: Remove border for cleaner look
-  //           ),
-  //           hintStyle: TextStyles.body,
-  //         ),
-  //         style: TextStyles.body, // Ensure consistent text style
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  //old
-  // Widget _buildQuantityField(
-  //     Map<String, dynamic> product, TextEditingController controller) {
-  //   // Only update the controller text if it doesn't match the current product quantity
-  //   if (controller.text != product['qty'].toString()) {
-  //     controller.text = product['qty'].toString();
-  //   }
-  //
-  //   return SizedBox(
-  //     width: 100,
-  //     child: Padding(
-  //       padding: const EdgeInsets.only(right: 30, top: 8, bottom: 8, left: 8),
-  //       child: TextFormField(
-  //         controller: controller,
-  //         textAlign: TextAlign.start,
-  //         keyboardType: TextInputType.number,
-  //         onChanged: (value) {
-  //           setState(() {
-  //             product['qty'] = double.tryParse(value) ?? 0;
-  //           });
-  //         },
-  //         decoration: InputDecoration(
-  //           filled: true,
-  //           fillColor: Colors.grey[100],
-  //           contentPadding:
-  //               const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-  //           border: InputBorder.none,
-  //           hintStyle: TextStyles.body,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Widget _buildQuantityField(Map<String, dynamic> product, TextEditingController controller) {
-  //   controller.text = product['qty'].toString(); // Keep the controller updated with the product qty.
-  //
-  //   return SizedBox(
-  //     width: 100,
-  //     child: Padding(
-  //       padding: const EdgeInsets.only(right: 30, top: 8, bottom: 8, left: 8),
-  //       child: TextFormField(
-  //         controller: controller, // Use the controller
-  //         textAlign: TextAlign.start,
-  //         keyboardType: TextInputType.number,
-  //         onChanged: (value) {
-  //           setState(() {
-  //             product['qty'] = double.tryParse(value) ?? 0;
-  //           });
-  //         },
-  //         decoration: InputDecoration(
-  //           filled: true,
-  //           fillColor: Colors.grey[100],
-  //           contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 10),
-  //           border: InputBorder.none,
-  //           hintStyle: TextStyles.body,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget buildDataTable2() {
     if (isLoading) {
-      _loading = true;
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
-// Show loading indicator while data is being fetched
+      var height = MediaQuery.of(context).size.height;
       return Padding(
         padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
+        child: CustomLoadingIcon(),
       );
     }
 
     if (filteredData.isEmpty) {
-      double right = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
@@ -2596,10 +1641,7 @@ class _CreateOrderState extends State<CreateOrder>
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
                                 column,
@@ -2609,8 +1651,6 @@ class _CreateOrderState extends State<CreateOrder>
                                   fontSize: 13,
                                 ),
                               ),
-
-// ),
                             ],
                           ),
                         ),
@@ -2621,7 +1661,7 @@ class _CreateOrderState extends State<CreateOrder>
                     },
                   );
                 }).toList(),
-                rows: []),
+                rows: const []),
           ),
           Padding(
             padding: const EdgeInsets.only(
@@ -2632,8 +1672,6 @@ class _CreateOrderState extends State<CreateOrder>
       );
     }
     return LayoutBuilder(builder: (context, constraints) {
-// double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width * 0.92;
 
       return Column(
         children: [
@@ -2647,7 +1685,6 @@ class _CreateOrderState extends State<CreateOrder>
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
                 columnSpacing: 35,
-// List.generate(5, (index)
                 columns: columns.map((column) {
                   return DataColumn(
                     label: Stack(
@@ -2655,10 +1692,7 @@ class _CreateOrderState extends State<CreateOrder>
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
                                 column,
@@ -2695,16 +1729,11 @@ class _CreateOrderState extends State<CreateOrder>
                                   });
                                 },
                               ),
-//SizedBox(width: 50,),
-//Padding(
-//  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-//  child:
                               const Spacer(),
                               MouseRegion(
                                 cursor: SystemMouseCursors.resizeColumn,
                                 child: GestureDetector(
                                     onHorizontalDragUpdate: (details) {
-// Update column width dynamically as user drags
                                       setState(() {
                                         columnWidths[columns.indexOf(column)] +=
                                             details.delta.dx;
@@ -2712,14 +1741,7 @@ class _CreateOrderState extends State<CreateOrder>
                                             columnWidths[
                                                     columns.indexOf(column)]
                                                 .clamp(151.0, 300.0);
-                                      });
-// setState(() {
-//   columnWidths[columns.indexOf(column)] += details.delta.dx;
-//   if (columnWidths[columns.indexOf(column)] < 50) {
-//     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-//   }
-// });
-                                    },
+                                      }); },
                                     child: const Padding(
                                       padding:
                                           EdgeInsets.only(top: 10, bottom: 10),
@@ -2763,9 +1785,8 @@ class _CreateOrderState extends State<CreateOrder>
                       }),
                       cells: [
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[0],
-                            // Same dynamic width as column headers
                             child: Text(
                               detail.orderId.toString(),
                               style: TextStyle(
@@ -2777,10 +1798,10 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[1],
                             child: Text(
-                              detail.orderDate!,
+                              detail.orderDate,
                               style: const TextStyle(
                                 color: Color(0xFFA6A6A6),
                               ),
@@ -2788,7 +1809,7 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[2],
                             child: Text(
                               detail.invoiceNo!,
@@ -2799,7 +1820,7 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[3],
                             child: Text(
                               detail.total.toString(),
@@ -2810,7 +1831,7 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[4],
                             child: Text(
                               detail.deliveryStatus.toString(),
@@ -2825,7 +1846,7 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[4],
                             child: Text(
                               detail.paymentStatus.toString(),
@@ -2836,15 +1857,8 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                       ],
-                      onSelectChanged: (selected) {
-                        if (selected != null && selected) {
-                          print('what is this');
-                          print(detail.invoiceNo);
-                          print(productList);
-                          print(detail.paymentStatus);
-//final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                        }
-                      });
+
+                      );
                 })),
           ),
         ],
@@ -2854,14 +1868,12 @@ class _CreateOrderState extends State<CreateOrder>
 
   Widget buildDataTable() {
     if (isLoading) {
-      _loading = true;
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
-// Show loading indicator while data is being fetched
+      var height = MediaQuery.of(context).size.height;
       return Padding(
         padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
+        child: CustomLoadingIcon(),
       );
     }
 
@@ -2886,10 +1898,7 @@ class _CreateOrderState extends State<CreateOrder>
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(column, style: TextStyles.subhead),
                             ],
@@ -2902,7 +1911,7 @@ class _CreateOrderState extends State<CreateOrder>
                     },
                   );
                 }).toList(),
-                rows: []),
+                rows: const []),
           ),
           Padding(
             padding: const EdgeInsets.only(
@@ -2913,7 +1922,7 @@ class _CreateOrderState extends State<CreateOrder>
       );
     }
     return LayoutBuilder(builder: (context, constraints) {
-// double padding = constraints.maxWidth * 0.065;
+
       double right = MediaQuery.of(context).size.width * 0.92;
 
       return Column(
@@ -2928,7 +1937,7 @@ class _CreateOrderState extends State<CreateOrder>
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
                 columnSpacing: 35,
-// List.generate(5, (index)
+
                 columns: columns.map((column) {
                   return DataColumn(
                     label: Stack(
@@ -2936,10 +1945,7 @@ class _CreateOrderState extends State<CreateOrder>
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(column, style: TextStyles.subhead),
                               IconButton(
@@ -2969,11 +1975,6 @@ class _CreateOrderState extends State<CreateOrder>
                                   });
                                 },
                               ),
-//SizedBox(width: 50,),
-//Padding(
-//  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-//  child:
-// ),
                             ],
                           ),
                         ),
@@ -2990,21 +1991,19 @@ class _CreateOrderState extends State<CreateOrder>
                     (index) {
                   final detail =
                       filteredData[(currentPage - 1) * itemsPerPage + index];
-                  final isSelected = _selectedProduct == detail;
                   return DataRow(
                       color: MaterialStateProperty.resolveWith<Color>((states) {
                         if (states.contains(MaterialState.hovered)) {
                           return Colors.blue.shade500.withOpacity(
-                              0.8); // Add some opacity to the dark blue
+                              0.8);
                         } else {
                           return Colors.white.withOpacity(0.9);
                         }
                       }),
                       cells: [
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[0],
-                            // Same dynamic width as column headers
                             child: Text(
                               detail.orderId.toString(),
                               style: TextStyles.body,
@@ -3012,7 +2011,7 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[1],
                             child: Text(
                               detail.orderDate,
@@ -3021,7 +2020,7 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[2],
                             child: Text(
                               detail.invoiceNo!,
@@ -3030,7 +2029,7 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[3],
                             child: Text(
                               detail.total.toString(),
@@ -3039,7 +2038,7 @@ class _CreateOrderState extends State<CreateOrder>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[4],
                             child: Text(
                               detail.deliveryStatus.toString(),
@@ -3047,25 +2046,10 @@ class _CreateOrderState extends State<CreateOrder>
                             ),
                           ),
                         ),
-                        // DataCell(
-                        //   Container(
-                        //     width: columnWidths[4],
-                        //     child: Text(
-                        //       detail.paymentStatus.toString(),
-                        //       style: TextStyles.body,
-                        //     ),
-                        //   ),
-                        // ),
+
                       ],
-                      onSelectChanged: (selected) {
-                        if (selected != null && selected) {
-                          print('what is this');
-                          print(detail.invoiceNo);
-                          print(productList);
-                          print(detail.paymentStatus);
-//final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                        }
-                      });
+
+                      );
                 })),
           ),
         ],

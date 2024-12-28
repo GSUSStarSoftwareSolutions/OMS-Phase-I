@@ -1,25 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
-import 'dart:ui' as ord;
 import 'dart:math' as math;
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
-import 'package:btb/admin/Api%20name.dart';
+import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart';
 import 'package:btb/widgets/custom%20loading.dart';
 import 'package:btb/widgets/pagination.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:btb/widgets/productclass.dart' as ord;
 import 'package:btb/Order%20Module/firstpage.dart' as ors;
 import '../../widgets/confirmdialog.dart';
 import '../../widgets/no datafound.dart';
 import '../../widgets/text_style.dart';
+
 
 void main() {
   runApp(const DashboardPage1());
@@ -55,22 +52,19 @@ class _DashboardPage1State extends State<DashboardPage1>
   String deliverystatus = '';
   late AnimationController _controller;
   late Animation<double> _shakeAnimation;
-  bool _isHovered1 = false;
   bool _isHovered2 = false;
   bool _isHovered5 = false;
   bool orderhover = false;
   bool orderhover2 = false;
-  Map<String, dynamic> PaymentMap = {};
+  Map<String, dynamic> paymentMap = {};
   String? dropdownValue1 = 'Delivery Status';
   String searchQuery = '';
   String token = window.sessionStorage["token"] ?? " ";
   String? role = window.sessionStorage["role"];
   String? dropdownValue2 = 'Select Year';
 
-  // late Future<DashboardCounts?> futureDashboardCounts;
-  //Naveen code
   int currentPage = 1;
-  Map<String, bool> _isHovered = {
+  final Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
     'Products': false,
@@ -81,17 +75,15 @@ class _DashboardPage1State extends State<DashboardPage1>
     'Return': false,
     'Reports': false,
   };
-  ord.Product? _selectedProduct;
   int itemsPerPage = 10;
   int totalItems = 0;
   int totalPages = 0;
   bool isLoading = false;
-  bool _loading = false;
   List<ors.detail> filteredData1 = [];
   List<ors.detail> filteredData = [];
   List<ors.detail> productList = [];
 
-  List<String> _sortOrder = List.generate(5, (index) => 'asc');
+  final List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Order ID',
     'Customer Name',
@@ -121,7 +113,7 @@ class _DashboardPage1State extends State<DashboardPage1>
       //https://ordermanagement-industrious-dugong-ig.cfapps.us10-001.hana.ondemand.com/api/order_master/get_all_ordermaster
       final response = await http.get(
         Uri.parse(
-          '$apicall/${companyName}/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/$companyName/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",
@@ -285,7 +277,7 @@ class _DashboardPage1State extends State<DashboardPage1>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/${companyName}/order_master/get_all_ordermaster',
+          '$apicall/$companyName/order_master/get_all_ordermaster',
         ),
         headers: {
           "Content-type": "application/json",
@@ -532,7 +524,7 @@ class _DashboardPage1State extends State<DashboardPage1>
   Future<void> _getDashboardCounts() async {
     final response = await http.get(
       Uri.parse(
-          '$apicall/${companyName}/order_master/get_customer_order_counts/${userId}'),
+          '$apicall/$companyName/order_master/get_customer_order_counts/$userId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -774,7 +766,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                               Padding(
                                 padding: const EdgeInsets.only(
                                     left: 35, right: 50, top: 5),
-                                child: Container(
+                                child: SizedBox(
                                   width: maxWidth,
                                   child: Column(
                                     children: [
@@ -1056,7 +1048,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           child:
                                                                               Text(
                                                                             _dashboardCounts != null
-                                                                                ? _dashboardCounts!.Picked.toString()
+                                                                                ? _dashboardCounts!.picked.toString()
                                                                                 : '0',
                                                                             style:
                                                                                 const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
@@ -1195,7 +1187,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           child:
                                                                               Text(
                                                                             _dashboardCounts != null
-                                                                                ? _dashboardCounts!.Delivered.toString()
+                                                                                ? _dashboardCounts!.delivered.toString()
                                                                                 : '0',
                                                                             style:
                                                                                 const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
@@ -1341,7 +1333,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           child:
                                                                               Text(
                                                                             _dashboardCounts != null
-                                                                                ? _dashboardCounts!.Cleard.toString()
+                                                                                ? _dashboardCounts!.cleard.toString()
                                                                                 : '0',
                                                                             style:
                                                                                 const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
@@ -1470,7 +1462,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                     child: SingleChildScrollView(
                                       controller: horizontalScroll,
                                       scrollDirection: Axis.horizontal,
-                                      child: Container(
+                                      child: SizedBox(
                                         width: 1200,
                                         child: Padding(
                                           padding: const EdgeInsets.only(
@@ -1480,7 +1472,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     left: 1, right: 1, top: 5),
-                                                child: Container(
+                                                child: SizedBox(
                                                   width: 1200,
                                                   //   color: Colors.grey[50],
                                                   child: Row(
@@ -1518,16 +1510,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                       milliseconds:
                                                                           200),
                                                               child: InkWell(
-                                                                onTap: () {
-                                                                  // context.go('/Open_Order');
-                                                                  // Navigator.push(
-                                                                  //   context,
-                                                                  //   MaterialPageRoute(
-                                                                  //       builder: (context) =>
-                                                                  //           OpenorderList()),
-                                                                  // );
-                                                                },
-                                                                // splashColor: Colors.grey.withOpacity(0.2),
+                                                                onTap: () {},
                                                                 child:
                                                                     Container(
                                                                   height: 115,
@@ -1726,7 +1709,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 10),
                                                                               child: Text(
-                                                                                _dashboardCounts != null ? _dashboardCounts!.Picked.toString() : '0',
+                                                                                _dashboardCounts != null ? _dashboardCounts!.picked.toString() : '0',
                                                                                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                                                                               ),
                                                                             ),
@@ -1853,7 +1836,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 10),
                                                                               child: Text(
-                                                                                _dashboardCounts != null ? _dashboardCounts!.Delivered.toString() : '0',
+                                                                                _dashboardCounts != null ? _dashboardCounts!.delivered.toString() : '0',
                                                                                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                                                                               ),
                                                                             ),
@@ -1989,7 +1972,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 10),
                                                                               child: Text(
-                                                                                _dashboardCounts != null ? _dashboardCounts!.Cleard.toString() : '0',
+                                                                                _dashboardCounts != null ? _dashboardCounts!.cleard.toString() : '0',
                                                                                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                                                                               ),
                                                                             ),
@@ -2215,7 +2198,6 @@ class _DashboardPage1State extends State<DashboardPage1>
   }
 
   Widget buildSearchField2() {
-    double maxWidth1 = MediaQuery.of(context).size.width;
     return LayoutBuilder(builder: (context, constraints) {
       return ConstrainedBox(
         constraints: const BoxConstraints(),
@@ -2567,19 +2549,17 @@ class _DashboardPage1State extends State<DashboardPage1>
 
   Widget buildDataTable2() {
     if (isLoading) {
-      _loading = true;
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
+      var height = MediaQuery.of(context).size.height;
       // Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
 
     if (filteredData1.isEmpty) {
-      double right = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
@@ -2594,16 +2574,14 @@ class _DashboardPage1State extends State<DashboardPage1>
                 columnSpacing: 50,
                 columns: [
                   DataColumn(
-                      label: Container(
-                          child: Text('Order ID', style: TextStyles.subhead))),
+                      label: Text('Order ID', style: TextStyles.subhead)),
                   DataColumn(
                       label: Text('Customer Name', style: TextStyles.subhead)),
                   DataColumn(
-                      label: Container(
-                          child: Text(
-                    'Order Date',
-                    style: TextStyles.subhead,
-                  ))),
+                      label: Text(
+                                          'Order Date',
+                                          style: TextStyles.subhead,
+                                        )),
                   DataColumn(
                       label: Container(
                           child: Text(
@@ -2611,11 +2589,10 @@ class _DashboardPage1State extends State<DashboardPage1>
                     style: TextStyles.subhead,
                   ))),
                   DataColumn(
-                      label: Container(
-                          child: Text(
-                    'Status',
-                    style: TextStyles.subhead,
-                  ))),
+                      label: Text(
+                                          'Status',
+                                          style: TextStyles.subhead,
+                                        )),
                 ],
                 rows: const []),
           ),
@@ -2669,7 +2646,6 @@ class _DashboardPage1State extends State<DashboardPage1>
 
     return LayoutBuilder(builder: (context, constraints) {
       // double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
@@ -2686,7 +2662,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                   return DataColumn(
                     label: Stack(
                       children: [
-                        Container(
+                        SizedBox(
                           //   padding: EdgeInsets.only(left: 5,right: 5),
                           width: columnWidths[columns.indexOf(column)],
                           // Dynamic width based on user interaction
@@ -2747,7 +2723,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                   final detail = filteredData1
                       .skip((currentPage - 1) * itemsPerPage)
                       .elementAt(index);
-                  final isSelected = _selectedProduct == detail;
                   // final isSelected = _selectedProduct == detail;
                   //final product = filteredData[(currentPage - 1) * itemsPerPage + index];
                   return DataRow(
@@ -2761,7 +2736,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                     }),
                     cells: [
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[0],
                           // Same dynamic width as column headers
                           child: Text(
@@ -2771,7 +2746,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[1],
                           child: Text(
                             detail.contactPerson!,
@@ -2780,16 +2755,16 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[2],
                           child: Text(
-                            detail.orderDate!,
+                            detail.orderDate,
                             style: TextStyles.body,
                           ),
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[3],
                           child: Text(
                             detail.total.toString(),
@@ -2798,7 +2773,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[4],
                           child: Text(
                             detail.deliveryStatus.toString(),
@@ -2879,13 +2854,12 @@ class _DashboardPage1State extends State<DashboardPage1>
 
   Widget buildDataTable1() {
     if (isLoading) {
-      _loading = true;
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
+      var height = MediaQuery.of(context).size.height;
       // Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
@@ -2905,28 +2879,24 @@ class _DashboardPage1State extends State<DashboardPage1>
                 columnSpacing: 50,
                 columns: [
                   DataColumn(
-                      label: Container(
-                          child: Text('Order ID', style: TextStyles.subhead))),
+                      label: Text('Order ID', style: TextStyles.subhead)),
                   DataColumn(
                       label: Text('Customer Name', style: TextStyles.subhead)),
                   DataColumn(
-                      label: Container(
-                          child: Text(
-                    'Order Date',
-                    style: TextStyles.subhead,
-                  ))),
+                      label: Text(
+                                          'Order Date',
+                                          style: TextStyles.subhead,
+                                        )),
                   DataColumn(
-                      label: Container(
-                          child: Text(
-                    'Total Amount',
-                    style: TextStyles.subhead,
-                  ))),
+                      label: Text(
+                                          'Total Amount',
+                                          style: TextStyles.subhead,
+                                        )),
                   DataColumn(
-                      label: Container(
-                          child: Text(
-                    'Status',
-                    style: TextStyles.subhead,
-                  ))),
+                      label: Text(
+                                          'Status',
+                                          style: TextStyles.subhead,
+                                        )),
                 ],
                 rows: const []),
           ),
@@ -2938,7 +2908,7 @@ class _DashboardPage1State extends State<DashboardPage1>
       );
     }
 
-    void _sortProducts(int columnIndex, String sortDirection) {
+    void sortProducts(int columnIndex, String sortDirection) {
       if (sortDirection == 'asc') {
         filteredData1.sort((a, b) {
           if (columnIndex == 0) {
@@ -2979,7 +2949,6 @@ class _DashboardPage1State extends State<DashboardPage1>
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-      // double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width;
       return Column(
         children: [
@@ -2997,14 +2966,10 @@ class _DashboardPage1State extends State<DashboardPage1>
                   return DataColumn(
                     label: Stack(
                       children: [
-                        Container(
-                          //   padding: EdgeInsets.only(left: 5,right: 5),
+                        SizedBox(
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            //crossAxisAlignment: CrossAxisAlignment.end,
-                            //   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(column,
                                   overflow: TextOverflow.ellipsis,
@@ -3032,7 +2997,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                 'asc'
                                             ? 'desc'
                                             : 'asc';
-                                    _sortProducts(columns.indexOf(column),
+                                    sortProducts(columns.indexOf(column),
                                         _sortOrder[columns.indexOf(column)]);
                                   });
                                 },
@@ -3054,13 +3019,10 @@ class _DashboardPage1State extends State<DashboardPage1>
                         itemsPerPage,
                         filteredData1.length -
                             (currentPage - 1) * itemsPerPage), (index) {
-                  // final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
+
                   final detail = filteredData1
                       .skip((currentPage - 1) * itemsPerPage)
                       .elementAt(index);
-                  final isSelected = _selectedProduct == detail;
-                  // final isSelected = _selectedProduct == detail;
-                  //final product = filteredData[(currentPage - 1) * itemsPerPage + index];
                   return DataRow(
                     color: MaterialStateProperty.resolveWith<Color>((states) {
                       if (states.contains(MaterialState.hovered)) {
@@ -3072,7 +3034,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                     }),
                     cells: [
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[0],
                           // Same dynamic width as column headers
                           child: Text(
@@ -3082,7 +3044,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[1],
                           child: Text(
                             detail.contactPerson!,
@@ -3091,7 +3053,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[2],
                           child: Text(
                             detail.orderDate!,
@@ -3100,7 +3062,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[3],
                           child: Text(
                             detail.total.toString(),
@@ -3109,7 +3071,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[4],
                           child: Text(
                             detail.deliveryStatus.toString(),
@@ -3118,68 +3080,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                     ],
-                    // onSelectChanged: (selected) {
-                    //   if (selected != null && selected) {
-                    //     final orderId = detail
-                    //         .orderId; // Capture the orderId of the selected row
-                    //     final detail1 = filteredData.firstWhere(
-                    //         (element) => element.orderId == orderId);
-                    //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                    //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                    //
-                    //     if (filteredData1.length <= 9) {
-                    //       //fetchOrders();
-                    //       PaymentMap = {
-                    //         'paymentmode': detail.paymentMode,
-                    //         'paymentStatus': detail.paymentStatus,
-                    //         'paymentdate': detail.paymentDate,
-                    //         'paidamount': detail.paidAmount,
-                    //       };
-                    //
-                    //       context.go('/Order_Placed_List', extra: {
-                    //         'product': detail1,
-                    //         'item': [], // pass an empty list of maps
-                    //         'arrow': 'Home',
-                    //         'status': detail.deliveryStatus,
-                    //         'paymentStatus': PaymentMap,
-                    //         'body': {},
-                    //         // 'status': detail.deliveryStatus,
-                    //         'itemsList': [], // pass an empty list of maps
-                    //         'orderDetails': filteredData
-                    //             .map((detail) => ors.OrderDetail(
-                    //                   orderId: detail.orderId,
-                    //                   orderDate: detail.orderDate, items: [],
-                    //                   // Add other fields as needed
-                    //                 ))
-                    //             .toList(),
-                    //       });
-                    //     } else {
-                    //       PaymentMap = {
-                    //         'paymentmode': detail.paymentMode,
-                    //         'paymentStatus': detail.paymentStatus,
-                    //         'paymentdate': detail.paymentDate,
-                    //         'paidamount': detail.paidAmount,
-                    //       };
-                    //       context.go('/Order_Placed_List', extra: {
-                    //         'product': detail1,
-                    //         'arrow': 'Home',
-                    //         'item': [], // pass an empty list of maps
-                    //         'status': detail.deliveryStatus,
-                    //         'paymentStatus': PaymentMap,
-                    //         'body': {},
-                    //         'itemsList': [], // pass an empty list of maps
-                    //         'orderDetails': filteredData
-                    //             .map((detail) => ors.OrderDetail(
-                    //                   orderId: detail.orderId,
-                    //                   orderDate: detail.orderDate, items: [],
-                    //                   // Add other fields as needed
-                    //                 ))
-                    //             .toList(),
-                    //       });
-                    //
-                    //     }
-                    //   }
-                    // }
                   );
                 })),
           ),
@@ -3281,34 +3181,28 @@ class Dashboard1 {
 
 class DashboardCounts {
   final int openOrders;
-  final int Cleard;
-  final int Inprepare;
-  final int Picked;
-
-  //final int? openInvoices;
+  final int cleard;
+  final int inprepare;
+  final int picked;
   final double totalAmount;
-  final int Delivered;
+  final int delivered;
 
   DashboardCounts(
       {required this.openOrders,
-      required this.Cleard,
-      required this.Inprepare,
-      required this.Picked,
-
-      //   required this.openInvoices,
+      required this.cleard,
+      required this.inprepare,
+      required this.picked,
       required this.totalAmount,
-      required this.Delivered});
+      required this.delivered});
 
   factory DashboardCounts.fromJson(Map<String, dynamic> json) {
     return DashboardCounts(
-      Picked: json['Picked'] ?? 0,
+      picked: json['Picked'] ?? 0,
       openOrders: json['Not Started'] ?? 0.0,
-      Cleard: json['Cleared'] ?? 0.0,
-      Inprepare: json['In Progress'] ?? 0.0,
-
-      //    openInvoices: json['Open Invoices'],
+      cleard: json['Cleared'] ?? 0.0,
+      inprepare: json['In Progress'] ?? 0.0,
       totalAmount: json['totalAmount'] ?? 0.0,
-      Delivered: json['Delivered'] ?? 0.0,
+      delivered: json['Delivered'] ?? 0.0,
     );
   }
 }
@@ -3338,4 +3232,3 @@ class VerticalDividerWidget extends StatelessWidget {
   }
 }
 
-//home page copy
