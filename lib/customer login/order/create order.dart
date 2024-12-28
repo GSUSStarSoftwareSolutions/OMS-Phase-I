@@ -90,6 +90,7 @@ class _CreateOrderState extends State<CreateOrder>
   final TextEditingController emailAddressController = TextEditingController();
   final TextEditingController mobilePhoneNumberController =
       TextEditingController();
+  String companyName = window.sessionStorage["company Name"] ?? " ";
 
   DateTime? _selectedDate;
   List<detail> filteredData = [];
@@ -122,7 +123,7 @@ class _CreateOrderState extends State<CreateOrder>
     try {
       final response = await http.get(
         Uri.parse(
-            '$apicall/productmaster/get_all_s4hana_productmaster?page=$page&limit=$itemsPerPage'),
+            '$apicall/public/productmaster/get_all_s4hana_productmaster?page=$page&limit=$itemsPerPage'),
         headers: {
           "Content-type": "application/json",
           "Authorization": 'Bearer $token',
@@ -181,7 +182,7 @@ class _CreateOrderState extends State<CreateOrder>
     try {
       // API call to fetch customer data for a specific userId
       final response = await http.get(
-        Uri.parse('$apicall/customer_master/get_all_s4hana_customermaster'),
+        Uri.parse('$apicall/public/customer_master/get_all_s4hana_customermaster'),
         headers: {
           "Content-type": "application/json",
           "Authorization": 'Bearer $token',
@@ -340,7 +341,7 @@ class _CreateOrderState extends State<CreateOrder>
 
     // Dummy data for the main payload
     final url =
-        '$apicall/order_master/add_order_master'; // Replace with your API endpoint
+        '$apicall/${companyName}/order_master/add_order_master'; // Replace with your API endpoint
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token', // Dummy token
@@ -2401,12 +2402,19 @@ class _CreateOrderState extends State<CreateOrder>
     return total.toStringAsFixed(2);
   }
 
-
   Widget _buildQuantityField(
       Map<String, dynamic> product, TextEditingController controller) {
-    // Only update the controller text if it doesn't match the current product quantity
+    // Sync controller's text with product['qty'] if needed
     if (controller.text != product['qty'].toString()) {
-      controller.text = product['qty'].toString();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final newText = product['qty']?.toString() ?? '';
+        if (controller.text != newText) {
+          controller.value = TextEditingValue(
+            text: newText,
+            selection: TextSelection.collapsed(offset: newText.length),
+          );
+        }
+      });
     }
 
     return Padding(
@@ -2418,8 +2426,16 @@ class _CreateOrderState extends State<CreateOrder>
           textAlign: TextAlign.start,
           keyboardType: TextInputType.number,
           onChanged: (value) {
+            // Update product quantity dynamically while user types
             setState(() {
-              product['qty'] = double.tryParse(value) ?? 0;
+              if (value.isEmpty) {
+                product['qty'] = 0; // Handle empty input gracefully
+              } else {
+                final parsedValue = double.tryParse(value);
+                if (parsedValue != null) {
+                  product['qty'] = parsedValue;
+                }
+              }
             });
           },
           decoration: InputDecoration(
@@ -2433,6 +2449,7 @@ class _CreateOrderState extends State<CreateOrder>
               borderRadius: BorderRadius.circular(8.0),
               borderSide: BorderSide.none, // Optional: Remove border for cleaner look
             ),
+            hintText: 'Qty', // Optional: Provide a placeholder text
             hintStyle: TextStyles.body,
           ),
           style: TextStyles.body, // Ensure consistent text style
@@ -2441,6 +2458,50 @@ class _CreateOrderState extends State<CreateOrder>
     );
   }
 
+
+
+
+  //original
+  // Widget _buildQuantityField(
+  //     Map<String, dynamic> product, TextEditingController controller) {
+  //   // Only update the controller text if it doesn't match the current product quantity
+  //   if (controller.text != product['qty'].toString()) {
+  //     controller.text = product['qty'].toString();
+  //   }
+  //
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5), // External padding
+  //     child: SizedBox(
+  //       width: 60, // Adjusted width for better spacing in DataTable
+  //       child: TextFormField(
+  //         controller: controller,
+  //         textAlign: TextAlign.start,
+  //         keyboardType: TextInputType.number,
+  //         onChanged: (value) {
+  //           setState(() {
+  //             product['qty'] = double.tryParse(value) ?? 0;
+  //           });
+  //         },
+  //         decoration: InputDecoration(
+  //           filled: true,
+  //           fillColor: Colors.grey[100],
+  //           contentPadding: const EdgeInsets.symmetric(
+  //             vertical: 12, // Internal padding for better alignment of text
+  //             horizontal: 10,
+  //           ),
+  //           border: OutlineInputBorder(
+  //             borderRadius: BorderRadius.circular(8.0),
+  //             borderSide: BorderSide.none, // Optional: Remove border for cleaner look
+  //           ),
+  //           hintStyle: TextStyles.body,
+  //         ),
+  //         style: TextStyles.body, // Ensure consistent text style
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  //old
   // Widget _buildQuantityField(
   //     Map<String, dynamic> product, TextEditingController controller) {
   //   // Only update the controller text if it doesn't match the current product quantity

@@ -61,6 +61,7 @@ class _AdminListState extends State<AdminList> {
   Map<String, dynamic> PaymentMap = {};
   String? dropdownValue1 = 'Delivery Status';
   String searchQuery = '';
+  String companyname = window.sessionStorage["company"] ?? " ";
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Role';
   int currentPage = 1;
@@ -95,7 +96,7 @@ class _AdminListState extends State<AdminList> {
 
   Future<void> deleteRowAPI(String TypeId) async {
     try {
-      String apiUri = '$apicall/user/delete_usermaster_by_id/$TypeId';
+      String apiUri = '$apicall/public/user/delete_usermaster_by_id/$TypeId';
 
       Map<String, String> headers = {
         'Content-Type': 'application/json',
@@ -124,10 +125,10 @@ class _AdminListState extends State<AdminList> {
                     child: Column(
                       children: [
                         // Warning Icon
-                        Icon(Icons.warning, color: Colors.orange, size: 50),
-                        SizedBox(height: 16),
+                        const Icon(Icons.warning, color: Colors.orange, size: 50),
+                        const SizedBox(height: 16),
                         // Confirmation Message
-                        Text(
+                        const Text(
                           'Session Expired',
                           style: TextStyle(
                             fontSize: 16,
@@ -135,14 +136,14 @@ class _AdminListState extends State<AdminList> {
                             color: Colors.black,
                           ),
                         ),
-                        Text(
+                        const Text(
                           "Please log in again to continue",
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         // Buttons
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -155,12 +156,12 @@ class _AdminListState extends State<AdminList> {
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                side: BorderSide(color: Colors.blue),
+                                side: const BorderSide(color: Colors.blue),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'ok',
                                 style: TextStyle(
                                   color: Colors.blue,
@@ -204,7 +205,7 @@ class _AdminListState extends State<AdminList> {
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/email/get_all_user_master?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/public/email/get_all_user_master/${companyname}?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",
@@ -229,10 +230,10 @@ class _AdminListState extends State<AdminList> {
                     child: Column(
                       children: [
                         // Warning Icon
-                        Icon(Icons.warning, color: Colors.orange, size: 50),
-                        SizedBox(height: 16),
+                        const Icon(Icons.warning, color: Colors.orange, size: 50),
+                        const SizedBox(height: 16),
                         // Confirmation Message
-                        Text(
+                        const Text(
                           'Session Expired',
                           style: TextStyle(
                             fontSize: 16,
@@ -240,14 +241,14 @@ class _AdminListState extends State<AdminList> {
                             color: Colors.black,
                           ),
                         ),
-                        Text(
+                        const Text(
                           "Please log in again to continue",
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         // Buttons
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -260,12 +261,12 @@ class _AdminListState extends State<AdminList> {
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                side: BorderSide(color: Colors.blue),
+                                side: const BorderSide(color: Colors.blue),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'ok',
                                 style: TextStyle(
                                   color: Colors.blue,
@@ -369,7 +370,7 @@ class _AdminListState extends State<AdminList> {
 
     //  String status = 'false';
     final String apiUrl =
-        '$apicall/user_master/update_user_status/$userId/$isActive';
+        '$apicall/public/user_master/update_user_status/$userId/$isActive';
     try {
       final response = await http.put(
         Uri.parse(apiUrl),
@@ -396,10 +397,10 @@ class _AdminListState extends State<AdminList> {
                     child: Column(
                       children: [
                         // Warning Icon
-                        Icon(Icons.warning, color: Colors.orange, size: 50),
-                        SizedBox(height: 16),
+                        const Icon(Icons.warning, color: Colors.orange, size: 50),
+                        const SizedBox(height: 16),
                         // Confirmation Message
-                        Text(
+                        const Text(
                           'Session Expired',
                           style: TextStyle(
                             fontSize: 16,
@@ -407,14 +408,14 @@ class _AdminListState extends State<AdminList> {
                             color: Colors.black,
                           ),
                         ),
-                        Text(
+                        const Text(
                           "Please log in again to continue",
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         // Buttons
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -427,12 +428,12 @@ class _AdminListState extends State<AdminList> {
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                side: BorderSide(color: Colors.blue),
+                                side: const BorderSide(color: Colors.blue),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'ok',
                                 style: TextStyle(
                                   color: Colors.blue,
@@ -564,6 +565,8 @@ class _AdminListState extends State<AdminList> {
   @override
   void initState() {
     super.initState();
+    print('company');
+    print(companyname);
     _dateController = TextEditingController();
     _selectedDate = DateTime.now();
     String formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate!);
@@ -593,7 +596,7 @@ class _AdminListState extends State<AdminList> {
                 Container(
                   width: maxWidth,
                   height: 60.0,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: Colors.white,
                       border: Border(
                         bottom: BorderSide(
@@ -620,10 +623,10 @@ class _AdminListState extends State<AdminList> {
                             ),
                           ),
                           const Spacer(),
-                          Row(
+                          const Row(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(
+                                padding: EdgeInsets.only(
                                   right: 10,top: 10
                                 ),
                                 // Adjust padding for better spacing
@@ -646,7 +649,7 @@ class _AdminListState extends State<AdminList> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Padding(
-                          padding: EdgeInsets.only(top: 0),
+                          padding: const EdgeInsets.only(top: 0),
                           child: Container(
                             height: 1400,
                             padding:    const EdgeInsets.only(left: 15, top: 10, right: 15),
@@ -663,19 +666,19 @@ class _AdminListState extends State<AdminList> {
                   ),
                   VerticalDividerWidget(
                     height: maxHeight,
-                    color: Color(0x29000000),
+                    color: const Color(0x29000000),
                   ),
                 } else ...{
                   Align(
                     alignment: Alignment.topLeft,
                     child: Padding(
-                      padding: EdgeInsets.only(top: 62),
+                      padding: const EdgeInsets.only(top: 60),
                       child: Container(
                         height: maxHeight,
                         padding:
                         const EdgeInsets.only(left: 15, top: 10, right: 15),
                         width: 200,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                             color:  Colors.white,
                             border: Border(
                               left: BorderSide(
@@ -693,7 +696,7 @@ class _AdminListState extends State<AdminList> {
                   ),
                   VerticalDividerWidget(
                     height: maxHeight,
-                    color: Color(0x29000000),
+                    color: const Color(0x29000000),
                   ),
                 },
                 Positioned(
@@ -710,7 +713,7 @@ class _AdminListState extends State<AdminList> {
                             child: SingleChildScrollView(
                               child: Column(
                                 children: [
-                                  SizedBox(height: 20),
+                                  const SizedBox(height: 20),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
@@ -721,7 +724,7 @@ class _AdminListState extends State<AdminList> {
                                           style: TextStyles.heading,
                                         ),
                                       ),
-                                      Spacer(),
+                                      const Spacer(),
                                       Padding(
                                         padding: const EdgeInsets.only(right: 20, top: 10),
                                         child: OutlinedButton(
@@ -827,7 +830,7 @@ class _AdminListState extends State<AdminList> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      SizedBox(height: 20),
+                                      const SizedBox(height: 20),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
@@ -975,7 +978,7 @@ class _AdminListState extends State<AdminList> {
                       decoration: InputDecoration(
                           hintText: 'Search by User ID and User Name',
                           hintStyle: TextStyles.body1,
-                          contentPadding: EdgeInsets.only(bottom: 20, left: 10),
+                          contentPadding: const EdgeInsets.only(bottom: 20, left: 10),
                           // adjusted padding
                           border: InputBorder.none,
                           suffixIcon: Padding(
@@ -1011,7 +1014,7 @@ class _AdminListState extends State<AdminList> {
                           border: Border.all(color: Colors.grey.shade400),
                         ),
                         child: DropdownButtonFormField2<String>(
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             contentPadding:
                             EdgeInsets.only(bottom: 20, left: 2),
                             // adjusted padding
@@ -1739,7 +1742,7 @@ class _AdminListState extends State<AdminList> {
             border: Border.symmetric(
                 horizontal: BorderSide(color: Colors.grey, width: 0.5))),
         child: DataTable(
-            headingRowColor:  MaterialStateProperty.all(Color(0xFFF7F7F7)),
+            headingRowColor:  MaterialStateProperty.all(const Color(0xFFF7F7F7)),
             showCheckboxColumn: false,
             headingRowHeight: 35,
             columnSpacing: 20,
@@ -1775,14 +1778,14 @@ class _AdminListState extends State<AdminList> {
                                   child: Image.asset(
                                     "images/ix_sort.png",
                                     color:
-                                    Color.fromRGBO(0, 83, 176, 1),
+                                    const Color.fromRGBO(0, 83, 176, 1),
                                   ))
                                   : SizedBox(
                                   width: 12,
                                   child: Image.asset(
                                     "images/ix_sort.png",
                                     color:
-                                    Color.fromRGBO(0, 83, 176, 1),
+                                    const Color.fromRGBO(0, 83, 176, 1),
                                   )),
                               onPressed: () {
                                 setState(() {
@@ -1930,7 +1933,7 @@ class _AdminListState extends State<AdminList> {
                     IconButton(
                         icon: Image.asset(
                           "images/edit_icon.png",
-                          color: Color.fromRGBO(0, 83, 176, 1),
+                          color: const Color.fromRGBO(0, 83, 176, 1),
                         ),
                         onPressed: () {
                           var selectedCustomer =
@@ -1941,13 +1944,13 @@ class _AdminListState extends State<AdminList> {
                             'EditUser': selectedCustomer,
                           });
                         }),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     IconButton(
                       icon: Image.asset(
                         "images/delete.png",
-                        color: Color.fromRGBO(250, 0, 0, 1),
+                        color: const Color.fromRGBO(250, 0, 0, 1),
                       ),
                       onPressed: () {
                         showDialog(
@@ -2202,7 +2205,7 @@ class _AdminListState extends State<AdminList> {
             border: Border.symmetric(
                 horizontal: BorderSide(color: Colors.grey, width: 0.5))),
         child: DataTable(
-          headingRowColor:  MaterialStateProperty.all(Color(0xFFF7F7F7)),
+          headingRowColor:  MaterialStateProperty.all(const Color(0xFFF7F7F7)),
             showCheckboxColumn: false,
             headingRowHeight: 35,
             columnSpacing: 20,
@@ -2238,14 +2241,14 @@ class _AdminListState extends State<AdminList> {
                                   child: Image.asset(
                                     "images/ix_sort.png",
                                     color:
-                                    Color.fromRGBO(0, 83, 176, 1),
+                                    const Color.fromRGBO(0, 83, 176, 1),
                                   ))
                                   : SizedBox(
                                   width: 12,
                                   child: Image.asset(
                                     "images/ix_sort.png",
                                     color:
-                                    Color.fromRGBO(0, 83, 176, 1),
+                                    const Color.fromRGBO(0, 83, 176, 1),
                                   )),
                               onPressed: () {
                                 setState(() {
@@ -2393,7 +2396,7 @@ class _AdminListState extends State<AdminList> {
                     IconButton(
                         icon: Image.asset(
                           "images/edit_icon.png",
-                          color: Color.fromRGBO(0, 83, 176, 1),
+                          color: const Color.fromRGBO(0, 83, 176, 1),
                         ),
                         onPressed: () {
                           var selectedCustomer =
@@ -2404,13 +2407,13 @@ class _AdminListState extends State<AdminList> {
                             'EditUser': selectedCustomer,
                           });
                         }),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     IconButton(
                       icon: Image.asset(
                         "images/delete.png",
-                        color: Color.fromRGBO(250, 0, 0, 1),
+                        color: const Color.fromRGBO(250, 0, 0, 1),
                       ),
                       onPressed: () {
                         showDialog(

@@ -464,7 +464,7 @@ class _CusListState extends State<CusList> {
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/customer_master/get_all_s4hana_customermaster?page=$page&limit=$itemsPerPage',
+          '$apicall/public/customer_master/get_all_s4hana_customermaster?page=$page&limit=$itemsPerPage',
         ),
         headers: {
           "Content-type": "application/json",
@@ -1186,15 +1186,15 @@ class _CusListState extends State<CusList> {
       if (sortDirection == 'asc') {
         filteredData.sort((a, b) {
           if (columnIndex == 0) {
-            return a.customer!.compareTo(b.customer!);
+            return a.customer.compareTo(b.customer);
           } else if (columnIndex == 1) {
-            return a.businessPartnerName!.compareTo(b.businessPartnerName!);
+            return a.businessPartner.compareTo(b.businessPartner);
           } else if (columnIndex == 2) {
-            return a.telephoneNumber1!.compareTo(b.telephoneNumber1!);
+            return a.cityName.compareTo(b.cityName);
           } else if (columnIndex == 3) {
-            return a.emailAddress!.toLowerCase().compareTo(b.emailAddress!.toLowerCase());
+            return a.telephoneNumber1.toLowerCase().compareTo(b.telephoneNumber1.toLowerCase());
           } else if (columnIndex == 4) {
-            return a.postalCode!.compareTo(b.postalCode!);
+            return a.emailAddress.compareTo(b.emailAddress);
           } else {
             return 0;
           }
@@ -1204,13 +1204,13 @@ class _CusListState extends State<CusList> {
           if (columnIndex == 0) {
             return b.customer!.compareTo(a.customer!); // Reverse the comparison
           } else if (columnIndex == 1) {
-            return b.businessPartnerName!.compareTo(a.businessPartnerName!); // Reverse the comparison
+            return b.businessPartner.compareTo(a.businessPartner); // Reverse the comparison
           } else if (columnIndex == 2) {
-            return b.telephoneNumber1!.compareTo(a.telephoneNumber1!); // Reverse the comparison
+            return b.cityName!.compareTo(a.cityName!); // Reverse the comparison
           } else if (columnIndex == 3) {
-            return b.emailAddress!.toLowerCase().compareTo(a.emailAddress!.toLowerCase()); // Reverse the comparison
+            return b.telephoneNumber1!.toLowerCase().compareTo(a.telephoneNumber1!.toLowerCase()); // Reverse the comparison
           } else if (columnIndex == 4) {
-            return b.postalCode!.compareTo(a.postalCode!); // Reverse the comparison
+            return b.emailAddress!.compareTo(a.emailAddress!); // Reverse the comparison
           } else {
             return 0;
           }
@@ -1409,13 +1409,15 @@ class _CusListState extends State<CusList> {
           if (columnIndex == 0) {
             return a.customer!.compareTo(b.customer!);
           } else if (columnIndex == 1) {
-            return a.businessPartnerName!.compareTo(b.businessPartnerName!);
+            return a.businessPartner!.compareTo(b.businessPartner!);
           } else if (columnIndex == 2) {
-            return a.telephoneNumber1!.compareTo(b.telephoneNumber1!);
+            return a.cityName!.compareTo(b.cityName!);
+
           } else if (columnIndex == 3) {
-            return a.emailAddress!.toLowerCase().compareTo(b.emailAddress!.toLowerCase());
+            return a.telephoneNumber1!.compareTo(b.telephoneNumber1!);
+
           } else if (columnIndex == 4) {
-            return a.postalCode!.compareTo(b.postalCode!);
+            return a.emailAddress!.toLowerCase().compareTo(b.emailAddress!.toLowerCase());
           } else {
             return 0;
           }
@@ -1425,13 +1427,13 @@ class _CusListState extends State<CusList> {
           if (columnIndex == 0) {
             return b.customer!.compareTo(a.customer!); // Reverse the comparison
           } else if (columnIndex == 1) {
-            return b.businessPartnerName!.compareTo(a.businessPartnerName!); // Reverse the comparison
+            return b.businessPartner!.compareTo(a.businessPartner!); // Reverse the comparison
           } else if (columnIndex == 2) {
-            return b.telephoneNumber1!.compareTo(a.telephoneNumber1!); // Reverse the comparison
+            return b.cityName!.compareTo(a.cityName!); // Reverse the comparison
           } else if (columnIndex == 3) {
-            return b.emailAddress!.toLowerCase().compareTo(a.emailAddress!.toLowerCase()); // Reverse the comparison
+            return b.telephoneNumber1!.toLowerCase().compareTo(a.telephoneNumber1!.toLowerCase()); // Reverse the comparison
           } else if (columnIndex == 4) {
-            return b.postalCode!.compareTo(a.postalCode!); // Reverse the comparison
+            return b.emailAddress!.compareTo(a.emailAddress!); // Reverse the comparison
           } else {
             return 0;
           }

@@ -59,7 +59,7 @@ class _userEditState extends State<userEdit> {
     });
   }
   Future<void> cusUpdate(BuildContext context) async {
-    String url = "$apicall/user/edit-usermaster";
+    String url = "$apicall/public/user/edit-usermaster";
     Map<String, dynamic> data = {
       "active": true,
       "userId": userId.text,
@@ -404,7 +404,7 @@ class _userEditState extends State<userEdit> {
                       // Added Align widget for the left side menu
                       alignment: Alignment.topLeft,
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 2),
+                        padding: const EdgeInsets.only(top: 0),
                         child: Container(
                           height: 1400,
                           width: 200,
@@ -427,7 +427,7 @@ class _userEditState extends State<userEdit> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: Padding(
-                      padding:  EdgeInsets.only(top:59),
+                      padding:  EdgeInsets.only(top:60),
                       child: Container(
                         height: maxHeight,
                         width: 200,

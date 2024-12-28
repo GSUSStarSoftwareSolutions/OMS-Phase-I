@@ -27,6 +27,7 @@ class Createusr extends StatefulWidget {
 
 class _CreateusrState extends State<Createusr> {
   bool _hasShownPopup = false;
+  String companyName = window.sessionStorage["company"] ?? " ";
   String token = window.sessionStorage["token"] ?? " ";
   final ScrollController _scrollController = ScrollController();
   late TextEditingController dateController;
@@ -43,7 +44,7 @@ class _CreateusrState extends State<Createusr> {
   List<String> items = [
     'Admin',
     'Employee',
-    //'Customer',
+    'Customer',
   ];
   String? selectedValue;
 
@@ -55,7 +56,7 @@ class _CreateusrState extends State<Createusr> {
     });
   }
   Future<void> cusSave(BuildContext context) async {
-    String url = "$apicall/user_master/add-usermaster";
+    String url = "$apicall/public/user_master/add-usermaster";
     Map<String, dynamic> data = {
       "active": true,
       "companyName": departmentController.text,
@@ -167,14 +168,8 @@ class _CreateusrState extends State<Createusr> {
                   ),
                   icon: const Icon(Icons.check_circle_rounded, color: Colors.green, size: 25),
                   title: const Text(
-                    'Account created.',
+                    'Account created Successfully',
                     style: TextStyle(fontSize: 15),
-                  ),
-                  content: const Row(
-                    children: [
-                      Text('Check your email for login details.!'),
-                      //    SelectableText('$customerId'),
-                    ],
                   ),
                   actions: [
                     ElevatedButton(
@@ -231,6 +226,9 @@ class _CreateusrState extends State<Createusr> {
 
   void initState() {
     super.initState();
+    print('company');
+    print(companyName);
+    departmentController.text = companyName;
     dateController = TextEditingController();
     dateController.text = 'Joining Date';
   }
@@ -316,8 +314,6 @@ class _CreateusrState extends State<Createusr> {
   }
 
   @override
-
-
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -387,7 +383,7 @@ class _CreateusrState extends State<Createusr> {
                       // Added Align widget for the left side menu
                       alignment: Alignment.topLeft,
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 2),
+                        padding: const EdgeInsets.only(top: 0),
                         child: Container(
                           height: 1400,
                           width: 200,
@@ -718,9 +714,11 @@ class _CreateusrState extends State<Createusr> {
                                                 child: Padding(
                                                   padding: const EdgeInsets.only(right: 8.0),
                                                   child: TextFormField(
+                                                  //  initialValue: companyName,
+                                                    enabled: false,
                                                     controller: departmentController,
                                                     style: GoogleFonts.inter(
-                                                        color: Colors.black,
+                                                        color: Colors.grey,
                                                         fontSize: 13),
                                                     decoration: InputDecoration(
                                                       hintText: 'Company Name',

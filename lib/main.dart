@@ -4,7 +4,6 @@ import 'package:btb/admin/admin%20edit.dart';
 import 'package:btb/admin/admin%20list.dart';
 import 'package:btb/admin/create%20login.dart';
 import 'package:btb/customer%20login/order/create%20order.dart';
-import 'package:btb/customer%20login/order/order%20view%20responsive.dart';
 import 'package:btb/customer%20module/create%20customer.dart';
 import 'package:btb/customer%20module/customer%20view.dart';
 import 'package:btb/dashboard/pay%20complete.dart';
@@ -25,27 +24,22 @@ import 'package:btb/dashboard/openorder%20screen.dart';
 import 'package:btb/dashboard/order%20completedlistscreen.dart';
 import 'package:btb/customer%20login/home/admin%20dash.dart';
 import 'package:btb/sample/notifier.dart';
-import 'package:btb/sample/size.dart';
+
 //import 'package:btb/customer%20login/home/order%20list.dart';
 import 'package:btb/widgets/productclass.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'Order Module/responsive order view.dart';
-import 'Order Module/responsiveorderfirstpage.dart';
 import 'Product/product list.dart';
-import 'Product/responsiveproductlist.dart';
 import 'admin/admin.dart';
 import 'admin/create users.dart';
+import 'admin/sign up.dart';
 import 'customer login/home/home.dart';
-import 'customer login/order/create order responsive.dart';
 import 'customer login/order/order list.dart';
 import 'customer login/order/order view screen.dart';
 import 'customer login/order/responsiveorder list.dart';
 import 'customer module/customer list.dart';
-import 'customer module/responsivecustomerlist.dart';
-import 'dashboard/responsivedashboard.dart';
 
 void main() async {
   // configureApp();
@@ -60,7 +54,6 @@ void main() async {
       create: (context) => MenuProvider(),
       child: MyApp(),
     ),
-
     // MultiProvider(
     //   providers: [
     //     ChangeNotifierProvider(create: (_) => ExtraDataProvider()),
@@ -96,7 +89,7 @@ class MyApp extends StatelessWidget {
   final GoRouter _router = GoRouter(
     // useHash: false,
     // routerNeglect: true,
-    //  useHash: false,f
+    //  useHash: false,
 
     // urlPathStrategy: UrlPathStrategy.path,
     initialLocation: window.sessionStorage.containsKey('token') ? '/Home' : '/',
@@ -110,6 +103,24 @@ class MyApp extends StatelessWidget {
           return CustomTransitionPage(
             key: state.pageKey,
             child: LoginScr(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: Duration(
+                milliseconds: 5), // Adjust transition duration if needed
+          );
+        },
+      ),
+      GoRoute(
+        path: '/SignUp',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: comLog(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -176,6 +187,29 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
+      // GoRoute(
+      //   path: '/Edit_User',
+      //   pageBuilder: (context, state) {
+      //     // Safely cast 'state.extra' to 'Map<String, dynamic>?'
+      //     final extra = state.extra is Map<String, dynamic>
+      //         ? state.extra as Map<String, dynamic>
+      //         : null;
+      //
+      //     return CustomTransitionPage(
+      //       key: state.pageKey,
+      //       child: userEdit(
+      //         EditUser: extra?['EditUser'] ?? {}, // Use default empty map if null
+      //       ),
+      //       transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      //         return FadeTransition(
+      //           opacity: animation,
+      //           child: child,
+      //         );
+      //       },
+      //       transitionDuration: const Duration(milliseconds: 5),
+      //     );
+      //   },
+      // ),
       GoRoute(
         path: '/Edit_User',
         pageBuilder: (context, state) {
@@ -183,7 +217,7 @@ class MyApp extends StatelessWidget {
           return CustomTransitionPage(
             key: state.pageKey,
             child: userEdit(
-              EditUser: extra['EditUser'] ?? {},
+              EditUser: extra['EditUser' ?? ''] ?? {},
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -202,7 +236,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: MainScreen(), //dashboard1
+            child: DashboardPage1(), //dashboard1MainScreen
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -220,7 +254,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ResponsivecreateOrdersPage(),//CreateOrder
+            child: CreateOrder(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -238,7 +272,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ResponsiveOrdersPage(),//cusorderpage
+            child: CusOrderPage(), //cusorderpage  ResponsiveOrdersPage
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -270,13 +304,9 @@ class MyApp extends StatelessWidget {
           }
           return CustomTransitionPage(
             key: state.pageKey,
-            child:
-            ResponsiveeditOrdersPage(
-              orderId: extra['orderId'] ?? '',
+            child: OrderView(
+              orderId: extra!['orderId'] ?? '',
             ),
-            // OrderView(
-            //   orderId: extra!['orderId'] ?? '',
-            // ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -294,7 +324,9 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ResponsiveEmpproductPage(),//ProductPage(product: null,)
+            child: ProductPage(
+              product: null,
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -312,7 +344,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ResponsiveEmpcustomerPage(),//CusList
+            child: CusList(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -405,7 +437,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ResponsiveEmpdashboard(),//DashboardPage
+            child: DashboardPage(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -423,7 +455,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ResponsiveEmpOrdersPage(),//Orderspage
+            child: Orderspage(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -442,13 +474,9 @@ class MyApp extends StatelessWidget {
           final extraData = state.extra as Map<String, dynamic>? ?? {};
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ResponsiveeditviewOrdersPage(
+            child: OrderView2(
               orderId: extraData['orderId'] ?? '',
             ),
-
-            // OrderView2(
-            //   orderId: extraData['orderId'] ?? '',
-            // ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -484,7 +512,7 @@ class MyApp extends StatelessWidget {
               );
             },
             transitionDuration:
-            Duration(milliseconds: 5), // Adjust the duration as needed
+                Duration(milliseconds: 5), // Adjust the duration as needed
           );
         },
       ),
@@ -544,7 +572,7 @@ class MyApp extends StatelessWidget {
           final products = (extra['products'] as List<dynamic>).cast<Product>();
           final data = extra['data'] as Map<String, dynamic>;
           final selectedProducts =
-          (extra['selectedProducts'] as List<dynamic>).cast<Product>();
+              (extra['selectedProducts'] as List<dynamic>).cast<Product>();
           final inputText = extra['inputText'] as String;
           final subText = extra['subText'] as String;
           final notselect = extra['notselect'] as String;
@@ -580,7 +608,7 @@ class MyApp extends StatelessWidget {
           final products = (extra['products'] as List<dynamic>).cast<Product>();
           final data = extra['data'] as Map<String, dynamic>;
           final selectedProducts =
-          (extra['selectedProducts'] as List<dynamic>).cast<Product>();
+              (extra['selectedProducts'] as List<dynamic>).cast<Product>();
           final inputText = extra['inputText'] as String;
           final subText = extra['subText'] as String;
           final notselect = extra['notselect'] as String;
@@ -641,12 +669,12 @@ class MyApp extends StatelessWidget {
                 );
               },
               transitionDuration:
-              Duration(milliseconds: 300), // Adjust transition duration
+                  Duration(milliseconds: 300), // Adjust transition duration
             );
           } else {
             final extra = state.extra as Map<String, dynamic>;
             Map<String, dynamic>? selectedProductsMap =
-            extra['selectedProducts'] as Map<String, dynamic>?;
+                extra['selectedProducts'] as Map<String, dynamic>?;
             return CustomTransitionPage(
               key: state.pageKey,
               child: SeventhPage(
@@ -848,7 +876,7 @@ class MyApp extends StatelessWidget {
               );
             },
             transitionDuration:
-            Duration(milliseconds: 200), // Adjust duration as needed
+                Duration(milliseconds: 200), // Adjust duration as needed
           );
         },
       ),
@@ -882,7 +910,7 @@ class MyApp extends StatelessWidget {
             key: state.pageKey,
             child: NextPage(
               selectedProducts:
-              extra['selectedProducts'] as List<Product>? ?? [],
+                  extra['selectedProducts'] as List<Product>? ?? [],
               // Provide an empty list if null
               product: extra['product'] as Product? ??
                   Product(
@@ -927,14 +955,63 @@ class MyApp extends StatelessWidget {
         },
       ),
     ],
-    // useHash: true,
+    redirect: (context, state) {
+      final bool isLoggedIn = window.sessionStorage.containsKey('token');
+      final String currentPath = state.matchedLocation;
+
+      // List of paths that are exempted before login
+      final List<String> exemptedPaths = ['/SignUp', '/Create_Account'];
+
+      if (!isLoggedIn && !exemptedPaths.contains(currentPath)) {
+        // If not logged in and path is not in exempted list, redirect to '/'
+        return '/';
+      }
+
+      // If logged in or path is exempted, no redirect
+      return null;
+    },
+      //new27-12-2024
+      // redirect: (BuildContext context, GoRouterState state) {
+      //   // Check if the user is logged in by looking for a 'token' in sessionStorage
+      //   final isLoggedIn = html.window.sessionStorage.containsKey('token');
+      //
+      //   // Identify if the user is trying to access the /SignUp or /Create_Account pages
+      //   final isSignUpPage = state.name == '/SignUp';
+      //   final isCreateAccountPage = state.name == '/Create_Account';
+      //
+      //   // If the user is not logged in
+      //   if (!isLoggedIn) {
+      //     // Allow access to /SignUp or /Create_Account without redirecting
+      //     if (isSignUpPage || isCreateAccountPage) {
+      //       return null;  // Don't apply redirect, allow access to the page
+      //     }
+      //     // Redirect to the login page for any other page
+      //     return '/';
+      //   }
+      //
+      //   // If the user is logged in, allow access to the requested page
+      //   return null;
+      // }
+
+
+
+    // redirect: (BuildContext context, GoRouterState state) {
+    //   final isLoggedIn = html.window.sessionStorage.containsKey('token');
+    //   final isLoggingIn =
+    //       state.name == '/';
+    //   if (!isLoggedIn) {
+    //     if (isLoggingIn) {
+    //       return null;
+    //     }
+    //     return '/';
+    //   }
+    //   return null;
+    // },
   );
 
   MyApp({super.key});
 
   @override
-  //import 'dart:html' as html;
-
   Widget build(BuildContext context) {
     // Disable browser navigation gestures in web
 
@@ -950,12 +1027,12 @@ class MyApp extends StatelessWidget {
 class NoTransitionsBuilder extends PageTransitionsBuilder {
   @override
   Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-      ) {
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return child; // No animations, no swipe gestures
   }
 }
@@ -1387,14 +1464,4 @@ class ErrorScreen extends StatelessWidget {
 //   }
 // }
 
-class UserRoleProvider with ChangeNotifier {
-  String _role = '';
-
-  String get role => _role;
-
-  void setRole(String newRole) {
-    _role = newRole;
-    notifyListeners();
-  }
-}
-// responsive workon main file carefully handle 2
+//main file carefully handle it

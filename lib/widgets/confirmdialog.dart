@@ -166,6 +166,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:html' as html;
 
+import 'package:provider/provider.dart';
+
+import '../sample/provider.dart';
+
 
 
 class AccountMenu extends StatefulWidget {
@@ -194,14 +198,18 @@ class _AccountMenuState extends State<AccountMenu> {
               color: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-                side: BorderSide(color: Colors.grey),
+
+                borderRadius: BorderRadius.circular(10),
+               // side: BorderSide(color: Colors.grey),
 
               ),
               onSelected: (value) {
                 if (value == 'logout') {
                   setState(() {
+                    html.window.sessionStorage.clear(); // Clears all data in sessionStorage
                     showTriangle = false;
+                  //  window.s
+                    //window.sessionStorage["token"].remove;
                     showConfirmationDialog(context);
                     print('Logged out');
                   });
@@ -238,7 +246,7 @@ class _AccountMenuState extends State<AccountMenu> {
             ),
             if (showTriangle)
               Positioned(
-                top: 39,
+                top: 40,
                 right: 10,
                 child: CustomPaint(
                   painter: TrianglePainter(),
@@ -295,8 +303,10 @@ class _AccountMenuState extends State<AccountMenu> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
+                          //  final authProvider = Provider.of<AuthProvider>(context, listen: false);
                             // Handle Yes action
                             context.go('/');
+                            //authProvider.logout();
                             // Navigator.push(
                             //   context,
                             //   PageRouteBuilder(
@@ -388,7 +398,7 @@ class TrianglePainter extends CustomPainter {
     canvas.drawPath(path, fillPaint);
 
     // Draw the triangle border
-    canvas.drawPath(path, borderPaint);
+    //canvas.drawPath(path, borderPaint);
   }
 
   @override

@@ -16,9 +16,11 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:btb/widgets/productclass.dart' as ord;
 import 'package:btb/Order%20Module/firstpage.dart' as ors;
+import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import '../Order Module/firstpage.dart' as ors;
 import '../customer module/customer list.dart';
+import '../sample/provider.dart';
 import '../widgets/confirmdialog.dart';
 import '../widgets/no datafound.dart';
 import '../widgets/text_style.dart';
@@ -56,6 +58,7 @@ class _DashboardPageState extends State<DashboardPage>
   late AnimationController _controller;
   late Animation<double> _shakeAnimation;
   bool _isHovered1 = false;
+  String companyName = window.sessionStorage["company Name"] ?? " ";
   bool _isHovered2 = false;
   bool _isHovered5 = false;
   bool orderhover = false;
@@ -120,7 +123,7 @@ class _DashboardPageState extends State<DashboardPage>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/${companyName}/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",
@@ -201,7 +204,8 @@ class _DashboardPageState extends State<DashboardPage>
         ).whenComplete(() {
           _hasShownPopup = false;
         });
-      } else {
+      }
+      else {
         if (response.statusCode == 200) {
           final jsonData = jsonDecode(response.body);
           List<ors.detail> products = [];
@@ -218,7 +222,6 @@ class _DashboardPageState extends State<DashboardPage>
                   jsonData['totalItems'] ?? 0; // Get the total number of items
             } else {}
           } else {}
-
           if (mounted) {
             setState(() {
               totalPages = (products.length / itemsPerPage).ceil();
@@ -251,7 +254,7 @@ class _DashboardPageState extends State<DashboardPage>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster',
+          '$apicall/${companyName}/order_master/get_all_ordermaster',
         ),
         headers: {
           "Content-type": "application/json",
@@ -498,7 +501,7 @@ class _DashboardPageState extends State<DashboardPage>
 
   Future<void> _getDashboardCounts() async {
     final response = await http.get(
-      Uri.parse('$apicall/order_master/get_order_counts'),
+      Uri.parse('$apicall/${companyName}/order_master/get_order_counts'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -598,6 +601,7 @@ class _DashboardPageState extends State<DashboardPage>
 
   @override
   Widget build(BuildContext context) {
+  //  final authProvider = Provider.of<AuthProvider>(context, listen: false);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -2375,11 +2379,11 @@ right:0,
   }
 
   Widget buildDataTable2() {
+
     if (isLoading) {
       _loading = true;
       var width = MediaQuery.of(context).size.width;
       var Height = MediaQuery.of(context).size.height;
-      // Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
             top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
@@ -2449,7 +2453,7 @@ right:0,
           } else if (columnIndex == 1) {
             return a.contactPerson!.compareTo(b.contactPerson!);
           } else if (columnIndex == 2) {
-            return a.createdDate!.compareTo(b.createdDate!);
+            return a.orderDate.compareTo(b.orderDate);
           } else if (columnIndex == 3) {
             return a.total.compareTo(b.total);
           } else if (columnIndex == 4) {
@@ -2466,8 +2470,8 @@ right:0,
             return b.contactPerson!
                 .compareTo(a.contactPerson!); // Reverse the comparison
           } else if (columnIndex == 2) {
-            return b.createdDate!
-                .compareTo(a.createdDate!); // Reverse the comparison
+            return b.orderDate
+                .compareTo(a.orderDate); // Reverse the comparison
           } else if (columnIndex == 3) {
             return b.total
                 .compareTo(a.total); // Reverse the comparison
@@ -2692,6 +2696,7 @@ right:0,
         ],
       );
     });
+
   }
 
   Widget buildDataTable1() {
@@ -2769,7 +2774,7 @@ right:0,
           } else if (columnIndex == 1) {
             return a.contactPerson!.compareTo(b.contactPerson!);
           } else if (columnIndex == 2) {
-            return a.createdDate!.compareTo(b.createdDate!);
+            return a.orderDate.compareTo(b.orderDate);
           } else if (columnIndex == 3) {
             return a.total.compareTo(b.total);
           } else if (columnIndex == 4) {
@@ -2786,8 +2791,8 @@ right:0,
             return b.contactPerson!
                 .compareTo(a.contactPerson!); // Reverse the comparison
           } else if (columnIndex == 2) {
-            return b.createdDate!
-                .compareTo(a.createdDate!); // Reverse the comparison
+            return b.orderDate
+                .compareTo(a.orderDate); // Reverse the comparison
           } else if (columnIndex == 3) {
             return b.total
                 .compareTo(a.total); // Reverse the comparison
@@ -2920,7 +2925,7 @@ right:0,
                         Container(
                           width: columnWidths[2],
                           child: Text(
-                            detail.orderDate!,
+                            detail.orderDate,
                             style: TextStyles.body,
                           ),
                         ),

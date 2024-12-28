@@ -71,6 +71,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
   String status = '';
   String selectDate = '';
 
+  String companyName = window.sessionStorage["company Name"] ?? " ";
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
 
@@ -99,7 +100,7 @@ class _OrderspageState extends State<Orderspage> with SingleTickerProviderStateM
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/${companyName}/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",

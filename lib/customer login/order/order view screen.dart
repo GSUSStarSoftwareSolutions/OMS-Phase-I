@@ -101,6 +101,7 @@ class _OrderViewState extends State<OrderView>
   bool _isHovered1 = false;
   late Animation<double> _shakeAnimation;
   String status = '';
+  String companyName = window.sessionStorage["company Name"] ?? " ";
   String selectDate = '';
 
   String token = window.sessionStorage["token"] ?? " ";
@@ -137,7 +138,7 @@ class _OrderViewState extends State<OrderView>
 
     try {
       final response = await http.get(
-        Uri.parse('$apicall/order_master/get_all_ordermaster'),
+        Uri.parse('$apicall/$companyName/order_master/get_all_ordermaster'),
         headers: {
           "Content-type": "application/json",
           "Authorization": 'Bearer $token',

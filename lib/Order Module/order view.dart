@@ -93,7 +93,7 @@ class _OrderView2State extends State<OrderView2>
   final TextEditingController orderDateController =TextEditingController();
   final TextEditingController totalAmountController =TextEditingController();
   //final TextEditingController orderIdController =TextEditingController();
-
+  String companyName = window.sessionStorage["company Name"] ?? " ";
 
   DateTime? _selectedDate;
   List<detail> filteredData = [];
@@ -138,7 +138,7 @@ class _OrderView2State extends State<OrderView2>
 
     try {
       final response = await http.get(
-        Uri.parse('$apicall/order_master/get_all_ordermaster'),
+        Uri.parse('$apicall/$companyName/order_master/get_all_ordermaster'),
         headers: {
           "Content-type": "application/json",
           "Authorization": 'Bearer $token',

@@ -72,10 +72,9 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
   late Animation<double> _shakeAnimation;
   String status = '';
   String selectDate = '';
-
+  String companyName = window.sessionStorage["company Name"] ?? " ";
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
-
   void _onSearchTextChanged(String text) {
     if (_searchDebounceTimer != null) {
       _searchDebounceTimer!.cancel(); // Cancel the previous timer
@@ -103,7 +102,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
     try {
       final response = await http.get(
         Uri.parse(
-            '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage'
+            '$apicall/$companyName/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage'
         ),
         headers: {
           "Content-type": "application/json",

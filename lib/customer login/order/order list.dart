@@ -42,7 +42,9 @@ class _CusOrderPageState extends State<CusOrderPage>
     'Total',
     'Status',
   ];
+  String companyName = window.sessionStorage["company Name"] ?? " ";
   bool _hasShownPopup = false;
+  String userId = window.sessionStorage["userId"] ?? " ";
   List<double> columnWidths = [95, 130, 110, 95, 150, 140];
   List<bool> columnSortState = [true, true, true, true, true, true];
   Timer? _searchDebounceTimer;
@@ -107,7 +109,7 @@ class _CusOrderPageState extends State<CusOrderPage>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/${companyName}/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",
@@ -187,36 +189,70 @@ class _CusOrderPageState extends State<CusOrderPage>
         ).whenComplete(() {
           _hasShownPopup = false;
         });
-      } else {
+      }
+      else {
         if (response.statusCode == 200) {
           final jsonData = jsonDecode(response.body);
           List<detail> products = [];
-          if (jsonData != null) {
-            if (jsonData is List) {
-              products = jsonData.map((item) => detail.fromJson(item)).toList();
-            } else if (jsonData is Map && jsonData.containsKey('body')) {
-              products = (jsonData['body'] as List)
-                  .map((item) => detail.fromJson(item))
-                  .toList();
-              totalItems =
-                  jsonData['totalItems'] ?? 0; // Get the total number of items
-            }
 
-            if (mounted) {
-              setState(() {
-                totalPages = (products.length / itemsPerPage).ceil();
-                print('pages');
-                print(totalPages);
-                productList = products;
-                print(productList);
-                _filterAndPaginateProducts();
-              });
+          if (jsonData is List) {
+            products = jsonData
+                .map((item) => detail.fromJson(item))
+                .where((product) => product.CusId == userId)
+                .toList();
+          } else if (jsonData is Map && jsonData.containsKey('body')) {
+            final body = jsonData['body'];
+            if (body != null) {
+              products = (body as List)
+                  .map((item) => detail.fromJson(item))
+                  .where((product) => product.CusId == userId)
+                  .toList();
+
+              totalItems = jsonData['totalItems'] ?? 0; // Get the total number of items
             }
+          }
+
+          if (mounted) {
+            setState(() {
+              totalPages = (products.length / itemsPerPage).ceil();
+              productList = products;
+              _filterAndPaginateProducts();
+            });
           }
         } else {
           throw Exception('Failed to load data');
         }
       }
+      // else {
+      //   if (response.statusCode == 200) {
+      //     final jsonData = jsonDecode(response.body);
+      //     List<detail> products = [];
+      //     if (jsonData != null) {
+      //       if (jsonData is List) {
+      //         products = jsonData.map((item) => detail.fromJson(item)).toList();
+      //       } else if (jsonData is Map && jsonData.containsKey('body')) {
+      //         products = (jsonData['body'] as List)
+      //             .map((item) => detail.fromJson(item))
+      //             .toList();
+      //         totalItems =
+      //             jsonData['totalItems'] ?? 0; // Get the total number of items
+      //       }
+      //
+      //       if (mounted) {
+      //         setState(() {
+      //           totalPages = (products.length / itemsPerPage).ceil();
+      //           print('pages');
+      //           print(totalPages);
+      //           productList = products;
+      //           print(productList);
+      //           _filterAndPaginateProducts();
+      //         });
+      //       }
+      //     }
+      //   } else {
+      //     throw Exception('Failed to load data');
+      //   }
+      // }
     } catch (e) {
       print('Error decoding JSON: $e');
 // Optionally, show an error message to the user

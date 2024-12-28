@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../sample/provider.dart';
 import '../widgets/text_style.dart';
 import 'verify_emailid.dart';
 void main() => runApp(MaterialApp(
@@ -24,6 +26,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
   final Password = TextEditingController();
   bool _obscureText = true;
 
+
   void _togglePasswordVisibility() {
     setState(() {
       _obscureText = !_obscureText;
@@ -32,7 +35,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
   Future<String?> checkLogin(String username, String password) async {
     Map tempJson = {"userName": username, "password": password};
     String url =
-        '$apicall/user_master/login-authenticate';
+        '$apicall/public/user_master/login-authenticate';
     final response = await http.post(Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
@@ -40,6 +43,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
         body: json.encode(tempJson));
     if (response.statusCode == 200) {
       Map tempData = json.decode(response.body);
+
       if (tempData.containsKey("error")) {
         // Handle empty input fields with appropriate messages
         if (tempData['code'] == '401' &&
@@ -61,10 +65,15 @@ class _LoginContainer2State extends State<LoginContainer2> {
         String role = tempData['role'];
         if (role == 'Employee') {
           // Handle Employee role
+         // authProvider.login();
+          window.sessionStorage["company Name"] = tempData['company Name'];
+          window.sessionStorage["company"] = tempData['company'];
           window.sessionStorage["token"] = tempData['token'];
           context.go('/Home'); // Navigate to Employee-specific home
         } else if (role == 'Customer') {
+          window.sessionStorage["company Name"] = tempData['company Name'];
           // Handle Admin role
+          window.sessionStorage["company"] = tempData['company'];
           window.sessionStorage["userId"] = tempData['userId'];
           window.sessionStorage["token"] = tempData['token'];
           //  String userId = tempData['userId'];
@@ -73,6 +82,10 @@ class _LoginContainer2State extends State<LoginContainer2> {
           // Navigate to Admin-specific home
         } else if (role == 'Admin') {
           // Handle Admin role
+
+          window.sessionStorage["company"] = tempData['company'];
+          print('data');
+          print( window.sessionStorage["company"]);
           window.sessionStorage["token"] = tempData['token'];
           context.go('/User_List');
           // Navigate to Admin-specific home

@@ -5,29 +5,20 @@ import 'dart:html';
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart' as ord;
-import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/animation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/single_child_widget.dart';
+import 'package:url_strategy/url_strategy.dart';
 import '../dashboard/dashboard.dart';
 import '../widgets/confirmdialog.dart';
 import '../widgets/custom loading.dart';
 import '../widgets/no datafound.dart';
 import '../widgets/pagination.dart';
-import '../Order Module/firstpage.dart';
-import '../widgets/productdata.dart';
-import '../widgets/productdata.dart';
 import '../widgets/productsap.dart' as ord;
 import '../widgets/text_style.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
-void main() => runApp(MaterialApp(
+void main() => runApp(const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: ProductPage(
         product: null,
@@ -63,6 +54,7 @@ class _ProductPageState extends State<ProductPage>
   final ScrollController horizontalScroll = ScrollController();
   late AnimationController _controller;
   bool _isHovered1 = false;
+  String companyname = window.sessionStorage["company Name"] ?? " ";
   Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
@@ -108,7 +100,7 @@ class _ProductPageState extends State<ProductPage>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/productmaster/get_all_s4hana_productmaster?page=$page&limit=$itemsPerPage',
+          '$apicall/public/productmaster/get_all_s4hana_productmaster?page=$page&limit=$itemsPerPage',
         ),
         headers: {
           "Content-type": "application/json",
@@ -260,7 +252,7 @@ class _ProductPageState extends State<ProductPage>
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
-                  icon: Icon(Icons.close, color: Colors.blue),
+                  icon: const Icon(Icons.close, color: Colors.blue),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -271,10 +263,10 @@ class _ProductPageState extends State<ProductPage>
                 child: Column(
                   children: [
                     // Warning Icon
-                    Icon(Icons.warning, color: Colors.orange, size: 50),
-                    SizedBox(height: 16),
+                    const Icon(Icons.warning, color: Colors.orange, size: 50),
+                    const SizedBox(height: 16),
                     // Confirmation Message
-                    Text(
+                    const Text(
                       'Are You Sure',
                       style: TextStyle(
                         fontSize: 18,
@@ -282,7 +274,7 @@ class _ProductPageState extends State<ProductPage>
                         color: Colors.blue,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -295,12 +287,12 @@ class _ProductPageState extends State<ProductPage>
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            side: BorderSide(color: Colors.blue),
+                            side: const BorderSide(color: Colors.blue),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Yes',
                             style: TextStyle(
                               color: Colors.blue,
@@ -314,12 +306,12 @@ class _ProductPageState extends State<ProductPage>
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            side: BorderSide(color: Colors.red),
+                            side: const BorderSide(color: Colors.red),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'No',
                             style: TextStyle(
                               color: Colors.red,
@@ -396,11 +388,10 @@ class _ProductPageState extends State<ProductPage>
                             ),
                           ),
                           const Spacer(),
-                          Row(
+                          const Row(
                             children: [
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(right: 10, top: 10),
+                                padding: EdgeInsets.only(right: 10, top: 10),
                                 // Adjust padding for better spacing
                                 child: AccountMenu(),
                               ),
@@ -448,7 +439,7 @@ class _ProductPageState extends State<ProductPage>
                   ),
                   VerticalDividerWidget(
                     height: maxHeight,
-                    color: Color(0x29000000),
+                    color: const Color(0x29000000),
                   ),
                 } else ...{
                   Align(
@@ -470,7 +461,7 @@ class _ProductPageState extends State<ProductPage>
                   ),
                   VerticalDividerWidget(
                     height: maxHeight,
-                    color: Color(0x29000000),
+                    color: const Color(0x29000000),
                   ),
                 },
                 Positioned(
@@ -573,7 +564,7 @@ class _ProductPageState extends State<ProductPage>
                             child: SingleChildScrollView(
                           child: Column(
                             children: [
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
@@ -686,7 +677,7 @@ class _ProductPageState extends State<ProductPage>
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 10,
                                       ),
                                       Padding(
@@ -807,7 +798,7 @@ class _ProductPageState extends State<ProductPage>
   Widget buildSearchField() {
     return LayoutBuilder(builder: (context, constraints) {
       return ConstrainedBox(
-        constraints: BoxConstraints(),
+        constraints: const BoxConstraints(),
         child: Container(
           padding: const EdgeInsets.only(
             left: 20,
@@ -845,9 +836,9 @@ class _ProductPageState extends State<ProductPage>
                                   color: Colors.black, fontSize: 13),
                               decoration: InputDecoration(
                                 hintText: 'Search by product name',
-                                hintStyle:
-                                    TextStyle(color: Colors.grey, fontSize: 13),
-                                contentPadding: EdgeInsets.symmetric(
+                                hintStyle: const TextStyle(
+                                    color: Colors.grey, fontSize: 13),
+                                contentPadding: const EdgeInsets.symmetric(
                                     vertical: 3, horizontal: 5),
                                 border: InputBorder.none,
                                 suffixIcon: Padding(
@@ -866,7 +857,7 @@ class _ProductPageState extends State<ProductPage>
                       ),
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
                 ],
               ),
             ],
@@ -885,17 +876,18 @@ class _ProductPageState extends State<ProductPage>
       _loading = true;
       // Show loading indicator while data is being fetched
       return Padding(
-        padding: EdgeInsets.only(bottom: Height * 0.100, left: width * 0.300),
+        padding: EdgeInsets.only(bottom: Height * 0.100, left: width * 0.300,     top: Height * 0.100,),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
+
     if (filteredProducts.isEmpty) {
       var _mediaQuery = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
             width: _mediaQuery - 250,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
 
                 ///  color:  Colors.grey,
                 // color:  Color(0xFFECEFF1),
@@ -952,11 +944,11 @@ class _ProductPageState extends State<ProductPage>
                     ),
                   ),
                 ],
-                rows: []),
+                rows: const []),
           ),
           Padding(
-            padding:
-                EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            padding: const EdgeInsets.only(
+                top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
           //Text('No productss found', style: TextStyle(fontSize: 24))),
@@ -971,7 +963,7 @@ class _ProductPageState extends State<ProductPage>
           // Heading Row with GestureDetector for resizing
           Container(
             width: _mediaQuery - 250,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Color(0xFFF7F7F7),
               border: Border.symmetric(
                   horizontal: BorderSide(color: Colors.grey, width: 0.5)),
@@ -1056,7 +1048,7 @@ class _ProductPageState extends State<ProductPage>
                       }),
                       cells: [
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[0],
                             // Same dynamic width as column headers
                             child: Text(
@@ -1068,7 +1060,7 @@ class _ProductPageState extends State<ProductPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[1],
                             child: Text(
                               product.categoryName,
@@ -1077,7 +1069,7 @@ class _ProductPageState extends State<ProductPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[2],
                             child: Text(
                               product.productType,
@@ -1086,7 +1078,7 @@ class _ProductPageState extends State<ProductPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[3],
                             child: Text(
                               product.standardPrice.toString(),
@@ -1095,7 +1087,7 @@ class _ProductPageState extends State<ProductPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[4],
                             child: Text(
                               product.baseUnit.toString(),
@@ -1132,7 +1124,7 @@ class _ProductPageState extends State<ProductPage>
       _loading = true;
       // Show loading indicator while data is being fetched
       return Padding(
-        padding: EdgeInsets.only(bottom: Height * 0.100, left: width * 0.300),
+        padding: EdgeInsets.only(bottom: Height * 0.100, left: width * 0.300,top: Height * 0.100,),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
@@ -1142,7 +1134,7 @@ class _ProductPageState extends State<ProductPage>
         children: [
           Container(
             width: 1100,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
 
                 ///  color:  Colors.grey,
                 // color:  Color(0xFFECEFF1),
@@ -1150,75 +1142,73 @@ class _ProductPageState extends State<ProductPage>
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),
             child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                columns: [
-                  DataColumn(
-                    label: Container(
-                      // padding: const EdgeInsets.only(left: 19),
-                      child: Text(
-                        'Product Name',
-                        style: TextStyles.subhead,
-                      ),
+              showCheckboxColumn: false,
+              headingRowHeight: 40,
+              columns: [
+                DataColumn(
+                  label: Container(
+                    // padding: const EdgeInsets.only(left: 19),
+                    child: Text(
+                      'Product Name',
+                      style: TextStyles.subhead,
                     ),
                   ),
-                  DataColumn(
-                    label: Container(
-                      // padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Category',
-                        style: TextStyles.subhead,
-                      ),
+                ),
+                DataColumn(
+                  label: Container(
+                    // padding: const EdgeInsets.only(left: 10),
+                    child: Text(
+                      'Category',
+                      style: TextStyles.subhead,
                     ),
                   ),
-                  DataColumn(
-                    label: Container(
-                      //padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Sub Category',
-                        style: TextStyles.subhead,
-                      ),
+                ),
+                DataColumn(
+                  label: Container(
+                    //padding: const EdgeInsets.only(left: 10),
+                    child: Text(
+                      'Sub Category',
+                      style: TextStyles.subhead,
                     ),
                   ),
-                  DataColumn(
-                    label: Container(
-                      //padding: const EdgeInsets.only(left: 22),
-                      child: Text(
-                        'Unit',
-                        style: TextStyles.subhead,
-                      ),
+                ),
+                DataColumn(
+                  label: Container(
+                    //padding: const EdgeInsets.only(left: 22),
+                    child: Text(
+                      'Unit',
+                      style: TextStyles.subhead,
                     ),
                   ),
-                  DataColumn(
-                    label: Container(
-                      //padding: const EdgeInsets.only(left: 12),
-                      child: Text(
-                        'Price',
-                        style: TextStyles.subhead,
-                      ),
+                ),
+                DataColumn(
+                  label: Container(
+                    child: Text(
+                      'Price',
+                      style: TextStyles.subhead,
                     ),
                   ),
-                ],
-                rows: []),
+                ),
+              ],
+              rows: const [],
+            ),
           ),
           Padding(
-            padding:
-                EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            padding: const EdgeInsets.only(
+                top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
-          //Text('No productss found', style: TextStyle(fontSize: 24))),
         ],
       );
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-      var _mediaQuery = MediaQuery.of(context).size.width;
       return Column(
         children: [
           // Heading Row with GestureDetector for resizing
           Container(
             width: 1100,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Color(0xFFF7F7F7),
               border: Border.symmetric(
                   horizontal: BorderSide(color: Colors.grey, width: 0.5)),
@@ -1303,7 +1293,7 @@ class _ProductPageState extends State<ProductPage>
                       }),
                       cells: [
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[0],
                             // Same dynamic width as column headers
                             child: Text(
@@ -1313,7 +1303,7 @@ class _ProductPageState extends State<ProductPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[1],
                             child: Text(
                               product.categoryName,
@@ -1322,7 +1312,7 @@ class _ProductPageState extends State<ProductPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[2],
                             child: Text(
                               product.productType,
@@ -1331,7 +1321,7 @@ class _ProductPageState extends State<ProductPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[3],
                             child: Text(
                               product.standardPrice.toString(),
@@ -1340,7 +1330,7 @@ class _ProductPageState extends State<ProductPage>
                           ),
                         ),
                         DataCell(
-                          Container(
+                          SizedBox(
                             width: columnWidths[4],
                             child: Text(
                               product.baseUnit.toString(),

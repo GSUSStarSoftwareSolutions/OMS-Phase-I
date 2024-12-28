@@ -513,6 +513,8 @@ class _DashboardScreenState extends State<DashboardScreen>
     140,
     135,
   ];
+  String companyName = window.sessionStorage["company Name"] ?? " ";
+
   List<bool> columnSortState = [true, true, true, true, true, true];
 
   Product? product1;
@@ -527,7 +529,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       //https://ordermanagement-industrious-dugong-ig.cfapps.us10-001.hana.ondemand.com/api/order_master/get_all_ordermaster
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/${companyName}/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",
@@ -658,7 +660,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster',
+          '$apicall/${companyName}/order_master/get_all_ordermaster',
         ),
         headers: {
           "Content-type": "application/json",
@@ -907,7 +909,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Future<void> _getDashboardCounts() async {
     final response = await http.get(
-      Uri.parse('$apicall/order_master/get_order_counts'),
+      Uri.parse('$apicall/${companyName}/order_master/get_order_counts'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -1686,6 +1688,7 @@ class GridView1 extends StatefulWidget {
 class _GridView1State extends State<GridView1> {
   bool _hasShownPopup = false;
   String token = window.sessionStorage["token"] ?? " ";
+  String companyName = window.sessionStorage["company Name"] ?? " ";
   Map<String, int> _dashboardCounts1 = {};
   DashboardCounts? _dashboardCounts;
 
@@ -1723,7 +1726,7 @@ class _GridView1State extends State<GridView1> {
     }
 
     final response = await http.get(
-      Uri.parse('$apicall/order_master/get_order_counts'),
+      Uri.parse('$apicall/${companyName}/order_master/get_order_counts'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

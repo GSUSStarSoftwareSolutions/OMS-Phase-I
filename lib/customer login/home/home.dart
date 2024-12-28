@@ -8,7 +8,6 @@ import 'package:btb/admin/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart';
 import 'package:btb/widgets/custom%20loading.dart';
 import 'package:btb/widgets/pagination.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -18,8 +17,6 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:btb/widgets/productclass.dart' as ord;
 import 'package:btb/Order%20Module/firstpage.dart' as ors;
-import 'package:responsive_framework/responsive_framework.dart';
-
 import '../../widgets/confirmdialog.dart';
 import '../../widgets/no datafound.dart';
 import '../../widgets/text_style.dart';
@@ -43,6 +40,8 @@ class _DashboardPage1State extends State<DashboardPage1>
   final ScrollController horizontalScroll = ScrollController();
   final ScrollController _scrollController = ScrollController();
   Timer? _searchDebounceTimer;
+  String companyName = window.sessionStorage["company Name"] ?? " ";
+  String userId = window.sessionStorage["userId"] ?? " ";
   String _searchText = '';
   DashboardCounts? _dashboardCounts;
   DateTime? _selectedDate;
@@ -122,7 +121,7 @@ class _DashboardPage1State extends State<DashboardPage1>
       //https://ordermanagement-industrious-dugong-ig.cfapps.us10-001.hana.ondemand.com/api/order_master/get_all_ordermaster
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/${companyName}/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",
@@ -207,19 +206,24 @@ class _DashboardPage1State extends State<DashboardPage1>
         if (response.statusCode == 200) {
           final jsonData = jsonDecode(response.body);
           List<ors.detail> products = [];
+
           if (jsonData is List) {
-            products =
-                jsonData.map((item) => ors.detail.fromJson(item)).toList();
+            products = jsonData
+                .map((item) => ors.detail.fromJson(item))
+                .where((product) => product.CusId == userId)
+                .toList();
           } else if (jsonData is Map && jsonData.containsKey('body')) {
             final body = jsonData['body'];
             if (body != null) {
               products = (body as List)
                   .map((item) => ors.detail.fromJson(item))
+                  .where((product) => product.CusId == userId)
                   .toList();
+
               totalItems =
                   jsonData['totalItems'] ?? 0; // Get the total number of items
-            } else {}
-          } else {}
+            }
+          }
 
           if (mounted) {
             setState(() {
@@ -232,6 +236,34 @@ class _DashboardPage1State extends State<DashboardPage1>
           throw Exception('Failed to load data');
         }
       }
+      // else {
+      //   if (response.statusCode == 200) {
+      //     final jsonData = jsonDecode(response.body);
+      //     List<ors.detail> products = [];
+      //     if (jsonData is List) {
+      //       products =
+      //           jsonData.map((item) => ors.detail.fromJson(item)).toList();
+      //     } else if (jsonData is Map && jsonData.containsKey('body')) {
+      //       final body = jsonData['body'];
+      //       if (body != null) {
+      //         products = (body as List)
+      //             .map((item) => ors.detail.fromJson(item))
+      //             .toList();
+      //         totalItems =
+      //             jsonData['totalItems'] ?? 0; // Get the total number of items
+      //       } else {}
+      //     } else {}
+      //     if (mounted) {
+      //       setState(() {
+      //         totalPages = (products.length / itemsPerPage).ceil();
+      //         productList = products;
+      //         _filterAndPaginateProducts();
+      //       });
+      //     }
+      //   } else {
+      //     throw Exception('Failed to load data');
+      //   }
+      // }
     } catch (e) {
       if (mounted) {
         if (context.findAncestorWidgetOfExactType<Scaffold>() != null) {
@@ -253,7 +285,7 @@ class _DashboardPage1State extends State<DashboardPage1>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/order_master/get_all_ordermaster',
+          '$apicall/${companyName}/order_master/get_all_ordermaster',
         ),
         headers: {
           "Content-type": "application/json",
@@ -479,7 +511,6 @@ class _DashboardPage1State extends State<DashboardPage1>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-
 // Define the shake animation (values will oscillate between -5.0 and 5.0)
     _shakeAnimation = Tween<double>(begin: 0, end: 5)
         .chain(CurveTween(curve: Curves.elasticIn))
@@ -500,7 +531,8 @@ class _DashboardPage1State extends State<DashboardPage1>
 
   Future<void> _getDashboardCounts() async {
     final response = await http.get(
-      Uri.parse('$apicall/order_master/get_order_counts'),
+      Uri.parse(
+          '$apicall/${companyName}/order_master/get_customer_order_counts/${userId}'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -627,12 +659,11 @@ class _DashboardPage1State extends State<DashboardPage1>
                           ),
                         ),
                         const Spacer(),
-                        Row(
+                        const Row(
                           children: [
-                            const SizedBox(width: 10),
+                            SizedBox(width: 10),
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(right: 10, top: 10),
+                              padding: EdgeInsets.only(right: 10, top: 10),
                               // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
@@ -680,7 +711,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                 ),
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               } else ...{
                 Align(
@@ -702,7 +733,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                 ),
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               },
               Positioned(
@@ -808,7 +839,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                     .white,
                                                                 border:
                                                                     Border.all(
-                                                                  color: Color(
+                                                                  color: const Color(
                                                                       0x29000000),
                                                                 ),
                                                                 borderRadius:
@@ -837,12 +868,12 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                         border:
                                                                             Border.all(
                                                                           color:
-                                                                              Color(0xffffac8c),
+                                                                              const Color(0xffffac8c),
                                                                           // Border color
                                                                           width:
                                                                               1.5,
                                                                         ),
-                                                                        color: Color(0xffffac8c)
+                                                                        color: const Color(0xffffac8c)
                                                                             .withOpacity(0.2),
                                                                         // Set the background color to match the border
                                                                         boxShadow: [
@@ -875,7 +906,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           CrossAxisAlignment
                                                                               .start,
                                                                       children: [
-                                                                        SizedBox(
+                                                                        const SizedBox(
                                                                             height:
                                                                                 10),
                                                                         Padding(
@@ -901,7 +932,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             style:
                                                                                 TextStyle(
                                                                               fontSize: maxWidth * 0.01,
-                                                                              color: Color(0xFF455A64),
+                                                                              color: const Color(0xFF455A64),
                                                                             ),
                                                                           ),
                                                                         ),
@@ -955,7 +986,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                     .white,
                                                                 border:
                                                                     Border.all(
-                                                                  color: Color(
+                                                                  color: const Color(
                                                                       0x29000000),
                                                                 ),
                                                                 borderRadius:
@@ -1015,7 +1046,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           CrossAxisAlignment
                                                                               .start,
                                                                       children: [
-                                                                        SizedBox(
+                                                                        const SizedBox(
                                                                             height:
                                                                                 10),
                                                                         Padding(
@@ -1032,15 +1063,16 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           ),
                                                                         ),
                                                                         Padding(
-                                                                          padding:
-                                                                              EdgeInsets.only(left: 10),
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              left: 10),
                                                                           child:
                                                                               Text(
                                                                             'Picked Orders',
                                                                             style:
                                                                                 TextStyle(
                                                                               fontSize: maxWidth * 0.01,
-                                                                              color: Color(0xFF455A64),
+                                                                              color: const Color(0xFF455A64),
                                                                             ),
                                                                           ),
                                                                         )
@@ -1093,7 +1125,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                     .white,
                                                                 border:
                                                                     Border.all(
-                                                                  color: Color(
+                                                                  color: const Color(
                                                                       0x29000000),
                                                                 ),
                                                                 borderRadius:
@@ -1153,7 +1185,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           CrossAxisAlignment
                                                                               .start,
                                                                       children: [
-                                                                        SizedBox(
+                                                                        const SizedBox(
                                                                             height:
                                                                                 10),
                                                                         Padding(
@@ -1179,7 +1211,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             style:
                                                                                 TextStyle(
                                                                               fontSize: maxWidth * 0.01,
-                                                                              color: Color(0xFF455A64),
+                                                                              color: const Color(0xFF455A64),
                                                                               // Dark grey-blue
                                                                               fontWeight: FontWeight.w500,
                                                                               letterSpacing: 0.5,
@@ -1236,7 +1268,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                     .white,
                                                                 border:
                                                                     Border.all(
-                                                                  color: Color(
+                                                                  color: const Color(
                                                                       0x29000000),
                                                                 ),
                                                                 borderRadius:
@@ -1299,7 +1331,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           CrossAxisAlignment
                                                                               .start,
                                                                       children: [
-                                                                        SizedBox(
+                                                                        const SizedBox(
                                                                             height:
                                                                                 10),
                                                                         Padding(
@@ -1511,7 +1543,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                     border:
                                                                         Border
                                                                             .all(
-                                                                      color: Color(
+                                                                      color: const Color(
                                                                           0x29000000),
                                                                     ),
                                                                     borderRadius:
@@ -1538,7 +1570,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                                   // Border color
                                                                                   width: 1.5,
                                                                                 ),
-                                                                                color: Color(0xffffac8c).withOpacity(0.2),
+                                                                                color: const Color(0xffffac8c).withOpacity(0.2),
                                                                                 // Set the background color to match the border
                                                                                 boxShadow: [
                                                                                   BoxShadow(
@@ -1560,7 +1592,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           Column(
                                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                                               children: [
-                                                                                SizedBox(height: 10),
+                                                                                const SizedBox(height: 10),
                                                                                 Padding(
                                                                                   padding: const EdgeInsets.only(left: 10),
                                                                                   child: Text(
@@ -1568,7 +1600,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                                     style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                                                                                   ),
                                                                                 ),
-                                                                                Padding(
+                                                                                const Padding(
                                                                                   padding: EdgeInsets.only(left: 10),
                                                                                   child: Text(
                                                                                     'Open Orders',
@@ -1636,7 +1668,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                     border:
                                                                         Border
                                                                             .all(
-                                                                      color: Color(
+                                                                      color: const Color(
                                                                           0x29000000),
                                                                     ),
                                                                     borderRadius:
@@ -1690,7 +1722,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           crossAxisAlignment:
                                                                               CrossAxisAlignment.start,
                                                                           children: [
-                                                                            SizedBox(height: 10),
+                                                                            const SizedBox(height: 10),
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 10),
                                                                               child: Text(
@@ -1698,7 +1730,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                                                                               ),
                                                                             ),
-                                                                            Padding(
+                                                                            const Padding(
                                                                               padding: EdgeInsets.only(left: 10),
                                                                               child: Text(
                                                                                 'Picked Orders',
@@ -1763,7 +1795,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                     border:
                                                                         Border
                                                                             .all(
-                                                                      color: Color(
+                                                                      color: const Color(
                                                                           0x29000000),
                                                                     ),
                                                                     borderRadius:
@@ -1817,7 +1849,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           crossAxisAlignment:
                                                                               CrossAxisAlignment.start,
                                                                           children: [
-                                                                            SizedBox(height: 10),
+                                                                            const SizedBox(height: 10),
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 10),
                                                                               child: Text(
@@ -1825,7 +1857,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                                                                               ),
                                                                             ),
-                                                                            Padding(
+                                                                            const Padding(
                                                                               padding: EdgeInsets.only(left: 10),
                                                                               child: Text(
                                                                                 'Order Delivered',
@@ -1894,7 +1926,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                     border:
                                                                         Border
                                                                             .all(
-                                                                      color: Color(
+                                                                      color: const Color(
                                                                           0x29000000),
                                                                     ),
                                                                     borderRadius:
@@ -1953,7 +1985,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           crossAxisAlignment:
                                                                               CrossAxisAlignment.start,
                                                                           children: [
-                                                                            SizedBox(height: 10),
+                                                                            const SizedBox(height: 10),
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 10),
                                                                               child: Text(
@@ -1961,17 +1993,17 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                                                                               ),
                                                                             ),
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(left: 10),
+                                                                            const Padding(
+                                                                              padding: EdgeInsets.only(left: 10),
                                                                               child: Text(
                                                                                 'Order Completed',
                                                                                 style: TextStyle(
                                                                                   fontSize: 13,
-                                                                                  color: const Color(0xFF455A64),
+                                                                                  color: Color(0xFF455A64),
                                                                                 ),
                                                                               ),
-                                                                            )
-                                                                          ])
+                                                                            ),
+                                                                          ]),
                                                                     ],
                                                                   ),
                                                                 ),
@@ -2208,15 +2240,14 @@ class _DashboardPage1State extends State<DashboardPage1>
                       style:
                           GoogleFonts.inter(color: Colors.black, fontSize: 13),
                       decoration: InputDecoration(
-                        hintText: 'Search by Order ID',
-                        hintStyle: TextStyles.body,
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-                        // adjusted padding
-                        border: InputBorder.none,
+                          hintText: 'Search by Order ID',
+                          hintStyle: TextStyles.body,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 3, horizontal: 5),
+                          // adjusted padding
+                          border: InputBorder.none,
                           suffixIcon: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 10, right: 5),
+                            padding: const EdgeInsets.only(left: 10, right: 5),
                             // Adjust image padding
                             child: Image.asset(
                               'images/search.png', // Replace with your image asset path
@@ -2426,7 +2457,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                               hintText: 'Search by Order ID',
                               hintStyle: TextStyles.body,
                               //hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 3, horizontal: 5),
                               // adjusted padding
                               border: InputBorder.none,
@@ -2553,7 +2584,7 @@ class _DashboardPage1State extends State<DashboardPage1>
         children: [
           Container(
             width: 1200,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),
@@ -2864,7 +2895,7 @@ class _DashboardPage1State extends State<DashboardPage1>
         children: [
           Container(
             width: right - 200,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),

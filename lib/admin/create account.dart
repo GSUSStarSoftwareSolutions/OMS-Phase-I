@@ -46,7 +46,7 @@ class _createscrState extends State<createscr> {
   }
 
   Future<String?> checkLogin(String Email, String password) async {
-    String url = '$apicall/user_master/add_password/$Email/$password';
+    String url = '$apicall/public/user_master/add_password/$Email/$password';
     //   'https://mjl9lz64l7.execute-api.ap-south-1.amazonaws.com/stage1/api/user_master/add_password/$Email/$password';
     final response = await http.put(Uri.parse(url), headers: {
       "Content-Type": "application/json",
