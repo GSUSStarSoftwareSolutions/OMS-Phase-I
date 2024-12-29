@@ -8,7 +8,6 @@ import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
 import 'package:btb/widgets/productclass.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -45,9 +44,6 @@ class _CusOrderPageState extends State<CusOrderPage>
   Timer? _searchDebounceTimer;
   String _searchText = '';
   bool isOrdersSelected = false;
-  detail? _selectedProduct;
-  late TextEditingController _dateController;
-  Map<String, dynamic> PaymentMap = {};
   int startIndex = 0;
   List<Product> filteredProducts = [];
   int currentPage = 1;
@@ -62,7 +58,6 @@ class _CusOrderPageState extends State<CusOrderPage>
   String searchQuery = '';
   List<detail> filteredData = [];
   late AnimationController _controller;
-  final bool _isHovered1 = false;
   late Animation<double> _shakeAnimation;
   String status = '';
   String selectDate = '';
@@ -71,12 +66,6 @@ class _CusOrderPageState extends State<CusOrderPage>
   String? dropdownValue2 = 'Select Year';
 
 
-  static final TextStyle filter = GoogleFonts.inter(
-    fontSize: 13.0, // Font size in px
-    fontWeight: FontWeight.w500, // Medium weight
-    color: Colors.grey,
-    // color: Color.fromRGBO(0, 83, 176, 1), // Default text color
-  );
 
   int itemsPerPage = 10;
   int totalItems = 0;
@@ -93,7 +82,7 @@ class _CusOrderPageState extends State<CusOrderPage>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/${companyName}/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/$companyName/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",
@@ -342,7 +331,6 @@ class _CusOrderPageState extends State<CusOrderPage>
   @override
   void initState() {
     super.initState();
-    _dateController = TextEditingController();
     fetchProducts(currentPage, itemsPerPage);
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
@@ -821,16 +809,15 @@ class _CusOrderPageState extends State<CusOrderPage>
   Widget buildDataTable2() {
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
+      var height = MediaQuery.of(context).size.height;
       return Padding(
         padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
 
     if (filteredData.isEmpty) {
-      double right = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
@@ -877,7 +864,7 @@ class _CusOrderPageState extends State<CusOrderPage>
         ],
       );
     }
-    void _sortProducts(int columnIndex, String sortDirection) {
+    void sortProducts(int columnIndex, String sortDirection) {
       if (sortDirection == 'asc') {
         filteredData.sort((a, b) {
           if (columnIndex == 0) {
@@ -915,7 +902,6 @@ class _CusOrderPageState extends State<CusOrderPage>
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-      double right = MediaQuery.of(context).size.width * 0.92;
 
       return Column(
         children: [
@@ -963,7 +949,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                                                 'asc'
                                             ? 'desc'
                                             : 'asc';
-                                    _sortProducts(columns.indexOf(column),
+                                    sortProducts(columns.indexOf(column),
                                         _sortOrder[columns.indexOf(column)]);
                                   });
                                 },
@@ -984,7 +970,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                     (index) {
                   final detail =
                       filteredData[(currentPage - 1) * itemsPerPage + index];
-                  final isSelected = _selectedProduct == detail;
                   return DataRow(
                       color: MaterialStateProperty.resolveWith<Color>((states) {
                         if (states.contains(MaterialState.hovered)) {
@@ -1018,7 +1003,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           SizedBox(
                             width: columnWidths[2],
                             child: Text(
-                              detail.orderDate!,
+                              detail.orderDate,
                               style: TextStyles.body,
                             ),
                           ),
@@ -1059,16 +1044,16 @@ class _CusOrderPageState extends State<CusOrderPage>
   Widget buildDataTable() {
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
+      var height = MediaQuery.of(context).size.height;
 
       return Padding(
         padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
 
-    void _sortProducts(int columnIndex, String sortDirection) {
+    void sortProducts(int columnIndex, String sortDirection) {
       if (sortDirection == 'asc') {
         filteredData.sort((a, b) {
           if (columnIndex == 0) {
@@ -1139,7 +1124,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                     },
                   );
                 }).toList(),
-                rows: []),
+                rows: const []),
           ),
           Padding(
             padding:
@@ -1198,7 +1183,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                                                 'asc'
                                             ? 'desc'
                                             : 'asc';
-                                    _sortProducts(columns.indexOf(column),
+                                    sortProducts(columns.indexOf(column),
                                         _sortOrder[columns.indexOf(column)]);
                                   });
                                 },
@@ -1219,7 +1204,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                     (index) {
                   final detail =
                       filteredData[(currentPage - 1) * itemsPerPage + index];
-                  final isSelected = _selectedProduct == detail;
                   return DataRow(
                       color: MaterialStateProperty.resolveWith<Color>((states) {
                         if (states.contains(MaterialState.hovered)) {
@@ -1253,7 +1237,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           SizedBox(
                             width: columnWidths[2],
                             child: Text(
-                              detail.orderDate!,
+                              detail.orderDate,
                               style: TextStyles.body,
                             ),
                           ),

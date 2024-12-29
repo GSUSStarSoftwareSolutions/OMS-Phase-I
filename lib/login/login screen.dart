@@ -1,18 +1,12 @@
 import 'dart:convert';
 import 'dart:html';
 import 'package:btb/widgets/Api%20name.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import '../sample/provider.dart';
 import '../widgets/text_style.dart';
 import 'verify_emailid.dart';
-void main() => runApp(MaterialApp(
-  home: LoginContainer2(),
-));
 
 class LoginContainer2 extends StatefulWidget {
   const LoginContainer2({super.key});
@@ -23,19 +17,18 @@ class LoginContainer2 extends StatefulWidget {
 
 class _LoginContainer2State extends State<LoginContainer2> {
   final userName = TextEditingController();
-  final Password = TextEditingController();
+  final password = TextEditingController();
   bool _obscureText = true;
-
 
   void _togglePasswordVisibility() {
     setState(() {
       _obscureText = !_obscureText;
     });
   }
+
   Future<String?> checkLogin(String username, String password) async {
     Map tempJson = {"userName": username, "password": password};
-    String url =
-        '$apicall/public/user_master/login-authenticate';
+    String url = '$apicall/public/user_master/login-authenticate';
     final response = await http.post(Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
@@ -45,53 +38,42 @@ class _LoginContainer2State extends State<LoginContainer2> {
       Map tempData = json.decode(response.body);
 
       if (tempData.containsKey("error")) {
-        // Handle empty input fields with appropriate messages
         if (tempData['code'] == '401' &&
             tempData['error'] == 'INVALID EMPLOYEE NAME or PASSWORD') {
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text("Enter valid  password")));
-        }
-
-        else if (tempData['code'] == '404' &&
+              const SnackBar(content: Text("Enter valid  password")));
+        } else if (tempData['code'] == '404' &&
             tempData['status'] == 'failed') {
           ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("User name not found")));
+        } else if (tempData['code'] == '403' &&
+            tempData['status'] == 'failed') {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(
+                  "Your account is inactive. Please contact the administrator for assistance")));
         }
-        else if (tempData['code'] == '403' &&    tempData['status'] == 'failed') {  ScaffoldMessenger.of(context).showSnackBar(      const SnackBar(content: Text("Your account is inactive. Please contact the administrator for assistance")));}
       } else {
         window.sessionStorage["userId"] = tempData['userId'];
-        // Check the role and handle accordingly
         String role = tempData['role'];
         if (role == 'Employee') {
-          // Handle Employee role
-         // authProvider.login();
           window.sessionStorage["company Name"] = tempData['company Name'];
           window.sessionStorage["company"] = tempData['company'];
           window.sessionStorage["token"] = tempData['token'];
-          context.go('/Home'); // Navigate to Employee-specific home
+          context.go('/Home');
         } else if (role == 'Customer') {
           window.sessionStorage["company Name"] = tempData['company Name'];
           // Handle Admin role
           window.sessionStorage["company"] = tempData['company'];
           window.sessionStorage["userId"] = tempData['userId'];
           window.sessionStorage["token"] = tempData['token'];
-          //  String userId = tempData['userId'];
-          //  Provider.of<UserRoleProvider>(context, listen: false).setRole(role);
           context.go('/Cus_Home');
-          // Navigate to Admin-specific home
         } else if (role == 'Admin') {
-          // Handle Admin role
-
           window.sessionStorage["company"] = tempData['company'];
           print('data');
-          print( window.sessionStorage["company"]);
+          print(window.sessionStorage["company"]);
           window.sessionStorage["token"] = tempData['token'];
           context.go('/User_List');
-          // Navigate to Admin-specific home
-        }
-        else {
-          // Handle other roles, if needed
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Unknown role")),
           );
@@ -99,45 +81,39 @@ class _LoginContainer2State extends State<LoginContainer2> {
         return null;
       }
     } else {
-      // Handle non-200 responses
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Invalid response from this ")),
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if(constraints.maxHeight >= 630){
+        if (constraints.maxHeight >= 630) {
           return Container(
             constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
-            // 80% of screen width
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: constraints.maxHeight * 0.15),
-                // 10% of screen height
                 Align(
-                  alignment: Alignment(-0.14, 0.0),
+                  alignment: const Alignment(-0.14, 0.0),
                   child: Text(
                     'Login to your account',
-                    // style: TextStyles.Login,
                     style: TextStyles.login(context),
                   ),
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03),
-                // 5% of screen height
                 Align(
-                  alignment: Alignment(-0.05, 0.0),
+                  alignment: const Alignment(-0.05, 0.0),
                   child: Text(
                     'Simplify your order management \nand gain complete control',
-                    // style: TextStyles.,
                     style: TextStyles.loginSub(context),
                   ),
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03),
-                // 5% of screen height
                 Align(
                   alignment: const Alignment(0.9, 0.4),
                   child: Column(
@@ -145,7 +121,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
                     children: [
                       SizedBox(height: constraints.maxHeight * 0.04),
                       Align(
-                          alignment: Alignment(-0.27, 0.0),
+                          alignment: const Alignment(-0.27, 0.0),
                           child: Text(
                             'Username',
                             style: TextStyles.header3,
@@ -158,10 +134,8 @@ class _LoginContainer2State extends State<LoginContainer2> {
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
                             controller: userName,
-
                             style: GoogleFonts.inter(
-                                color: Colors.black,
-                                fontSize: 13),
+                                color: Colors.black, fontSize: 13),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               hintText: 'Enter your username',
@@ -172,23 +146,22 @@ class _LoginContainer2State extends State<LoginContainer2> {
                             ),
                             onFieldSubmitted: (value) async {
                               print('username');
-                              String? role =
-                              await checkLogin(userName.text, Password.text);
+                              String? role = await checkLogin(
+                                  userName.text, password.text);
                               if (role != null) {
-                                if(role == 'Employee'){
+                                if (role == 'Employee') {
                                   context.go('/Home');
-                                }else if(role == 'Customer'){
+                                } else if (role == 'Customer') {
                                   context.go('/Customer_Order_List');
-                                }else if(role == 'Admin'){
+                                } else if (role == 'Admin') {
                                   context.go('/User_List');
-                                }else if(userName.text.isNotEmpty && Password.text.isEmpty){
+                                } else if (userName.text.isNotEmpty &&
+                                    password.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content:
-                                        Text("Please enter password")),
+                                        content: Text("Please enter password")),
                                   );
                                 }
-
                               }
                             },
                           ),
@@ -197,10 +170,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
                       const SizedBox(height: 20),
                       Align(
                           alignment: const Alignment(-0.27, 0.0),
-                          child: Text(
-                              'Password',
-                              style: TextStyles.header3
-                          )),
+                          child: Text('Password', style: TextStyles.header3)),
                       const SizedBox(height: 10),
                       Align(
                         alignment: const Alignment(0.1, 0.0),
@@ -208,15 +178,14 @@ class _LoginContainer2State extends State<LoginContainer2> {
                           height: 40,
                           width: constraints.maxWidth * 0.39,
                           child: TextFormField(
-                            controller: Password,
+                            controller: password,
                             style: GoogleFonts.inter(
-                                color: Colors.black,
-                                fontSize: 13),
+                                color: Colors.black, fontSize: 13),
                             obscureText: _obscureText,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                               hintText: 'Enter your Password',
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 8,
                               ),
@@ -228,28 +197,27 @@ class _LoginContainer2State extends State<LoginContainer2> {
                                   size: 20,
                                 ),
                                 onPressed:
-                                _togglePasswordVisibility, // Toggle password visibility
+                                    _togglePasswordVisibility, // Toggle password visibility
                               ),
                             ),
                             onFieldSubmitted: (value) async {
                               print('username');
-                              String? role =
-                              await checkLogin(userName.text, Password.text);
+                              String? role = await checkLogin(
+                                  userName.text, password.text);
                               if (role != null) {
-                                if(role == 'Employee'){
+                                if (role == 'Employee') {
                                   context.go('/Home');
-                                }else if(role == 'Customer'){
+                                } else if (role == 'Customer') {
                                   context.go('/Customer_Order_List');
-                                }else if(role == 'Admin'){
+                                } else if (role == 'Admin') {
                                   context.go('/User_List');
-                                }else if(userName.text.isEmpty && Password.text.isNotEmpty){
+                                } else if (userName.text.isEmpty &&
+                                    password.text.isNotEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content:
-                                        Text("Please enter username")),
+                                        content: Text("Please enter username")),
                                   );
                                 }
-
                               }
                             },
                           ),
@@ -257,25 +225,20 @@ class _LoginContainer2State extends State<LoginContainer2> {
                       ),
                       const SizedBox(height: 10),
                       Align(
-                          alignment: Alignment(0.36, 0.2),
-                          child: InkWell(
-                            splashColor: Colors.transparent,
-                            // remove splash effect
-                            highlightColor: Colors.transparent,
-                            // remove highlight effect
-                            onTap: () {
-                              Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                    Logout(),
-                              ));
-                            },
-                            child: Text(
-                                'Forgot password ?',
-                                style: TextStyles.forgot
-                            ),
-                          )
-                        // child: Text('Forgot password ?'),
+                        alignment: const Alignment(0.36, 0.2),
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () {
+                            Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const Logout(),
+                            ));
+                          },
+                          child: Text('Forgot password ?',
+                              style: TextStyles.forgot),
+                        ),
                       ),
                       const SizedBox(
                         height: 20,
@@ -283,28 +246,31 @@ class _LoginContainer2State extends State<LoginContainer2> {
                       Align(
                         alignment: const Alignment(0.1, 0.2),
                         child: SizedBox(
-                          width:200,
+                          width: 200,
                           child: ElevatedButton(
                             onPressed: () async {
-                              if (userName.text.isEmpty && Password.text.isEmpty) {
+                              if (userName.text.isEmpty &&
+                                  password.text.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please enter username & password")),
+                                  const SnackBar(
+                                      content: Text(
+                                          "Please enter username & password")),
                                 );
-                              }
-                              else if (userName.text.isEmpty && Password.text.isNotEmpty) {
+                              } else if (userName.text.isEmpty &&
+                                  password.text.isNotEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please enter username")),
+                                  const SnackBar(
+                                      content: Text("Please enter username")),
                                 );
-                              }
-                              else if (userName.text.isNotEmpty && Password.text.isEmpty) {
+                              } else if (userName.text.isNotEmpty &&
+                                  password.text.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please enter password")),
+                                  const SnackBar(
+                                      content: Text("Please enter password")),
                                 );
+                              } else {
+                                await checkLogin(userName.text, password.text);
                               }
-                              else{
-                                await checkLogin(userName.text, Password.text);
-                              }
-
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[800],
@@ -312,12 +278,10 @@ class _LoginContainer2State extends State<LoginContainer2> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
-                            child:  Align(
-                                alignment: Alignment(0.0, 0.0),
-                                child: Text(
-                                    'Login',
-                                    style: TextStyles.button1
-                                )),
+                            child: Align(
+                                alignment: const Alignment(0.0, 0.0),
+                                child:
+                                    Text('Login', style: TextStyles.button1)),
                           ),
                         ),
                       ),
@@ -326,61 +290,50 @@ class _LoginContainer2State extends State<LoginContainer2> {
                         alignment: const Alignment(0.1, 0.0),
                         child: RichText(
                           textAlign: TextAlign.center,
-                          text:  TextSpan(
+                          text: TextSpan(
                             children: [
                               TextSpan(
-                                  text: 'Need help? ',
-                                  style: TextStyles.need
-                              ),
+                                  text: 'Need help? ', style: TextStyles.need),
                               TextSpan(
                                   text: 'Contact Support',
-                                  style: TextStyles.contact
-                              ),
+                                  style: TextStyles.contact),
                             ],
                           ),
                         ),
                       ),
-                      SizedBox(height: 5,)
+                      const SizedBox(
+                        height: 5,
+                      )
                     ],
                   ),
                 ),
               ],
             ),
           );
-        }
-        else{
+        } else {
           return SingleChildScrollView(
             child: Container(
               constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
-              // 80% of screen width
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(height: constraints.maxHeight * 0.15),
-                  // 10% of screen height
                   Align(
-                    alignment: Alignment(-0.14, 0.0),
+                    alignment: const Alignment(-0.14, 0.0),
                     child: Text(
                       'Login to Your account',
                       style: TextStyles.login(context),
-                      // style: TextStyle(
-                      //     fontSize: constraints.maxWidth * 0.023,
-                      //     fontWeight: FontWeight.bold,
-                      //     color: Colors.blue),
                     ),
                   ),
                   SizedBox(height: constraints.maxHeight * 0.03),
-                  // 5% of screen height
                   Align(
-                    alignment: Alignment(-0.05, 0.0),
+                    alignment: const Alignment(-0.05, 0.0),
                     child: Text(
                       'Simplify your order management \nand gain complete control',
                       style: TextStyles.loginSub(context),
-                      // style: TextStyle(fontSize: constraints.maxWidth * 0.020),
                     ),
                   ),
                   SizedBox(height: constraints.maxHeight * 0.03),
-                  // 5% of screen height
                   Align(
                     alignment: const Alignment(0.9, 0.4),
                     child: Column(
@@ -388,11 +341,10 @@ class _LoginContainer2State extends State<LoginContainer2> {
                       children: [
                         SizedBox(height: constraints.maxHeight * 0.04),
                         Align(
-                            alignment: Alignment(-0.27, 0.0),
+                            alignment: const Alignment(-0.27, 0.0),
                             child: Text(
                               'Username',
                               style: TextStyles.header3,
-                              // style: TextStyle(fontWeight: FontWeight.bold),
                             )),
                         const SizedBox(height: 10),
                         Align(
@@ -403,8 +355,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
                             child: TextFormField(
                               controller: userName,
                               style: GoogleFonts.inter(
-                                  color: Colors.black,
-                                  fontSize: 13),
+                                  color: Colors.black, fontSize: 13),
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 hintText: 'Enter your username',
@@ -415,23 +366,23 @@ class _LoginContainer2State extends State<LoginContainer2> {
                               ),
                               onFieldSubmitted: (value) async {
                                 print('username');
-                                String? role =
-                                await checkLogin(userName.text, Password.text);
+                                String? role = await checkLogin(
+                                    userName.text, password.text);
                                 if (role != null) {
-                                  if(role == 'Employee'){
+                                  if (role == 'Employee') {
                                     context.go('/Home');
-                                  }else if(role == 'Customer'){
+                                  } else if (role == 'Customer') {
                                     context.go('/Customer_Order_List');
-                                  }else if(role == 'Admin'){
+                                  } else if (role == 'Admin') {
                                     context.go('/User_List');
-                                  }else if(userName.text.isNotEmpty && Password.text.isEmpty){
+                                  } else if (userName.text.isNotEmpty &&
+                                      password.text.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content:
-                                          Text("Please enter password")),
+                                              Text("Please enter password")),
                                     );
                                   }
-
                                 }
                               },
                             ),
@@ -439,11 +390,10 @@ class _LoginContainer2State extends State<LoginContainer2> {
                         ),
                         const SizedBox(height: 20),
                         Align(
-                            alignment: Alignment(-0.27, 0.0),
+                            alignment: const Alignment(-0.27, 0.0),
                             child: Text(
                               'Password',
                               style: TextStyles.header3,
-                              // style: TextStyle(fontWeight: FontWeight.bold),
                             )),
                         const SizedBox(height: 10),
                         Align(
@@ -452,15 +402,14 @@ class _LoginContainer2State extends State<LoginContainer2> {
                             height: 40,
                             width: constraints.maxWidth * 0.39,
                             child: TextFormField(
-                              controller: Password,
+                              controller: password,
                               style: GoogleFonts.inter(
-                                  color: Colors.black,
-                                  fontSize: 13),
+                                  color: Colors.black, fontSize: 13),
                               obscureText: _obscureText,
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(),
+                                border: const OutlineInputBorder(),
                                 hintText: 'Enter your Password',
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 10,
                                   vertical: 8,
                                 ),
@@ -472,28 +421,28 @@ class _LoginContainer2State extends State<LoginContainer2> {
                                     size: 20,
                                   ),
                                   onPressed:
-                                  _togglePasswordVisibility, // Toggle password visibility
+                                      _togglePasswordVisibility, // Toggle password visibility
                                 ),
                               ),
                               onFieldSubmitted: (value) async {
                                 print('username');
-                                String? role =
-                                await checkLogin(userName.text, Password.text);
+                                String? role = await checkLogin(
+                                    userName.text, password.text);
                                 if (role != null) {
-                                  if(role == 'Employee'){
+                                  if (role == 'Employee') {
                                     context.go('/Home');
-                                  }else if(role == 'Customer'){
+                                  } else if (role == 'Customer') {
                                     context.go('/Customer_Order_List');
-                                  }else if(role == 'Admin'){
+                                  } else if (role == 'Admin') {
                                     context.go('/User_List');
-                                  }else if(userName.text.isEmpty && Password.text.isNotEmpty){
+                                  } else if (userName.text.isEmpty &&
+                                      password.text.isNotEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content:
-                                          Text("Please enter username")),
+                                              Text("Please enter username")),
                                     );
                                   }
-
                                 }
                               },
                             ),
@@ -501,25 +450,22 @@ class _LoginContainer2State extends State<LoginContainer2> {
                         ),
                         const SizedBox(height: 10),
                         Align(
-                            alignment: Alignment(0.36, 0.2),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              // remove splash effect
-                              highlightColor: Colors.transparent,
-                              // remove highlight effect
-                              onTap: () {
-                                Navigator.of(context).push(PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation, secondaryAnimation) =>
-                                      Logout(),
-                                ));
-                              },
-                              child: Text(
-                                'Forgot password ?',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            )
-                          // child: Text('Forgot password ?'),
+                          alignment: const Alignment(0.36, 0.2),
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () {
+                              Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const Logout(),
+                              ));
+                            },
+                            child: const Text(
+                              'Forgot password ?',
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
                         ),
                         const SizedBox(
                           height: 20,
@@ -530,25 +476,29 @@ class _LoginContainer2State extends State<LoginContainer2> {
                             width: constraints.maxWidth * 0.2,
                             child: ElevatedButton(
                               onPressed: () async {
-                                if (userName.text.isEmpty && Password.text.isEmpty) {
+                                if (userName.text.isEmpty &&
+                                    password.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Please enter username & password")),
+                                    const SnackBar(
+                                        content: Text(
+                                            "Please enter username & password")),
                                   );
-                                }
-                                else if (userName.text.isEmpty && Password.text.isNotEmpty) {
+                                } else if (userName.text.isEmpty &&
+                                    password.text.isNotEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Please enter username")),
+                                    const SnackBar(
+                                        content: Text("Please enter username")),
                                   );
-                                }
-                                else if (userName.text.isNotEmpty && Password.text.isEmpty) {
+                                } else if (userName.text.isNotEmpty &&
+                                    password.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Please enter password")),
+                                    const SnackBar(
+                                        content: Text("Please enter password")),
                                   );
+                                } else {
+                                  await checkLogin(
+                                      userName.text, password.text);
                                 }
-                                else{
-                                  await checkLogin(userName.text, Password.text);
-                                }
-
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[800],
@@ -556,8 +506,8 @@ class _LoginContainer2State extends State<LoginContainer2> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
-                              child:  Align(
-                                  alignment: Alignment(0.0, 0.0),
+                              child: Align(
+                                  alignment: const Alignment(0.0, 0.0),
                                   child: Text(
                                     'Login',
                                     style: TextStyles.button1,
@@ -566,7 +516,7 @@ class _LoginContainer2State extends State<LoginContainer2> {
                             ),
                           ),
                         ),
-                        SizedBox(height: constraints.maxHeight *  0.06),
+                        SizedBox(height: constraints.maxHeight * 0.06),
                         Align(
                           alignment: const Alignment(0.1, 0.0),
                           child: Padding(
@@ -600,7 +550,6 @@ class _LoginContainer2State extends State<LoginContainer2> {
             ),
           );
         }
-
       },
     );
   }
@@ -608,74 +557,65 @@ class _LoginContainer2State extends State<LoginContainer2> {
 
 class ImageContainer extends StatelessWidget {
   const ImageContainer({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (context,constraints){
-          if(constraints.maxHeight >=630){
-            return Container(
-              width: double.infinity, // Take full width
-              color: Colors.grey[100],
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 40, left: 25),
-                    child: Image.asset('images/Final-Ikyam-Logo.png'),
+    return LayoutBuilder(builder: (context, constraints) {
+      if (constraints.maxHeight >= 630) {
+        return Container(
+          width: double.infinity,
+          color: Colors.grey[100],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 40, left: 25),
+                child: Image.asset('images/Final-Ikyam-Logo.png'),
+              ),
+              const SizedBox(height: 50),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: MediaQuery.of(context).size.width * 0.3,
+                  child: Image.asset(
+                    'images/ikyam1.png',
+                    fit: BoxFit.cover,
                   ),
-                  const SizedBox(height: 50), // You can adjust this value
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width *
-                          0.4, // Take 70% of screen width
-                      height: MediaQuery.of(context).size.width *
-                          0.3, // Take 70% of screen width
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        return Container(
+          width: double.infinity,
+          color: Colors.grey[100],
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 40, left: 25),
+                  child: Image.asset('images/Final-Ikyam-Logo.png'),
+                ),
+                const SizedBox(height: 50),
+                Center(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    height: MediaQuery.of(context).size.width * 0.7,
+                    child: SingleChildScrollView(
                       child: Image.asset(
                         'images/ikyam1.png',
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
-                ],
-              ),
-            );
-          }
-          else{
-            return Container(
-              width: double.infinity, // Take full width
-              color: Colors.grey[100],
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40, left: 25),
-                      child: Image.asset('images/Final-Ikyam-Logo.png'),
-                    ),
-                    const SizedBox(height: 50), // You can adjust this value
-                    Center(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width *
-                            0.4, // Take 70% of screen width
-                        height: MediaQuery.of(context).size.width *
-                            0.7, // Take 70% of screen width
-                        child: SingleChildScrollView(
-                          child: Image.asset(
-                            'images/ikyam1.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
-                    ),
-                  ],
                 ),
-              ),
-            );
-          }
-
-        }
-    );
-
+              ],
+            ),
+          ),
+        );
+      }
+    });
   }
 }

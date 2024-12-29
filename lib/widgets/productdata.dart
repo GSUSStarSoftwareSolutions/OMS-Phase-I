@@ -19,7 +19,6 @@ class ProductData {
 
   factory ProductData.fromJson(Map<String, dynamic> json) {
     return ProductData(
-      // prodId: json['prodId'] ?? '',
       category: json['category'] ?? '',
       productName: json['productName'] ?? '',
       subCategory: json['subCategory'] ?? '',
@@ -27,7 +26,6 @@ class ProductData {
       tax: json['tax'] ?? '',
       discount: json['discount'] ?? '',
       price: json['price'] ?? 0,
-      //  imageId: json['imageId'] ?? '',
     );
   }
 }

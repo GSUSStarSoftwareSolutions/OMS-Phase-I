@@ -9,8 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:url_strategy/url_strategy.dart';
-import '../dashboard/dashboard.dart';
+import '../customer login/home/home.dart';
 import '../widgets/confirmdialog.dart';
 import '../widgets/custom loading.dart';
 import '../widgets/no datafound.dart';
@@ -19,11 +18,11 @@ import '../widgets/productsap.dart' as ord;
 import '../widgets/text_style.dart';
 
 void main() => runApp(const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: ProductPage(
-        product: null,
-      ),
-    ));
+  debugShowCheckedModeBanner: false,
+  home: ProductPage(
+    product: null,
+  ),
+));
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key, required this.product});
@@ -36,8 +35,7 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage>
     with SingleTickerProviderStateMixin {
-  ord.Product? _selectedProduct;
-  List<String> _sortOrder = List.generate(5, (index) => 'asc');
+  final List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Product Name',
     'Category Name',
@@ -53,9 +51,9 @@ class _ProductPageState extends State<ProductPage>
   Timer? _searchDebounceTimer;
   final ScrollController horizontalScroll = ScrollController();
   late AnimationController _controller;
-  bool _isHovered1 = false;
+  final bool _isHovered1 = false;
   String companyname = window.sessionStorage["company Name"] ?? " ";
-  Map<String, bool> _isHovered = {
+  final Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
     'Products': false,
@@ -68,35 +66,29 @@ class _ProductPageState extends State<ProductPage>
   };
   late Animation<double> _shakeAnimation;
   String _searchText = '';
-  String _category = '';
-
+  final String _category = '';
   late TextEditingController _dateController;
-  String _subCategory = '';
+  final String _subCategory = '';
   int startIndex = 0;
   List<ord.ProductData> filteredProducts = [];
   String? dropdownValue1 = 'Category';
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Sub Category';
   bool _hasShownPopup = false;
-
   final ScrollController _scrollController = ScrollController();
   int currentPage = 1;
   int itemsPerPage = 10;
-  bool _isRowHovered = false;
   int totalItems = 0;
   int totalPages = 0;
   bool _loading = false;
   bool isLoading = false;
   List<ord.ProductData> productList = [];
-
-// Example method for fetching products
   Future<void> fetchProducts(int page, int itemsPerPage) async {
     if (isLoading) return;
 
     setState(() {
       isLoading = true;
     });
-
     try {
       final response = await http.get(
         Uri.parse(
@@ -107,14 +99,10 @@ class _ProductPageState extends State<ProductPage>
           "Authorization": 'Bearer $token',
         },
       );
-
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
-
         List<ord.ProductData> products = [];
-
         if (jsonData != null) {
-          // Iterate over the response to map the products
           products = jsonData.map<ord.ProductData>((item) {
             return ord.ProductData(
               product: item['product'] ?? '',
@@ -123,16 +111,15 @@ class _ProductPageState extends State<ProductPage>
               baseUnit: item['baseUnit'] ?? '',
               productDescription: item['productDescription'] ?? '',
               standardPrice: item['standardPrice'] ?? 0,
-              // Default value if not present
-              currency: item['currency'] ?? 'INR', // Default to INR
+              currency: item['currency'] ?? 'INR',
             );
           }).toList();
 
           setState(() {
             productList = products;
             totalPages =
-                (products.length / itemsPerPage).ceil(); // Update total pages
-            print(totalPages); // Debugging output
+                (products.length / itemsPerPage).ceil();
+
             _filterAndPaginateProducts();
           });
         }
@@ -141,92 +128,31 @@ class _ProductPageState extends State<ProductPage>
       }
     } catch (e) {
       print('Error: $e');
-      // Optionally, show an error message to the user
     } finally {
       setState(() {
         isLoading = false;
       });
     }
   }
-
-//   Future<void> fetchProducts(int page, int itemsPerPage) async {
-//     if (isLoading) return;
-//     setState(() {
-//       isLoading = true;
-//     });
-//
-//     try {
-//       final response = await http.get(
-//         Uri.parse(
-//           '$apicall/productmaster/get_all_productmaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
-//         ),
-//         headers: {
-//           "Content-type": "application/json",
-//           "Authorization": 'Bearer $token',
-//         },
-//       );
-//
-//       if (response.statusCode == 200) {
-//         final jsonData = jsonDecode(response.body);
-//         List<ord.Product> products = [];
-//         if (jsonData != null) {
-//           if (jsonData is List) {
-//             products = jsonData.map((item) => ord.Product.fromJson(item)).toList();
-//           } else if (jsonData is Map && jsonData.containsKey('body')) {
-//             products = (jsonData['body'] as List).map((item) => ord.Product.fromJson(item)).toList();
-//             //  totalItems = jsonData['totalItems'] ?? 0;
-//
-//             print('pages');
-//             print(totalPages);// Changed itemsPerPage to 10
-//           }
-//
-//           setState(() {
-//             productList = products;
-//             totalPages = (products.length / itemsPerPage).ceil();
-//             print(totalPages);
-//             _filterAndPaginateProducts();
-//           });
-//         }
-//       } else {
-//         throw Exception('Failed to load data');
-//       }
-//     } catch (e) {
-//       print('Error decoding JSON: $e');
-//       // Optionally, show an error message to the user
-//     } finally {
-//       setState(() {
-//         isLoading = false;
-//       });
-//     }
-//   }
-
   void _updateSearch(String searchText) {
     setState(() {
       _searchText = searchText;
-      currentPage = 1; // Reset to first page when searching
+      currentPage = 1;
       _filterAndPaginateProducts();
-      // _clearSearch();
     });
   }
 
   void _goToPreviousPage() {
-    print("previos");
-
     if (currentPage > 1) {
       if (filteredProducts.length > itemsPerPage) {
         setState(() {
           currentPage--;
-          //  fetchProducts(currentPage, itemsPerPage);
         });
       }
-      //fetchProducts(page: currentPage);
-      // _filterAndPaginateProducts();
     }
   }
 
   void _goToNextPage() {
-    print('nextpage');
-
     if (currentPage < totalPages) {
       if (filteredProducts.length > currentPage * itemsPerPage) {
         setState(() {
@@ -235,7 +161,6 @@ class _ProductPageState extends State<ProductPage>
       }
     }
   }
-
   void showConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -248,7 +173,6 @@ class _ProductPageState extends State<ProductPage>
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Close Button
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
@@ -262,10 +186,8 @@ class _ProductPageState extends State<ProductPage>
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    // Warning Icon
                     const Icon(Icons.warning, color: Colors.orange, size: 50),
                     const SizedBox(height: 16),
-                    // Confirmation Message
                     const Text(
                       'Are You Sure',
                       style: TextStyle(
@@ -281,7 +203,6 @@ class _ProductPageState extends State<ProductPage>
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            // Handle Yes action
                             context.go('/');
                             // Navigator.of(context).pop();
                           },
@@ -355,7 +276,7 @@ class _ProductPageState extends State<ProductPage>
   @override
   void dispose() {
     _searchDebounceTimer
-        ?.cancel(); // Cancel the timer when the widget is disposed
+        ?.cancel();
     super.dispose();
   }
 
@@ -371,8 +292,8 @@ class _ProductPageState extends State<ProductPage>
             return Stack(
               children: [
                 Container(
-                  color: Colors.white, // White background color
-                  height: 60.0, // Total height including bottom shadow
+                  color: Colors.white,
+                  height: 60.0,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -384,7 +305,6 @@ class _ProductPageState extends State<ProductPage>
                             child: Image.asset(
                               "images/Final-Ikyam-Logo.png",
                               height: 35.0,
-                              // Adjusted to better match proportions
                             ),
                           ),
                           const Spacer(),
@@ -392,7 +312,6 @@ class _ProductPageState extends State<ProductPage>
                             children: [
                               Padding(
                                 padding: EdgeInsets.only(right: 10, top: 10),
-                                // Adjust padding for better spacing
                                 child: AccountMenu(),
                               ),
                             ],
@@ -404,8 +323,8 @@ class _ProductPageState extends State<ProductPage>
                       ),
                       const Divider(
                         height: 3.0,
-                        thickness: 3.0, // Thickness of the shadow
-                        color: Color(0x29000000), // Shadow color (#00000029)
+                        thickness: 3.0,
+                        color: Color(0x29000000),
                       ),
                     ],
                   ),
@@ -418,7 +337,6 @@ class _ProductPageState extends State<ProductPage>
                     bottom: 0,
                     child: SingleChildScrollView(
                       child: Align(
-                        // Added Align widget for the left side menu
                         alignment: Alignment.topLeft,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 2),
@@ -451,7 +369,7 @@ class _ProductPageState extends State<ProductPage>
                         width: 200,
                         color: Colors.white,
                         padding:
-                            const EdgeInsets.only(left: 15, top: 10, right: 15),
+                        const EdgeInsets.only(left: 15, top: 10, right: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: _buildMenuItems(context),
@@ -472,217 +390,18 @@ class _ProductPageState extends State<ProductPage>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      // Center(
-                      //   child: Container(
-                      //     padding: const EdgeInsets.symmetric(horizontal: 16),
-                      //     color: Color(0xFFFFFDFF),
-                      //     height: 50,
-                      //     child: Row(
-                      //       children: [
-                      //         const Padding(
-                      //           padding: EdgeInsets.only(left: 20),
-                      //           child: Text(
-                      //             'Product List',
-                      //             style: TextStyle(
-                      //               fontSize: 20,
-                      //               fontWeight: FontWeight.bold,
-                      //             ),
-                      //             textAlign: TextAlign.center,
-                      //           ),
-                      //         ),
-                      //         const Spacer(),
-                      //         Align(
-                      //           alignment: Alignment.topRight,
-                      //           child: Padding(
-                      //             padding: const EdgeInsets.only(top: 10, right: 80),
-                      //             child: AnimatedBuilder(
-                      //                 animation: _controller,
-                      //                 builder: (context, child) {
-                      //                   return Transform.translate(offset: Offset(_isHovered1? _shakeAnimation.value : 0,0),
-                      //                     child: AnimatedContainer(
-                      //                       duration: const Duration(milliseconds: 300),
-                      //                       curve: Curves.easeInOut,
-                      //                       decoration: BoxDecoration(
-                      //                         color: _isHovered1
-                      //                             ? Colors.blue[800]
-                      //                             : Colors.blue[800], // Background color change on hover
-                      //                         borderRadius: BorderRadius.circular(5),
-                      //                         boxShadow: _isHovered1
-                      //                             ? [
-                      //                           BoxShadow(
-                      //                               color: Colors.black45,
-                      //                               blurRadius: 6,
-                      //                               spreadRadius: 2)
-                      //                         ]
-                      //                             : [],
-                      //                       ),
-                      //                       child: OutlinedButton(
-                      //                         onPressed: () {
-                      //                           context.go('/Create_New_Product');
-                      //                         },
-                      //                         style: OutlinedButton.styleFrom(
-                      //                           backgroundColor: Colors
-                      //                               .blue[800], // Button background color
-                      //                           shape: RoundedRectangleBorder(
-                      //                             borderRadius: BorderRadius.circular(
-                      //                                 5), // Rounded corners
-                      //                           ),
-                      //                           side: BorderSide.none, // No outline
-                      //                         ),
-                      //                         child: const Text(
-                      //                           'Create',
-                      //                           style: TextStyle(
-                      //                             fontSize: 14,
-                      //                             // fontWeight: FontWeight.bold,
-                      //                             color: Colors.white,
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                     ),
-                      //                   );
-                      //                 }
-                      //
-                      //             ),
-                      //           ),
-                      //         ),
-                      //
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-                      // Container(
-                      //   margin: const EdgeInsets.only(left: 0),
-                      //   // Space above/below the border
-                      //   height: 1,
-                      //   // width: 1000,
-                      //   width: constraints.maxWidth,
-                      //   // Border height
-                      //   color: Colors.grey, // Border color
-                      // ),
                       if (constraints.maxWidth >= 1350) ...{
                         Expanded(
                             child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 30, top: 10),
-                                    child: Text(
-                                      'Product List',
-                                      style: TextStyles.heading,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 30,
-                                          top: 20,
-                                          right: 30,
-                                          bottom: 15),
-                                      child: Container(
-                                        height: 690,
-                                        width: maxWidth * 0.8,
-                                        decoration: BoxDecoration(
-                                          //   border: Border.all(color: Colors.grey),
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(2),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.1),
-                                              // Soft grey shadow
-                                              spreadRadius: 3,
-                                              blurRadius: 3,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-                                        child: SizedBox(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              buildSearchField(),
-                                              const SizedBox(height: 10),
-                                              Expanded(
-                                                child: Scrollbar(
-                                                  controller: _scrollController,
-                                                  thickness: 6,
-                                                  thumbVisibility: true,
-                                                  child: SingleChildScrollView(
-                                                    controller:
-                                                        _scrollController,
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    child: buildDataTable(),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: 1,
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 30),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  children: [
-                                                    PaginationControls(
-                                                      currentPage: currentPage,
-                                                      totalPages:
-                                                          filteredProducts
-                                                                      .length >
-                                                                  itemsPerPage
-                                                              ? totalPages
-                                                              : 1,
-                                                      onPreviousPage:
-                                                          _goToPreviousPage,
-                                                      onNextPage: _goToNextPage,
-                                                      // onLastPage: _goToLastPage,
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      )),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )),
-                      } else ...{
-                        Expanded(
-                            child: AdaptiveScrollbar(
-                          position: ScrollbarPosition.bottom,
-                          controller: horizontalScroll,
-                          child: SingleChildScrollView(
-                            controller: horizontalScroll,
-                            scrollDirection: Axis.horizontal,
-                            child: SingleChildScrollView(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  const SizedBox(height: 10),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
                                       Padding(
                                         padding: const EdgeInsets.only(
-                                            left: 30, top: 20),
+                                            left: 30, top: 10),
                                         child: Text(
                                           'Product List',
                                           style: TextStyles.heading,
@@ -701,17 +420,15 @@ class _ProductPageState extends State<ProductPage>
                                               bottom: 15),
                                           child: Container(
                                             height: 690,
-                                            width: 1100,
+                                            width: maxWidth * 0.8,
                                             decoration: BoxDecoration(
-                                              //   border: Border.all(color: Colors.grey),
                                               color: Colors.white,
                                               borderRadius:
-                                                  BorderRadius.circular(2),
+                                              BorderRadius.circular(2),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.1),
-                                                  // Soft grey shadow
+                                                  color:
+                                                  Colors.grey.withOpacity(0.1),
                                                   spreadRadius: 3,
                                                   blurRadius: 3,
                                                   offset: const Offset(0, 3),
@@ -721,24 +438,21 @@ class _ProductPageState extends State<ProductPage>
                                             child: SizedBox(
                                               child: Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                                 children: [
                                                   buildSearchField(),
                                                   const SizedBox(height: 10),
                                                   Expanded(
                                                     child: Scrollbar(
-                                                      controller:
-                                                          _scrollController,
+                                                      controller: _scrollController,
                                                       thickness: 6,
                                                       thumbVisibility: true,
-                                                      child:
-                                                          SingleChildScrollView(
+                                                      child: SingleChildScrollView(
                                                         controller:
-                                                            _scrollController,
+                                                        _scrollController,
                                                         scrollDirection:
-                                                            Axis.horizontal,
-                                                        child:
-                                                            buildDataTable2(),
+                                                        Axis.horizontal,
+                                                        child: buildDataTable(),
                                                       ),
                                                     ),
                                                   ),
@@ -746,26 +460,23 @@ class _ProductPageState extends State<ProductPage>
                                                     height: 1,
                                                   ),
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 30),
+                                                    padding: const EdgeInsets.only(
+                                                        right: 30),
                                                     child: Row(
                                                       mainAxisAlignment:
-                                                          MainAxisAlignment.end,
+                                                      MainAxisAlignment.end,
                                                       children: [
                                                         PaginationControls(
-                                                          currentPage:
-                                                              currentPage,
+                                                          currentPage: currentPage,
                                                           totalPages:
-                                                              filteredProducts
-                                                                          .length >
-                                                                      itemsPerPage
-                                                                  ? totalPages
-                                                                  : 1,
+                                                          filteredProducts
+                                                              .length >
+                                                              itemsPerPage
+                                                              ? totalPages
+                                                              : 1,
                                                           onPreviousPage:
-                                                              _goToPreviousPage,
-                                                          onNextPage:
-                                                              _goToNextPage,
+                                                          _goToPreviousPage,
+                                                          onNextPage: _goToNextPage,
                                                           // onLastPage: _goToLastPage,
                                                         ),
                                                       ],
@@ -779,9 +490,125 @@ class _ProductPageState extends State<ProductPage>
                                   ),
                                 ],
                               ),
-                            ),
-                          ),
-                        )),
+                            )),
+                      } else ...{
+                        Expanded(
+                            child: AdaptiveScrollbar(
+                              position: ScrollbarPosition.bottom,
+                              controller: horizontalScroll,
+                              child: SingleChildScrollView(
+                                controller: horizontalScroll,
+                                scrollDirection: Axis.horizontal,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 30, top: 20),
+                                            child: Text(
+                                              'Product List',
+                                              style: TextStyles.heading,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 30,
+                                                  top: 20,
+                                                  right: 30,
+                                                  bottom: 15),
+                                              child: Container(
+                                                height: 690,
+                                                width: 1100,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                  BorderRadius.circular(2),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.1),
+                                                      spreadRadius: 3,
+                                                      blurRadius: 3,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: SizedBox(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                    children: [
+                                                      buildSearchField(),
+                                                      const SizedBox(height: 10),
+                                                      Expanded(
+                                                        child: Scrollbar(
+                                                          controller:
+                                                          _scrollController,
+                                                          thickness: 6,
+                                                          thumbVisibility: true,
+                                                          child:
+                                                          SingleChildScrollView(
+                                                            controller:
+                                                            _scrollController,
+                                                            scrollDirection:
+                                                            Axis.horizontal,
+                                                            child:
+                                                            buildDataTable2(),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 1,
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(
+                                                            right: 30),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                          children: [
+                                                            PaginationControls(
+                                                              currentPage:
+                                                              currentPage,
+                                                              totalPages:
+                                                              filteredProducts
+                                                                  .length >
+                                                                  itemsPerPage
+                                                                  ? totalPages
+                                                                  : 1,
+                                                              onPreviousPage:
+                                                              _goToPreviousPage,
+                                                              onNextPage:
+                                                              _goToNextPage,
+                                                              // onLastPage: _goToLastPage,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              )),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )),
                       }
                     ],
                   ),
@@ -808,7 +635,6 @@ class _ProductPageState extends State<ProductPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // const SizedBox(height: 2),
               Row(
                 children: [
                   Column(
@@ -819,10 +645,8 @@ class _ProductPageState extends State<ProductPage>
                         padding: const EdgeInsets.all(8.0),
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
-                            // maxWidth: 374,
                             maxWidth: constraints.maxWidth * 0.261,
-                            // reduced width
-                            maxHeight: 39, // reduced height
+                            maxHeight: 39,
                           ),
                           child: Container(
                             height: 35,
@@ -843,10 +667,9 @@ class _ProductPageState extends State<ProductPage>
                                 border: InputBorder.none,
                                 suffixIcon: Padding(
                                   padding:
-                                      const EdgeInsets.only(left: 10, right: 5),
-                                  // Adjust image padding
+                                  const EdgeInsets.only(left: 10, right: 5),
                                   child: Image.asset(
-                                    'images/search.png', // Replace with your image asset path
+                                    'images/search.png',
                                   ),
                                 ),
                               ),
@@ -868,29 +691,23 @@ class _ProductPageState extends State<ProductPage>
   }
 
   Widget buildDataTable() {
-    // _filterAndPaginateProducts();
-
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
+      var height = MediaQuery.of(context).size.height;
       _loading = true;
-      // Show loading indicator while data is being fetched
       return Padding(
-        padding: EdgeInsets.only(bottom: Height * 0.100, left: width * 0.300,     top: Height * 0.100,),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+        padding: EdgeInsets.only(bottom: height * 0.100, left: width * 0.300,     top: height * 0.100,),
+        child: CustomLoadingIcon(),
       );
     }
 
     if (filteredProducts.isEmpty) {
-      var _mediaQuery = MediaQuery.of(context).size.width;
+      var mediaQuery = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
-            width: _mediaQuery - 250,
+            width: mediaQuery - 250,
             decoration: const BoxDecoration(
-
-                ///  color:  Colors.grey,
-                // color:  Color(0xFFECEFF1),
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),
@@ -899,48 +716,33 @@ class _ProductPageState extends State<ProductPage>
                 headingRowHeight: 40,
                 columns: [
                   DataColumn(
-                    label: Container(
-                      // padding: const EdgeInsets.only(left: 19),
-                      child: Text(
-                        'Product Name',
-                        style: TextStyles.subhead,
-                      ),
+                    label: Text(
+                      'Product Name',
+                      style: TextStyles.subhead,
                     ),
                   ),
                   DataColumn(
-                    label: Container(
-                      // padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Category',
-                        style: TextStyles.subhead,
-                      ),
+                    label: Text(
+                      'Category',
+                      style: TextStyles.subhead,
                     ),
                   ),
                   DataColumn(
-                    label: Container(
-                      //padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Sub Category',
-                        style: TextStyles.subhead,
-                      ),
+                    label: Text(
+                      'Sub Category',
+                      style: TextStyles.subhead,
                     ),
                   ),
                   DataColumn(
-                    label: Container(
-                      //padding: const EdgeInsets.only(left: 22),
-                      child: Text(
-                        'Unit',
-                        style: TextStyles.subhead,
-                      ),
+                    label: Text(
+                      'Unit',
+                      style: TextStyles.subhead,
                     ),
                   ),
                   DataColumn(
-                    label: Container(
-                      //padding: const EdgeInsets.only(left: 12),
-                      child: Text(
-                        'Price',
-                        style: TextStyles.subhead,
-                      ),
+                    label: Text(
+                      'Price',
+                      style: TextStyles.subhead,
                     ),
                   ),
                 ],
@@ -951,29 +753,25 @@ class _ProductPageState extends State<ProductPage>
                 top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
-          //Text('No productss found', style: TextStyle(fontSize: 24))),
         ],
       );
     }
-
     return LayoutBuilder(builder: (context, constraints) {
-      var _mediaQuery = MediaQuery.of(context).size.width;
+      var mediaQuery = MediaQuery.of(context).size.width;
       return Column(
         children: [
-          // Heading Row with GestureDetector for resizing
           Container(
-            width: _mediaQuery - 250,
+            width: mediaQuery - 250,
             decoration: const BoxDecoration(
               color: Color(0xFFF7F7F7),
               border: Border.symmetric(
                   horizontal: BorderSide(color: Colors.grey, width: 0.5)),
             ),
             child: SizedBox(
-              width: _mediaQuery * 0.2,
+              width: mediaQuery * 0.2,
               child: DataTable(
                   showCheckboxColumn: false,
                   headingRowHeight: 40,
-                  // List.generate(5, (index)
                   columns: columns.map((column) {
                     return DataColumn(
                       label: Stack(
@@ -981,10 +779,7 @@ class _ProductPageState extends State<ProductPage>
                           Container(
                             padding: null,
                             width: columnWidths[columns.indexOf(column)],
-                            // Dynamic width based on user interaction
                             child: Row(
-                              //crossAxisAlignment: CrossAxisAlignment.end,
-                              //   mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Text(
                                   column,
@@ -992,33 +787,31 @@ class _ProductPageState extends State<ProductPage>
                                 ),
                                 IconButton(
                                   icon: _sortOrder[columns.indexOf(column)] ==
-                                          'asc'
+                                      'asc'
                                       ? SizedBox(
-                                          width: 12,
-                                          child: Image.asset(
-                                            "images/ix_sort.png",
-                                            color: Colors.blue,
-                                          ))
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      ))
                                       : SizedBox(
-                                          width: 12,
-                                          child: Image.asset(
-                                            "images/ix_sort.png",
-                                            color: Colors.blue,
-                                          )),
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      )),
                                   onPressed: () {
                                     setState(() {
                                       _sortOrder[columns.indexOf(column)] =
-                                          _sortOrder[columns.indexOf(column)] ==
-                                                  'asc'
-                                              ? 'desc'
-                                              : 'asc';
+                                      _sortOrder[columns.indexOf(column)] ==
+                                          'asc'
+                                          ? 'desc'
+                                          : 'asc';
                                       _sortProducts(columns.indexOf(column),
                                           _sortOrder[columns.indexOf(column)]);
                                     });
                                   },
                                 ),
-
-                                // ),
                               ],
                             ),
                           ),
@@ -1035,8 +828,7 @@ class _ProductPageState extends State<ProductPage>
                           filteredProducts.length -
                               (currentPage - 1) * itemsPerPage), (index) {
                     final product = filteredProducts[
-                        (currentPage - 1) * itemsPerPage + index];
-                    final isSelected = _selectedProduct == product;
+                    (currentPage - 1) * itemsPerPage + index];
                     return DataRow(
                       color: MaterialStateProperty.resolveWith<Color>((states) {
                         if (states.contains(MaterialState.hovered)) {
@@ -1050,7 +842,6 @@ class _ProductPageState extends State<ProductPage>
                         DataCell(
                           SizedBox(
                             width: columnWidths[0],
-                            // Same dynamic width as column headers
                             child: Text(
                               product.productDescription.length > 25
                                   ? '${product.productDescription.substring(0, 25)}...'
@@ -1098,10 +889,6 @@ class _ProductPageState extends State<ProductPage>
                       ],
                       onSelectChanged: (selected) {
                         if (selected != null && selected) {
-                          print('from first page');
-                          print(filteredProducts);
-                          print(product);
-
                           if (filteredProducts.length <= 9) {
                           } else {}
                         }
@@ -1116,28 +903,21 @@ class _ProductPageState extends State<ProductPage>
   }
 
   Widget buildDataTable2() {
-    // _filterAndPaginateProducts();
-
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
+      var height = MediaQuery.of(context).size.height;
       _loading = true;
-      // Show loading indicator while data is being fetched
       return Padding(
-        padding: EdgeInsets.only(bottom: Height * 0.100, left: width * 0.300,top: Height * 0.100,),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+        padding: EdgeInsets.only(bottom: height * 0.100, left: width * 0.300,top: height * 0.100,),
+        child: CustomLoadingIcon(),
       );
     }
     if (filteredProducts.isEmpty) {
-      var _mediaQuery = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
             width: 1100,
             decoration: const BoxDecoration(
-
-                ///  color:  Colors.grey,
-                // color:  Color(0xFFECEFF1),
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),
@@ -1146,47 +926,33 @@ class _ProductPageState extends State<ProductPage>
               headingRowHeight: 40,
               columns: [
                 DataColumn(
-                  label: Container(
-                    // padding: const EdgeInsets.only(left: 19),
-                    child: Text(
-                      'Product Name',
-                      style: TextStyles.subhead,
-                    ),
+                  label: Text(
+                    'Product Name',
+                    style: TextStyles.subhead,
                   ),
                 ),
                 DataColumn(
-                  label: Container(
-                    // padding: const EdgeInsets.only(left: 10),
-                    child: Text(
-                      'Category',
-                      style: TextStyles.subhead,
-                    ),
+                  label: Text(
+                    'Category',
+                    style: TextStyles.subhead,
                   ),
                 ),
                 DataColumn(
-                  label: Container(
-                    //padding: const EdgeInsets.only(left: 10),
-                    child: Text(
-                      'Sub Category',
-                      style: TextStyles.subhead,
-                    ),
+                  label: Text(
+                    'Sub Category',
+                    style: TextStyles.subhead,
                   ),
                 ),
                 DataColumn(
-                  label: Container(
-                    //padding: const EdgeInsets.only(left: 22),
-                    child: Text(
-                      'Unit',
-                      style: TextStyles.subhead,
-                    ),
+                  label: Text(
+                    'Unit',
+                    style: TextStyles.subhead,
                   ),
                 ),
                 DataColumn(
-                  label: Container(
-                    child: Text(
-                      'Price',
-                      style: TextStyles.subhead,
-                    ),
+                  label: Text(
+                    'Price',
+                    style: TextStyles.subhead,
                   ),
                 ),
               ],
@@ -1205,7 +971,6 @@ class _ProductPageState extends State<ProductPage>
     return LayoutBuilder(builder: (context, constraints) {
       return Column(
         children: [
-          // Heading Row with GestureDetector for resizing
           Container(
             width: 1100,
             decoration: const BoxDecoration(
@@ -1214,11 +979,9 @@ class _ProductPageState extends State<ProductPage>
                   horizontal: BorderSide(color: Colors.grey, width: 0.5)),
             ),
             child: SizedBox(
-              // width: _mediaQuery * 0.2,
               child: DataTable(
                   showCheckboxColumn: false,
                   headingRowHeight: 40,
-                  // List.generate(5, (index)
                   columns: columns.map((column) {
                     return DataColumn(
                       label: Stack(
@@ -1226,10 +989,7 @@ class _ProductPageState extends State<ProductPage>
                           Container(
                             padding: null,
                             width: columnWidths[columns.indexOf(column)],
-                            // Dynamic width based on user interaction
                             child: Row(
-                              //crossAxisAlignment: CrossAxisAlignment.end,
-                              //   mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Text(
                                   column,
@@ -1237,33 +997,31 @@ class _ProductPageState extends State<ProductPage>
                                 ),
                                 IconButton(
                                   icon: _sortOrder[columns.indexOf(column)] ==
-                                          'asc'
+                                      'asc'
                                       ? SizedBox(
-                                          width: 12,
-                                          child: Image.asset(
-                                            "images/ix_sort.png",
-                                            color: Colors.blue,
-                                          ))
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      ))
                                       : SizedBox(
-                                          width: 12,
-                                          child: Image.asset(
-                                            "images/ix_sort.png",
-                                            color: Colors.blue,
-                                          )),
+                                      width: 12,
+                                      child: Image.asset(
+                                        "images/ix_sort.png",
+                                        color: Colors.blue,
+                                      )),
                                   onPressed: () {
                                     setState(() {
                                       _sortOrder[columns.indexOf(column)] =
-                                          _sortOrder[columns.indexOf(column)] ==
-                                                  'asc'
-                                              ? 'desc'
-                                              : 'asc';
+                                      _sortOrder[columns.indexOf(column)] ==
+                                          'asc'
+                                          ? 'desc'
+                                          : 'asc';
                                       _sortProducts(columns.indexOf(column),
                                           _sortOrder[columns.indexOf(column)]);
                                     });
                                   },
                                 ),
-
-                                // ),
                               ],
                             ),
                           ),
@@ -1280,8 +1038,7 @@ class _ProductPageState extends State<ProductPage>
                           filteredProducts.length -
                               (currentPage - 1) * itemsPerPage), (index) {
                     final product = filteredProducts[
-                        (currentPage - 1) * itemsPerPage + index];
-                    final isSelected = _selectedProduct == product;
+                    (currentPage - 1) * itemsPerPage + index];
                     return DataRow(
                       color: MaterialStateProperty.resolveWith<Color>((states) {
                         if (states.contains(MaterialState.hovered)) {
@@ -1341,10 +1098,6 @@ class _ProductPageState extends State<ProductPage>
                       ],
                       onSelectChanged: (selected) {
                         if (selected != null && selected) {
-                          print('from first page');
-                          print(filteredProducts);
-                          print(product);
-
                           if (filteredProducts.length <= 9) {
                           } else {}
                         }
@@ -1374,17 +1127,12 @@ class _ProductPageState extends State<ProductPage>
             height: 42,
             decoration: BoxDecoration(
               color: Colors.blue[800],
-              // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-              // color: Color.fromRGBO(224, 59, 48, 1.0),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(8),
-                // Radius for top-left corner
                 topRight: Radius.circular(8),
-                // No radius for top-right corner
                 bottomLeft: Radius.circular(8),
-                // Radius for bottom-left corner
                 bottomRight:
-                    Radius.circular(8), // No radius for bottom-right corner
+                Radius.circular(8),
               ),
             ),
             child: _buildMenuItem('Product', Icons.production_quantity_limits,
@@ -1410,7 +1158,7 @@ class _ProductPageState extends State<ProductPage>
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(
-        () => _isHovered[title] = true,
+            () => _isHovered[title] = true,
       ),
       onExit: (_) => setState(() => _isHovered[title] = false),
       child: GestureDetector(
@@ -1440,7 +1188,7 @@ class _ProductPageState extends State<ProductPage>
                   style: TextStyle(
                     color: iconColor,
                     fontSize: 15,
-                    decoration: TextDecoration.none, // Remove underline
+                    decoration: TextDecoration.none,
                   ),
                 ),
               ],
@@ -1450,7 +1198,6 @@ class _ProductPageState extends State<ProductPage>
       ),
     );
   }
-
   void _sortProducts(int columnIndex, String sortOrder) {
     if (sortOrder == 'asc') {
       filteredProducts.sort((a, b) {
@@ -1493,11 +1240,8 @@ class _ProductPageState extends State<ProductPage>
     }
     setState(() {});
   }
-
   void _filterAndPaginateProducts() {
     filteredProducts = productList.where((product) {
-      print('filter');
-      print(filteredProducts);
       final matchesSearchText = product.productDescription
           .toLowerCase()
           .contains(_searchText.toLowerCase());
@@ -1515,32 +1259,28 @@ class _ProductPageState extends State<ProductPage>
       }
       if (_category == 'Category' && _subCategory.isNotEmpty) {
         return matchesSearchText &&
-            product.productType == _subCategory; // Include all products
+            product.productType == _subCategory;
       }
       if (_category.isNotEmpty && _subCategory == 'Sub Category') {
         return matchesSearchText &&
-            product.categoryName == _category; // Include all products
+            product.categoryName == _category;
       }
       if (_category.isEmpty && _subCategory.isNotEmpty) {
         return matchesSearchText &&
-            product.productType == _subCategory; // Include all products
+            product.productType == _subCategory;
       }
       if (_category.isNotEmpty && _subCategory.isEmpty) {
         return matchesSearchText &&
-            product.categoryName == _category; // Include all products
+            product.categoryName == _category;
       }
       return matchesSearchText &&
           (product.categoryName == _category &&
               product.productType == _subCategory);
     }).toList();
-
-    // filteredProducts.sort((a, b) => a.productName.toLowerCase().compareTo(b.productName.toLowerCase()));
     totalPages = (filteredProducts.length / itemsPerPage).ceil();
-    // final startIndex = (currentPage - 1) * itemsPerPage;
-    // final endIndex = startIndex + itemsPerPage;
-    //
     setState(() {
       currentPage = 1;
     });
   }
 }
+

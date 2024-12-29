@@ -2,21 +2,11 @@ import 'dart:convert';
 import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/login/login.dart';
 import 'package:btb/login/verification%20screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-
 import '../widgets/text_style.dart';
-
-
-
-
-void main(){
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,home:Logout() ,));
-}
 
 class Logout extends StatefulWidget {
   const Logout({super.key});
@@ -53,10 +43,7 @@ class LogoutContainer1 extends StatefulWidget {
 }
 
 class _LogoutContainer1State extends State<LogoutContainer1> {
-  final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
-
-
 
   Future<void> _forgetPassword(BuildContext context, String email) async {
     try {
@@ -81,27 +68,24 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
       print(response);
 
       if (response.statusCode == 200) {
-        if(response.body == 'email not found'){
+        if (response.body == 'email not found') {
           showDialog(
             barrierDismissible: false,
             context: context,
             builder: (context) {
               return AlertDialog(
-                icon: Icon(
-                    Icons.warning_rounded, color: Colors.orange, size: 25),
-                content: Row(
+                icon: const Icon(Icons.warning_rounded,
+                    color: Colors.orange, size: 25),
+                content: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                        'Email address not found'),
+                    Text('Email address not found'),
                   ],
                 ),
                 actions: [
                   TextButton(
-                    child: Text('OK'),
+                    child: const Text('OK'),
                     onPressed: () {
-                      // context.go('/');
-                      //   context.go('/Forget_password');
                       Navigator.pop(context);
                     },
                   ),
@@ -109,34 +93,36 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
               );
             },
           );
-        }else if(response.body == 'Reset password email sent successfully'){
+        } else if (response.body == 'Reset password email sent successfully') {
           showDialog(
             barrierDismissible: false,
             context: context,
             builder: (context) {
               return AlertDialog(
-                icon: Icon(Icons.check_circle_rounded,color: Colors.green,size: 25,),
-                content:  Padding(padding:
-                EdgeInsets.only(left: 35),
-                    child: Text(
-                      'A verification code has been \nsent successfully.Please \ncheck your email.',style: TextStyles.contact1,)
+                icon: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.green,
+                  size: 25,
                 ),
+                content: Padding(
+                    padding: const EdgeInsets.only(left: 35),
+                    child: Text(
+                      'A verification code has been \nsent successfully.Please \ncheck your email.',
+                      style: TextStyles.contact1,
+                    )),
                 actions: [
                   TextButton(
-                    child: Text('OK'),
+                    child: const Text('OK'),
                     onPressed: () {
-                      // context.go('/');
-                      //   context.go('/Forget_password');
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation,
-                              secondaryAnimation) =>
-                              Verify(),
-                          transitionDuration:
-                          const Duration(milliseconds: 5),
-                          transitionsBuilder: (context, animation,
-                              secondaryAnimation, child) {
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const Verify(),
+                          transitionDuration: const Duration(milliseconds: 5),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
                             return FadeTransition(
                               opacity: animation,
                               child: child,
@@ -150,55 +136,53 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
               );
             },
           );
-        }else{
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Something went wrong')),
+            const SnackBar(content: Text('Something went wrong')),
           );
         }
-
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send mail: ${response.statusCode}')),
+          SnackBar(
+              content: Text('Failed to send mail: ${response.statusCode}')),
         );
       }
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: Network or CORS issue')),
+        const SnackBar(content: Text('Error: Network or CORS issue')),
       );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if(constraints.maxHeight >= 630){
+        if (constraints.maxHeight >= 630) {
           return Container(
-            constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.5), // 80% of screen width
+            constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.5),
+            // 80% of screen width
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: constraints.maxHeight * 0.2), // 10% of screen height
+                SizedBox(height: constraints.maxHeight * 0.2),
+                // 10% of screen height
                 Align(
-                  alignment: Alignment(-0.30, 0.5),
+                  alignment: const Alignment(-0.30, 0.5),
                   child: SizedBox(
                     height: 35,
                     width: 100,
                     child: OutlinedButton(
-                      // onPressed: handleButtonPress,
-                      //my copy
-                        onPressed: (){
+                        onPressed: () {
                           Navigator.push(
                             context,
                             PageRouteBuilder(
                               pageBuilder:
                                   (context, animation, secondaryAnimation) =>
-                                  LoginScr(),
+                                      LoginScr(),
                               transitionDuration:
-                              const Duration(milliseconds: 200),
+                                  const Duration(milliseconds: 200),
                               transitionsBuilder: (context, animation,
                                   secondaryAnimation, child) {
                                 return FadeTransition(
@@ -219,34 +203,39 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
-                          // mainAxisSize: MainAxisSize.min,
-                          //crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            IconButton(onPressed: (){}, icon: Icon(Icons.arrow_circle_left_sharp,color: Colors.white,size: 17,)),
-                            Text('Go Back',style: TextStyle(color: Colors.white),)
+                            IconButton(
+                                onPressed: () {},
+                                icon: const Icon(
+                                  Icons.arrow_circle_left_sharp,
+                                  color: Colors.white,
+                                  size: 17,
+                                )),
+                            const Text(
+                              'Go Back',
+                              style: TextStyle(color: Colors.white),
+                            )
                           ],
-                        )
-
-                    ),
+                        )),
                   ),
                 ),
-                SizedBox(height: 10,),
-                Align(
-                  alignment: Alignment(-0.20, 0.5),
-                  child: Text(
-                      'Password Reset',
-                      style: TextStyles.pass(context)
-                  ),
+                const SizedBox(
+                  height: 10,
                 ),
-                SizedBox(height: constraints.maxHeight * 0.03), // 5% of screen height
                 Align(
-                  alignment: Alignment(-0.14, 0.0),
+                  alignment: const Alignment(-0.20, 0.5),
+                  child:
+                      Text('Password Reset', style: TextStyles.pass(context)),
+                ),
+                SizedBox(height: constraints.maxHeight * 0.03),
+                // 5% of screen height
+                Align(
+                  alignment: const Alignment(-0.14, 0.0),
                   child: Text(
                       ' Enter your email address and\n we\'ll send you  a link to \n reset your password',
-                      style: TextStyles.subhead1
-                  ),
+                      style: TextStyles.subhead1),
                 ),
-                SizedBox(height: constraints.maxHeight * 0.03), // 5% of screen height
+                SizedBox(height: constraints.maxHeight * 0.03),
                 Align(
                   alignment: const Alignment(0.9, 0.4),
                   child: Column(
@@ -255,7 +244,8 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                       SizedBox(height: constraints.maxHeight * 0.04),
                       Align(
                         alignment: const Alignment(-0.325, 0.0),
-                        child: Text('Email Address', style: TextStyles.email(context)),
+                        child: Text('Email Address',
+                            style: TextStyles.email(context)),
                       ),
                       const SizedBox(height: 10),
                       Align(
@@ -266,8 +256,7 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                           child: TextFormField(
                             controller: emailController,
                             style: GoogleFonts.inter(
-                                color: Colors.black,
-                                fontSize: 13),
+                                color: Colors.black, fontSize: 13),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               hintStyle: TextStyle(fontSize: 15),
@@ -278,7 +267,8 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                               ),
                             ),
                             inputFormatters: [
-                              FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
+                              FilteringTextInputFormatter.allow(
+                                  RegExp("[a-zA-Z,0-9,@.]")),
                               FilteringTextInputFormatter.deny(RegExp(r'^\s')),
                               FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
                             ],
@@ -286,22 +276,21 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                         ),
                       ),
                       const SizedBox(height: 40),
-
                       Align(
                         alignment: const Alignment(0.0, 0.8),
                         child: SizedBox(
                           width: constraints.maxWidth * 0.2,
                           child: ElevatedButton(
-                            onPressed: (){
-                              if(emailController.text.isEmpty){
+                            onPressed: () {
+                              if (emailController.text.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(
-                                      'Enter Valid E-mail Address')),
+                                  const SnackBar(
+                                      content:
+                                          Text('Enter Valid E-mail Address')),
                                 );
-                              }else{
+                              } else {
                                 _forgetPassword(context, emailController.text);
                               }
-
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[800],
@@ -310,45 +299,42 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                               ),
                             ),
                             child: Align(
-                                alignment: Alignment(0.0, 0.0),
-                                child:  Text('Reset',
-                                    style:TextStyles.button1)),
+                                alignment: const Alignment(0.0, 0.0),
+                                child:
+                                    Text('Reset', style: TextStyles.button1)),
                           ),
                         ),
                       ),
-
                     ],
                   ),
                 ),
               ],
             ),
           );
-        }
-        else{
+        } else {
           return Container(
-            constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.5), // 80% of screen width
+            constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.5),
+            // 80% of screen width
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 40), // 10% of screen height
+                  const SizedBox(height: 40), // 10% of screen height
                   Align(
-                    alignment: Alignment(-0.30, 0.5),
+                    alignment: const Alignment(-0.30, 0.5),
                     child: SizedBox(
                       height: 35,
                       width: 100,
                       child: OutlinedButton(
-                        // onPressed: handleButtonPress,
-                        //my copy
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                               context,
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation, secondaryAnimation) =>
-                                    LoginScr(),
+                                        LoginScr(),
                                 transitionDuration:
-                                const Duration(milliseconds: 200),
+                                    const Duration(milliseconds: 200),
                                 transitionsBuilder: (context, animation,
                                     secondaryAnimation, child) {
                                   return FadeTransition(
@@ -369,34 +355,43 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            // mainAxisSize: MainAxisSize.min,
-                            //crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              IconButton(onPressed: (){}, icon: Icon(Icons.arrow_circle_left_sharp,color: Colors.white,size: 17,)),
-                              Text('Go Back',style: TextStyle(color: Colors.white),)
+                              IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    Icons.arrow_circle_left_sharp,
+                                    color: Colors.white,
+                                    size: 17,
+                                  )),
+                              const Text(
+                                'Go Back',
+                                style: TextStyle(color: Colors.white),
+                              )
                             ],
-                          )
-
-                      ),
+                          )),
                     ),
                   ),
-                  SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Align(
-                    alignment: Alignment(-0.20, 0.5),
+                    alignment: const Alignment(-0.20, 0.5),
                     child: Text(
                       'Password Reset',
-                      style: TextStyle(fontSize: constraints.maxWidth * 0.035, color: Colors.blue),
+                      style: TextStyle(
+                          fontSize: constraints.maxWidth * 0.035,
+                          color: Colors.blue),
                     ),
                   ),
-                  SizedBox(height: constraints.maxHeight * 0.03), // 5% of screen height
+                  SizedBox(height: constraints.maxHeight * 0.03),
                   Align(
-                    alignment: Alignment(-0.14, 0.0),
+                    alignment: const Alignment(-0.14, 0.0),
                     child: Text(
                       ' Enter your email address and\n we\'ll send you  a link to \n reset your password',
                       style: TextStyle(fontSize: constraints.maxWidth * 0.023),
                     ),
                   ),
-                  SizedBox(height: constraints.maxHeight * 0.03), // 5% of screen height
+                  SizedBox(height: constraints.maxHeight * 0.03),
                   Align(
                     alignment: const Alignment(0.9, 0.4),
                     child: Column(
@@ -405,7 +400,12 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                         SizedBox(height: constraints.maxHeight * 0.04),
                         Align(
                           alignment: const Alignment(-0.325, 0.0),
-                          child: Text('Email Address', style: TextStyle(fontSize: constraints.maxWidth * 0.015,fontWeight: FontWeight.bold),),
+                          child: Text(
+                            'Email Address',
+                            style: TextStyle(
+                                fontSize: constraints.maxWidth * 0.015,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
                         const SizedBox(height: 10),
                         Align(
@@ -416,7 +416,7 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                             child: TextFormField(
                               controller: emailController,
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(),
+                                border: const OutlineInputBorder(),
                                 hintText: 'Enter your E-mail Address',
                                 contentPadding: EdgeInsets.symmetric(
                                   horizontal: constraints.maxWidth * 0.02,
@@ -424,30 +424,33 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                                 ),
                               ),
                               inputFormatters: [
-                                FilteringTextInputFormatter.allow(RegExp("[a-zA-Z,0-9,@.]")),
-                                FilteringTextInputFormatter.deny(RegExp(r'^\s')),
-                                FilteringTextInputFormatter.deny(RegExp(r'\s\s')),
+                                FilteringTextInputFormatter.allow(
+                                    RegExp("[a-zA-Z,0-9,@.]")),
+                                FilteringTextInputFormatter.deny(
+                                    RegExp(r'^\s')),
+                                FilteringTextInputFormatter.deny(
+                                    RegExp(r'\s\s')),
                               ],
                             ),
                           ),
                         ),
                         const SizedBox(height: 40),
-
                         Align(
                           alignment: const Alignment(0.0, 0.8),
                           child: SizedBox(
                             width: constraints.maxWidth * 0.2,
                             child: ElevatedButton(
-                              onPressed: (){
-                                if(emailController.text.isEmpty){
+                              onPressed: () {
+                                if (emailController.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(
-                                        'Enter Valid E-mail Address')),
+                                    const SnackBar(
+                                        content:
+                                            Text('Enter Valid E-mail Address')),
                                   );
-                                }else{
-                                  _forgetPassword(context, emailController.text);
+                                } else {
+                                  _forgetPassword(
+                                      context, emailController.text);
                                 }
-
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[800],
@@ -456,12 +459,16 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
                                 ),
                               ),
                               child: Align(
-                                  alignment: Alignment(0.0, 0.0),
-                                  child:  Text('Reset', style: TextStyle(fontSize: constraints.maxWidth * 0.02, color: Colors.white),)),
+                                  alignment: const Alignment(0.0, 0.0),
+                                  child: Text(
+                                    'Reset',
+                                    style: TextStyle(
+                                        fontSize: constraints.maxWidth * 0.02,
+                                        color: Colors.white),
+                                  )),
                             ),
                           ),
                         ),
-
                       ],
                     ),
                   ),
@@ -475,72 +482,67 @@ class _LogoutContainer1State extends State<LogoutContainer1> {
   }
 }
 
-
-
 class ImageContainer1 extends StatelessWidget {
   const ImageContainer1({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (context,constraints) {
-          if(constraints.maxHeight >= 630){
-            return Container(
-              width: double.infinity, // Take full width
-              color: Colors.grey[100],
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 40, left: 25),
-                    child: Image.asset('images/Final-Ikyam-Logo.png'),
+    return LayoutBuilder(builder: (context, constraints) {
+      if (constraints.maxHeight >= 630) {
+        return Container(
+          width: double.infinity,
+          color: Colors.grey[100],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 40, left: 25),
+                child: Image.asset('images/Final-Ikyam-Logo.png'),
+              ),
+              const SizedBox(height: 50),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: MediaQuery.of(context).size.width * 0.3,
+                  child: Image.asset(
+                    'images/ikyam1.png',
+                    fit: BoxFit.cover,
                   ),
-                  const SizedBox(height: 50), // You can adjust this value
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.4, // Take 70% of screen width
-                      height: MediaQuery.of(context).size.width * 0.3, // Take 70% of screen width
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        return Container(
+          width: double.infinity,
+          color: Colors.grey[100],
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 40, left: 25),
+                  child: Image.asset('images/Final-Ikyam-Logo.png'),
+                ),
+                const SizedBox(height: 50),
+                Center(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    height: MediaQuery.of(context).size.width * 0.7,
+                    child: SingleChildScrollView(
                       child: Image.asset(
                         'images/ikyam1.png',
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
-                ],
-              ),
-            );
-          }else{
-            return Container(
-              width: double.infinity, // Take full width
-              color: Colors.grey[100],
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40, left: 25),
-                      child: Image.asset('images/Final-Ikyam-Logo.png'),
-                    ),
-                    const SizedBox(height: 50), // You can adjust this value
-                    Center(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.4, // Take 70% of screen width
-                        height: MediaQuery.of(context).size.width *
-                            0.7,// Take 70% of screen width
-                        child: SingleChildScrollView(
-                          child: Image.asset(
-                            'images/ikyam1.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
-              ),
-            );
-          }
-        }
-    );
+              ],
+            ),
+          ),
+        );
+      }
+    });
   }
 }

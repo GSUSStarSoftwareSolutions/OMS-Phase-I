@@ -7,18 +7,12 @@ import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
 import 'package:btb/widgets/pagination.dart';
 import 'package:btb/widgets/productclass.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
 import '../Order Module/firstpage.dart';
 import '../dashboard/dashboard.dart';
-import '../main.dart';
 import '../widgets/custom loading.dart';
 import '../widgets/no datafound.dart';
 import '../widgets/text_style.dart';
@@ -36,7 +30,7 @@ class CustomerDetails extends StatefulWidget {
 }
 
 class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProviderStateMixin {
-  List<String> _sortOrder = List.generate(5, (index) => 'asc');
+  final List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Order ID',
     'Customer Name',
@@ -44,16 +38,13 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
     'Total',
     'Status',
   ];
-  bool _hasShownPopup = false;
   List<double> columnWidths = [110, 150, 120, 95, 140];
   List<bool> columnSortState = [true, true, true, true, true, true];
   Timer? _searchDebounceTimer;
   String _searchText = '';
   bool isOrdersSelected = false;
-  bool _loading = false;
-  detail? _selectedProduct;
   late TextEditingController _dateController;
-  Map<String, dynamic> PaymentMap = {};
+
   int startIndex = 0;
   List<Product> filteredProducts = [];
   int currentPage = 1;
@@ -67,24 +58,14 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
   List<dynamic> detailJson = [];
   String searchQuery = '';
   List<detail> filteredData = [];
-  late AnimationController _controller;
-  bool _isHovered1 = false;
-  late Animation<double> _shakeAnimation;
+
+  final bool _isHovered1 = false;
   String status = '';
   String selectDate = '';
   String companyName = window.sessionStorage["company Name"] ?? " ";
   String token = window.sessionStorage["token"] ?? " ";
   String? dropdownValue2 = 'Select Year';
-  void _onSearchTextChanged(String text) {
-    if (_searchDebounceTimer != null) {
-      _searchDebounceTimer!.cancel(); // Cancel the previous timer
-    }
-    _searchDebounceTimer = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _searchText = text;
-      });
-    });
-  }
+
 
   int itemsPerPage = 10;
   int totalItems = 0;
@@ -128,10 +109,10 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                       child: Column(
                         children: [
                           // Warning Icon
-                          Icon(Icons.warning, color: Colors.orange, size: 50),
-                          SizedBox(height: 16),
+                          const Icon(Icons.warning, color: Colors.orange, size: 50),
+                          const SizedBox(height: 16),
                           // Confirmation Message
-                          Text(
+                          const Text(
                             'Session Expired',
                             style: TextStyle(
                               fontSize: 16,
@@ -139,13 +120,13 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               color: Colors.black,
                             ),
                           ),
-                          Text(
+                          const Text(
                             "Please log in again to continue", style: TextStyle(
                             fontSize: 12,
 
                             color: Colors.black,
                           ),),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           // Buttons
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -158,12 +139,12 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
-                                  side: BorderSide(color: Colors.blue),
+                                  side: const BorderSide(color: Colors.blue),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
                                 ),
-                                child: Text(
+                                child: const Text(
                                   'ok',
                                   style: TextStyle(
                                     color: Colors.blue,
@@ -180,7 +161,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
               );
           },
         ).whenComplete(() {
-          _hasShownPopup = false;
         });
       }
       else {
@@ -198,14 +178,8 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
               totalItems = jsonData['totalItems'] ?? 0;
             }
 
-            print('user');
-            print(widget.orderId);
-
-            // Check the data structure
-            print('Product Customer IDs:');
             products.forEach((product) => print(product.CusId));
 
-            // Apply filtering for CusId
             List<detail> matchedCustomers = products.where((customer) {
               return customer.CusId!.trim().toLowerCase() ==
                   widget.orderId!.trim().toLowerCase();
@@ -214,10 +188,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
             if (matchedCustomers.isNotEmpty) {
               setState(() {
                 totalPages = (matchedCustomers.length / itemsPerPage).ceil();
-                print('pages');
-                print(totalPages);
                 productList = matchedCustomers; // Use matchedCustomers
-                print(productList);
                 _filterAndPaginateProducts();
               });
             } else {
@@ -260,8 +231,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
   }
 
   void _goToNextPage() {
-    print('nextpage');
-
     if (currentPage < totalPages) {
       if (filteredData.length > currentPage * itemsPerPage) {
         setState(() {
@@ -269,10 +238,9 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
         });
       }
     }
-//_filterAndPaginateProducts();
   }
 
-  Map<String, bool> _isHovered = {
+  final Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
     'Products': false,
@@ -368,102 +336,13 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
 
     ];
   }
-  List<Widget> _buildMenuItems1(BuildContext context) {
-    return [
-      Column(
-        children: [
-          const SizedBox(
-            height: 10,
-          ),
-          _buildMenuItem1(Icons.home_outlined,
-              Colors.blue[900]!, '/Home'),
-          _buildMenuItem1(Icons.production_quantity_limits,
-              Colors.blue[900]!, '/Product_List'),
-          _buildMenuItem1(Icons.account_circle_outlined, Colors.white, '/Customer'),
-          Container(
-              height: 42,
-              decoration: BoxDecoration(
-                color: Colors.blue[800],
-                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-                // color: Color.fromRGBO(224, 59, 48, 1.0),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  // Radius for top-left corner
-                  topRight: Radius.circular(8),
-                  // No radius for top-right corner
-                  bottomLeft: Radius.circular(8),
-                  // Radius for bottom-left corner
-                  bottomRight:
-                  Radius.circular(8), // No radius for bottom-right corner
-                ),
-              ),
-              child: _buildMenuItem1(Icons.production_quantity_limits, Colors.blue[900]!, '/Order_List')),
 
-        ],
-      ),
-      const SizedBox(
-        height: 6,
-      ),
-
-
-
-    ];
-  }
-  Widget _buildMenuItem1(IconData icon, Color iconColor, String route) {
-    iconColor = _isHovered[route] == true ? Colors.blue : Colors.black87;
-    route == '/Order_List' ? _isHovered[route] = false : _isHovered[route] = false;
-    route == '/Order_List' ? iconColor = Colors.white : Colors.black;
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(
-            () => _isHovered[route] = true,
-      ),
-      onExit: (_) => setState(() => _isHovered[route] = false),
-      child: GestureDetector(
-        onTap: () {
-          context.go(route);
-        },
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 5, right: 20),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: _isHovered[route]! ? Colors.black12 : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 10,top:2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(icon, color: iconColor,size: 20,),
-
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   @override
   void initState() {
     super.initState();
     _dateController = TextEditingController();
     fetchProducts(currentPage, itemsPerPage);
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-    _shakeAnimation = Tween<double>(begin: 0, end: 5)
-        .chain(CurveTween(curve: Curves.elasticIn))
-        .animate(_controller)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _controller.reverse();
-        } else if (status == AnimationStatus.dismissed) {
-          _controller.forward();
-        }
-      });
   }
 
   @override
@@ -504,12 +383,12 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                           ),
                         ),
                         const Spacer(),
-                        Row(
+                        const Row(
                           children: [
-                            const SizedBox(width: 10),
+                            SizedBox(width: 10),
                             Padding(
                               padding:
-                              const EdgeInsets.only(right: 10, top: 10),
+                              EdgeInsets.only(right: 10, top: 10),
                               // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
@@ -558,7 +437,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
 
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               }
               else ...{
@@ -581,7 +460,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                 ),
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               },
 
@@ -861,9 +740,9 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                 decoration: InputDecoration(
                                     hintText: 'Search by Order ID or Customer Name',
                                     hintStyle:
-                                    TextStyle(fontSize: 13, color: Colors.grey),
+                                    const TextStyle(fontSize: 13, color: Colors.grey),
                                     contentPadding:
-                                    EdgeInsets.only(bottom: 20, left: 10),
+                                    const EdgeInsets.only(bottom: 20, left: 10),
                                     // adjusted padding
                                     border: InputBorder.none,
                                     suffixIcon: Padding(
@@ -979,19 +858,17 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
 
   Widget buildDataTable2() {
     if (isLoading) {
-      _loading = true;
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
+      var height = MediaQuery.of(context).size.height;
 // Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
 
     if (filteredData.isEmpty) {
-      double right = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
@@ -1030,11 +907,11 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                     },
                   );
                 }).toList(),
-                rows: []),
+                rows: const []),
           ),
           Padding(
             padding:
-            EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            const EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
         ],
@@ -1043,7 +920,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
 
     return LayoutBuilder(builder: (context, constraints) {
 // double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width * 0.92;
 
       return Column(
         children: [
@@ -1123,7 +999,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                         (index) {
                       final detail =
                       filteredData[(currentPage - 1) * itemsPerPage + index];
-                      final isSelected = _selectedProduct == detail;
                       return DataRow(
                           color: MaterialStateProperty.resolveWith<Color>((states) {
                             if (states.contains(MaterialState.hovered)) {
@@ -1135,7 +1010,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                           }),
                           cells: [
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[0],
                                 // Same dynamic width as column headers
                                 child: Text(
@@ -1145,7 +1020,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[2],
                                 child: Text(
                                   detail.contactPerson!,
@@ -1154,7 +1029,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[1],
                                 child: Text(
                                   detail.orderDate,
@@ -1163,7 +1038,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[3],
                                 child: Text(
                                   detail.total.toString(),
@@ -1172,7 +1047,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[4],
                                 child: Text(
                                   detail.deliveryStatus.toString(),
@@ -1180,28 +1055,8 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                 ),
                               ),
                             ),
-                            // DataCell(
-                            //   Container(
-                            //     width: columnWidths[4],
-                            //     child: Text(
-                            //       detail.paymentStatus.toString(),
-                            //       style: TextStyles.body,
-                            //     ),
-                            //   ),
-                            // ),
-
                           ],
-                          onSelectChanged: (selected) {
-                            if (selected != null && selected) {
-                              print('what is this');
-                              print(detail.invoiceNo);
-                              print(productList);
-                              print(detail.paymentStatus);
-//final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-
-
-                            }
-                          });
+                         );
                     })),
           ),
         ],
@@ -1211,13 +1066,12 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
 
   Widget buildDataTable() {
     if (isLoading) {
-      _loading = true;
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
+      var height = MediaQuery.of(context).size.height;
 // Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
@@ -1262,11 +1116,11 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                     },
                   );
                 }).toList(),
-                rows: []),
+                rows: const []),
           ),
           Padding(
             padding:
-            EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
+            const EdgeInsets.only(top: 150, left: 130, bottom: 350, right: 150),
             child: CustomDatafound(),
           ),
         ],
@@ -1355,7 +1209,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                         (index) {
                       final detail =
                       filteredData[(currentPage - 1) * itemsPerPage + index];
-                      final isSelected = _selectedProduct == detail;
                       return DataRow(
                           color: MaterialStateProperty.resolveWith<Color>((states) {
                             if (states.contains(MaterialState.hovered)) {
@@ -1367,7 +1220,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                           }),
                           cells: [
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[0],
                                 // Same dynamic width as column headers
                                 child: Text(
@@ -1377,7 +1230,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[2],
                                 child: Text(
                                   detail.contactPerson!,
@@ -1386,7 +1239,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[1],
                                 child: Text(
                                   detail.orderDate,
@@ -1395,7 +1248,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[3],
                                 child: Text(
                                   detail.total.toString(),
@@ -1404,7 +1257,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               ),
                             ),
                             DataCell(
-                              Container(
+                              SizedBox(
                                 width: columnWidths[4],
                                 child: Text(
                                   detail.deliveryStatus.toString(),
@@ -1412,27 +1265,8 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                 ),
                               ),
                             ),
-                            // DataCell(
-                            //   Container(
-                            //     width: columnWidths[4],
-                            //     child: Text(
-                            //       detail.paymentStatus.toString(),
-                            //       style: TextStyles.body,
-                            //     ),
-                            //   ),
-                            // ),
-
                           ],
-                          onSelectChanged: (selected) {
-                            if (selected != null && selected) {
-                              print('what is this');
-                              print(detail.invoiceNo);
-                              print(productList);
-                              print(detail.paymentStatus);
-//final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-
-                            }
-                          });
+                         );
                     })),
           ),
         ],

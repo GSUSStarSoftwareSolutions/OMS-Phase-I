@@ -1,48 +1,31 @@
 import 'dart:convert';
 import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/login/login.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/image.dart';
 
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: ConfirmPassword(
-      verificationcode: '',
-    ),
-  ));
-}
-
-class ConfirmPassword extends StatefulWidget {
+class confirmPassword extends StatefulWidget {
   String verificationcode;
 
-  ConfirmPassword({super.key, required this.verificationcode});
+  confirmPassword({super.key, required this.verificationcode});
 
   @override
-  State<ConfirmPassword> createState() => _ConfirmPasswordState();
+  State<confirmPassword> createState() => _confirmPasswordState();
 }
 
-class _ConfirmPasswordState extends State<ConfirmPassword> {
+class _confirmPasswordState extends State<confirmPassword> {
   String otp = '';
-
-  final Password = TextEditingController();
-  final ConfirmPassword = TextEditingController();
+  final password = TextEditingController();
+  final confirmPassword = TextEditingController();
   bool _obscureText = true;
   bool _obscureText2 = true;
-
   String? _passwordError;
   final _formKey = GlobalKey<FormState>();
 
   void initState() {
     // TODO: implement initState
     super.initState();
-    print('verification code');
-    print(widget.verificationcode);
-    // otp = widget.verificationcode;
   }
 
   Future<void> _changePassword(BuildContext context, String otp,
@@ -67,34 +50,25 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
         headers: headers,
         body: jsonEncode(body),
       );
-
-      // Success response handling
-      print(response.body);
-
-      // if (response.statusCode == 200) {
-      // final responseBody = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        // Success response handling
         showDialog(
           barrierDismissible: false,
           context: context,
           builder: (context) {
             return AlertDialog(
-              icon: Icon(
+              icon: const Icon(
                 Icons.check_circle_rounded,
                 color: Colors.green,
                 size: 25,
               ),
-              content: Padding(
+              content: const Padding(
                   padding: EdgeInsets.only(left: 35),
                   child:
-                  Text('Your password has been\n changed successfully .')),
+                      Text('Your password has been\n changed successfully.')),
               actions: <Widget>[
                 TextButton(
-                  child: Text('OK'),
+                  child: const Text('OK'),
                   onPressed: () {
-                    // context.go('/');
-                    // context.go('/');
                     Navigator.push(
                       context,
                       PageRouteBuilder(
@@ -122,14 +96,15 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              icon: Icon(Icons.warning_rounded, color: Colors.red, size: 25),
-              content: Padding(
+              icon: const Icon(Icons.warning_rounded,
+                  color: Colors.red, size: 25),
+              content: const Padding(
                 padding: EdgeInsets.only(left: 65),
                 child: Text('Invalid OTP'),
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('OK'),
+                  child: const Text('OK'),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -138,18 +113,14 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
             );
           },
         );
-        //}
       } else {
-        // Handle server errors
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
-              Text('Failed to change password: ${response.statusCode}')),
+                  Text('Failed to change password: ${response.statusCode}')),
         );
       }
     } catch (e) {
-      // Network or other unexpected error handling
-      print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
@@ -178,13 +149,10 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                             child: Image.asset('images/Final-Ikyam-Logo.png'),
                           ),
                           const SizedBox(height: 50),
-                          // You can adjust this value
                           Center(
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width *
-                                  0.4, // Take 70% of screen width
-                              height: MediaQuery.of(context).size.width *
-                                  0.3, // Take 70% of screen width
+                              width: MediaQuery.of(context).size.width * 0.4,
+                              height: MediaQuery.of(context).size.width * 0.3,
                               child: Image.asset(
                                 'images/ikyam1.png',
                                 fit: BoxFit.cover,
@@ -199,30 +167,26 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                     flex: 3,
                     child: Container(
                       constraints:
-                      BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
-                      // 80% of screen width
+                          BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SizedBox(height: constraints.maxHeight * 0.2),
-                          // 10% of screen height
                           Align(
-                            alignment: Alignment(-0.30, 0.5),
+                            alignment: const Alignment(-0.30, 0.5),
                             child: SizedBox(
                               height: 35,
                               width: 100,
                               child: OutlinedButton(
-                                // onPressed: handleButtonPress,
-                                //my copy
                                   onPressed: () {
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(
                                         pageBuilder: (context, animation,
-                                            secondaryAnimation) =>
+                                                secondaryAnimation) =>
                                             LoginScr(),
                                         transitionDuration:
-                                        const Duration(milliseconds: 200),
+                                            const Duration(milliseconds: 200),
                                         transitionsBuilder: (context, animation,
                                             secondaryAnimation, child) {
                                           return FadeTransition(
@@ -243,17 +207,15 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                   ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    // mainAxisSize: MainAxisSize.min,
-                                    //crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       IconButton(
                                           onPressed: () {},
-                                          icon: Icon(
+                                          icon: const Icon(
                                             Icons.arrow_circle_left_sharp,
                                             color: Colors.white,
                                             size: 17,
                                           )),
-                                      Text(
+                                      const Text(
                                         'Go Back',
                                         style: TextStyle(color: Colors.white),
                                       )
@@ -261,12 +223,11 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                   )),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Align(
-                            alignment: Alignment(-0.016, 0.0),
-                            //     alignment: Alignment(-0.20, 0.5),
+                            alignment: const Alignment(-0.016, 0.0),
                             child: Text(
                               'Create New Password',
                               style: TextStyle(
@@ -275,9 +236,8 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                             ),
                           ),
                           SizedBox(height: constraints.maxHeight * 0.03),
-                          // 5% of screen height
                           Align(
-                            alignment: Alignment(-0.046, 0.0),
+                            alignment: const Alignment(-0.046, 0.0),
                             child: Text(
                               'Your New Password Must Be \nDifferent from Previously Used Password',
                               style: TextStyle(
@@ -285,7 +245,6 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                             ),
                           ),
                           SizedBox(height: constraints.maxHeight * 0.03),
-                          // 5% of screen height
                           Align(
                             alignment: const Alignment(0.9, 0.4),
                             child: Form(
@@ -296,13 +255,13 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                   SizedBox(
                                       height: constraints.maxHeight * 0.04),
                                   Align(
-                                      alignment: Alignment(-0.300, 0.0),
+                                      alignment: const Alignment(-0.300, 0.0),
                                       child: Text(
                                         'New Password',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize:
-                                            constraints.maxWidth * 0.01),
+                                                constraints.maxWidth * 0.01),
                                       )),
                                   const SizedBox(height: 5),
                                   Align(
@@ -312,9 +271,9 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                       width: constraints.maxWidth * 0.2,
                                       child: TextFormField(
                                         obscureText: _obscureText,
-                                        controller: Password,
+                                        controller: password,
                                         decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
+                                          border: const OutlineInputBorder(),
                                           suffixIcon: IconButton(
                                               onPressed: () {
                                                 setState(() {
@@ -328,27 +287,21 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                                 size: 18,
                                               )),
                                           hintText: 'Enter your new password',
-                                          hintStyle: TextStyle(fontSize: 15),
-                                          contentPadding: EdgeInsets.symmetric(
+                                          hintStyle:
+                                              const TextStyle(fontSize: 15),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
                                             horizontal: 10,
                                             vertical: 8,
                                           ),
                                         ),
                                         inputFormatters: [
-                                          // FilteringTextInputFormatter
-                                          //     .digitsOnly,
-                                          // LengthLimitingTextInputFormatter
-                                          //   (
-                                          //     10),W
                                           FilteringTextInputFormatter.allow(
                                               RegExp('.*')),
-                                          // limits to 10 digits
                                           FilteringTextInputFormatter.deny(
                                               RegExp(r'^\s')),
-                                          // Disallow starting with a space
                                           FilteringTextInputFormatter.deny(
                                               RegExp(r'\s\s')),
-                                          // Disallow multiple spaces
                                         ],
                                         onFieldSubmitted: (value) async {},
                                       ),
@@ -356,14 +309,13 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                   ),
                                   const SizedBox(height: 20),
                                   Align(
-                                      alignment: Alignment(-0.280, 0.0),
-                                      //alignment:Alignment(-0.4, 0.0),
+                                      alignment: const Alignment(-0.280, 0.0),
                                       child: Text(
                                         'Confirm Password',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize:
-                                            constraints.maxWidth * 0.01),
+                                                constraints.maxWidth * 0.01),
                                       )),
                                   const SizedBox(height: 5),
                                   Align(
@@ -373,14 +325,15 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                       width: constraints.maxWidth * 0.2,
                                       child: TextFormField(
                                         obscureText: _obscureText2,
-                                        controller: ConfirmPassword,
+                                        controller: confirmPassword,
                                         decoration: InputDecoration(
-                                            border: OutlineInputBorder(),
+                                            border: const OutlineInputBorder(),
                                             hintText:
-                                            'Enter your confirm password',
-                                            hintStyle: TextStyle(fontSize: 15),
+                                                'Enter your confirm password',
+                                            hintStyle:
+                                                const TextStyle(fontSize: 15),
                                             contentPadding:
-                                            EdgeInsets.symmetric(
+                                                const EdgeInsets.symmetric(
                                               horizontal: 10,
                                               vertical: 8,
                                             ),
@@ -389,110 +342,89 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                                 onPressed: () {
                                                   setState(() {
                                                     _obscureText2 =
-                                                    !_obscureText2;
+                                                        !_obscureText2;
                                                   });
                                                 },
                                                 icon: Icon(
                                                   _obscureText2
                                                       ? Icons.visibility_off
                                                       : Icons
-                                                      .visibility_rounded,
+                                                          .visibility_rounded,
                                                   size: 18,
                                                 ))),
-
                                         inputFormatters: [
-                                          // FilteringTextInputFormatter
-                                          //     .digitsOnly,
-                                          // LengthLimitingTextInputFormatter
-                                          //   (
-                                          //     10),
                                           FilteringTextInputFormatter.allow(
                                               RegExp('.*')),
-                                          // FilteringTextInputFormatter.allow(
-                                          //     RegExp("[a-zA-Z0-9!@#%&*^()\$.,/:;'{}-_ ]")),
-                                          // limits to 10 digits
                                           FilteringTextInputFormatter.deny(
                                               RegExp(r'^\s')),
-                                          // Disallow starting with a space
                                           FilteringTextInputFormatter.deny(
                                               RegExp(r'\s\s')),
-                                          // Disallow multiple spaces
                                         ],
-                                        // validator: (value) {
-                                        //   if (value != userName.text) {
-                                        //     return 'Passwords do not match';
-                                        //   }
-                                        //   return null;
-                                        // },
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 60,
                                   ),
                                   Align(
                                     alignment: const Alignment(0.0, 0.6),
-                                    // alignment: const Alignment(0.1, 0.2),
                                     child: SizedBox(
                                       width: constraints.maxWidth * 0.1,
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          if (Password.text.isEmpty &&
-                                              ConfirmPassword.text.isEmpty) {
+                                          if (password.text.isEmpty &&
+                                              confirmPassword.text.isEmpty) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
-                                              SnackBar(
+                                              const SnackBar(
                                                   content: Text(
                                                       'New Password and Confirm Password field are required')),
                                             );
-                                          } else if (Password.text.isEmpty &&
-                                              ConfirmPassword.text.isNotEmpty) {
+                                          } else if (password.text.isEmpty &&
+                                              confirmPassword.text.isNotEmpty) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
-                                              SnackBar(
+                                              const SnackBar(
                                                   content: Text(
                                                       'Please Enter Password')),
                                             );
-                                          } else if (Password.text.isNotEmpty &&
-                                              ConfirmPassword.text.isEmpty) {
+                                          } else if (password.text.isNotEmpty &&
+                                              confirmPassword.text.isEmpty) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
-                                              SnackBar(
+                                              const SnackBar(
                                                   content: Text(
                                                       'Please Enter Confirm Password')),
                                             );
-                                          } else if (Password.text ==
-                                              ConfirmPassword.text) {
-                                            // passwords match, proceed with saving
+                                          } else if (password.text ==
+                                              confirmPassword.text) {
                                             _changePassword(
                                                 context,
                                                 '',
-                                                Password.text,
-                                                ConfirmPassword.text);
+                                                password.text,
+                                                confirmPassword.text);
                                           } else {
                                             showDialog(
                                               barrierDismissible: false,
                                               context: context,
                                               builder: (context) {
                                                 return AlertDialog(
-                                                  icon: Icon(
+                                                  icon: const Icon(
                                                     Icons
                                                         .warning_amber_outlined,
                                                     color: Colors.red,
                                                     size: 25,
                                                   ),
-                                                  content: Padding(
+                                                  content: const Padding(
                                                       padding: EdgeInsets.only(
                                                           left: 35),
                                                       child: Text(
                                                           'Both Passwords do not match.')),
                                                   actions: <Widget>[
                                                     TextButton(
-                                                      child: Text('OK'),
+                                                      child: const Text('OK'),
                                                       onPressed: () {
                                                         Navigator.pop(context);
-                                                        // context.go('/');
-                                                        //context.go('/');
                                                       },
                                                     ),
                                                   ],
@@ -505,7 +437,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                           backgroundColor: Colors.blue[800],
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
-                                            BorderRadius.circular(4),
+                                                BorderRadius.circular(4),
                                           ),
                                         ),
                                         child: const Align(
@@ -541,13 +473,10 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                               child: Image.asset('images/Final-Ikyam-Logo.png'),
                             ),
                             const SizedBox(height: 50),
-                            // You can adjust this value
                             Center(
                               child: SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.4,
-                                // Take 70% of screen width
                                 height: MediaQuery.of(context).size.width * 0.7,
-                                // Take 70% of screen width
                                 child: SingleChildScrollView(
                                   child: Image.asset(
                                     'images/ikyam1.png',
@@ -565,32 +494,28 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                     flex: 3,
                     child: Container(
                       constraints:
-                      BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
+                          BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
                       // 80% of screen width
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(height: constraints.maxHeight * 0.2),
-                            // 10% of screen height
-                            // 10% of screen height
                             Align(
-                              alignment: Alignment(-0.30, 0.5),
+                              alignment: const Alignment(-0.30, 0.5),
                               child: SizedBox(
                                 height: 35,
                                 width: 100,
                                 child: OutlinedButton(
-                                  // onPressed: handleButtonPress,
-                                  //my copy
                                     onPressed: () {
                                       Navigator.push(
                                         context,
                                         PageRouteBuilder(
                                           pageBuilder: (context, animation,
-                                              secondaryAnimation) =>
+                                                  secondaryAnimation) =>
                                               LoginScr(),
                                           transitionDuration:
-                                          const Duration(milliseconds: 200),
+                                              const Duration(milliseconds: 200),
                                           transitionsBuilder: (context,
                                               animation,
                                               secondaryAnimation,
@@ -613,18 +538,16 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.start,
-                                      // mainAxisSize: MainAxisSize.min,
-                                      //crossAxisAlignment: CrossAxisAlignment.start,
+                                          MainAxisAlignment.start,
                                       children: [
                                         IconButton(
                                             onPressed: () {},
-                                            icon: Icon(
+                                            icon: const Icon(
                                               Icons.arrow_circle_left_sharp,
                                               color: Colors.white,
                                               size: 17,
                                             )),
-                                        Text(
+                                        const Text(
                                           'Go Back',
                                           style: TextStyle(color: Colors.white),
                                         )
@@ -632,10 +555,9 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                     )),
                               ),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             Align(
-                              alignment: Alignment(-0.016, 0.0),
-                              //     alignment: Alignment(-0.20, 0.5),
+                              alignment: const Alignment(-0.016, 0.0),
                               child: Text(
                                 'Create New Password',
                                 style: TextStyle(
@@ -644,9 +566,8 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                               ),
                             ),
                             SizedBox(height: constraints.maxHeight * 0.03),
-                            // 5% of screen height
                             Align(
-                              alignment: Alignment(-0.046, 0.0),
+                              alignment: const Alignment(-0.046, 0.0),
                               child: Text(
                                 'Your New Password Must Be \nDifferent from Previously Used Password',
                                 style: TextStyle(
@@ -654,7 +575,6 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                               ),
                             ),
                             SizedBox(height: constraints.maxHeight * 0.03),
-                            // 5% of screen height
                             Align(
                               alignment: const Alignment(0.9, 0.4),
                               child: Form(
@@ -665,13 +585,13 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                     SizedBox(
                                         height: constraints.maxHeight * 0.04),
                                     Align(
-                                        alignment: Alignment(-0.300, 0.0),
+                                        alignment: const Alignment(-0.300, 0.0),
                                         child: Text(
                                           'New Password',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize:
-                                              constraints.maxWidth * 0.01),
+                                                  constraints.maxWidth * 0.01),
                                         )),
                                     const SizedBox(height: 5),
                                     Align(
@@ -681,21 +601,21 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                         width: constraints.maxWidth * 0.2,
                                         child: TextFormField(
                                           obscureText: _obscureText,
-                                          controller: Password,
+                                          controller: password,
                                           decoration: InputDecoration(
-                                            border: OutlineInputBorder(),
+                                            border: const OutlineInputBorder(),
                                             suffixIcon: IconButton(
                                                 onPressed: () {
                                                   setState(() {
                                                     _obscureText =
-                                                    !_obscureText;
+                                                        !_obscureText;
                                                   });
                                                 },
                                                 icon: Icon(
                                                   _obscureText
                                                       ? Icons.visibility_off
                                                       : Icons
-                                                      .visibility_rounded,
+                                                          .visibility_rounded,
                                                   size: 18,
                                                 )),
                                             hintText: 'Enter your new password',
@@ -703,26 +623,18 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                                 fontSize: constraints.maxWidth *
                                                     0.01),
                                             contentPadding:
-                                            EdgeInsets.symmetric(
+                                                const EdgeInsets.symmetric(
                                               horizontal: 10,
                                               vertical: 8,
                                             ),
                                           ),
                                           inputFormatters: [
-                                            // FilteringTextInputFormatter
-                                            //     .digitsOnly,
-                                            // LengthLimitingTextInputFormatter
-                                            //   (
-                                            //     10),W
                                             FilteringTextInputFormatter.allow(
                                                 RegExp('.*')),
-                                            // limits to 10 digits
                                             FilteringTextInputFormatter.deny(
                                                 RegExp(r'^\s')),
-                                            // Disallow starting with a space
                                             FilteringTextInputFormatter.deny(
                                                 RegExp(r'\s\s')),
-                                            // Disallow multiple spaces
                                           ],
                                           onFieldSubmitted: (value) async {},
                                         ),
@@ -730,14 +642,13 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                     ),
                                     const SizedBox(height: 20),
                                     Align(
-                                        alignment: Alignment(-0.280, 0.0),
-                                        //alignment:Alignment(-0.4, 0.0),
+                                        alignment: const Alignment(-0.280, 0.0),
                                         child: Text(
                                           'Confirm Password',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize:
-                                              constraints.maxWidth * 0.01),
+                                                  constraints.maxWidth * 0.01),
                                         )),
                                     const SizedBox(height: 5),
                                     Align(
@@ -747,17 +658,18 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                         width: constraints.maxWidth * 0.2,
                                         child: TextFormField(
                                           obscureText: _obscureText2,
-                                          controller: ConfirmPassword,
+                                          controller: confirmPassword,
                                           decoration: InputDecoration(
-                                              border: OutlineInputBorder(),
+                                              border:
+                                                  const OutlineInputBorder(),
                                               hintText:
-                                              'Enter your confirm password',
+                                                  'Enter your confirm password',
                                               hintStyle: TextStyle(
                                                   fontSize:
-                                                  constraints.maxWidth *
-                                                      0.01),
+                                                      constraints.maxWidth *
+                                                          0.01),
                                               contentPadding:
-                                              EdgeInsets.symmetric(
+                                                  const EdgeInsets.symmetric(
                                                 horizontal: 10,
                                                 vertical: 8,
                                               ),
@@ -766,114 +678,93 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                                   onPressed: () {
                                                     setState(() {
                                                       _obscureText2 =
-                                                      !_obscureText2;
+                                                          !_obscureText2;
                                                     });
                                                   },
                                                   icon: Icon(
                                                     _obscureText2
                                                         ? Icons.visibility_off
                                                         : Icons
-                                                        .visibility_rounded,
+                                                            .visibility_rounded,
                                                     size: 18,
                                                   ))),
-
                                           inputFormatters: [
-                                            // FilteringTextInputFormatter
-                                            //     .digitsOnly,
-                                            // LengthLimitingTextInputFormatter
-                                            //   (
-                                            //     10),
                                             FilteringTextInputFormatter.allow(
                                                 RegExp('.*')),
-                                            // FilteringTextInputFormatter.allow(
-                                            //     RegExp("[a-zA-Z0-9!@#%&*^()\$.,/:;'{}-_ ]")),
-                                            // limits to 10 digits
                                             FilteringTextInputFormatter.deny(
                                                 RegExp(r'^\s')),
-                                            // Disallow starting with a space
                                             FilteringTextInputFormatter.deny(
                                                 RegExp(r'\s\s')),
-                                            // Disallow multiple spaces
                                           ],
-                                          // validator: (value) {
-                                          //   if (value != userName.text) {
-                                          //     return 'Passwords do not match';
-                                          //   }
-                                          //   return null;
-                                          // },
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 60,
                                     ),
                                     Align(
                                       alignment: const Alignment(0.0, 0.6),
-                                      // alignment: const Alignment(0.1, 0.2),
                                       child: SizedBox(
                                         width: constraints.maxWidth * 0.1,
                                         child: ElevatedButton(
                                           onPressed: () {
-                                            if (Password.text.isEmpty &&
-                                                ConfirmPassword.text.isEmpty) {
+                                            if (password.text.isEmpty &&
+                                                confirmPassword.text.isEmpty) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
-                                                SnackBar(
+                                                const SnackBar(
                                                     content: Text(
                                                         'New Password and Confirm Password field are required')),
                                               );
-                                            } else if (Password.text.isEmpty &&
-                                                ConfirmPassword
+                                            } else if (password.text.isEmpty &&
+                                                confirmPassword
                                                     .text.isNotEmpty) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
-                                                SnackBar(
+                                                const SnackBar(
                                                     content: Text(
                                                         'Please Enter Password')),
                                               );
-                                            } else if (Password
-                                                .text.isNotEmpty &&
-                                                ConfirmPassword.text.isEmpty) {
+                                            } else if (password
+                                                    .text.isNotEmpty &&
+                                                confirmPassword.text.isEmpty) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
-                                                SnackBar(
+                                                const SnackBar(
                                                     content: Text(
                                                         'Please Enter Confirm Password')),
                                               );
-                                            } else if (Password.text ==
-                                                ConfirmPassword.text) {
-                                              // passwords match, proceed with saving
+                                            } else if (password.text ==
+                                                confirmPassword.text) {
                                               _changePassword(
                                                   context,
                                                   '',
-                                                  Password.text,
-                                                  ConfirmPassword.text);
+                                                  password.text,
+                                                  confirmPassword.text);
                                             } else {
                                               showDialog(
                                                 barrierDismissible: false,
                                                 context: context,
                                                 builder: (context) {
                                                   return AlertDialog(
-                                                    icon: Icon(
+                                                    icon: const Icon(
                                                       Icons
                                                           .warning_amber_outlined,
                                                       color: Colors.red,
                                                       size: 25,
                                                     ),
-                                                    content: Padding(
+                                                    content: const Padding(
                                                         padding:
-                                                        EdgeInsets.only(
-                                                            left: 35),
+                                                            EdgeInsets.only(
+                                                                left: 35),
                                                         child: Text(
                                                             'Both Passwords do not match.')),
                                                     actions: <Widget>[
                                                       TextButton(
-                                                        child: Text('OK'),
+                                                        child: const Text('OK'),
                                                         onPressed: () {
                                                           Navigator.pop(
                                                               context);
-                                                          // context.go('/');
-                                                          //context.go('/');
                                                         },
                                                       ),
                                                     ],
@@ -886,7 +777,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                             backgroundColor: Colors.blue[800],
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                              BorderRadius.circular(4),
+                                                  BorderRadius.circular(4),
                                             ),
                                           ),
                                           child: const Align(
