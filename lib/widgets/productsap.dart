@@ -17,7 +17,6 @@ class ProductData {
     required this.currency,
   });
 
-  // Factory method to create a Product object from JSON data
   factory ProductData.fromJson(Map<String, dynamic> json) {
     return ProductData(
       product: json['Product'] ?? '',

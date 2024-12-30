@@ -993,12 +993,12 @@ class _DashboardScreenState extends State<DashboardScreen>
           _dashboardCounts = {
             if (dashboardCounts.openOrders > 0)
               'Open Orders': dashboardCounts.openOrders,
-            if (dashboardCounts.Picked > 0)
-              'Picked Orders': dashboardCounts.Picked,
-            if (dashboardCounts.Delivered > 0)
-              'Order Delivered': dashboardCounts.Delivered,
-            if (dashboardCounts.Cleard > 0)
-              'Order Completed': dashboardCounts.Cleard,
+            if (dashboardCounts.picked > 0)
+              'Picked Orders': dashboardCounts.picked,
+            if (dashboardCounts.delivered > 0)
+              'Order Delivered': dashboardCounts.delivered,
+            if (dashboardCounts.cleard > 0)
+              'Order Completed': dashboardCounts.cleard,
           } as Map<String, int>;
         });
       } else {
@@ -1739,9 +1739,9 @@ class _GridView1State extends State<GridView1> {
       setState(() {
         _dashboardCounts1 = {
           'Open Orders': _dashboardCounts?.openOrders ?? 0,
-          'Picked Orders': _dashboardCounts?.Picked ?? 0,
-          'Order Delivered': _dashboardCounts?.Delivered ?? 0,
-          'Order Completed': _dashboardCounts?.Cleard ?? 0,
+          'Picked Orders': _dashboardCounts?.picked ?? 0,
+          'Order Delivered': _dashboardCounts?.delivered ?? 0,
+          'Order Completed': _dashboardCounts?.cleard ?? 0,
         };
 
         // Initialize _isHovered based on the size of _dashboardCounts1

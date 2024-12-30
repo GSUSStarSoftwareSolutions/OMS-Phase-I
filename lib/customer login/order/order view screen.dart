@@ -1,33 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
-import 'dart:ui' as order;
-import 'dart:math' as math;
-import 'dart:ui' as ord;
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/confirmdialog.dart';
-import 'package:btb/widgets/pagination.dart';
 import 'package:btb/widgets/productclass.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-
 import '../../Order Module/firstpage.dart';
 import '../../dashboard/dashboard.dart';
-import '../../widgets/custom loading.dart';
-import '../../widgets/no datafound.dart';
-import '../../widgets/productsap.dart' as ord;
 import '../../widgets/text_style.dart';
 
-void main() {
-  runApp(const OrderView());
-}
+
 
 class OrderView extends StatefulWidget {
   final String? orderId;
@@ -39,7 +25,6 @@ class OrderView extends StatefulWidget {
 
 class _OrderViewState extends State<OrderView>
     with SingleTickerProviderStateMixin {
-  List<String> _sortOrder = List.generate(5, (index) => 'asc');
   List<String> columns = [
     'Order ID',
     'Customer ID',
@@ -47,16 +32,13 @@ class _OrderViewState extends State<OrderView>
     'Total',
     'Status',
   ];
-  bool _hasShownPopup = false;
+  final bool _hasShownPopup = false;
   List<double> columnWidths = [95, 110, 110, 95, 150, 140];
   List<bool> columnSortState = [true, true, true, true, true, true];
   Timer? _searchDebounceTimer;
-  String _searchText = '';
   bool isOrdersSelected = false;
-  bool _loading = false;
-  detail? _selectedProduct;
+
   late TextEditingController _dateController;
-  Map<String, dynamic> PaymentMap = {};
 
   int startIndex = 0;
   List<Product> filteredProducts = [];
@@ -66,9 +48,7 @@ class _OrderViewState extends State<OrderView>
 
   late Future<List<detail>> futureOrders;
 
-  // List<ord.ProductData> productList = [];
 
-  final ScrollController _scrollController = ScrollController();
   List<dynamic> detailJson = [];
   String searchQuery = '';
   final TextEditingController businessPartnerController =
@@ -91,36 +71,17 @@ class _OrderViewState extends State<OrderView>
   final TextEditingController orderIdController =TextEditingController();
   final TextEditingController orderDateController =TextEditingController();
   final TextEditingController totalAmountController =TextEditingController();
-  //final TextEditingController orderIdController =TextEditingController();
-
-
   DateTime? _selectedDate;
   List<detail> filteredData = [];
-  bool _isTotalVisible = false;
-  late AnimationController _controller;
-  bool _isHovered1 = false;
-  late Animation<double> _shakeAnimation;
   String status = '';
   String companyName = window.sessionStorage["company Name"] ?? " ";
   String selectDate = '';
-
   String token = window.sessionStorage["token"] ?? " ";
   String userId = window.sessionStorage["userId"] ?? " ";
   String? dropdownValue2 = 'Select Year';
-
   List<Map<String, dynamic>> productList = [];
    List<Map<String, dynamic>> _selectedProducts = [];
 
-  final List<Map<String, dynamic>> _products = [
-    {'name': 'Product 1', 'price': 100},
-    {'name': 'Product 2', 'price': 200},
-    {'name': 'Product 3', 'price': 300},
-  ];
-
-
-
-
-// Function to calculate the total amount
   double _calculateTotal() {
     double total = 0.0;
     for (var product in _selectedProducts) {
@@ -149,15 +110,12 @@ class _OrderViewState extends State<OrderView>
         final decodedResponse = jsonDecode(response.body);
 
         if (decodedResponse is List) {
-          // Handle response when it's a List
           setState(() {
             var matchingOrder = decodedResponse.firstWhere(
                   (order) => order['orderId'] == widget.orderId,
               orElse: () => null,
             );
-
             if (matchingOrder != null) {
-              // Populate _selectedProducts
               if (matchingOrder.containsKey('items') &&
                   matchingOrder['items'] is List) {
                 _selectedProducts =
@@ -166,7 +124,6 @@ class _OrderViewState extends State<OrderView>
                 throw Exception('No matching order or invalid items structure');
               }
 
-              // Populate controllers
               orderIdController.text = matchingOrder['orderId'] ?? '';
               orderDateController.text = matchingOrder['orderDate'] ?? '';
               totalAmountController.text =
@@ -176,14 +133,12 @@ class _OrderViewState extends State<OrderView>
             }
           });
         } else if (decodedResponse is Map<String, dynamic>) {
-          // Handle response when it's a Map
+
           if (decodedResponse.containsKey('items') &&
               decodedResponse['items'] is List) {
             setState(() {
               _selectedProducts =
               List<Map<String, dynamic>>.from(decodedResponse['items']);
-
-              // Populate controllers
               orderIdController.text = decodedResponse['orderId'] ?? '';
               orderDateController.text = decodedResponse['orderDate'] ?? '';
               totalAmountController.text =
@@ -211,8 +166,6 @@ class _OrderViewState extends State<OrderView>
 
   Future<void> callApi() async {
     List<Map<String, dynamic>> items = [];
-
-    // Process _selectedProducts rows into API payload
     for (int i = 0; i < _selectedProducts.length; i++) {
       final product = _selectedProducts[i];
       items.add({
@@ -225,55 +178,41 @@ class _OrderViewState extends State<OrderView>
         "qty": product['qty'] ?? '',
         "StandardPrice": product['price'] ?? '',
         "totalAmount": ((product['qty'] * product['price'])) ?? ''
-        // "productName": product['productDescription'] ?? 'Dummy Product',
-        // "category": product['categoryName'] ?? 'Dummy Category',
-        // "subCategory": 'Dummy SubCategory',
-        // "price": product['price'] ?? 0.0,
-        // "qty": product['qty'] ?? 1,
-        // "actualAmount": (product['price'] ?? 0.0) * (product['qty'] ?? 1),
-        // "totalAmount": (product['price'] ?? 0.0) * (product['qty'] ?? 1),
-        // "discount": 0.0,
-        // "tax": 0.0,
       });
     }
 
-    // Dummy data for the main payload
+
     final url =
         '$apicall/order_master/add_order_master'; // Replace with your API endpoint
     final headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token', // Dummy token
+      'Authorization': 'Bearer $token',
     };
     final body = {
       "deliveryLocation": cityNameController.text,
-      //  "deliveryAddress": "123 Dummy Street, City",
       "contactPerson": businessPartnerNameController.text,
-      //  "contactNumber": "1234567890",
-      // "comments": "This is a dummy order comment.",
-      // "status": "Not Started",
       "customerId": customerController.text,
-      "orderDate": _dateController.text, // 2024-11-17T00:00:00
-      "postalCode": postalCodeController.text, //
-      "region": regionController.text, //
-      "streetName": streetNameController.text, //
-      "telephoneNumber": telephoneNumber1Controller.text, //
-      "total": _calculateTotal(), // Dummy total amount
-      "items": items, // Rows data processed above
+      "orderDate": _dateController.text,
+      "postalCode": postalCodeController.text,
+      "region": regionController.text,
+      "streetName": streetNameController.text,
+      "telephoneNumber": telephoneNumber1Controller.text,
+      "total": _calculateTotal(),
+      "items": items,
     };
 
     try {
-      // Make the POST API call
+
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
         body: json.encode(body),
       );
 
-      // Handle the response
       if (response.statusCode == 200) {
-        print('API call successful');
+
         final responseData = json.decode(response.body);
-        print('Response: $responseData');
+
         showDialog(
           barrierDismissible: false,
           context: context,
@@ -284,7 +223,7 @@ class _OrderViewState extends State<OrderView>
                 color: Colors.green,
                 size: 25,
               ),
-              content: Row(
+              content: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('Order Placed'),
@@ -301,7 +240,7 @@ class _OrderViewState extends State<OrderView>
             );
           },
         );
-        // You can handle navigation or further logic here
+
       } else {
         print('API call failed with status code: ${response.statusCode}');
         print('Response: ${response.body}');
@@ -318,141 +257,9 @@ class _OrderViewState extends State<OrderView>
   int totalPages = 0;
   bool isLoading = false;
 
-  Future<void> fetchProducts1(int page, int itemsPerPage) async {
-    if (isLoading) return;
-    if (!mounted) return;
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
-        ),
-        headers: {
-          "Content-type": "application/json",
-          "Authorization": 'Bearer $token',
-        },
-      );
-      // if(token == " ")
-      // {
-      //   showDialog(
-      //     barrierDismissible: false,
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return
-      //         AlertDialog(
-      //           shape: RoundedRectangleBorder(
-      //             borderRadius: BorderRadius.circular(15.0),
-      //           ),
-      //           contentPadding: EdgeInsets.zero,
-      //           content: Column(
-      //             mainAxisSize: MainAxisSize.min,
-      //             children: [
-      //               Padding(
-      //                 padding: const EdgeInsets.all(16.0),
-      //                 child: Column(
-      //                   children: [
-      //                     // Warning Icon
-      //                     Icon(Icons.warning, color: Colors.orange, size: 50),
-      //                     SizedBox(height: 16),
-      //                     // Confirmation Message
-      //                     Text(
-      //                       'Session Expired',
-      //                       style: TextStyle(
-      //                         fontSize: 16,
-      //                         fontWeight: FontWeight.bold,
-      //                         color: Colors.black,
-      //                       ),
-      //                     ),
-      //                     Text("Please log in again to continue",style: TextStyle(
-      //                       fontSize: 12,
-      //
-      //                       color: Colors.black,
-      //                     ),),
-      //                     SizedBox(height: 20),
-      //                     // Buttons
-      //                     Row(
-      //                       mainAxisAlignment: MainAxisAlignment.center,
-      //                       children: [
-      //                         ElevatedButton(
-      //                           onPressed: () {
-      //                             // Handle Yes action
-      //                             context.go('/');
-      //                             // Navigator.of(context).pop();
-      //                           },
-      //                           style: ElevatedButton.styleFrom(
-      //                             backgroundColor: Colors.white,
-      //                             side: BorderSide(color: Colors.blue),
-      //                             shape: RoundedRectangleBorder(
-      //                               borderRadius: BorderRadius.circular(10.0),
-      //                             ),
-      //                           ),
-      //                           child: Text(
-      //                             'ok',
-      //                             style: TextStyle(
-      //                               color: Colors.blue,
-      //                             ),
-      //                           ),
-      //                         ),
-      //                       ],
-      //                     ),
-      //                   ],
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         );
-      //     },
-      //   ).whenComplete(() {
-      //     _hasShownPopup = false;
-      //   });
-      //
-      // }
-      // else{
-      //   if (response.statusCode == 200) {
-      //     final jsonData = jsonDecode(response.body);
-      //     List<detail> products = [];
-      //     if (jsonData != null) {
-      //       if (jsonData is List) {
-      //         products = jsonData.map((item) => detail.fromJson(item)).toList();
-      //       } else if (jsonData is Map && jsonData.containsKey('body')) {
-      //         products = (jsonData['body'] as List)
-      //             .map((item) => detail.fromJson(item))
-      //             .toList();
-      //         totalItems =
-      //             jsonData['totalItems'] ?? 0; // Get the total number of items
-      //       }
-      //
-      //       if (mounted) {
-      //         setState(() {
-      //           totalPages = (products.length / itemsPerPage).ceil();
-      //           print('pages');
-      //           print(totalPages);
-      //           productList = products;
-      //           print(productList);
-      //           _filterAndPaginateProducts();
-      //         });
-      //       }
-      //     }
-      //   } else {
-      //     throw Exception('Failed to load data');
-      //   }
-      // }
-    } catch (e) {
-      print('Error decoding JSON: $e');
-// Optionally, show an error message to the user
-    } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
 
 
-  Map<String, bool> _isHovered = {
+  final Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
     'Products': false,
@@ -472,17 +279,12 @@ class _OrderViewState extends State<OrderView>
               height: 42,
               decoration: BoxDecoration(
                 color: Colors.blue[800],
-                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-                // color: Color.fromRGBO(224, 59, 48, 1.0),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
-                  // Radius for top-left corner
                   topRight: Radius.circular(8),
-                  // No radius for top-right corner
                   bottomLeft: Radius.circular(8),
-                  // Radius for bottom-left corner
                   bottomRight:
-                  Radius.circular(8), // No radius for bottom-right corner
+                  Radius.circular(8),
                 ),
               ),
               child: _buildMenuItem('Orders', Icons.warehouse_outlined,
@@ -547,30 +349,8 @@ class _OrderViewState extends State<OrderView>
   @override
   void initState() {
     super.initState();
-    print(userId ?? '');
-    print(widget.orderId ?? '');
-    //  fetchProducts
-
-    //fetchProducts(currentPage, itemsPerPage);
-
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-    _shakeAnimation = Tween<double>(begin: 0, end: 5)
-        .chain(CurveTween(curve: Curves.elasticIn))
-        .animate(_controller)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _controller.reverse();
-        } else if (status == AnimationStatus.dismissed) {
-          _controller.forward();
-        }
-      });
-    //_dateController = TextEditingController();
     _dateController = TextEditingController();
     _selectedDate = DateTime.now();
-
     String formattedDate1 =
     DateFormat('yyyy-MM-ddTHH:mm:ss').format(_selectedDate!);
     String formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate!);
@@ -586,26 +366,13 @@ class _OrderViewState extends State<OrderView>
     super.dispose();
   }
 
-  // double calculateTotalAmount(List<Map<String, dynamic>> products) {
-  //   double total = 0.0;
-  //   for (var product in products) {
-  //     total += product['qty'] * product['price'];
-  //   }
-  //   return total;
-  // }
 
   @override
   Widget build(BuildContext context) {
-    //   double totalAmount = calculateTotalAmount(productList);
-    // double overallTotal = productList
-    //     .map((product) => product['qty'] * product['price'])
-    //     .fold(0.0, (sum, total) => sum + total);
-    //String? role = Provider.of<UserRoleProvider>(context).role;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.grey[50],
-        //backgroundColor: const Color.fromRGBO(21, 101, 192, 0.07),
         body: LayoutBuilder(builder: (context, constraints) {
           double maxWidth = constraints.maxWidth;
           double maxHeight = constraints.maxHeight;
@@ -629,11 +396,11 @@ class _OrderViewState extends State<OrderView>
                           ),
                         ),
                         const Spacer(),
-                        Row(
+                        const Row(
                           children: [
                             Padding(
                               padding:
-                              const EdgeInsets.only(right: 10, top: 10),
+                              EdgeInsets.only(right: 10, top: 10),
                               // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
@@ -681,7 +448,7 @@ class _OrderViewState extends State<OrderView>
 
                 VerticalDividerWidget(
                   height: maxHeight,
-                  color: Color(0x29000000),
+                  color: const Color(0x29000000),
                 ),
               } else ...{
                 Align(
@@ -768,18 +535,18 @@ class _OrderViewState extends State<OrderView>
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        SizedBox(height: 20,),
+                                        const SizedBox(height: 20,),
                                         Row(
                                           children: [
                                              Padding(
                                               padding:
-                                              EdgeInsets.only(top: 20, left: 30,bottom: 20),
+                                              const EdgeInsets.only(top: 20, left: 30,bottom: 20),
                                               child: Text(
                                                 'Order ID: ${orderIdController.text}',
                                                 style: TextStyles.body2,
                                               ),
                                             ),
-                                            Spacer(),
+                                            const Spacer(),
                                             Padding(
                                               padding: EdgeInsets.only(
                                                   right: maxWidth * 0.04,top: 20,bottom: 20
@@ -833,7 +600,7 @@ class _OrderViewState extends State<OrderView>
                                         ),
                                         Row(
                                           children: [
-                                            Spacer(),
+                                            const Spacer(),
                                             Padding(
                                               padding: const EdgeInsets.only(right: 10,bottom: 10),
                                               //children: [
@@ -852,7 +619,6 @@ class _OrderViewState extends State<OrderView>
                                                     Alignment.topRight,
                                                     child: Text(
                                                       'Total: \₹${totalAmountController.text}',
-                                                      // Display the total
                                                       style: TextStyles.subhead,
                                                     ),
                                                   ),
@@ -889,7 +655,6 @@ class _OrderViewState extends State<OrderView>
                                       width: 1500,
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
-                                        //   mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.only(left: 0, top: 10),
@@ -938,18 +703,18 @@ class _OrderViewState extends State<OrderView>
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  SizedBox(height: 20,),
+                                                  const SizedBox(height: 20,),
                                                   Row(
                                                     children: [
                                                       Padding(
                                                         padding:
-                                                        EdgeInsets.only(top: 20, left: 30,bottom: 20),
+                                                        const EdgeInsets.only(top: 20, left: 30,bottom: 20),
                                                         child: Text(
                                                           'Order ID: ${orderIdController.text}',
                                                           style: TextStyles.body2,
                                                         ),
                                                       ),
-                                                      Spacer(),
+                                                      const Spacer(),
                                                       Padding(
                                                         padding: EdgeInsets.only(
                                                             right: maxWidth * 0.04,top: 20,bottom: 20
@@ -1003,7 +768,7 @@ class _OrderViewState extends State<OrderView>
                                                   ),
                                                   Row(
                                                     children: [
-                                                      Spacer(),
+                                                      const Spacer(),
                                                       Padding(
                                                         padding: const EdgeInsets.only(right: 10,bottom: 10),
                                                         //children: [
@@ -1057,689 +822,9 @@ class _OrderViewState extends State<OrderView>
   }
 
 
-  Widget _buildProductSearchField(Map<String, dynamic> product) {
-    return SizedBox(
-      height: 60,
-      width: 320, // Set the desired width of the suggestion box
-      child: Autocomplete<String>(
-        optionsBuilder: (TextEditingValue textEditingValue) {
-          if (textEditingValue.text.isEmpty) {
-            return const Iterable<String>.empty();
-          }
-          return productList
-              .where((p) => p['productDescription']
-              .toLowerCase()
-              .contains(textEditingValue.text.toLowerCase()))
-              .map((p) => p['productDescription']);
-        },
-        onSelected: (String selection) {
-          final selectedProduct = productList
-              .firstWhere((p) => p['productDescription'] == selection);
-          setState(() {
-            product['product'] = selectedProduct['product'];
-            product['categoryName'] = selectedProduct['categoryName'];
-            product['baseUnit'] = selectedProduct['baseUnit'];
-            product['price'] = selectedProduct['price'];
-            product['productDescription'] =
-            selectedProduct['productDescription'];
-            product['currency'] = selectedProduct['currency'];
-            product['productType'] = selectedProduct['productType'];
-            product['standardPrice'] = selectedProduct['standardPrice'];
-          });
-        },
-        optionsViewBuilder: (context, onSelected, options) {
-          return Align(
-            alignment: Alignment.topLeft,
-            child: Material(
-              elevation: 4.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white, // Set background color to white
-                  borderRadius: BorderRadius.circular(8.0), // Set border radius
-                ),
-                width: 300, // Set the desired width of the dropdown
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  children: options.map((String option) {
-                    return ListTile(
-                      title: Text(option),
-                      onTap: () {
-                        onSelected(option);
-                      },
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          );
-        },
-        fieldViewBuilder: (
-            BuildContext context,
-            TextEditingController textEditingController,
-            FocusNode focusNode,
-            ord.VoidCallback onFieldSubmitted,
-            ) {
-          textEditingController.text = product['productDescription'] ?? '';
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              textAlign: TextAlign.start,
-              controller: textEditingController,
-              focusNode: focusNode,
-              // maxLines: 1,
-              // minLines: 1,
-              //expands: true,
-              decoration: InputDecoration(
-                filled: true,
-                //  contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                fillColor: Colors.grey[100],
-                // contentPadding: EdgeInsets.symmetric(horizontal: 7),
-                border: InputBorder.none,
-                contentPadding:
-                const EdgeInsets.symmetric(vertical: 18, horizontal: 10),
-                // Removes the border
-                hintText: 'Search Product',
-                hintStyle: TextStyles.body,
-              ),
-              maxLines: 1,
-              minLines: 1,
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   String calculateTotalPrice(Map<String, dynamic> product) {
-    // Calculate total price
     double total = product['qty'] * product['price'];
-    // Return formatted string
     return total.toStringAsFixed(2);
   }
 
-  Widget _buildQuantityField(Map<String, dynamic> product) {
-    return SizedBox(
-      width: 100,
-      child: Padding(
-        padding: const EdgeInsets.only(right: 30, top: 8, bottom: 8, left: 8),
-        child: TextFormField(
-          textAlign: TextAlign.start,
-          keyboardType: TextInputType.number,
-          onChanged: (value) {
-            setState(() {
-              product['qty'] = int.tryParse(value) ?? 1;
-            });
-          },
-          decoration: InputDecoration(
-            filled: true,
-            // Ensures the fillColor is applied
-            fillColor: Colors.grey[100],
-
-            // Set the background color
-            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 10),
-            border: InputBorder.none,
-            // Removes the border
-            //hintText: 'Enter Qty',
-            hintStyle: TextStyles.body,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildDataTable2() {
-    if (isLoading) {
-      _loading = true;
-      var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
-// Show loading indicator while data is being fetched
-      return Padding(
-        padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
-      );
-    }
-
-    if (filteredData.isEmpty) {
-      double right = MediaQuery.of(context).size.width;
-      return Column(
-        children: [
-          Container(
-            width: 1100,
-            decoration: const BoxDecoration(
-                color: Color(0xFFF7F7F7),
-                border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                columns: columns.map((column) {
-                  return DataColumn(
-                    label: Stack(
-                      children: [
-                        Container(
-                          padding: null,
-                          width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
-                          child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                column,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
-                              ),
-
-// ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    onSort: (columnIndex, ascending) {
-                      _sortOrder;
-                    },
-                  );
-                }).toList(),
-                rows: []),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 150, left: 130, bottom: 350, right: 150),
-            child: CustomDatafound(),
-          ),
-        ],
-      );
-    }
-    return LayoutBuilder(builder: (context, constraints) {
-// double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width * 0.92;
-
-      return Column(
-        children: [
-          Container(
-            width: 1100,
-            decoration: const BoxDecoration(
-                color: Color(0xFFF7F7F7),
-                border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                columnSpacing: 35,
-// List.generate(5, (index)
-                columns: columns.map((column) {
-                  return DataColumn(
-                    label: Stack(
-                      children: [
-                        Container(
-                          padding: null,
-                          width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
-                          child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                column,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo[900],
-                                  fontSize: 13,
-                                ),
-                              ),
-                              IconButton(
-                                icon:
-                                _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(
-                                    width: 12,
-                                    child: Image.asset(
-                                      "images/sort.png",
-                                      color: Colors.grey,
-                                    ))
-                                    : SizedBox(
-                                    width: 12,
-                                    child: Image.asset(
-                                      "images/sort.png",
-                                      color: Colors.blue,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    _sortOrder[columns.indexOf(column)] =
-                                    _sortOrder[columns.indexOf(column)] ==
-                                        'asc'
-                                        ? 'desc'
-                                        : 'asc';
-                                    _sortProducts(columns.indexOf(column),
-                                        _sortOrder[columns.indexOf(column)]);
-                                  });
-                                },
-                              ),
-//SizedBox(width: 50,),
-//Padding(
-//  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-//  child:
-                              const Spacer(),
-                              MouseRegion(
-                                cursor: SystemMouseCursors.resizeColumn,
-                                child: GestureDetector(
-                                    onHorizontalDragUpdate: (details) {
-// Update column width dynamically as user drags
-                                      setState(() {
-                                        columnWidths[columns.indexOf(column)] +=
-                                            details.delta.dx;
-                                        columnWidths[columns.indexOf(column)] =
-                                            columnWidths[
-                                            columns.indexOf(column)]
-                                                .clamp(151.0, 300.0);
-                                      });
-// setState(() {
-//   columnWidths[columns.indexOf(column)] += details.delta.dx;
-//   if (columnWidths[columns.indexOf(column)] < 50) {
-//     columnWidths[columns.indexOf(column)] = 50; // Minimum width
-//   }
-// });
-                                    },
-                                    child: const Padding(
-                                      padding:
-                                      EdgeInsets.only(top: 10, bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          VerticalDivider(
-                                            width: 5,
-                                            thickness: 4,
-                                            color: Colors.grey,
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              ),
-// ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    onSort: (columnIndex, ascending) {
-                      _sortOrder;
-                    },
-                  );
-                }).toList(),
-                rows: List.generate(
-                    math.min(itemsPerPage,
-                        filteredData.length - (currentPage - 1) * itemsPerPage),
-                        (index) {
-                      final detail =
-                      filteredData[(currentPage - 1) * itemsPerPage + index];
-                      final isSelected = _selectedProduct == detail;
-                      return DataRow(
-                          color: MaterialStateProperty.resolveWith<Color>((states) {
-                            if (states.contains(MaterialState.hovered)) {
-                              return Colors.blue.shade500.withOpacity(
-                                  0.8); // Add some opacity to the dark blue
-                            } else {
-                              return Colors.white.withOpacity(0.9);
-                            }
-                          }),
-                          cells: [
-                            DataCell(
-                              Container(
-                                width: columnWidths[0],
-                                // Same dynamic width as column headers
-                                child: Text(
-                                  detail.orderId.toString(),
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? Colors.deepOrange[200]
-                                        : const Color(0xFFFFB315),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[1],
-                                child: Text(
-                                  detail.orderDate!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[2],
-                                child: Text(
-                                  detail.invoiceNo!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[3],
-                                child: Text(
-                                  detail.total.toString(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[4],
-                                child: Text(
-                                  detail.deliveryStatus.toString(),
-                                  style: TextStyle(
-                                    color: detail.deliveryStatus == "In Progress"
-                                        ? Colors.orange
-                                        : detail.deliveryStatus == "Delivered"
-                                        ? Colors.green
-                                        : Colors.red,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[4],
-                                child: Text(
-                                  detail.paymentStatus.toString(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFA6A6A6),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                          onSelectChanged: (selected) {
-                            if (selected != null && selected) {
-                              print('what is this');
-                              print(detail.invoiceNo);
-                              print(productList);
-                              print(detail.paymentStatus);
-//final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                            }
-                          });
-                    })),
-          ),
-        ],
-      );
-    });
-  }
-
-  Widget buildDataTable() {
-    if (isLoading) {
-      _loading = true;
-      var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
-// Show loading indicator while data is being fetched
-      return Padding(
-        padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
-      );
-    }
-
-    if (filteredData.isEmpty) {
-      double right = MediaQuery.of(context).size.width;
-      return Column(
-        children: [
-          Container(
-            width: right - 100,
-            decoration: const BoxDecoration(
-                color: Color(0xFFF7F7F7),
-                border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                columnSpacing: 35,
-                columns: columns.map((column) {
-                  return DataColumn(
-                    label: Stack(
-                      children: [
-                        Container(
-                          padding: null,
-                          width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
-                          child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(column, style: TextStyles.subhead),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    onSort: (columnIndex, ascending) {
-                      _sortOrder;
-                    },
-                  );
-                }).toList(),
-                rows: []),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 150, left: 130, bottom: 350, right: 150),
-            child: CustomDatafound(),
-          ),
-        ],
-      );
-    }
-    return LayoutBuilder(builder: (context, constraints) {
-// double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width * 0.92;
-
-      return Column(
-        children: [
-          Container(
-            width: right - 100,
-            decoration: const BoxDecoration(
-                color: Color(0xFFF7F7F7),
-                border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                columnSpacing: 35,
-// List.generate(5, (index)
-                columns: columns.map((column) {
-                  return DataColumn(
-                    label: Stack(
-                      children: [
-                        Container(
-                          padding: null,
-                          width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
-                          child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(column, style: TextStyles.subhead),
-                              IconButton(
-                                icon:
-                                _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(
-                                    width: 12,
-                                    child: Image.asset(
-                                      "images/sort.png",
-                                      color: Colors.grey,
-                                    ))
-                                    : SizedBox(
-                                    width: 12,
-                                    child: Image.asset(
-                                      "images/sort.png",
-                                      color: Colors.blue,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    _sortOrder[columns.indexOf(column)] =
-                                    _sortOrder[columns.indexOf(column)] ==
-                                        'asc'
-                                        ? 'desc'
-                                        : 'asc';
-                                    _sortProducts(columns.indexOf(column),
-                                        _sortOrder[columns.indexOf(column)]);
-                                  });
-                                },
-                              ),
-//SizedBox(width: 50,),
-//Padding(
-//  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-//  child:
-// ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    onSort: (columnIndex, ascending) {
-                      _sortOrder;
-                    },
-                  );
-                }).toList(),
-                rows: List.generate(
-                    math.min(itemsPerPage,
-                        filteredData.length - (currentPage - 1) * itemsPerPage),
-                        (index) {
-                      final detail =
-                      filteredData[(currentPage - 1) * itemsPerPage + index];
-                      final isSelected = _selectedProduct == detail;
-                      return DataRow(
-                          color: MaterialStateProperty.resolveWith<Color>((states) {
-                            if (states.contains(MaterialState.hovered)) {
-                              return Colors.blue.shade500.withOpacity(
-                                  0.8); // Add some opacity to the dark blue
-                            } else {
-                              return Colors.white.withOpacity(0.9);
-                            }
-                          }),
-                          cells: [
-                            DataCell(
-                              Container(
-                                width: columnWidths[0],
-                                // Same dynamic width as column headers
-                                child: Text(
-                                  detail.orderId.toString(),
-                                  style: TextStyles.body,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[1],
-                                child: Text(
-                                  detail.orderDate,
-                                  style: TextStyles.body,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[2],
-                                child: Text(
-                                  detail.invoiceNo!,
-                                  style: TextStyles.body,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[3],
-                                child: Text(
-                                  detail.total.toString(),
-                                  style: TextStyles.body,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: columnWidths[4],
-                                child: Text(
-                                  detail.deliveryStatus.toString(),
-                                  style: TextStyles.body,
-                                ),
-                              ),
-                            ),
-                            // DataCell(
-                            //   Container(
-                            //     width: columnWidths[4],
-                            //     child: Text(
-                            //       detail.paymentStatus.toString(),
-                            //       style: TextStyles.body,
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
-                          onSelectChanged: (selected) {
-                            if (selected != null && selected) {
-                              print('what is this');
-                              print(detail.invoiceNo);
-                              print(productList);
-                              print(detail.paymentStatus);
-//final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                            }
-                          });
-                    })),
-          ),
-        ],
-      );
-    });
-  }
-
-  void _sortProducts(int columnIndex, String sortDirection) {
-    if (sortDirection == 'asc') {
-      filteredData.sort((a, b) {
-        if (columnIndex == 0) {
-          return a.paymentStatus!
-              .toLowerCase()
-              .compareTo(b.paymentStatus!.toLowerCase());
-        } else if (columnIndex == 1) {
-          return a.orderId!.compareTo(b.orderId!);
-        } else if (columnIndex == 2) {
-          return a.orderDate.compareTo(b.orderDate);
-        } else if (columnIndex == 3) {
-          return a.invoiceNo!.compareTo(b.invoiceNo!);
-        } else if (columnIndex == 4) {
-          return a.total.compareTo(b.total);
-        } else if (columnIndex == 5) {
-          return a.deliveryStatus.compareTo(b.deliveryStatus);
-        } else {
-          return 0;
-        }
-      });
-    } else {
-      filteredData.sort((a, b) {
-        if (columnIndex == 0) {
-          return b.paymentStatus!
-              .toLowerCase()
-              .compareTo(a.paymentStatus!.toLowerCase());
-        } else if (columnIndex == 1) {
-          return b.orderId!.compareTo(a.orderId!);
-        } else if (columnIndex == 2) {
-          return b.orderDate.compareTo(a.orderDate);
-        } else if (columnIndex == 3) {
-          return b.invoiceNo!.compareTo(a.invoiceNo!);
-        } else if (columnIndex == 4) {
-          return b.total.compareTo(a.total);
-        } else if (columnIndex == 5) {
-          return b.deliveryStatus.compareTo(a.deliveryStatus);
-        } else {
-          return 0;
-        }
-      });
-    }
-    setState(() {});
-  }
 }

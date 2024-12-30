@@ -7,20 +7,12 @@ import 'package:btb/widgets/Api%20name.dart';
 import 'package:btb/widgets/productclass.dart';
 import 'package:btb/widgets/custom%20loading.dart';
 import 'package:btb/widgets/pagination.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:btb/widgets/productclass.dart' as ord;
 import 'package:btb/Order%20Module/firstpage.dart' as ors;
-import 'package:provider/provider.dart';
-import 'package:responsive_framework/responsive_framework.dart';
-import '../Order Module/firstpage.dart' as ors;
-import '../customer module/customer list.dart';
-import '../sample/provider.dart';
 import '../widgets/confirmdialog.dart';
 import '../widgets/no datafound.dart';
 import '../widgets/text_style.dart';
@@ -57,23 +49,20 @@ class _DashboardPageState extends State<DashboardPage>
   String deliverystatus = '';
   late AnimationController _controller;
   late Animation<double> _shakeAnimation;
-  bool _isHovered1 = false;
+  final bool _isHovered1 = false;
   String companyName = window.sessionStorage["company Name"] ?? " ";
   bool _isHovered2 = false;
   bool _isHovered5 = false;
   bool orderhover = false;
   bool orderhover2 = false;
-  Map<String, dynamic> PaymentMap = {};
   String? dropdownValue1 = 'Delivery Status';
   String searchQuery = '';
   String token = window.sessionStorage["token"] ?? " ";
   String? role = window.sessionStorage["role"];
   String? dropdownValue2 = 'Select Year';
 
-  // late Future<DashboardCounts?> futureDashboardCounts;
-  //Naveen code
   int currentPage = 1;
-  Map<String, bool> _isHovered = {
+  final Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
     'Products': false,
@@ -84,7 +73,6 @@ class _DashboardPageState extends State<DashboardPage>
     'Return': false,
     'Reports': false,
   };
-  ord.Product? _selectedProduct;
   int itemsPerPage = 10;
   int totalItems = 0;
   int totalPages = 0;
@@ -94,7 +82,7 @@ class _DashboardPageState extends State<DashboardPage>
   List<ors.detail> filteredData = [];
   List<ors.detail> productList = [];
 
-  List<String> _sortOrder = List.generate(6, (index) => 'asc');
+  final List<String> _sortOrder = List.generate(6, (index) => 'asc');
   List<String> columns = [
     'Order ID',
     'Customer Name',
@@ -123,7 +111,7 @@ class _DashboardPageState extends State<DashboardPage>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/${companyName}/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/$companyName/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
         ),
         headers: {
           "Content-type": "application/json",
@@ -151,7 +139,6 @@ class _DashboardPageState extends State<DashboardPage>
                         const Icon(Icons.warning,
                             color: Colors.orange, size: 50),
                         const SizedBox(height: 16),
-                        // Confirmation Message
                         const Text(
                           'Session Expired',
                           style: TextStyle(
@@ -174,9 +161,7 @@ class _DashboardPageState extends State<DashboardPage>
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Handle Yes action
                                 context.go('/');
-                                // Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
@@ -186,7 +171,7 @@ class _DashboardPageState extends State<DashboardPage>
                                 ),
                               ),
                               child: const Text(
-                                'ok',
+                                'Ok',
                                 style: TextStyle(
                                   color: Colors.blue,
                                 ),
@@ -204,8 +189,7 @@ class _DashboardPageState extends State<DashboardPage>
         ).whenComplete(() {
           _hasShownPopup = false;
         });
-      }
-      else {
+      } else {
         if (response.statusCode == 200) {
           final jsonData = jsonDecode(response.body);
           List<ors.detail> products = [];
@@ -254,7 +238,7 @@ class _DashboardPageState extends State<DashboardPage>
     try {
       final response = await http.get(
         Uri.parse(
-          '$apicall/${companyName}/order_master/get_all_ordermaster',
+          '$apicall/$companyName/order_master/get_all_ordermaster',
         ),
         headers: {
           "Content-type": "application/json",
@@ -305,9 +289,7 @@ class _DashboardPageState extends State<DashboardPage>
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Handle Yes action
                                 context.go('/');
-                                // Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
@@ -317,7 +299,7 @@ class _DashboardPageState extends State<DashboardPage>
                                 ),
                               ),
                               child: const Text(
-                                'ok',
+                                'Ok',
                                 style: TextStyle(
                                   color: Colors.blue,
                                 ),
@@ -341,7 +323,7 @@ class _DashboardPageState extends State<DashboardPage>
           if (jsonData == null) {
             return;
           }
-          // List<detail> filteredData = [];
+
           if (jsonData is List) {
             filteredData =
                 jsonData.map((item) => ors.detail.fromJson(item)).toList();
@@ -383,9 +365,8 @@ class _DashboardPageState extends State<DashboardPage>
   void _updateSearch(String searchText) {
     setState(() {
       _searchText = searchText;
-      currentPage = 1; // Reset to first page when searching
+      currentPage = 1;
       _filterAndPaginateProducts();
-      // _clearSearch();
     });
   }
 
@@ -412,26 +393,19 @@ class _DashboardPageState extends State<DashboardPage>
   void _filterAndPaginateProducts() {
     filteredData1 = productList.where((product) {
       final matchesSearchText =
-      product.orderId!.toLowerCase().contains(_searchText.toLowerCase());
+          product.orderId!.toLowerCase().contains(_searchText.toLowerCase());
       String orderYear = '';
       if (product.deliveredDate!.contains('/') ||
           product.deliveredDate!.contains('-')) {
         String separator = product.deliveredDate!.contains('/') ? '/' : '-';
         final dateParts = product.deliveredDate!.split(separator);
         if (dateParts.length == 3) {
-          orderYear = dateParts[2]; // Extract the year
-          //Extract the day
+          orderYear = dateParts[2];
         }
       }
-      // print(product.deliveredDate);
-      // if (product.deliveredDate!.contains('/')) {
-      //   final dateParts = product.deliveredDate!.split('/');
-      //   if (dateParts.length == 3) {
-      //     orderYear = dateParts[0]; // Extract the year
-      //   }
-      // }
+
       if (status.isEmpty && selectDate.isEmpty) {
-        return matchesSearchText; // Include all products that match the search text
+        return matchesSearchText;
       }
       if (status == 'Delivery Status' && selectDate == 'Select Year') {
         return matchesSearchText;
@@ -443,30 +417,23 @@ class _DashboardPageState extends State<DashboardPage>
         return matchesSearchText;
       }
       if (status == 'Delivery Status' && selectDate.isNotEmpty) {
-        return matchesSearchText &&
-            orderYear == selectDate; // Include all products
+        return matchesSearchText && orderYear == selectDate;
       }
       if (status.isNotEmpty && selectDate == 'Select Year') {
-        return matchesSearchText &&
-            product.deliveryStatus == status; // Include all products
+        return matchesSearchText && product.deliveryStatus == status;
       }
       if (status.isEmpty && selectDate.isNotEmpty) {
-        return matchesSearchText &&
-            orderYear == selectDate; // Include all products
+        return matchesSearchText && orderYear == selectDate;
       }
 
       if (status.isNotEmpty && selectDate.isEmpty) {
-        return matchesSearchText &&
-            product.deliveryStatus == status; // Include all products
+        return matchesSearchText && product.deliveryStatus == status;
       }
       return matchesSearchText &&
           (product.deliveryStatus == status && orderYear == selectDate);
-      //  return false;
     }).toList();
     totalPages = (filteredData1.length / itemsPerPage).ceil();
     setState(() {
-      // print('fileterpaginate');
-      // print(_filteredData);
       currentPage = 1;
     });
   }
@@ -480,8 +447,6 @@ class _DashboardPageState extends State<DashboardPage>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-
-// Define the shake animation (values will oscillate between -5.0 and 5.0)
     _shakeAnimation = Tween<double>(begin: 0, end: 5)
         .chain(CurveTween(curve: Curves.elasticIn))
         .animate(_controller)
@@ -501,7 +466,7 @@ class _DashboardPageState extends State<DashboardPage>
 
   Future<void> _getDashboardCounts() async {
     final response = await http.get(
-      Uri.parse('$apicall/${companyName}/order_master/get_order_counts'),
+      Uri.parse('$apicall/$companyName/order_master/get_order_counts'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -524,10 +489,8 @@ class _DashboardPageState extends State<DashboardPage>
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      // Warning Icon
                       const Icon(Icons.warning, color: Colors.orange, size: 50),
                       const SizedBox(height: 16),
-                      // Confirmation Message
                       const Text(
                         'Session Expired',
                         style: TextStyle(
@@ -544,15 +507,12 @@ class _DashboardPageState extends State<DashboardPage>
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // Buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              // Handle Yes action
                               context.go('/');
-                              // Navigator.of(context).pop();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
@@ -562,7 +522,7 @@ class _DashboardPageState extends State<DashboardPage>
                               ),
                             ),
                             child: const Text(
-                              'ok',
+                              'Ok',
                               style: TextStyle(
                                 color: Colors.blue,
                               ),
@@ -595,13 +555,12 @@ class _DashboardPageState extends State<DashboardPage>
   @override
   void dispose() {
     _searchDebounceTimer?.cancel();
-    _controller.dispose(); // Cancel the timer when the widget is disposed
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-  //  final authProvider = Provider.of<AuthProvider>(context, listen: false);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -612,8 +571,8 @@ class _DashboardPageState extends State<DashboardPage>
           return Stack(
             children: [
               Container(
-                color: Colors.white, // White background color
-                height: 60.0, // Total height including bottom shadow
+                color: Colors.white,
+                height: 60.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -625,7 +584,6 @@ class _DashboardPageState extends State<DashboardPage>
                           child: Image.asset(
                             "images/Final-Ikyam-Logo.png",
                             height: 35.0,
-                            // Adjusted to better match proportions
                           ),
                         ),
                         const Spacer(),
@@ -633,9 +591,7 @@ class _DashboardPageState extends State<DashboardPage>
                           children: [
                             SizedBox(width: 10),
                             Padding(
-                              padding:
-                              EdgeInsets.only(right: 10, top: 10),
-                              // Adjust padding for better spacing
+                              padding: EdgeInsets.only(right: 10, top: 10),
                               child: AccountMenu(),
                             ),
                           ],
@@ -647,45 +603,43 @@ class _DashboardPageState extends State<DashboardPage>
                     ),
                     const Divider(
                       height: 3.0,
-                      thickness: 3.0, // Thickness of the shadow
-                      color: Color(0x29000000), // Shadow color (#00000029)
+                      thickness: 3.0,
+                      color: Color(0x29000000),
                     ),
                   ],
                 ),
               ),
               if (constraints.maxHeight <= 500) ...{
                 Positioned(
-                    top:60,
-                    left:0,
-right:0,
-                    bottom: 0,child:   SingleChildScrollView(
-                  child: Align(
-                    // Added Align widget for the left side menu
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Container(
-                        height: 1400,
-                        width: 200,
-                        color: Colors.white,
-                        padding:
-                        const EdgeInsets.only(left: 15, top: 10, right: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _buildMenuItems(context),
+                  top: 60,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: SingleChildScrollView(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Container(
+                          height: 1400,
+                          width: 200,
+                          color: Colors.white,
+                          padding: const EdgeInsets.only(
+                              left: 15, top: 10, right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildMenuItems(context),
+                          ),
                         ),
                       ),
                     ),
-
                   ),
-
-                ),),
+                ),
                 VerticalDividerWidget(
                   height: maxHeight,
                   color: const Color(0x29000000),
                 ),
-              }
-              else ...{
+              } else ...{
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
@@ -695,7 +649,7 @@ right:0,
                       width: 200,
                       color: Colors.white,
                       padding:
-                      const EdgeInsets.only(left: 15, top: 10, right: 15),
+                          const EdgeInsets.only(left: 15, top: 10, right: 15),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: _buildMenuItems(context),
@@ -707,15 +661,13 @@ right:0,
                   height: maxHeight,
                   color: const Color(0x29000000),
                 ),
-
               },
               Positioned(
                 left: 200,
                 top: 64,
                 right: 0,
                 bottom: 40,
-                child:Column(
-                  //mainAxisAlignment: MainAxisAlignment.end,
+                child: Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 30),
@@ -737,1197 +689,1330 @@ right:0,
                       ),
                     ),
                     Expanded(
-                      // flex: 1,
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 30),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                if (constraints.maxWidth >= 1350) ...{
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 35, right: 50, top: 5),
-                                    child: Container(
-                                      width: maxWidth,
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 1, right: 1, top: 5),
-                                            child: Container(
-                                              //   color: Colors.grey[50],
-                                              child: Column(
-                                                children: [Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                        const EdgeInsets.only(top: 10,bottom: 10,left: 10),
-                                                        child: MouseRegion(
-                                                          onEnter: (_){
-                                                            setState(() {
-                                                              _isHovered2 = true;
-                                                            });
-                                                          },
-                                                          onExit: (_){
-                                                            setState(() {
-                                                              _isHovered2 = false;
-                                                            });
-                                                          },
-
-                                                          child: AnimatedScale  (
-                                                            scale: _isHovered2 ? 1.05: 1.0,
-                                                            duration:  const Duration(milliseconds: 200),
-                                                            child: InkWell(
-                                                              onTap: () {
-                                                                // context.go('/Open_Order');
-                                                                // Navigator.push(
-                                                                //   context,
-                                                                //   MaterialPageRoute(
-                                                                //       builder: (context) =>
-                                                                //           OpenorderList()),
-                                                                // );
-                                                              },
-                                                              // splashColor: Colors.grey.withOpacity(0.2),
-                                                              child: Container(
-                                                                height: 115,
-                                                                width: maxWidth * 0.15,
-                                                                padding:
-                                                                const EdgeInsets.all(16),
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.white,
-                                                                  border: Border.all(color: const Color(0x29000000),),
-                                                                  borderRadius: BorderRadius.circular(15),
-                                                                ),
-                                                                child: Row(
-                                                                  crossAxisAlignment:
-                                                                  CrossAxisAlignment.center,
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding:
-                                                                      const EdgeInsets.only(
-                                                                          top: 3),
-                                                                      child:Container(
-                                                                        width: 60,
-                                                                        height: 60,
-                                                                        decoration: BoxDecoration(
-                                                                          shape: BoxShape.circle,
-                                                                          border: Border.all(
-                                                                            color: const Color(0xffffac8c), // Border color
-                                                                            width: 1.5,
-                                                                          ),
-                                                                          color:  const Color(0xffffac8c).withOpacity(0.2), // Set the background color to match the border
-                                                                          boxShadow: [
-                                                                            BoxShadow(
-                                                                              color: const Color(0xffffac8c).withOpacity(0.1), // Soft grey shadow
-                                                                              spreadRadius: 1,
-                                                                              blurRadius: 3,
-                                                                              offset: const Offset(0, 1),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        child: Image.asset("images/openorders.png"),
-                                                                      ),
-
-
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height: 5,
-                                                                    ),
-                                                                    Column(
-                                                                        crossAxisAlignment:
-                                                                        CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          const SizedBox(height: 10),
-                                                                          Padding(
-                                                                            padding:
-                                                                            const EdgeInsets.only(
-                                                                                left: 10),
-                                                                            child: Text(
-                                                                              _dashboardCounts != null
-                                                                                  ? _dashboardCounts!
-                                                                                  .openOrders
-                                                                                  .toString()
-                                                                                  : '0',
-                                                                              style: const TextStyle(
-                                                                                  fontSize: 25,
-                                                                                  fontWeight:
-                                                                                  FontWeight
-                                                                                      .bold),
-                                                                            ),
-                                                                          ),
-                                                                           Padding(
-                                                                            padding:const  EdgeInsets.only(
-                                                                                left: 10),
-                                                                            child: Text(
-                                                                              'Open Orders',
-                                                                              style: TextStyle(
-                                                                                fontSize: maxWidth * 0.01,
-                                                                                color: const Color(0xFF455A64),),
-                                                                            ),
-                                                                          ),
-                                                                        ]
-                                                                    )
-
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                        const EdgeInsets.only(top: 10,bottom: 10),
-                                                        child: MouseRegion(
-                                                          onEnter: (_) {
-                                                            setState(() {
-                                                              _isHovered5 = true;
-                                                            });
-                                                          },
-                                                          onExit: (_) {
-                                                            setState(() {
-                                                              _isHovered5 = false;
-                                                            });
-                                                          },
-                                                          child: AnimatedScale(
-                                                            scale: _isHovered5
-                                                                ? 1.05
-                                                                : 1.0,
-                                                            duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                200),
-                                                            child: InkWell(
-                                                              onTap: () {
-                                                                // context.go(
-                                                                //     '/Picked_order');
-                                                              },
-                                                              child: Container(
-                                                                height: 115,
-                                                                width: maxWidth * 0.15,
-                                                                padding: const EdgeInsets.all(16),
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.white,
-                                                                  border: Border.all(color: const Color(0x29000000),),
-                                                                  borderRadius: BorderRadius.circular(15),
-                                                                ),
-                                                                child: Row(
-                                                                  crossAxisAlignment:
-                                                                  CrossAxisAlignment.center,
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding:
-                                                                      const EdgeInsets.only(
-                                                                          top: 3),
-                                                                      child: Container(
-                                                                        width: 60,
-                                                                        height: 60,
-                                                                        decoration: BoxDecoration(
-                                                                          shape: BoxShape.circle,
-                                                                          border: Border.all(
-                                                                              color: const Color(
-                                                                                  0xFF9F86FF),
-                                                                              width: 1.5),
-                                                                          color: const Color(
-                                                                              0xFF9F86FF).withOpacity(0.1),
-
-                                                                          boxShadow: [
-                                                                            BoxShadow(
-                                                                              color: const Color(
-                                                                                  0xFF9F86FF)
-                                                                                  .withOpacity(
-                                                                                  0.1),
-                                                                              // Soft grey shadow
-                                                                              spreadRadius: 1,
-                                                                              blurRadius: 3,
-                                                                              offset:
-                                                                              const Offset(
-                                                                                  0, 1),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        child: Image.asset(
-                                                                            "images/file.png",
-                                                                            fit:
-                                                                            BoxFit.scaleDown),
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height: 5,
-                                                                    ),
-                                                                    Column(
-                                                                        crossAxisAlignment:
-                                                                        CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          const SizedBox(height: 10),
-                                                                          Padding(
-                                                                            padding: const EdgeInsets.only(
-                                                                                left: 10),
-                                                                            child: Text(
-                                                                              _dashboardCounts != null
-                                                                                  ? _dashboardCounts!
-                                                                                  .Picked
-                                                                                  .toString()
-                                                                                  : '0',
-                                                                              style: const TextStyle(
-                                                                                  fontSize: 25,
-                                                                                  fontWeight:
-                                                                                  FontWeight
-                                                                                      .bold),
-                                                                            ),
-                                                                          ),
-                                                                           Padding(
-                                                                            padding: const EdgeInsets.only(
-                                                                                left: 10),
-                                                                            child: Text(
-                                                                              'Picked Orders',
-                                                                              style: TextStyle(
-                                                                                fontSize: maxWidth * 0.01,
-                                                                                color: const Color(0xFF455A64),),
-                                                                            ),
-                                                                          )
-                                                                        ]
-                                                                    )
-
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                        const EdgeInsets.only(top: 10,bottom: 10),
-                                                        child: MouseRegion(
-                                                          onEnter: (_){setState(() {
-                                                            orderhover2 = true;
-                                                          });
-                                                          },
-                                                          onExit: (_){setState(() {
-                                                            orderhover2 = false;
-                                                          });
-                                                          },
-                                                          child: AnimatedScale(
-                                                            scale: orderhover2 ? 1.05: 1.0,
-                                                            duration:  const Duration(milliseconds: 200),
-                                                            child: InkWell(
-                                                              onTap: () {
-
-                                                                //context.go('/Order_Complete');
-                                                              },
-                                                              child: Container(
-                                                                height: 115,
-                                                                width: maxWidth * 0.15,
-                                                                padding: const EdgeInsets.all(16),
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.white,
-                                                                  border: Border.all(color: const Color(0x29000000),),
-                                                                  borderRadius: BorderRadius.circular(15),
-                                                                ),
-                                                                child: Row(
-                                                                  crossAxisAlignment:
-                                                                  CrossAxisAlignment.center,
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding:
-                                                                      const EdgeInsets.only(
-                                                                          top: 3),
-                                                                      child: Container(
-                                                                        width: 60,
-                                                                        height: 60,
-                                                                        decoration: BoxDecoration(
-                                                                          shape: BoxShape.circle,
-                                                                          border: Border.all(
-                                                                              color: const Color(
-                                                                                  0xFF0388AB),
-                                                                              width: 1.5),
-                                                                          color: const Color(
-                                                                              0xffB8EFFC).withOpacity(0.1),
-
-                                                                          boxShadow: [
-                                                                            BoxShadow(
-                                                                              color: const Color(
-                                                                                  0xFF0388AB)
-                                                                                  .withOpacity(
-                                                                                  0.1),
-                                                                              // Soft grey shadow
-                                                                              spreadRadius: 1,
-                                                                              blurRadius: 3,
-                                                                              offset:
-                                                                              const Offset(
-                                                                                  0, 1),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        child: Image.asset(
-                                                                            "images/dash.png",
-                                                                            fit:
-                                                                            BoxFit.scaleDown),
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height: 5,
-                                                                    ),
-                                                                    Column(
-                                                                        crossAxisAlignment:
-                                                                        CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          const SizedBox(height: 10),
-                                                                          Padding(
-                                                                            padding:
-                                                                            const EdgeInsets.only(
-                                                                                left: 10),
-                                                                            child: Text(
-                                                                              _dashboardCounts != null
-                                                                                  ? _dashboardCounts!
-                                                                                  .Delivered
-                                                                                  .toString()
-                                                                                  : '0',
-                                                                              style: const TextStyle(
-                                                                                  fontSize: 25,
-                                                                                  fontWeight:
-                                                                                  FontWeight.bold),
-                                                                            ),
-                                                                          ),
-                                                                           Padding(
-                                                                            padding:const EdgeInsets.only(
-                                                                                left: 10),
-                                                                            child: Text(
-                                                                              'Order Delivered',
-                                                                              style: TextStyle(
-                                                                                fontSize: maxWidth * 0.01,
-                                                                                color: const Color(0xFF455A64), // Dark grey-blue
-                                                                                fontWeight: FontWeight.w500,
-                                                                                letterSpacing: 0.5,
-                                                                              ),
-                                                                            ),
-                                                                          )
-                                                                        ]
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(
-                                                            top: 10,bottom:10,right: 10
-                                                        ),
-                                                        child: MouseRegion(
-                                                          onEnter: (_){setState(() {
-                                                            orderhover = true;
-                                                          });
-                                                          },
-                                                          onExit: (_){setState(() {
-                                                            orderhover = false;
-                                                          });
-                                                          },
-                                                          child: AnimatedScale(
-                                                            scale: orderhover ? 1.05: 1.0,
-                                                            duration:  const Duration(milliseconds: 200),
-                                                            child: InkWell(
-                                                              onTap: () {
-
-                                                                //  context.go('/Pay_Complete');
-                                                              },
-                                                              child: Container(
-                                                                height: 115,
-                                                                width: maxWidth * 0.155,
-                                                                padding:
-                                                                const EdgeInsets.all(16),
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.white,
-                                                                  border: Border.all(color: const Color(0x29000000),),
-                                                                  borderRadius: BorderRadius.circular(15),
-                                                                ),
-                                                                child: Row(
-                                                                  crossAxisAlignment:
-                                                                  CrossAxisAlignment.center,
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding:
-                                                                      const EdgeInsets.only(
-                                                                          top: 1),
-                                                                      child: Container(
-                                                                        width: 60,
-                                                                        height: 60,
-                                                                        decoration:
-                                                                        BoxDecoration(
-                                                                          shape: BoxShape.circle,
-                                                                          border: Border.all(
-                                                                              color: const Color(
-                                                                                  0xFF19C92F),
-                                                                              width: 1.5),
-                                                                          color: const Color(
-                                                                              0xFFBFFFC7),
-
-                                                                          boxShadow: [
-                                                                            BoxShadow(
-                                                                              color: const Color(
-                                                                                  0xFF418CFC33)
-                                                                                  .withOpacity(
-                                                                                  0.1),
-                                                                              // Soft grey shadow
-                                                                              spreadRadius: 1,
-                                                                              blurRadius: 3,
-                                                                              offset:
-                                                                              const Offset(
-                                                                                  0, 1),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        child: Image.asset(
-                                                                          "images/nk1.png",
-                                                                          width: 35,
-                                                                          height: 35,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height: 5,
-                                                                    ),
-                                                                    Column(
-                                                                        crossAxisAlignment:
-                                                                        CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          const SizedBox(height: 10),
-                                                                          Padding(
-                                                                            padding:
-                                                                            const EdgeInsets.only(
-                                                                                left: 10),
-                                                                            child: Text(
-                                                                              _dashboardCounts != null
-                                                                                  ? _dashboardCounts!
-                                                                                  .Cleard
-                                                                                  .toString()
-                                                                                  : '0',
-                                                                              style: const TextStyle(
-                                                                                  fontSize: 25,
-                                                                                  fontWeight:
-                                                                                  FontWeight
-                                                                                      .bold),
-                                                                            ),
-                                                                          ),
-                                                                          const Padding(
-                                                                            padding: EdgeInsets.only(
-                                                                                left: 10),
-                                                                            child: Text(
-                                                                              'Order Completed',
-                                                                              style: TextStyle(
-                                                                                fontSize: 15,
-                                                                                color: Color(0xFF455A64),),
-                                                                            ),
-                                                                          )
-                                                                        ]
-                                                                    )
-
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ]
-
-                                                )],
-                                              ),
-                                            ),
-                                          ),
-
-                                          Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 1,
-                                                  top: 20,
-                                                  right: 1,
-                                                  bottom: 10),
-                                              child: Container(
-                                                height: 650,
-                                                width: maxWidth,
-                                                decoration: BoxDecoration(
-                                                  //   border: Border.all(color: Colors.grey),
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(2),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.grey.withOpacity(0.1),
-                                                      // Soft grey shadow
-                                                      spreadRadius: 3,
-                                                      blurRadius: 3,
-                                                      offset: const Offset(0, 3),
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: SizedBox(
-                                                  //width: maxWidth * 0.8,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                    children: [
-                                                      buildSearchField1(),
-                                                      const SizedBox(height: 20),
-                                                      Expanded(
-                                                        child: Scrollbar(
-                                                          controller:
-                                                          _scrollController,
-                                                          thickness: 6,
-                                                          thumbVisibility: true,
-                                                          child:
-                                                          SingleChildScrollView(
-                                                            controller:
-                                                            _scrollController,
-                                                            scrollDirection:
-                                                            Axis.horizontal,
-                                                            child: buildDataTable1(),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 1,
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                        const EdgeInsets.only(
-                                                            right: 30),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                          MainAxisAlignment.end,
-                                                          children: [
-                                                            PaginationControls(
-                                                              currentPage:
-                                                              currentPage,
-                                                              totalPages: filteredData1
-                                                                  .length >
-                                                                  itemsPerPage
-                                                                  ? totalPages
-                                                                  : 1,
-                                                              //totalPages//totalPages,
-                                                              // onFirstPage: _goToFirstPage,
-                                                              onPreviousPage:
-                                                              _goToPreviousPage,
-                                                              onNextPage:
-                                                              _goToNextPage,
-                                                              // onLastPage: _goToLastPage,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              )),
-
-                                        ],
-                                      ),
-                                    ),),
-                                }
-                                else ...{
-                                  SizedBox(
-                                    height: 874,
-                                    child:
-                                    AdaptiveScrollbar(
-                                        position: ScrollbarPosition.bottom,
-                                        controller: horizontalScroll,
-                                        child: SingleChildScrollView(
-                                          controller: horizontalScroll,
-                                          scrollDirection: Axis.horizontal,
-                                          child:Container(
-                                            width:1200,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 35, right: 50, top: 5),
-                                              child: Column(
+                      padding: const EdgeInsets.only(left: 30),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            if (constraints.maxWidth >= 1350) ...{
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 35, right: 50, top: 5),
+                                child: SizedBox(
+                                  width: maxWidth,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 1, right: 1, top: 5),
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        left: 1, right: 1, top: 5),
-                                                    child: Container(
-                                                      width:1200,
-                                                      //   color: Colors.grey[50],
-                                                      child: Row(
-                                                          mainAxisAlignment:
-                                                          MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                              const EdgeInsets.only(top: 10,bottom: 10,left: 10),
-                                                              child: MouseRegion(
-                                                                onEnter: (_){
-                                                                  setState(() {
-                                                                    _isHovered2 = true;
-                                                                  });
-                                                                },
-                                                                onExit: (_){
-                                                                  setState(() {
-                                                                    _isHovered2 = false;
-                                                                  });
-                                                                },
-
-                                                                child: AnimatedScale  (
-                                                                  scale: _isHovered2 ? 1.05: 1.0,
-                                                                  duration:  const Duration(milliseconds: 200),
-                                                                  child: InkWell(
-                                                                    onTap: () {
-                                                                      // context.go('/Open_Order');
-                                                                      // Navigator.push(
-                                                                      //   context,
-                                                                      //   MaterialPageRoute(
-                                                                      //       builder: (context) =>
-                                                                      //           OpenorderList()),
-                                                                      // );
-                                                                    },
-                                                                    // splashColor: Colors.grey.withOpacity(0.2),
-                                                                    child: Container(
-                                                                      height: 115,
-                                                                      width: 200,
-                                                                      padding:
-                                                                      const EdgeInsets.all(16),
-                                                                      decoration: BoxDecoration(
-                                                                        color: Colors.white,
-                                                                        border: Border.all(color: const Color(0x29000000),),
-                                                                        borderRadius: BorderRadius.circular(15),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10,
+                                                            bottom: 10,
+                                                            left: 10),
+                                                    child: MouseRegion(
+                                                      onEnter: (_) {
+                                                        setState(() {
+                                                          _isHovered2 = true;
+                                                        });
+                                                      },
+                                                      onExit: (_) {
+                                                        setState(() {
+                                                          _isHovered2 = false;
+                                                        });
+                                                      },
+                                                      child: AnimatedScale(
+                                                        scale: _isHovered2
+                                                            ? 1.05
+                                                            : 1.0,
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    200),
+                                                        child: InkWell(
+                                                          onTap: () {},
+                                                          child: Container(
+                                                            height: 115,
+                                                            width:
+                                                                maxWidth * 0.15,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(16),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                  Colors.white,
+                                                              border:
+                                                                  Border.all(
+                                                                color: const Color(
+                                                                    0x29000000),
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15),
+                                                            ),
+                                                            child: Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          top:
+                                                                              3),
+                                                                  child:
+                                                                      Container(
+                                                                    width: 60,
+                                                                    height: 60,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                      border:
+                                                                          Border
+                                                                              .all(
+                                                                        color: const Color(
+                                                                            0xffffac8c),
+                                                                        width:
+                                                                            1.5,
                                                                       ),
-                                                                      child: Column(
-                                                                        children: [
-                                                                          Row(
-                                                                            crossAxisAlignment:
-                                                                            CrossAxisAlignment.center,
-                                                                            children: [
-                                                                              Padding(
-                                                                                padding:
-                                                                                const EdgeInsets.only(
-                                                                                    top: 3),
-                                                                                child:Container(
-                                                                                  width: 60,
-                                                                                  height: 60,
-                                                                                  decoration: BoxDecoration(
-                                                                                    shape: BoxShape.circle,
-                                                                                    border: Border.all(
-                                                                                      color: const Color(0xffffac8c), // Border color
-                                                                                      width: 1.5,
-                                                                                    ),
-                                                                                    color:  const Color(0xffffac8c).withOpacity(0.2), // Set the background color to match the border
-                                                                                    boxShadow: [
-                                                                                      BoxShadow(
-                                                                                        color: const Color(0xffffac8c).withOpacity(0.1), // Soft grey shadow
-                                                                                        spreadRadius: 1,
-                                                                                        blurRadius: 3,
-                                                                                        offset: const Offset(0, 1),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                  child: Image.asset("images/openorders.png"),
-                                                                                ),
-
-
-                                                                              ),
-                                                                              const SizedBox(
-                                                                                height: 5,
-                                                                              ),
-                                                                              Column(
-                                                                                  crossAxisAlignment:
-                                                                                  CrossAxisAlignment.start,
-                                                                                  children: [
-                                                                                    const SizedBox(height: 10),
-                                                                                    Padding(
-                                                                                      padding:
-                                                                                      const EdgeInsets.only(
-                                                                                          left: 10),
-                                                                                      child: Text(
-                                                                                        _dashboardCounts != null
-                                                                                            ? _dashboardCounts!
-                                                                                            .openOrders
-                                                                                            .toString()
-                                                                                            : '0',
-                                                                                        style: const TextStyle(
-                                                                                            fontSize: 25,
-                                                                                            fontWeight:
-                                                                                            FontWeight
-                                                                                                .bold),
-                                                                                      ),
-                                                                                    ),
-                                                                                    const Padding(
-                                                                                      padding: EdgeInsets.only(
-                                                                                          left: 10),
-                                                                                      child: Text(
-                                                                                        'Open Orders',
-                                                                                        style: TextStyle(
-                                                                                          fontSize: 13,
-                                                                                          color: Color(0xFF455A64),),
-                                                                                      ),
-                                                                                    ),
-                                                                                  ]
-                                                                              )
-
-                                                                            ],
-                                                                          ),
-                                                                        ],
-                                                                      ),
+                                                                      color: const Color(
+                                                                              0xffffac8c)
+                                                                          .withOpacity(
+                                                                              0.2),
+                                                                      boxShadow: [
+                                                                        BoxShadow(
+                                                                          color:
+                                                                              const Color(0xffffac8c).withOpacity(0.1),
+                                                                          spreadRadius:
+                                                                              1,
+                                                                          blurRadius:
+                                                                              3,
+                                                                          offset: const Offset(
+                                                                              0,
+                                                                              1),
+                                                                        ),
+                                                                      ],
                                                                     ),
+                                                                    child: Image
+                                                                        .asset(
+                                                                            "images/openorders.png"),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                              const EdgeInsets.only(top: 10,bottom: 10),
-                                                              child: MouseRegion(
-                                                                onEnter: (_) {
-                                                                  setState(() {
-                                                                    _isHovered5 = true;
-                                                                  });
-                                                                },
-                                                                onExit: (_) {
-                                                                  setState(() {
-                                                                    _isHovered5 = false;
-                                                                  });
-                                                                },
-                                                                child: AnimatedScale(
-                                                                  scale: _isHovered5
-                                                                      ? 1.05
-                                                                      : 1.0,
-                                                                  duration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                      200),
-                                                                  child: InkWell(
-                                                                    onTap: () {
-                                                                      // context.go(
-                                                                      //     '/Picked_order');
-                                                                    },
-                                                                    child: Container(
-                                                                      height: 115,
-                                                                      width: 200,
-                                                                      padding: const EdgeInsets.all(16),
-                                                                      decoration: BoxDecoration(
-                                                                        color: Colors.white,
-                                                                        border: Border.all(color: const Color(0x29000000),),
-                                                                        borderRadius: BorderRadius.circular(15),
-                                                                      ),
-                                                                      child: Row(
-                                                                        crossAxisAlignment:
-                                                                        CrossAxisAlignment.center,
-                                                                        children: [
-                                                                          Padding(
-                                                                            padding:
-                                                                            const EdgeInsets.only(
-                                                                                top: 3),
-                                                                            child: Container(
-                                                                              width: 60,
-                                                                              height: 60,
-                                                                              decoration: BoxDecoration(
-                                                                                shape: BoxShape.circle,
-                                                                                border: Border.all(
-                                                                                    color: const Color(
-                                                                                        0xFF9F86FF),
-                                                                                    width: 1.5),
-                                                                                color: const Color(
-                                                                                    0xFF9F86FF).withOpacity(0.1),
-
-                                                                                boxShadow: [
-                                                                                  BoxShadow(
-                                                                                    color: const Color(
-                                                                                        0xFF9F86FF)
-                                                                                        .withOpacity(
-                                                                                        0.1),
-                                                                                    // Soft grey shadow
-                                                                                    spreadRadius: 1,
-                                                                                    blurRadius: 3,
-                                                                                    offset:
-                                                                                    const Offset(
-                                                                                        0, 1),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              child: Image.asset(
-                                                                                  "images/file.png",
-                                                                                  fit:
-                                                                                  BoxFit.scaleDown),
-                                                                            ),
-                                                                          ),
-                                                                          const SizedBox(
-                                                                            height: 5,
-                                                                          ),
-                                                                          Column(
-                                                                              crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                const SizedBox(height: 10),
-                                                                                Padding(
-                                                                                  padding: const EdgeInsets.only(
-                                                                                      left: 10),
-                                                                                  child: Text(
-                                                                                    _dashboardCounts != null
-                                                                                        ? _dashboardCounts!
-                                                                                        .Picked
-                                                                                        .toString()
-                                                                                        : '0',
-                                                                                    style: const TextStyle(
-                                                                                        fontSize: 25,
-                                                                                        fontWeight:
-                                                                                        FontWeight
-                                                                                            .bold),
-                                                                                  ),
-                                                                                ),
-                                                                                const Padding(
-                                                                                  padding: EdgeInsets.only(
-                                                                                      left: 10),
-                                                                                  child: Text(
-                                                                                    'Picked Orders',
-                                                                                    style: TextStyle(
-                                                                                      fontSize: 13,
-                                                                                      color: Color(0xFF455A64),),
-                                                                                  ),
-                                                                                )
-                                                                              ]
-                                                                          )
-
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ),
+                                                                const SizedBox(
+                                                                  height: 5,
                                                                 ),
-                                                              ),
+                                                                Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      const SizedBox(
+                                                                          height:
+                                                                              10),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                10),
+                                                                        child:
+                                                                            Text(
+                                                                          _dashboardCounts != null
+                                                                              ? _dashboardCounts!.openOrders.toString()
+                                                                              : '0',
+                                                                          style: const TextStyle(
+                                                                              fontSize: 25,
+                                                                              fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                10),
+                                                                        child:
+                                                                            Text(
+                                                                          'Open Orders',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                maxWidth * 0.01,
+                                                                            color:
+                                                                                const Color(0xFF455A64),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ])
+                                                              ],
                                                             ),
-                                                            Padding(
-                                                              padding:
-                                                              const EdgeInsets.only(top: 10,bottom: 10),
-                                                              child: MouseRegion(
-                                                                onEnter: (_){setState(() {
-                                                                  orderhover2 = true;
-                                                                });
-                                                                },
-                                                                onExit: (_){setState(() {
-                                                                  orderhover2 = false;
-                                                                });
-                                                                },
-                                                                child: AnimatedScale(
-                                                                  scale: orderhover2 ? 1.05: 1.0,
-                                                                  duration:  const Duration(milliseconds: 200),
-                                                                  child: InkWell(
-                                                                    onTap: () {
-
-                                                                      //context.go('/Order_Complete');
-                                                                    },
-                                                                    child: Container(
-                                                                      height: 115,
-                                                                      width: 200,
-                                                                      padding: const EdgeInsets.all(16),
-                                                                      decoration: BoxDecoration(
-                                                                        color: Colors.white,
-                                                                        border: Border.all(color: const Color(0x29000000),),
-                                                                        borderRadius: BorderRadius.circular(15),
-                                                                      ),
-                                                                      child: Row(
-                                                                        crossAxisAlignment:
-                                                                        CrossAxisAlignment.center,
-                                                                        children: [
-                                                                          Padding(
-                                                                            padding:
-                                                                            const EdgeInsets.only(
-                                                                                top: 3),
-                                                                            child: Container(
-                                                                              width: 60,
-                                                                              height: 60,
-                                                                              decoration: BoxDecoration(
-                                                                                shape: BoxShape.circle,
-                                                                                border: Border.all(
-                                                                                    color: const Color(
-                                                                                        0xFF0388AB),
-                                                                                    width: 1.5),
-                                                                                color: const Color(
-                                                                                    0xffB8EFFC).withOpacity(0.1),
-
-                                                                                boxShadow: [
-                                                                                  BoxShadow(
-                                                                                    color: const Color(
-                                                                                        0xFF0388AB)
-                                                                                        .withOpacity(
-                                                                                        0.1),
-                                                                                    // Soft grey shadow
-                                                                                    spreadRadius: 1,
-                                                                                    blurRadius: 3,
-                                                                                    offset:
-                                                                                    const Offset(
-                                                                                        0, 1),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              child: Image.asset(
-                                                                                  "images/dash.png",
-                                                                                  fit:
-                                                                                  BoxFit.scaleDown),
-                                                                            ),
-                                                                          ),
-                                                                          const SizedBox(
-                                                                            height: 5,
-                                                                          ),
-                                                                          Column(
-                                                                              crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                const SizedBox(height: 10),
-                                                                                Padding(
-                                                                                  padding:
-                                                                                  const EdgeInsets.only(
-                                                                                      left: 10),
-                                                                                  child: Text(
-                                                                                    _dashboardCounts != null
-                                                                                        ? _dashboardCounts!
-                                                                                        .Delivered
-                                                                                        .toString()
-                                                                                        : '0',
-                                                                                    style: const TextStyle(
-                                                                                        fontSize: 25,
-                                                                                        fontWeight:
-                                                                                        FontWeight.bold),
-                                                                                  ),
-                                                                                ),
-                                                                                const Padding(
-                                                                                  padding: EdgeInsets.only(
-                                                                                      left: 10),
-                                                                                  child: Text(
-                                                                                    'Order Delivered',
-                                                                                    style: TextStyle(
-                                                                                      fontSize: 12,
-                                                                                      color: Color(0xFF455A64), // Dark grey-blue
-                                                                                      fontWeight: FontWeight.w500,
-                                                                                      letterSpacing: 0.5,
-                                                                                    ),
-                                                                                  ),
-                                                                                )
-                                                                              ]
-                                                                          )
-
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(
-                                                                  top: 10,bottom:10,right: 10
-                                                              ),
-                                                              child: MouseRegion(
-                                                                onEnter: (_){setState(() {
-                                                                  orderhover = true;
-                                                                });
-                                                                },
-                                                                onExit: (_){setState(() {
-                                                                  orderhover = false;
-                                                                });
-                                                                },
-                                                                child: AnimatedScale(
-                                                                  scale: orderhover ? 1.05: 1.0,
-                                                                  duration:  const Duration(milliseconds: 200),
-                                                                  child: InkWell(
-                                                                    onTap: () {
-
-                                                                      //  context.go('/Pay_Complete');
-                                                                    },
-                                                                    child: Container(
-                                                                      height: 115,
-                                                                      width: 200,
-                                                                      padding:
-                                                                      const EdgeInsets.all(16),
-                                                                      decoration: BoxDecoration(
-                                                                        color: Colors.white,
-                                                                        border: Border.all(color: const Color(0x29000000),),
-                                                                        borderRadius: BorderRadius.circular(15),
-                                                                      ),
-                                                                      child: Row(
-                                                                        crossAxisAlignment:
-                                                                        CrossAxisAlignment.center,
-                                                                        children: [
-                                                                          Padding(
-                                                                            padding:
-                                                                            const EdgeInsets.only(
-                                                                                top: 1),
-                                                                            child: Container(
-                                                                              width: 60,
-                                                                              height: 60,
-                                                                              decoration:
-                                                                              BoxDecoration(
-                                                                                shape: BoxShape.circle,
-                                                                                border: Border.all(
-                                                                                    color: const Color(
-                                                                                        0xFF19C92F),
-                                                                                    width: 1.5),
-                                                                                color: const Color(
-                                                                                    0xFFBFFFC7),
-
-                                                                                boxShadow: [
-                                                                                  BoxShadow(
-                                                                                    color: const Color(
-                                                                                        0xFF418CFC33)
-                                                                                        .withOpacity(
-                                                                                        0.1),
-                                                                                    // Soft grey shadow
-                                                                                    spreadRadius: 1,
-                                                                                    blurRadius: 3,
-                                                                                    offset:
-                                                                                    const Offset(
-                                                                                        0, 1),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              child: Image.asset(
-                                                                                "images/nk1.png",
-                                                                                width: 35,
-                                                                                height: 35,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          const SizedBox(
-                                                                            height: 5,
-                                                                          ),
-                                                                          Column(
-                                                                              crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                const SizedBox(height: 10),
-                                                                                Padding(
-                                                                                  padding:
-                                                                                  const EdgeInsets.only(
-                                                                                      left: 10),
-                                                                                  child: Text(
-                                                                                    _dashboardCounts != null
-                                                                                        ? _dashboardCounts!
-                                                                                        .Cleard
-                                                                                        .toString()
-                                                                                        : '0',
-                                                                                    style: const TextStyle(
-                                                                                        fontSize: 25,
-                                                                                        fontWeight:
-                                                                                        FontWeight
-                                                                                            .bold),
-                                                                                  ),
-                                                                                ),
-                                                                                const Padding(
-                                                                                  padding: EdgeInsets.only(
-                                                                                      left: 10),
-                                                                                  child: Text(
-                                                                                    'Order Completed',
-                                                                                    style: TextStyle(
-                                                                                      fontSize:13,
-                                                                                      color: Color(0xFF455A64),),
-                                                                                  ),
-                                                                                )
-                                                                              ]
-                                                                          )
-
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ]
-
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-
                                                   Padding(
-                                                      padding: const EdgeInsets.only(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: MouseRegion(
+                                                      onEnter: (_) {
+                                                        setState(() {
+                                                          _isHovered5 = true;
+                                                        });
+                                                      },
+                                                      onExit: (_) {
+                                                        setState(() {
+                                                          _isHovered5 = false;
+                                                        });
+                                                      },
+                                                      child: AnimatedScale(
+                                                        scale: _isHovered5
+                                                            ? 1.05
+                                                            : 1.0,
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    200),
+                                                        child: InkWell(
+                                                          onTap: () {
+                                                          },
+                                                          child: Container(
+                                                            height: 115,
+                                                            width:
+                                                                maxWidth * 0.15,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(16),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                  Colors.white,
+                                                              border:
+                                                                  Border.all(
+                                                                color: const Color(
+                                                                    0x29000000),
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15),
+                                                            ),
+                                                            child: Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          top:
+                                                                              3),
+                                                                  child:
+                                                                      Container(
+                                                                    width: 60,
+                                                                    height: 60,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                      border: Border.all(
+                                                                          color: const Color(
+                                                                              0xFF9F86FF),
+                                                                          width:
+                                                                              1.5),
+                                                                      color: const Color(
+                                                                              0xFF9F86FF)
+                                                                          .withOpacity(
+                                                                              0.1),
+                                                                      boxShadow: [
+                                                                        BoxShadow(
+                                                                          color:
+                                                                              const Color(0xFF9F86FF).withOpacity(0.1),
+                                                                          spreadRadius:
+                                                                              1,
+                                                                          blurRadius:
+                                                                              3,
+                                                                          offset: const Offset(
+                                                                              0,
+                                                                              1),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child: Image.asset(
+                                                                        "images/file.png",
+                                                                        fit: BoxFit
+                                                                            .scaleDown),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 5,
+                                                                ),
+                                                                Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      const SizedBox(
+                                                                          height:
+                                                                              10),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                10),
+                                                                        child:
+                                                                            Text(
+                                                                          _dashboardCounts != null
+                                                                              ? _dashboardCounts!.picked.toString()
+                                                                              : '0',
+                                                                          style: const TextStyle(
+                                                                              fontSize: 25,
+                                                                              fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                10),
+                                                                        child:
+                                                                            Text(
+                                                                          'Picked Orders',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                maxWidth * 0.01,
+                                                                            color:
+                                                                                const Color(0xFF455A64),
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ])
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: MouseRegion(
+                                                      onEnter: (_) {
+                                                        setState(() {
+                                                          orderhover2 = true;
+                                                        });
+                                                      },
+                                                      onExit: (_) {
+                                                        setState(() {
+                                                          orderhover2 = false;
+                                                        });
+                                                      },
+                                                      child: AnimatedScale(
+                                                        scale: orderhover2
+                                                            ? 1.05
+                                                            : 1.0,
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    200),
+                                                        child: InkWell(
+                                                          onTap: () {},
+                                                          child: Container(
+                                                            height: 115,
+                                                            width:
+                                                                maxWidth * 0.15,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(16),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                  Colors.white,
+                                                              border:
+                                                                  Border.all(
+                                                                color: const Color(
+                                                                    0x29000000),
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15),
+                                                            ),
+                                                            child: Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          top:
+                                                                              3),
+                                                                  child:
+                                                                      Container(
+                                                                    width: 60,
+                                                                    height: 60,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                      border: Border.all(
+                                                                          color: const Color(
+                                                                              0xFF0388AB),
+                                                                          width:
+                                                                              1.5),
+                                                                      color: const Color(
+                                                                              0xffB8EFFC)
+                                                                          .withOpacity(
+                                                                              0.1),
+                                                                      boxShadow: [
+                                                                        BoxShadow(
+                                                                          color:
+                                                                              const Color(0xFF0388AB).withOpacity(0.1),
+                                                                          spreadRadius: 1,
+                                                                          blurRadius: 3,
+                                                                          offset: const Offset(0, 1),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child: Image.asset("images/dash.png", fit: BoxFit.scaleDown),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 5,
+                                                                ),
+                                                                Column(
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                    children: [
+                                                                      const SizedBox(
+                                                                          height:
+                                                                              10),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                10),
+                                                                        child:
+                                                                            Text(
+                                                                          _dashboardCounts != null
+                                                                              ? _dashboardCounts!.delivered.toString()
+                                                                              : '0',
+                                                                          style: const TextStyle(
+                                                                              fontSize: 25,
+                                                                              fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.only(left: 10),
+                                                                        child:
+                                                                            Text(
+                                                                          'Order Delivered',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                maxWidth * 0.01,
+                                                                            color:
+                                                                                const Color(0xFF455A64),
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                            letterSpacing:
+                                                                                0.5,
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ])
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10,
+                                                            bottom: 10,
+                                                            right: 10),
+                                                    child: MouseRegion(
+                                                      onEnter: (_) {
+                                                        setState(() {
+                                                          orderhover = true;
+                                                        });
+                                                      },
+                                                      onExit: (_) {
+                                                        setState(() {
+                                                          orderhover = false;
+                                                        });
+                                                      },
+                                                      child: AnimatedScale(
+                                                        scale: orderhover
+                                                            ? 1.05
+                                                            : 1.0,
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    200),
+                                                        child: InkWell(
+                                                          onTap: () {
+
+                                                          },
+                                                          child: Container(
+                                                            height: 115,
+                                                            width: maxWidth *
+                                                                0.155,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(16),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                  Colors.white,
+                                                              border:
+                                                                  Border.all(
+                                                                color: const Color(
+                                                                    0x29000000),
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15),
+                                                            ),
+                                                            child: Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          top:
+                                                                              1),
+                                                                  child:
+                                                                      Container(
+                                                                    width: 60,
+                                                                    height: 60,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                      border: Border.all(
+                                                                          color: const Color(
+                                                                              0xFF19C92F),
+                                                                          width:
+                                                                              1.5),
+                                                                      color: const Color(
+                                                                          0xFFBFFFC7),
+                                                                      boxShadow: [
+                                                                        BoxShadow(
+                                                                          color:
+                                                                              const Color(0xFF418CFC33).withOpacity(0.1),
+                                                                          // Soft grey shadow
+                                                                          spreadRadius:
+                                                                              1,
+                                                                          blurRadius:
+                                                                              3,
+                                                                          offset: const Offset(
+                                                                              0,
+                                                                              1),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child: Image
+                                                                        .asset(
+                                                                      "images/nk1.png",
+                                                                      width: 35,
+                                                                      height:
+                                                                          35,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 5,
+                                                                ),
+                                                                Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      const SizedBox(
+                                                                          height:
+                                                                              10),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                10),
+                                                                        child:
+                                                                            Text(
+                                                                          _dashboardCounts != null
+                                                                              ? _dashboardCounts!.cleard.toString()
+                                                                              : '0',
+                                                                          style: const TextStyle(
+                                                                              fontSize: 25,
+                                                                              fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                      ),
+                                                                      const Padding(
+                                                                        padding:
+                                                                            EdgeInsets.only(left: 10),
+                                                                        child:
+                                                                            Text(
+                                                                          'Order Completed',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                            color:
+                                                                                Color(0xFF455A64),
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ])
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ])
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 1,
+                                              top: 20,
+                                              right: 1,
+                                              bottom: 10),
+                                          child: Container(
+                                            height: 650,
+                                            width: maxWidth,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(2),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.1),
+                                                  spreadRadius: 3,
+                                                  blurRadius: 3,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
+                                            ),
+                                            child: SizedBox(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  buildSearchField1(),
+                                                  const SizedBox(height: 20),
+                                                  Expanded(
+                                                    child: Scrollbar(
+                                                      controller:
+                                                          _scrollController,
+                                                      thickness: 6,
+                                                      thumbVisibility: true,
+                                                      child:
+                                                          SingleChildScrollView(
+                                                        controller:
+                                                            _scrollController,
+                                                        scrollDirection:
+                                                            Axis.horizontal,
+                                                        child:
+                                                            buildDataTable1(),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 1,
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 30),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      children: [
+                                                        PaginationControls(
+                                                          currentPage:
+                                                              currentPage,
+                                                          totalPages: filteredData1
+                                                                      .length >
+                                                                  itemsPerPage
+                                                              ? totalPages
+                                                              : 1,
+                                                          onPreviousPage:
+                                                              _goToPreviousPage,
+                                                          onNextPage:
+                                                              _goToNextPage,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            } else ...{
+                              SizedBox(
+                                height: 874,
+                                child: AdaptiveScrollbar(
+                                    position: ScrollbarPosition.bottom,
+                                    controller: horizontalScroll,
+                                    child: SingleChildScrollView(
+                                      controller: horizontalScroll,
+                                      scrollDirection: Axis.horizontal,
+                                      child: SizedBox(
+                                        width: 1200,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 35, right: 50, top: 5),
+                                          child: Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 1, right: 1, top: 5),
+                                                child: SizedBox(
+                                                  width: 1200,
+                                                  child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 10,
+                                                                  bottom: 10,
+                                                                  left: 10),
+                                                          child: MouseRegion(
+                                                            onEnter: (_) {
+                                                              setState(() {
+                                                                _isHovered2 =
+                                                                    true;
+                                                              });
+                                                            },
+                                                            onExit: (_) {
+                                                              setState(() {
+                                                                _isHovered2 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                            child:
+                                                                AnimatedScale(
+                                                              scale: _isHovered2
+                                                                  ? 1.05
+                                                                  : 1.0,
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          200),
+                                                              child: InkWell(
+                                                                onTap: () {
+
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  height: 115,
+                                                                  width: 200,
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          16),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: const Color(
+                                                                          0x29000000),
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Row(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.center,
+                                                                        children: [
+                                                                          Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.only(top: 3),
+                                                                            child:
+                                                                                Container(
+                                                                              width: 60,
+                                                                              height: 60,
+                                                                              decoration: BoxDecoration(
+                                                                                shape: BoxShape.circle,
+                                                                                border: Border.all(
+                                                                                  color: const Color(0xffffac8c),
+                                                                                  // Border color
+                                                                                  width: 1.5,
+                                                                                ),
+                                                                                color: const Color(0xffffac8c).withOpacity(0.2),
+                                                                                boxShadow: [
+                                                                                  BoxShadow(
+                                                                                    color: const Color(0xffffac8c).withOpacity(0.1),
+                                                                                    spreadRadius: 1,
+                                                                                    blurRadius: 3,
+                                                                                    offset: const Offset(0, 1),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                              child: Image.asset("images/openorders.png"),
+                                                                            ),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                            height:
+                                                                                5,
+                                                                          ),
+                                                                          Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                const SizedBox(height: 10),
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.only(left: 10),
+                                                                                  child: Text(
+                                                                                    _dashboardCounts != null ? _dashboardCounts!.openOrders.toString() : '0',
+                                                                                    style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                                                                                  ),
+                                                                                ),
+                                                                                const Padding(
+                                                                                  padding: EdgeInsets.only(left: 10),
+                                                                                  child: Text(
+                                                                                    'Open Orders',
+                                                                                    style: TextStyle(
+                                                                                      fontSize: 13,
+                                                                                      color: Color(0xFF455A64),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ])
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: MouseRegion(
+                                                            onEnter: (_) {
+                                                              setState(() {
+                                                                _isHovered5 =
+                                                                    true;
+                                                              });
+                                                            },
+                                                            onExit: (_) {
+                                                              setState(() {
+                                                                _isHovered5 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                            child:
+                                                                AnimatedScale(
+                                                              scale: _isHovered5
+                                                                  ? 1.05
+                                                                  : 1.0,
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          200),
+                                                              child: InkWell(
+
+                                                                child:
+                                                                    Container(
+                                                                  height: 115,
+                                                                  width: 200,
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          16),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: const Color(
+                                                                          0x29000000),
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15),
+                                                                  ),
+                                                                  child: Row(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            top:
+                                                                                3),
+                                                                        child:
+                                                                            Container(
+                                                                          width:
+                                                                              60,
+                                                                          height:
+                                                                              60,
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            shape:
+                                                                                BoxShape.circle,
+                                                                            border:
+                                                                                Border.all(color: const Color(0xFF9F86FF), width: 1.5),
+                                                                            color:
+                                                                                const Color(0xFF9F86FF).withOpacity(0.1),
+                                                                            boxShadow: [
+                                                                              BoxShadow(
+                                                                                color: const Color(0xFF9F86FF).withOpacity(0.1),
+                                                                                spreadRadius: 1,
+                                                                                blurRadius: 3,
+                                                                                offset: const Offset(0, 1),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          child: Image.asset(
+                                                                              "images/file.png",
+                                                                              fit: BoxFit.scaleDown),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height:
+                                                                            5,
+                                                                      ),
+                                                                      Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            const SizedBox(height: 10),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(left: 10),
+                                                                              child: Text(
+                                                                                _dashboardCounts != null ? _dashboardCounts!.picked.toString() : '0',
+                                                                                style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                            const Padding(
+                                                                              padding: EdgeInsets.only(left: 10),
+                                                                              child: Text(
+                                                                                'Picked Orders',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 13,
+                                                                                  color: Color(0xFF455A64),
+                                                                                ),
+                                                                              ),
+                                                                            )
+                                                                          ])
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: MouseRegion(
+                                                            onEnter: (_) {
+                                                              setState(() {
+                                                                orderhover2 =
+                                                                    true;
+                                                              });
+                                                            },
+                                                            onExit: (_) {
+                                                              setState(() {
+                                                                orderhover2 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                            child:
+                                                                AnimatedScale(
+                                                              scale: orderhover2
+                                                                  ? 1.05
+                                                                  : 1.0,
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          200),
+                                                              child: InkWell(
+                                                                onTap: () {
+
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  height: 115,
+                                                                  width: 200,
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          16),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: const Color(
+                                                                          0x29000000),
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15),
+                                                                  ),
+                                                                  child: Row(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            top:
+                                                                                3),
+                                                                        child:
+                                                                            Container(
+                                                                          width:
+                                                                              60,
+                                                                          height:
+                                                                              60,
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            shape:
+                                                                                BoxShape.circle,
+                                                                            border:
+                                                                                Border.all(color: const Color(0xFF0388AB), width: 1.5),
+                                                                            color:
+                                                                                const Color(0xffB8EFFC).withOpacity(0.1),
+                                                                            boxShadow: [
+                                                                              BoxShadow(
+                                                                                color: const Color(0xFF0388AB).withOpacity(0.1),
+                                                                                spreadRadius: 1,
+                                                                                blurRadius: 3,
+                                                                                offset: const Offset(0, 1),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          child: Image.asset(
+                                                                              "images/dash.png",
+                                                                              fit: BoxFit.scaleDown),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height:
+                                                                            5,
+                                                                      ),
+                                                                      Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            const SizedBox(height: 10),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(left: 10),
+                                                                              child: Text(
+                                                                                _dashboardCounts != null ? _dashboardCounts!.delivered.toString() : '0',
+                                                                                style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                            const Padding(
+                                                                              padding: EdgeInsets.only(left: 10),
+                                                                              child: Text(
+                                                                                'Order Delivered',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 12,
+                                                                                  color: Color(0xFF455A64),
+                                                                                  // Dark grey-blue
+                                                                                  fontWeight: FontWeight.w500,
+                                                                                  letterSpacing: 0.5,
+                                                                                ),
+                                                                              ),
+                                                                            )
+                                                                          ])
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 10,
+                                                                  bottom: 10,
+                                                                  right: 10),
+                                                          child: MouseRegion(
+                                                            onEnter: (_) {
+                                                              setState(() {
+                                                                orderhover =
+                                                                    true;
+                                                              });
+                                                            },
+                                                            onExit: (_) {
+                                                              setState(() {
+                                                                orderhover =
+                                                                    false;
+                                                              });
+                                                            },
+                                                            child:
+                                                                AnimatedScale(
+                                                              scale: orderhover
+                                                                  ? 1.05
+                                                                  : 1.0,
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          200),
+                                                              child: InkWell(
+                                                                child:
+                                                                    Container(
+                                                                  height: 115,
+                                                                  width: 200,
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          16),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: const Color(
+                                                                          0x29000000),
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15),
+                                                                  ),
+                                                                  child: Row(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            top:
+                                                                                1),
+                                                                        child:
+                                                                            Container(
+                                                                          width:
+                                                                              60,
+                                                                          height:
+                                                                              60,
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            shape:
+                                                                                BoxShape.circle,
+                                                                            border:
+                                                                                Border.all(color: const Color(0xFF19C92F), width: 1.5),
+                                                                            color:
+                                                                                const Color(0xFFBFFFC7),
+                                                                            boxShadow: [
+                                                                              BoxShadow(
+                                                                                color: const Color(0xFF418CFC33).withOpacity(0.1),
+                                                                                spreadRadius: 1,
+                                                                                blurRadius: 3,
+                                                                                offset: const Offset(0, 1),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          child:
+                                                                              Image.asset(
+                                                                            "images/nk1.png",
+                                                                            width:
+                                                                                35,
+                                                                            height:
+                                                                                35,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height:
+                                                                            5,
+                                                                      ),
+                                                                      Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            const SizedBox(height: 10),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(left: 10),
+                                                                              child: Text(
+                                                                                _dashboardCounts != null ? _dashboardCounts!.cleard.toString() : '0',
+                                                                                style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                            const Padding(
+                                                                              padding: EdgeInsets.only(left: 10),
+                                                                              child: Text(
+                                                                                'Order Completed',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 13,
+                                                                                  color: Color(0xFF455A64),
+                                                                                ),
+                                                                              ),
+                                                                            )
+                                                                          ])
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ]),
+                                                ),
+                                              ),
+                                              Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
                                                           left: 1,
                                                           top: 20,
                                                           right: 1,
                                                           bottom: 50),
-                                                      child: Container(
-                                                        height: 650,
-                                                        width: 1100,
-                                                        decoration: BoxDecoration(
-                                                          //   border: Border.all(color: Colors.grey),
-                                                          color: Colors.white,
-                                                          borderRadius: BorderRadius.circular(2),
-                                                          boxShadow: [
-                                                            BoxShadow(
-                                                              color: Colors.grey.withOpacity(0.1),
-                                                              // Soft grey shadow
-                                                              spreadRadius: 3,
-                                                              blurRadius: 3,
-                                                              offset: const Offset(0, 3),
-                                                            ),
-                                                          ],
+                                                  child: Container(
+                                                    height: 650,
+                                                    width: 1100,
+                                                    decoration: BoxDecoration(
+                                                      //   border: Border.all(color: Colors.grey),
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              2),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey
+                                                              .withOpacity(0.1),
+                                                          spreadRadius: 3,
+                                                          blurRadius: 3,
+                                                          offset: const Offset(
+                                                              0, 3),
                                                         ),
-                                                        child: SizedBox(
-                                                          //width: maxWidth * 0.8,
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                            CrossAxisAlignment.start,
-                                                            children: [
-                                                              buildSearchField1(),
-                                                              const SizedBox(height: 20),
-                                                              Expanded(
-                                                                child: Scrollbar(
-                                                                  controller:
+                                                      ],
+                                                    ),
+                                                    child: SizedBox(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          buildSearchField1(),
+                                                          const SizedBox(
+                                                              height: 20),
+                                                          Expanded(
+                                                            child: Scrollbar(
+                                                              controller:
                                                                   _scrollController,
-                                                                  thickness: 6,
-                                                                  thumbVisibility: true,
-                                                                  child:
+                                                              thickness: 6,
+                                                              thumbVisibility:
+                                                                  true,
+                                                              child:
                                                                   SingleChildScrollView(
-                                                                    controller:
+                                                                controller:
                                                                     _scrollController,
-                                                                    scrollDirection:
+                                                                scrollDirection:
                                                                     Axis.horizontal,
-                                                                    child: buildDataTable2(),
-                                                                  ),
-                                                                ),
+                                                                child:
+                                                                    buildDataTable2(),
                                                               ),
-                                                              const SizedBox(
-                                                                height: 1,
-                                                              ),
-                                                              Padding(
-                                                                padding:
-                                                                const EdgeInsets.only(
-                                                                    right: 30),
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                  MainAxisAlignment.end,
-                                                                  children: [
-                                                                    PaginationControls(
-                                                                      currentPage:
-                                                                      currentPage,
-                                                                      totalPages: filteredData1
-                                                                          .length >
-                                                                          itemsPerPage
-                                                                          ? totalPages
-                                                                          : 1,
-                                                                      //totalPages//totalPages,
-                                                                      // onFirstPage: _goToFirstPage,
-                                                                      onPreviousPage:
-                                                                      _goToPreviousPage,
-                                                                      onNextPage:
-                                                                      _goToNextPage,
-                                                                      // onLastPage: _goToLastPage,
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              )
-                                                            ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                      )),
-
-                                                ],
-                                              ),),
-                                          ),)
-                                    ),
-                                  ),
-                                }
-                              ],
-                            ),
-                          ),
-                        ))
+                                                          const SizedBox(
+                                                            height: 1,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    right: 30),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                PaginationControls(
+                                                                  currentPage:
+                                                                      currentPage,
+                                                                  totalPages: filteredData1
+                                                                              .length >
+                                                                          itemsPerPage
+                                                                      ? totalPages
+                                                                      : 1,
+                                                                  onPreviousPage:
+                                                                      _goToPreviousPage,
+                                                                  onNextPage:
+                                                                      _goToNextPage,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )),
+                              ),
+                            }
+                          ],
+                        ),
+                      ),
+                    ))
                   ],
                 ),
               )
@@ -1949,21 +2034,15 @@ right:0,
               height: 42,
               decoration: BoxDecoration(
                 color: Colors.blue[800],
-                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-                // color: Color.fromRGBO(224, 59, 48, 1.0),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
-                  // Radius for top-left corner
                   topRight: Radius.circular(8),
-                  // No radius for top-right corner
                   bottomLeft: Radius.circular(8),
-                  // Radius for bottom-left corner
                   bottomRight:
-                  Radius.circular(8), // No radius for bottom-right corner
+                      Radius.circular(8),
                 ),
               ),
-              child: _buildMenuItem(
-                  'Home', Icons.home, Colors.white, '/Home')),
+              child: _buildMenuItem('Home', Icons.home, Colors.white, '/Home')),
         ],
       ),
       const SizedBox(
@@ -1971,10 +2050,8 @@ right:0,
       ),
       _buildMenuItem('Product', Icons.production_quantity_limits,
           Colors.blue[900]!, '/Product_List'),
-      // _buildMenuItem('Home', Icons.dashboard, Colors.blueAccent, '/Home'),
       _buildMenuItem('Customer', Icons.account_circle_outlined,
           Colors.blue[900]!, '/Customer'),
-
       _buildMenuItem(
           'Orders', Icons.warehouse_outlined, Colors.blue[900]!, '/Order_List'),
     ];
@@ -1988,7 +2065,7 @@ right:0,
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(
-            () => _isHovered[title] = true,
+        () => _isHovered[title] = true,
       ),
       onExit: (_) => setState(() => _isHovered[title] = false),
       child: GestureDetector(
@@ -2003,11 +2080,15 @@ right:0,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 10,top:2),
+            padding: const EdgeInsets.only(left: 10, top: 2),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(icon, color: iconColor,size: 20,),
+                Icon(
+                  icon,
+                  color: iconColor,
+                  size: 20,
+                ),
                 const SizedBox(width: 10),
                 Text(
                   title,
@@ -2026,7 +2107,6 @@ right:0,
   }
 
   Widget buildSearchField2() {
-    double maxWidth1 = MediaQuery.of(context).size.width;
     return LayoutBuilder(builder: (context, constraints) {
       return ConstrainedBox(
         constraints: const BoxConstraints(),
@@ -2036,26 +2116,24 @@ right:0,
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 30),
                   child: Container(
-                    width: 310, // reduced width
-                    height: 35, // reduced height
+                    width: 310,
+                    height: 35,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(2),
                       border: Border.all(color: Colors.grey),
                     ),
                     child: TextFormField(
-                      style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
-                      decoration:  InputDecoration(
+                      style:
+                          GoogleFonts.inter(color: Colors.black, fontSize: 13),
+                      decoration: InputDecoration(
                         hintText: 'Search by Order ID',
                         hintStyle: TextStyles.body,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 5),
-                      //  hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                    //    contentPadding: EdgeInsets.only(bottom: 20, left: 10),
-                        // adjusted padding
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 3, horizontal: 5),
                         border: InputBorder.none,
                         suffixIcon: const Padding(
                           padding: EdgeInsets.only(right: 2),
@@ -2073,165 +2151,6 @@ right:0,
               ],
             ),
             const SizedBox(height: 8),
-            // Row(
-            //   children: [
-            //     Column(
-            //       crossAxisAlignment: CrossAxisAlignment.start,
-            //       children: [
-            //         //  const SizedBox(height: 8),
-            //         Padding(
-            //           padding: const EdgeInsets.only(left: 30),
-            //           child: Container(
-            //             width: 150, // reduced width
-            //             height: 35, // reduced height
-            //             decoration: BoxDecoration(
-            //               color: Colors.white,
-            //               borderRadius: BorderRadius.circular(2),
-            //               border: Border.all(color: Colors.grey),
-            //             ),
-            //             child: DropdownButtonFormField2<String>(
-            //               decoration: const InputDecoration(
-            //                 contentPadding: EdgeInsets.only(
-            //                     bottom: 15, left: 9), // Custom padding
-            //                 border: InputBorder.none, // No default border
-            //                 filled: true,
-            //                 fillColor: Colors.white, // Background color
-            //               ),
-            //               isExpanded: true,
-            //               // Ensures dropdown takes full width
-            //               value: dropdownValue1,
-            //               onChanged: (String? newValue) {
-            //                 setState(() {
-            //                   dropdownValue1 = newValue;
-            //                   status = newValue ?? '';
-            //                   _filterAndPaginateProducts();
-            //                 });
-            //               },
-            //               items: <String>[
-            //                 'Delivery Status',
-            //                 'Not Started',
-            //                 'In Progress',
-            //                 'Delivered',
-            //               ].map<DropdownMenuItem<String>>((String value) {
-            //                 return DropdownMenuItem<String>(
-            //                   value: value,
-            //                   child: Text(
-            //                     value,
-            //                     style: TextStyle(
-            //                       fontSize: 13,
-            //                       color: value == 'Delivery Status'
-            //                           ? Colors.grey
-            //                           : Colors.black,
-            //                     ),
-            //                   ),
-            //                 );
-            //               }).toList(),
-            //               iconStyleData: const IconStyleData(
-            //                 icon: Icon(
-            //                   Icons.arrow_drop_down_circle_rounded,
-            //                   color: Colors.indigo,
-            //                   size: 16,
-            //                 ),
-            //                 iconSize: 16,
-            //               ),
-            //               buttonStyleData: const ButtonStyleData(
-            //                 height: 50, // Button height
-            //                 padding: EdgeInsets.only(
-            //                     left: 10, right: 10), // Button padding
-            //               ),
-            //               dropdownStyleData: DropdownStyleData(
-            //                 decoration: BoxDecoration(
-            //                   borderRadius: BorderRadius.circular(7),
-            //                   // Rounded corners
-            //                   color: Colors.white, // Dropdown background color
-            //                 ),
-            //                 maxHeight: 200, // Max height for dropdown items
-            //                 width: maxWidth1 * 0.1, // Dropdown width
-            //                 offset: const Offset(0, -20),
-            //               ),
-            //             ),
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //     // const SizedBox(width: 16),
-            //     Column(
-            //       crossAxisAlignment: CrossAxisAlignment.start,
-            //       children: [
-            //         // const SizedBox(height: 8),
-            //         Padding(
-            //           padding: const EdgeInsets.all(8.0),
-            //           child: Container(
-            //             width: 150, // reduced width
-            //             height: 35, // reduced height
-            //             decoration: BoxDecoration(
-            //               color: Colors.white,
-            //               borderRadius: BorderRadius.circular(2),
-            //               border: Border.all(color: Colors.grey),
-            //             ),
-            //             child: DropdownButtonFormField2<String>(
-            //               decoration: const InputDecoration(
-            //                 contentPadding:
-            //                 EdgeInsets.only(bottom: 15, left: 10),
-            //                 // adjusted padding
-            //                 border: InputBorder.none,
-            //                 filled: true,
-            //                 fillColor: Colors.white,
-            //               ),
-            //               //icon: Container(),
-            //               value: dropdownValue2,
-            //               onChanged: (String? newValue) {
-            //                 setState(() {
-            //                   selectDate = newValue ?? '';
-            //                   dropdownValue2 = newValue;
-            //                   _filterAndPaginateProducts();
-            //                 });
-            //               },
-            //               items: <String>['Select Year', '2023', '2024', '2025']
-            //                   .map<DropdownMenuItem<String>>((String value) {
-            //                 return DropdownMenuItem<String>(
-            //                   value: value,
-            //                   child: Text(
-            //                     value,
-            //                     style: TextStyle(
-            //                       fontSize: 13,
-            //                       color: value == 'Select Year'
-            //                           ? Colors.grey
-            //                           : Colors.black,
-            //                     ),
-            //                   ),
-            //                 );
-            //               }).toList(),
-            //               iconStyleData: const IconStyleData(
-            //                 icon: Icon(
-            //                   Icons.arrow_drop_down_circle_rounded,
-            //                   color: Colors.indigo,
-            //                   size: 16,
-            //                 ),
-            //                 iconSize: 16,
-            //               ),
-            //               buttonStyleData: const ButtonStyleData(
-            //                 height: 50, // Button height
-            //                 padding: EdgeInsets.only(
-            //                     left: 10, right: 10), // Button padding
-            //               ),
-            //               dropdownStyleData: DropdownStyleData(
-            //                 decoration: BoxDecoration(
-            //                   borderRadius: BorderRadius.circular(7),
-            //                   // Rounded corners
-            //                   color: Colors.white, // Dropdown background color
-            //                 ),
-            //                 maxHeight: 200, // Max height for dropdown items
-            //                 width: maxWidth1 * 0.1, // Dropdown width
-            //                 offset: const Offset(0, -20),
-            //               ),
-            //             ),
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ],
-            // ),
           ],
         ),
       );
@@ -2246,130 +2165,44 @@ right:0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             const SizedBox(height: 8),
             Row(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // const SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.only(top: 20, left: 30),
                       child: Container(
-                        width: maxWidth1 * 0.2, // reduced width
-                        height: 35, // reduced height
+                        width: maxWidth1 * 0.2,
+                        height: 35,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(2),
                           border: Border.all(color: Colors.grey),
                         ),
                         child: TextFormField(
-                          style: GoogleFonts.inter(    color: Colors.black,    fontSize: 13),
-                          decoration:  InputDecoration(
+                          style: GoogleFonts.inter(
+                              color: Colors.black, fontSize: 13),
+                          decoration: InputDecoration(
                               hintText: 'Search by Order ID',
                               hintStyle: TextStyles.body,
-                           //   hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                              contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 5),
-                              // adjusted padding
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 3, horizontal: 5),
                               border: InputBorder.none,
                               suffixIcon: Padding(
-                                padding: const EdgeInsets.only(left: 10, right: 5), // Adjust image padding
+                                padding: const EdgeInsets.only(
+                                    left: 10, right: 5),
                                 child: Image.asset(
-                                  'images/search.png', // Replace with your image asset path
+                                  'images/search.png',
                                 ),
-                              )
-                          ),
+                              )),
                           onChanged: _updateSearch,
                         ),
                       ),
                     ),
                   ],
                 ),
-                // Spacer(),
-                // Padding(
-                //   padding: const EdgeInsets.only(right: 30),
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       //  const SizedBox(height: 8),
-                //       Padding(
-                //         padding: const EdgeInsets.only(left: 30,top: 20),
-                //         child: Container(
-                //           width: maxWidth1 * 0.1, // reduced width
-                //           height: 35, // reduced height
-                //           decoration: BoxDecoration(
-                //             color: Colors.white,
-                //             borderRadius: BorderRadius.circular(2),
-                //             border: Border.all(color: Colors.grey),
-                //           ),
-                //           child: DropdownButtonFormField2<String>(
-                //             decoration: const InputDecoration(
-                //               contentPadding: EdgeInsets.only(
-                //                   bottom: 15, left: 9), // Custom padding
-                //               border: InputBorder.none, // No default border
-                //               filled: true,
-                //               fillColor: Colors.white, // Background color
-                //             ),
-                //             isExpanded: true,
-                //             // Ensures dropdown takes full width
-                //             value: dropdownValue1,
-                //             onChanged: (String? newValue) {
-                //               setState(() {
-                //                 dropdownValue1 = newValue;
-                //                 status = newValue ?? '';
-                //                 _filterAndPaginateProducts();
-                //               });
-                //             },
-                //             items: <String>[
-                //               'Delivery Status',
-                //               'Not Started',
-                //               'In Progress',
-                //               'Delivered',
-                //             ].map<DropdownMenuItem<String>>((String value) {
-                //               return DropdownMenuItem<String>(
-                //                 value: value,
-                //                 child: Text(
-                //                   value,
-                //                   style: TextStyle(
-                //                     fontSize: 13,
-                //                     color: value == 'Delivery Status'
-                //                         ? Colors.grey
-                //                         : Colors.black,
-                //                   ),
-                //                 ),
-                //               );
-                //             }).toList(),
-                //             iconStyleData: const IconStyleData(
-                //               icon: Icon(
-                //                 Icons.keyboard_arrow_down,
-                //                 color: Colors.indigo,
-                //                 size: 16,
-                //               ),
-                //               iconSize: 16,
-                //             ),
-                //             buttonStyleData: const ButtonStyleData(
-                //               height: 50, // Button height
-                //               padding: EdgeInsets.only(
-                //                   left: 10, right: 10), // Button padding
-                //             ),
-                //             dropdownStyleData: DropdownStyleData(
-                //               decoration: BoxDecoration(
-                //                 borderRadius: BorderRadius.circular(7),
-                //                 // Rounded corners
-                //                 color: Colors.white, // Dropdown background color
-                //               ),
-                //               maxHeight: 200, // Max height for dropdown items
-                //               width: maxWidth1 * 0.1, // Dropdown width
-                //               offset: const Offset(0, -20),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-
               ],
             ),
           ],
@@ -2379,25 +2212,23 @@ right:0,
   }
 
   Widget buildDataTable2() {
-
     if (isLoading) {
       _loading = true;
       var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
+      var height = MediaQuery.of(context).size.height;
       return Padding(
         padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
         child: CustomLoadingIcon(), // Replace this with your custom GIF widget
       );
     }
 
     if (filteredData1.isEmpty) {
-      double right = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
             width: 1200,
-            decoration:  const BoxDecoration(
+            decoration: const BoxDecoration(
                 color: Color(0xFFF7F7F7),
                 border: Border.symmetric(
                     horizontal: BorderSide(color: Colors.grey, width: 0.5))),
@@ -2407,33 +2238,24 @@ right:0,
                 columnSpacing: 50,
                 columns: [
                   DataColumn(
-                      label: Container(
-                          child: Text(
-                              'Order ID',
-                              style: TextStyles.subhead))),
+                      label: Text('Order ID', style: TextStyles.subhead)),
+                  DataColumn(
+                      label: Text('Customer Name', style: TextStyles.subhead)),
                   DataColumn(
                       label: Text(
-                          'Customer Name',
-                          style: TextStyles.subhead
-                      )),
+                    'Order Date',
+                    style: TextStyles.subhead,
+                  )),
                   DataColumn(
-                      label: Container(
-                          child: Text(
-                            'Order Date',
-                            style: TextStyles.subhead,
-                          ))),
+                      label: Text(
+                    'Total Amount',
+                    style: TextStyles.subhead,
+                  )),
                   DataColumn(
-                      label: Container(
-                          child: Text(
-                            'Total Amount',
-                            style: TextStyles.subhead,
-                          ))),
-                  DataColumn(
-                      label: Container(
-                          child: Text(
-                            'Status',
-                            style: TextStyles.subhead,
-                          ))),
+                      label: Text(
+                    'Status',
+                    style: TextStyles.subhead,
+                  )),
                 ],
                 rows: const []),
           ),
@@ -2445,7 +2267,7 @@ right:0,
       );
     }
 
-    void _sortProducts(int columnIndex, String sortDirection) {
+    void sortProducts(int columnIndex, String sortDirection) {
       if (sortDirection == 'asc') {
         filteredData1.sort((a, b) {
           if (columnIndex == 0) {
@@ -2458,26 +2280,24 @@ right:0,
             return a.total.compareTo(b.total);
           } else if (columnIndex == 4) {
             return a.deliveryStatus.compareTo(b.deliveryStatus);
-          }  else {
+          } else {
             return 0;
           }
         });
       } else {
         filteredData1.sort((a, b) {
           if (columnIndex == 0) {
-            return b.orderId!.compareTo(a.orderId!); // Reverse the comparison
+            return b.orderId!.compareTo(a.orderId!);
           } else if (columnIndex == 1) {
             return b.contactPerson!
-                .compareTo(a.contactPerson!); // Reverse the comparison
+                .compareTo(a.contactPerson!);
           } else if (columnIndex == 2) {
-            return b.orderDate
-                .compareTo(a.orderDate); // Reverse the comparison
+            return b.orderDate.compareTo(a.orderDate);
           } else if (columnIndex == 3) {
-            return b.total
-                .compareTo(a.total); // Reverse the comparison
+            return b.total.compareTo(a.total);
           } else if (columnIndex == 4) {
             return b.deliveryStatus
-                .compareTo(a.deliveryStatus); // Reverse the comparison
+                .compareTo(a.deliveryStatus);
           } else {
             return 0;
           }
@@ -2487,8 +2307,6 @@ right:0,
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-      // double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width;
       return Column(
         children: [
           Container(
@@ -2505,50 +2323,41 @@ right:0,
                   return DataColumn(
                     label: Stack(
                       children: [
-                        Container(
-                          //   padding: EdgeInsets.only(left: 5,right: 5),
+                        SizedBox(
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            //crossAxisAlignment: CrossAxisAlignment.end,
-                            //   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text(
-                                  column,
+                              Text(column,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyles.subhead
-                              ),
-                              //  if (columns.indexOf(column) > 0)
+                                  style: TextStyles.subhead),
                               IconButton(
                                 icon:
-                                _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(
-                                    width: 12,
-                                    child: Image.asset(
-                                      "images/ix_sort.png",
-                                      color: Colors.blue,
-                                    ))
-                                    : SizedBox(
-                                    width: 12,
-                                    child: Image.asset(
-                                      "images/ix_sort.png",
-                                      color: Colors.blue,
-                                    )),
+                                    _sortOrder[columns.indexOf(column)] == 'asc'
+                                        ? SizedBox(
+                                            width: 12,
+                                            child: Image.asset(
+                                              "images/ix_sort.png",
+                                              color: Colors.blue,
+                                            ))
+                                        : SizedBox(
+                                            width: 12,
+                                            child: Image.asset(
+                                              "images/ix_sort.png",
+                                              color: Colors.blue,
+                                            )),
                                 onPressed: () {
                                   setState(() {
                                     _sortOrder[columns.indexOf(column)] =
-                                    _sortOrder[columns.indexOf(column)] ==
-                                        'asc'
-                                        ? 'desc'
-                                        : 'asc';
-                                    _sortProducts(columns.indexOf(column),
+                                        _sortOrder[columns.indexOf(column)] ==
+                                                'asc'
+                                            ? 'desc'
+                                            : 'asc';
+                                    sortProducts(columns.indexOf(column),
                                         _sortOrder[columns.indexOf(column)]);
                                   });
                                 },
                               ),
-                              //SizedBox(width: 50,),
-                              // ),
                             ],
                           ),
                         ),
@@ -2564,27 +2373,22 @@ right:0,
                         itemsPerPage,
                         filteredData1.length -
                             (currentPage - 1) * itemsPerPage), (index) {
-                  // final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
                   final detail = filteredData1
                       .skip((currentPage - 1) * itemsPerPage)
                       .elementAt(index);
-                  final isSelected = _selectedProduct == detail;
-                  // final isSelected = _selectedProduct == detail;
-                  //final product = filteredData[(currentPage - 1) * itemsPerPage + index];
                   return DataRow(
                     color: MaterialStateProperty.resolveWith<Color>((states) {
                       if (states.contains(MaterialState.hovered)) {
                         return Colors.blue.shade500.withOpacity(
-                            0.8); // Add some opacity to the dark blue
+                            0.8);
                       } else {
                         return Colors.white.withOpacity(0.9);
                       }
                     }),
                     cells: [
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[0],
-                          // Same dynamic width as column headers
                           child: Text(
                             detail.orderId.toString(),
                             style: TextStyles.body,
@@ -2592,7 +2396,7 @@ right:0,
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[1],
                           child: Text(
                             detail.contactPerson!,
@@ -2601,328 +2405,7 @@ right:0,
                         ),
                       ),
                       DataCell(
-                        Container(
-                          width: columnWidths[2],
-                          child: Text(
-                            detail.orderDate!,
-                            style: TextStyles.body,
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          width: columnWidths[3],
-                          child: Text(
-                            detail.total.toString(),
-                            style: TextStyles.body,
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          width: columnWidths[4],
-                          child: Text(
-                            detail.deliveryStatus.toString(),
-                            style: TextStyles.body,
-                          ),
-                        ),
-                      ),
-                    ],
-                    // onSelectChanged: (selected) {
-                    //   if (selected != null && selected) {
-                    //     final orderId = detail
-                    //         .orderId; // Capture the orderId of the selected row
-                    //     final detail1 = filteredData.firstWhere(
-                    //         (element) => element.orderId == orderId);
-                    //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                    //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                    //
-                    //     if (filteredData1.length <= 9) {
-                    //       //fetchOrders();
-                    //       PaymentMap = {
-                    //         'paymentmode': detail.paymentMode,
-                    //         'paymentStatus': detail.paymentStatus,
-                    //         'paymentdate': detail.paymentDate,
-                    //         'paidamount': detail.paidAmount,
-                    //       };
-                    //
-                    //       context.go('/Order_Placed_List', extra: {
-                    //         'product': detail1,
-                    //         'item': [], // pass an empty list of maps
-                    //         'arrow': 'Home',
-                    //         'status': detail.deliveryStatus,
-                    //         'paymentStatus': PaymentMap,
-                    //         'body': {},
-                    //         // 'status': detail.deliveryStatus,
-                    //         'itemsList': [], // pass an empty list of maps
-                    //         'orderDetails': filteredData
-                    //             .map((detail) => ors.OrderDetail(
-                    //                   orderId: detail.orderId,
-                    //                   orderDate: detail.orderDate, items: [],
-                    //                   // Add other fields as needed
-                    //                 ))
-                    //             .toList(),
-                    //       });
-                    //     } else {
-                    //       PaymentMap = {
-                    //         'paymentmode': detail.paymentMode,
-                    //         'paymentStatus': detail.paymentStatus,
-                    //         'paymentdate': detail.paymentDate,
-                    //         'paidamount': detail.paidAmount,
-                    //       };
-                    //       context.go('/Order_Placed_List', extra: {
-                    //         'product': detail1,
-                    //         'arrow': 'Home',
-                    //         'item': [], // pass an empty list of maps
-                    //         'status': detail.deliveryStatus,
-                    //         'paymentStatus': PaymentMap,
-                    //         'body': {},
-                    //         'itemsList': [], // pass an empty list of maps
-                    //         'orderDetails': filteredData
-                    //             .map((detail) => ors.OrderDetail(
-                    //                   orderId: detail.orderId,
-                    //                   orderDate: detail.orderDate, items: [],
-                    //                   // Add other fields as needed
-                    //                 ))
-                    //             .toList(),
-                    //       });
-                    //
-                    //     }
-                    //   }
-                    // }
-                  );
-                })),
-          ),
-        ],
-      );
-    });
-
-  }
-
-  Widget buildDataTable1() {
-    if (isLoading) {
-      _loading = true;
-      var width = MediaQuery.of(context).size.width;
-      var Height = MediaQuery.of(context).size.height;
-      // Show loading indicator while data is being fetched
-      return Padding(
-        padding: EdgeInsets.only(
-            top: Height * 0.100, bottom: Height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
-      );
-    }
-    if (filteredData1.isEmpty) {
-      double right = MediaQuery.of(context).size.width;
-      return Column(
-        children: [
-          Container(
-            width: right - 200,
-            decoration:  const BoxDecoration(
-                color: Color(0xFFF7F7F7),
-                border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                columnSpacing: 50,
-                columns: [
-                  DataColumn(
-                      label: Container(
-                          child: Text(
-                              'Order ID',
-                              style: TextStyles.subhead))),
-                  DataColumn(
-                      label: Text(
-                          'Customer Name',
-                          style: TextStyles.subhead
-                      )),
-                  DataColumn(
-                      label: Container(
-                          child: Text(
-                            'Order Date',
-                            style: TextStyles.subhead,
-                          ))),
-                  DataColumn(
-                      label: Container(
-                          child: Text(
-                            'Total Amount',
-                            style: TextStyles.subhead,
-                          ))),
-                  DataColumn(
-                      label: Container(
-                          child: Text(
-                            'Status',
-                            style: TextStyles.subhead,
-                          ))),
-
-                ],
-                rows: const []),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 80, left: 130, right: 150),
-            child: CustomDatafound(),
-          ),
-        ],
-      );
-    }
-
-    void _sortProducts(int columnIndex, String sortDirection) {
-      if (sortDirection == 'asc') {
-        filteredData1.sort((a, b) {
-          if (columnIndex == 0) {
-            return a.orderId!.compareTo(b.orderId!);
-          } else if (columnIndex == 1) {
-            return a.contactPerson!.compareTo(b.contactPerson!);
-          } else if (columnIndex == 2) {
-            return a.orderDate.compareTo(b.orderDate);
-          } else if (columnIndex == 3) {
-            return a.total.compareTo(b.total);
-          } else if (columnIndex == 4) {
-            return a.deliveryStatus.compareTo(b.deliveryStatus);
-          }  else {
-            return 0;
-          }
-        });
-      } else {
-        filteredData1.sort((a, b) {
-          if (columnIndex == 0) {
-            return b.orderId!.compareTo(a.orderId!); // Reverse the comparison
-          } else if (columnIndex == 1) {
-            return b.contactPerson!
-                .compareTo(a.contactPerson!); // Reverse the comparison
-          } else if (columnIndex == 2) {
-            return b.orderDate
-                .compareTo(a.orderDate); // Reverse the comparison
-          } else if (columnIndex == 3) {
-            return b.total
-                .compareTo(a.total); // Reverse the comparison
-          } else if (columnIndex == 4) {
-            return b.deliveryStatus
-                .compareTo(a.deliveryStatus); // Reverse the comparison
-          } else {
-            return 0;
-          }
-        });
-      }
-      setState(() {});
-    }
-
-    return LayoutBuilder(builder: (context, constraints) {
-      // double padding = constraints.maxWidth * 0.065;
-      double right = MediaQuery.of(context).size.width;
-      return Column(
-        children: [
-          Container(
-            width: right - 200,
-            decoration: const BoxDecoration(
-                color: Color(0xFFF7F7F7),
-                border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
-            child: DataTable(
-                showCheckboxColumn: false,
-                headingRowHeight: 40,
-                columnSpacing: 35,
-                columns: columns.map((column) {
-                  return DataColumn(
-                    label: Stack(
-                      children: [
-                        Container(
-                          //   padding: EdgeInsets.only(left: 5,right: 5),
-                          width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            //crossAxisAlignment: CrossAxisAlignment.end,
-                            //   mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                  column,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyles.subhead
-                              ),
-                              //  if (columns.indexOf(column) > 0)
-                              IconButton(
-                                icon:
-                                _sortOrder[columns.indexOf(column)] == 'asc'
-                                    ? SizedBox(
-                                    width: 12,
-                                    child: Image.asset(
-                                      "images/ix_sort.png",
-                                      color: Colors.blue,
-                                    ))
-                                    : SizedBox(
-                                    width: 12,
-                                    child: Image.asset(
-                                      "images/ix_sort.png",
-                                      color: Colors.blue,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    _sortOrder[columns.indexOf(column)] =
-                                    _sortOrder[columns.indexOf(column)] ==
-                                        'asc'
-                                        ? 'desc'
-                                        : 'asc';
-                                    _sortProducts(columns.indexOf(column),
-                                        _sortOrder[columns.indexOf(column)]);
-                                  });
-                                },
-                              ),
-                              //SizedBox(width: 50,),
-                              // ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    onSort: (columnIndex, ascending) {
-                      _sortOrder;
-                    },
-                  );
-                }).toList(),
-                rows: List.generate(
-                    math.min(
-                        itemsPerPage,
-                        filteredData1.length -
-                            (currentPage - 1) * itemsPerPage), (index) {
-                  // final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                  final detail = filteredData1
-                      .skip((currentPage - 1) * itemsPerPage)
-                      .elementAt(index);
-                  final isSelected = _selectedProduct == detail;
-                  // final isSelected = _selectedProduct == detail;
-                  //final product = filteredData[(currentPage - 1) * itemsPerPage + index];
-                  return DataRow(
-                    color: MaterialStateProperty.resolveWith<Color>((states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.blue.shade500.withOpacity(
-                            0.8); // Add some opacity to the dark blue
-                      } else {
-                        return Colors.white.withOpacity(0.9);
-                      }
-                    }),
-                    cells: [
-                      DataCell(
-                        Container(
-                          width: columnWidths[0],
-                          // Same dynamic width as column headers
-                          child: Text(
-                            detail.orderId.toString(),
-                            style: TextStyles.body,
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          width: columnWidths[1],
-                          child: Text(
-                            detail.contactPerson!,
-                            style: TextStyles.body,
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[2],
                           child: Text(
                             detail.orderDate,
@@ -2931,7 +2414,7 @@ right:0,
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[3],
                           child: Text(
                             detail.total.toString(),
@@ -2940,7 +2423,7 @@ right:0,
                         ),
                       ),
                       DataCell(
-                        Container(
+                        SizedBox(
                           width: columnWidths[4],
                           child: Text(
                             detail.deliveryStatus.toString(),
@@ -2948,70 +2431,237 @@ right:0,
                           ),
                         ),
                       ),
-
                     ],
-                    // onSelectChanged: (selected) {
-                    //   if (selected != null && selected) {
-                    //     final orderId = detail
-                    //         .orderId; // Capture the orderId of the selected row
-                    //     final detail1 = filteredData.firstWhere(
-                    //         (element) => element.orderId == orderId);
-                    //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                    //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                    //
-                    //     if (filteredData1.length <= 9) {
-                    //       //fetchOrders();
-                    //       PaymentMap = {
-                    //         'paymentmode': detail.paymentMode,
-                    //         'paymentStatus': detail.paymentStatus,
-                    //         'paymentdate': detail.paymentDate,
-                    //         'paidamount': detail.paidAmount,
-                    //       };
-                    //
-                    //       context.go('/Order_Placed_List', extra: {
-                    //         'product': detail1,
-                    //         'item': [], // pass an empty list of maps
-                    //         'arrow': 'Home',
-                    //         'status': detail.deliveryStatus,
-                    //         'paymentStatus': PaymentMap,
-                    //         'body': {},
-                    //         // 'status': detail.deliveryStatus,
-                    //         'itemsList': [], // pass an empty list of maps
-                    //         'orderDetails': filteredData
-                    //             .map((detail) => ors.OrderDetail(
-                    //                   orderId: detail.orderId,
-                    //                   orderDate: detail.orderDate, items: [],
-                    //                   // Add other fields as needed
-                    //                 ))
-                    //             .toList(),
-                    //       });
-                    //     } else {
-                    //       PaymentMap = {
-                    //         'paymentmode': detail.paymentMode,
-                    //         'paymentStatus': detail.paymentStatus,
-                    //         'paymentdate': detail.paymentDate,
-                    //         'paidamount': detail.paidAmount,
-                    //       };
-                    //       context.go('/Order_Placed_List', extra: {
-                    //         'product': detail1,
-                    //         'arrow': 'Home',
-                    //         'item': [], // pass an empty list of maps
-                    //         'status': detail.deliveryStatus,
-                    //         'paymentStatus': PaymentMap,
-                    //         'body': {},
-                    //         'itemsList': [], // pass an empty list of maps
-                    //         'orderDetails': filteredData
-                    //             .map((detail) => ors.OrderDetail(
-                    //                   orderId: detail.orderId,
-                    //                   orderDate: detail.orderDate, items: [],
-                    //                   // Add other fields as needed
-                    //                 ))
-                    //             .toList(),
-                    //       });
-                    //
-                    //     }
-                    //   }
-                    // }
+                  );
+                })),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget buildDataTable1() {
+    if (isLoading) {
+      _loading = true;
+      var width = MediaQuery.of(context).size.width;
+      var height = MediaQuery.of(context).size.height;
+      return Padding(
+        padding: EdgeInsets.only(
+            top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
+        child: CustomLoadingIcon(),
+      );
+    }
+    if (filteredData1.isEmpty) {
+      double right = MediaQuery.of(context).size.width;
+      return Column(
+        children: [
+          Container(
+            width: right - 200,
+            decoration: const BoxDecoration(
+                color: Color(0xFFF7F7F7),
+                border: Border.symmetric(
+                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+            child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columnSpacing: 50,
+                columns: [
+                  DataColumn(
+                      label: Text('Order ID', style: TextStyles.subhead)),
+                  DataColumn(
+                      label: Text('Customer Name', style: TextStyles.subhead)),
+                  DataColumn(
+                      label: Text(
+                    'Order Date',
+                    style: TextStyles.subhead,
+                  )),
+                  DataColumn(
+                      label: Text(
+                    'Total Amount',
+                    style: TextStyles.subhead,
+                  )),
+                  DataColumn(
+                      label: Text(
+                    'Status',
+                    style: TextStyles.subhead,
+                  )),
+                ],
+                rows: const []),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 80, left: 130, right: 150),
+            child: CustomDatafound(),
+          ),
+        ],
+      );
+    }
+
+    void sortProducts(int columnIndex, String sortDirection) {
+      if (sortDirection == 'asc') {
+        filteredData1.sort((a, b) {
+          if (columnIndex == 0) {
+            return a.orderId!.compareTo(b.orderId!);
+          } else if (columnIndex == 1) {
+            return a.contactPerson!.compareTo(b.contactPerson!);
+          } else if (columnIndex == 2) {
+            return a.orderDate.compareTo(b.orderDate);
+          } else if (columnIndex == 3) {
+            return a.total.compareTo(b.total);
+          } else if (columnIndex == 4) {
+            return a.deliveryStatus.compareTo(b.deliveryStatus);
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        filteredData1.sort((a, b) {
+          if (columnIndex == 0) {
+            return b.orderId!.compareTo(a.orderId!);
+          } else if (columnIndex == 1) {
+            return b.contactPerson!
+                .compareTo(a.contactPerson!);
+          } else if (columnIndex == 2) {
+            return b.orderDate.compareTo(a.orderDate);
+          } else if (columnIndex == 3) {
+            return b.total.compareTo(a.total);
+          } else if (columnIndex == 4) {
+            return b.deliveryStatus
+                .compareTo(a.deliveryStatus);
+          } else {
+            return 0;
+          }
+        });
+      }
+      setState(() {});
+    }
+
+    return LayoutBuilder(builder: (context, constraints) {
+      double right = MediaQuery.of(context).size.width;
+      return Column(
+        children: [
+          Container(
+            width: right - 200,
+            decoration: const BoxDecoration(
+                color: Color(0xFFF7F7F7),
+                border: Border.symmetric(
+                    horizontal: BorderSide(color: Colors.grey, width: 0.5))),
+            child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 40,
+                columnSpacing: 35,
+                columns: columns.map((column) {
+                  return DataColumn(
+                    label: Stack(
+                      children: [
+                        SizedBox(
+                          width: columnWidths[columns.indexOf(column)],
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(column,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyles.subhead),
+                              IconButton(
+                                icon:
+                                    _sortOrder[columns.indexOf(column)] == 'asc'
+                                        ? SizedBox(
+                                            width: 12,
+                                            child: Image.asset(
+                                              "images/ix_sort.png",
+                                              color: Colors.blue,
+                                            ))
+                                        : SizedBox(
+                                            width: 12,
+                                            child: Image.asset(
+                                              "images/ix_sort.png",
+                                              color: Colors.blue,
+                                            )),
+                                onPressed: () {
+                                  setState(() {
+                                    _sortOrder[columns.indexOf(column)] =
+                                        _sortOrder[columns.indexOf(column)] ==
+                                                'asc'
+                                            ? 'desc'
+                                            : 'asc';
+                                    sortProducts(columns.indexOf(column),
+                                        _sortOrder[columns.indexOf(column)]);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    onSort: (columnIndex, ascending) {
+                      _sortOrder;
+                    },
+                  );
+                }).toList(),
+                rows: List.generate(
+                    math.min(
+                        itemsPerPage,
+                        filteredData1.length -
+                            (currentPage - 1) * itemsPerPage), (index) {
+                  final detail = filteredData1
+                      .skip((currentPage - 1) * itemsPerPage)
+                      .elementAt(index);
+                  return DataRow(
+                    color: MaterialStateProperty.resolveWith<Color>((states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return Colors.blue.shade500.withOpacity(
+                            0.8);
+                      } else {
+                        return Colors.white.withOpacity(0.9);
+                      }
+                    }),
+                    cells: [
+                      DataCell(
+                        SizedBox(
+                          width: columnWidths[0],
+                          child: Text(
+                            detail.orderId.toString(),
+                            style: TextStyles.body,
+                          ),
+                        ),
+                      ),
+                      DataCell(
+                        SizedBox(
+                          width: columnWidths[1],
+                          child: Text(
+                            detail.contactPerson!,
+                            style: TextStyles.body,
+                          ),
+                        ),
+                      ),
+                      DataCell(
+                        SizedBox(
+                          width: columnWidths[2],
+                          child: Text(
+                            detail.orderDate,
+                            style: TextStyles.body,
+                          ),
+                        ),
+                      ),
+                      DataCell(
+                        SizedBox(
+                          width: columnWidths[3],
+                          child: Text(
+                            detail.total.toString(),
+                            style: TextStyles.body,
+                          ),
+                        ),
+                      ),
+                      DataCell(
+                        SizedBox(
+                          width: columnWidths[4],
+                          child: Text(
+                            detail.deliveryStatus.toString(),
+                            style: TextStyles.body,
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 })),
           ),
@@ -3087,12 +2737,8 @@ class Dashboard1 {
       orderId: json['orderId'] ?? '',
       customerId: json['customerId'] ?? '',
       createdDate: json['createdDate'] ?? '',
-      referenceNumber: json['referenceNumber'] != null
-          ? int.parse(json['referenceNumber'].toString())
-          : 0,
-      totalAmount: json['totalAmount'] != null
-          ? int.parse(json['totalAmount'].toString())
-          : 0,
+      referenceNumber: json['referenceNumber'] != null ? int.parse(json['referenceNumber'].toString()) : 0,
+      totalAmount: json['totalAmount'] != null ? int.parse(json['totalAmount'].toString()) : 0,
       deliveryStatus: json['deliveryStatus'] ?? '',
     );
   }
@@ -3113,38 +2759,31 @@ class Dashboard1 {
 
 class DashboardCounts {
   final int openOrders;
-  final int Cleard;
-  final int Inprepare;
-  final int Picked;
-
-  //final int? openInvoices;
+  final int cleard;
+  final int inprepare;
+  final int picked;
   final double totalAmount;
-  final int Delivered;
+  final int delivered;
 
   DashboardCounts(
       {required this.openOrders,
-        required this.Cleard,
-        required this.Inprepare,
-        required this.Picked,
-
-        //   required this.openInvoices,
-        required this.totalAmount,
-        required this.Delivered});
+      required this.cleard,
+      required this.inprepare,
+      required this.picked,
+      required this.totalAmount,
+      required this.delivered});
 
   factory DashboardCounts.fromJson(Map<String, dynamic> json) {
     return DashboardCounts(
-      Picked: json['Picked'] ?? 0,
+      picked: json['Picked'] ?? 0,
       openOrders: json['Not Started'] ?? 0.0,
-      Cleard: json['Cleared'] ?? 0.0,
-      Inprepare: json['In Progress'] ?? 0.0,
-
-      //    openInvoices: json['Open Invoices'],
+      cleard: json['Cleared'] ?? 0.0,
+      inprepare: json['In Progress'] ?? 0.0,
       totalAmount: json['totalAmount'] ?? 0.0,
-      Delivered: json['Delivered'] ?? 0.0,
+      delivered: json['Delivered'] ?? 0.0,
     );
   }
 }
-
 
 class VerticalDividerWidget extends StatelessWidget {
   final double height;
@@ -3152,24 +2791,21 @@ class VerticalDividerWidget extends StatelessWidget {
   final double width;
 
   const VerticalDividerWidget({
-    Key? key,
+    super.key,
     this.height = 100,
-    this.width =100,
-
+    this.width = 100,
     this.color = Colors.grey,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 200,top: 61),
+      padding: const EdgeInsets.only(left: 200, top: 61),
       child: Container(
-        width: 4, // Thickness of the vertical divider
-        height: height, // Height of the divider
-        color: color, // Color of the divider
+        width: 4,
+        height: height,
+        color: color,
       ),
     );
   }
 }
-
- 

@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'customer list.dart';
 
 class CreateCustomer extends StatefulWidget {
   const CreateCustomer({
@@ -30,7 +29,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
   String? errorMessage;
   bool purchaseOrderError = false;
   final TextEditingController priceController = TextEditingController();
-  final TextEditingController ContactnoController = TextEditingController();
+  final TextEditingController contactnoController = TextEditingController();
   final TextEditingController imageIdController = TextEditingController();
   final List<String> list = ['Select', 'Select 1', 'Select 2', 'Select 3'];
   String dropdownValue = 'Select';
@@ -50,13 +49,13 @@ class _CreateCustomerState extends State<CreateCustomer> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController shippingAdd1 = TextEditingController();
   final TextEditingController shippingAdd2 = TextEditingController();
-  final TextEditingController EmailController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController unitController = TextEditingController();
   bool isHomeSelected = false;
   final _formKey = GlobalKey<FormState>();
 
-  Map<String, bool> _isHovered = {
+  final Map<String, bool> _isHovered = {
     'Home': false,
     'Customer': false,
     'Products': false,
@@ -139,11 +138,11 @@ class _CreateCustomerState extends State<CreateCustomer> {
 
     String url = "$apicall/customer_master/add_customer_master";
     Map<String, dynamic> data = {
-      "contactNo": ContactnoController.text,
+      "contactNo": contactnoController.text,
       "customerName": cusNameController.text,
       "billingAddress": addressController.text,
       "deliveryLocation": addressController.text,
-      "email": EmailController.text,
+      "email": emailController.text,
       "shippingAddress1": shippingAdd1.text,
       "shippingAddress2": shippingAdd2.text,
       "returnCredit": 0
@@ -173,10 +172,10 @@ class _CreateCustomerState extends State<CreateCustomer> {
                   child: Column(
                     children: [
                       // Warning Icon
-                      Icon(Icons.warning, color: Colors.orange, size: 50),
-                      SizedBox(height: 16),
+                      const Icon(Icons.warning, color: Colors.orange, size: 50),
+                      const SizedBox(height: 16),
                       // Confirmation Message
-                      Text(
+                      const Text(
                         'Session Expired',
                         style: TextStyle(
                           fontSize: 16,
@@ -184,14 +183,14 @@ class _CreateCustomerState extends State<CreateCustomer> {
                           color: Colors.black,
                         ),
                       ),
-                      Text(
+                      const Text(
                         "Please log in again to continue",
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       // Buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -204,12 +203,12 @@ class _CreateCustomerState extends State<CreateCustomer> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              side: BorderSide(color: Colors.blue),
+                              side: const BorderSide(color: Colors.blue),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
-                            child: Text(
+                            child: const Text(
                               'ok',
                               style: TextStyle(
                                 color: Colors.blue,
@@ -340,8 +339,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
             const SizedBox(
               width: 10,
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
+            const Padding(
+              padding: EdgeInsets.only(top: 10),
               child: AccountMenu(),
             ),
           ],
@@ -496,7 +495,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                   const SizedBox(height: 16),
                                   // Email
                                   TextFormField(
-                                    controller: EmailController,
+                                    controller: emailController,
                                     decoration: const InputDecoration(
                                       labelText: 'Email *',
                                       labelStyle: TextStyle(
@@ -514,9 +513,9 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                           RegExp(r'\s\s')),
                                     ],
                                     onChanged: (value) {
-                                      EmailController.value = TextEditingValue(
+                                      emailController.value = TextEditingValue(
                                         text: value.toLowerCase(),
-                                        selection: EmailController.selection,
+                                        selection: emailController.selection,
                                       );
                                     },
                                     validator: (value) {
@@ -531,7 +530,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
 
                                   // Contact Number
           TextFormField(
-          controller: ContactnoController,
+          controller: contactnoController,
           decoration: const InputDecoration(
           labelText: 'Mobile Number *',
           labelStyle: TextStyle(fontSize: 16, color: Colors.black87),
@@ -662,10 +661,10 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                     children: [
                                       OutlinedButton(
                                         onPressed: () {
-                                          ContactnoController.clear();
+                                          contactnoController.clear();
                                           cusNameController.clear();
                                           addressController.clear();
-                                          EmailController.clear();
+                                          emailController.clear();
                                           shippingAdd1.clear();
                                           shippingAdd2.clear();
                                           // Clear form
@@ -699,20 +698,20 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                                     'Please fill  Customer name'),
                                               ),
                                             );
-                                          } else if (EmailController
+                                          } else if (emailController
                                                   .text.isEmpty ||
                                               !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$')
                                                   .hasMatch(
-                                                      EmailController.text)) {
+                                                      emailController.text)) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
-                                              SnackBar(
+                                              const SnackBar(
                                                   content: Text(
                                                       'Enter Valid E-mail Address')),
                                             );
-                                          } else if (ContactnoController
+                                          } else if (contactnoController
                                                   .text.isEmpty ||
-                                              ContactnoController.text.length !=
+                                              contactnoController.text.length !=
                                                   10) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
@@ -841,7 +840,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                           const SizedBox(height: 16),
                                           // Email
                                           TextFormField(
-                                            controller: EmailController,
+                                            controller: emailController,
                                             decoration: const InputDecoration(
                                               labelText: 'Email *',
                                               labelStyle: TextStyle(
@@ -861,9 +860,9 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                                   RegExp(r'\s\s')),
                                             ],
                                             onChanged: (value) {
-                                              EmailController.value = TextEditingValue(
+                                              emailController.value = TextEditingValue(
                                                 text: value.toLowerCase(),
-                                                selection: EmailController.selection,
+                                                selection: emailController.selection,
                                               );
                                             },
                                             validator: (value) {
@@ -878,7 +877,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
 
                                           // Contact Number
                                           TextFormField(
-                                            controller: ContactnoController,
+                                            controller: contactnoController,
                                             keyboardType: TextInputType.number,
                                             inputFormatters: [
                                               FilteringTextInputFormatter
@@ -994,10 +993,10 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                             children: [
                                               OutlinedButton(
                                                 onPressed: () {
-                                                  ContactnoController.clear();
+                                                  contactnoController.clear();
                                                   cusNameController.clear();
                                                   addressController.clear();
-                                                  EmailController.clear();
+                                                  emailController.clear();
                                                   // Clear form
                                                 },
                                                 style: OutlinedButton.styleFrom(
@@ -1034,22 +1033,22 @@ class _CreateCustomerState extends State<CreateCustomer> {
                                                             'Please fill  Customer name'),
                                                       ),
                                                     );
-                                                  } else if (EmailController
+                                                  } else if (emailController
                                                           .text.isEmpty ||
                                                       !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+\.(com|in|net)$')
                                                           .hasMatch(
-                                                              EmailController
+                                                              emailController
                                                                   .text)) {
                                                     ScaffoldMessenger.of(
                                                             context)
                                                         .showSnackBar(
-                                                      SnackBar(
+                                                      const SnackBar(
                                                           content: Text(
                                                               'Enter Valid E-mail Address')),
                                                     );
-                                                  } else if (ContactnoController
+                                                  } else if (contactnoController
                                                           .text.isEmpty ||
-                                                      ContactnoController
+                                                      contactnoController
                                                               .text.length !=
                                                           10) {
                                                     ScaffoldMessenger.of(
