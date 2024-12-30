@@ -56,7 +56,6 @@ class _CreateOrderState extends State<CreateOrder>
 
   late Future<List<detail>> futureOrders;
 
-  // List<ord.ProductData> productList = [];
 
   List<dynamic> detailJson = [];
   String searchQuery = '';
@@ -162,7 +161,7 @@ class _CreateOrderState extends State<CreateOrder>
     });
 
     try {
-      // API call to fetch customer data for a specific userId
+
       final response = await http.get(
         Uri.parse('$apicall/public/customer_master/get_all_s4hana_customermaster'),
         headers: {
@@ -233,19 +232,10 @@ class _CreateOrderState extends State<CreateOrder>
         "qty": product['qty'] ?? '',
         "standardPrice": product['price'] ?? '',
         "totalAmount": ((product['qty'] * product['price'])) ?? ''
-        // "productName": product['productDescription'] ?? 'Dummy Product',
-        // "category": product['categoryName'] ?? 'Dummy Category',
-        // "subCategory": 'Dummy SubCategory',
-        // "price": product['price'] ?? 0.0,
-        // "qty": product['qty'] ?? 1,
-        // "actualAmount": (product['price'] ?? 0.0) * (product['qty'] ?? 1),
-        // "totalAmount": (product['price'] ?? 0.0) * (product['qty'] ?? 1),
-        // "discount": 0.0,
-        // "tax": 0.0,
+
       });
     }
 
-    // Dummy data for the main payload
     final url =
         '$apicall/$companyName/order_master/add_order_master';
     final headers = {
@@ -275,34 +265,40 @@ class _CreateOrderState extends State<CreateOrder>
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 25,
-              ),
-              content: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Order Placed'),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    context.go('/Customer_Order_List'); // Close the dialog
-                  },
-                  child: const Text('OK'),
+        if(responseData['status'] == 'success'){
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 25,
                 ),
-              ],
-            );
-          },
-        );
+                content: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Order Placed'),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      context.go('/Customer_Order_List'); // Close the dialog
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }else{
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Failed to save data ${response.statusCode}')),
+          );
+        }
       } else {
         print('API call failed with status code: ${response.statusCode}');
         print('Response: ${response.body}');
@@ -445,7 +441,7 @@ class _CreateOrderState extends State<CreateOrder>
   @override
   void dispose() {
     _searchDebounceTimer
-        ?.cancel(); // Cancel the timer when the widget is disposed
+        ?.cancel();
     super.dispose();
   }
 
@@ -487,7 +483,6 @@ class _CreateOrderState extends State<CreateOrder>
                             Padding(
                               padding:
                                   EdgeInsets.only(right: 10, top: 10),
-                              // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
                           ],
@@ -499,8 +494,8 @@ class _CreateOrderState extends State<CreateOrder>
                     ),
                     const Divider(
                       height: 3.0,
-                      thickness: 3.0, // Thickness of the shadow
-                      color: Color(0x29000000), // Shadow color (#00000029)
+                      thickness: 3.0,
+                      color: Color(0x29000000),
                     ),
                   ],
                 ),
@@ -513,7 +508,6 @@ class _CreateOrderState extends State<CreateOrder>
                   bottom: 0,
                   child: SingleChildScrollView(
                     child: Align(
-                      // Added Align widget for the left side menu
                       alignment: Alignment.topLeft,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 2),
@@ -568,7 +562,6 @@ class _CreateOrderState extends State<CreateOrder>
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     if (constraints.maxWidth >= 1300) ...{
-                      //   double overallTotal = _selectedProducts.fold(0, (sum, product) {return sum + (product['qty'] * product['price']);});
                       Expanded(
                           child: SingleChildScrollView(
                         child: Column(
@@ -625,8 +618,6 @@ class _CreateOrderState extends State<CreateOrder>
                                               (product) =>
                                                   product['qty'] == null ||
                                                   product['qty'] <= 0)) {
-                                            // Check if any product has an invalid or zero quantity
-
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -644,7 +635,6 @@ class _CreateOrderState extends State<CreateOrder>
 
                                         style: OutlinedButton.styleFrom(
                                           backgroundColor: Colors.blue[800],
-                                          // Button background color
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                                 5),),
@@ -685,9 +675,6 @@ class _CreateOrderState extends State<CreateOrder>
                                         style: TextStyles.header3,
                                       ),
                                     ),
-
-                                    //  ),
-                                    // SizedBox(height: 20.h),
                                   ],
                                 ),
                               ),
@@ -710,7 +697,6 @@ class _CreateOrderState extends State<CreateOrder>
                                         controller: _dateController,
                                         style: TextStyle(
                                             fontSize: maxWidth * 0.009),
-                                        // Replace with your TextEditingController
                                         readOnly: true,
                                         decoration: InputDecoration(
                                           suffixIcon: Padding(
@@ -758,15 +744,15 @@ class _CreateOrderState extends State<CreateOrder>
                                       offset: Offset(0, 3),
                                       blurRadius: 6,
                                       color: Color(
-                                          0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                          0x29000000),
                                     )
                                   ],
                                   border: Border.all(
                                     color: const Color(
-                                        0xFFB2C2D3), // border: #B2C2D3
+                                        0xFFB2C2D3),
                                   ),
                                   borderRadius: const BorderRadius.all(
-                                      Radius.circular(8)), // border-radius: 8px
+                                      Radius.circular(8)),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -784,7 +770,6 @@ class _CreateOrderState extends State<CreateOrder>
                                       width: maxWidth,
                                       color: Colors.grey[100],
                                       child: DataTable(
-                                      //  dataRowHeight: 57,
                                         headingRowHeight: 50,
                                         dataRowColor: MaterialStateProperty
                                             .resolveWith<Color>(
@@ -928,16 +913,14 @@ class _CreateOrderState extends State<CreateOrder>
                                                 right: 20,
                                                 bottom: 10,left: 10,
                                                 top: 10),
-                                            // Adjust padding to match alignment
                                             child: Align(
                                               alignment:
                                                   Alignment.centerRight,
-                                              // Align text to the right
                                               child: Text(
                                                 'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
                                                 style: TextStyles.subhead,
                                                 textAlign: TextAlign
-                                                    .right, // Ensure right-aligned text
+                                                    .right,
                                               ),
                                             ),
                                                                                         ),
@@ -973,7 +956,6 @@ class _CreateOrderState extends State<CreateOrder>
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      //   mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.only(
@@ -1028,8 +1010,6 @@ class _CreateOrderState extends State<CreateOrder>
                                                                       null ||
                                                                   product['productDescription']
                                                                       .isEmpty)) {
-                                                            // Check if any product has an empty or null productDescription
-
                                                             ScaffoldMessenger
                                                                     .of(context)
                                                                 .showSnackBar(
@@ -1199,22 +1179,21 @@ class _CreateOrderState extends State<CreateOrder>
                                             //height: 800,
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              // color: const Color(0xFFFFFFFF),
                                               boxShadow: const [
                                                 BoxShadow(
                                                   offset: Offset(0, 3),
                                                   blurRadius: 6,
                                                   color: Color(
-                                                      0x29000000), // box-shadow: 0px 3px 6px #00000029
+                                                      0x29000000),
                                                 )
                                               ],
                                               border: Border.all(
                                                 color: const Color(
-                                                    0xFFB2C2D3), // border: #B2C2D3
+                                                    0xFFB2C2D3),
                                               ),
                                               borderRadius: const BorderRadius
                                                   .all(Radius.circular(
-                                                      8)), // border-radius: 8px
+                                                      8)),
                                             ),
                                             child: Column(
                                               crossAxisAlignment:
@@ -1243,7 +1222,7 @@ class _CreateOrderState extends State<CreateOrder>
                                                       (Set<MaterialState>
                                                           states) {
                                                         return Colors
-                                                            .white; // Set row background to white
+                                                            .white;
                                                       },
                                                     ),
                                                     columns: [
@@ -1417,16 +1396,14 @@ class _CreateOrderState extends State<CreateOrder>
                                                                 right: 20,
                                                                 bottom: 10,left: 10,
                                                                 top: 10),
-                                                            // Adjust padding to match alignment
                                                             child: Align(
                                                               alignment:
                                                               Alignment.centerRight,
-                                                              // Align text to the right
                                                               child: Text(
                                                                 'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
                                                                 style: TextStyles.subhead,
                                                                 textAlign: TextAlign
-                                                                    .right, // Ensure right-aligned text
+                                                                    .right,
                                                               ),
                                                             ),
                                                           ),
@@ -1496,10 +1473,10 @@ class _CreateOrderState extends State<CreateOrder>
              elevation: 4.0,
              child: Container(
                decoration: BoxDecoration(
-                 color: Colors.white, // Set background color to white
-                 borderRadius: BorderRadius.circular(8.0), // Set border radius
+                 color: Colors.white,
+                 borderRadius: BorderRadius.circular(8.0),
                ),
-               width: 200, // Set the desired width of the dropdown
+               width: 200,
                child: ListView(
                  padding: EdgeInsets.zero,
                  shrinkWrap: true,
@@ -1524,7 +1501,7 @@ class _CreateOrderState extends State<CreateOrder>
              ) {
            textEditingController.text = product['productDescription'] ?? '';
            return Padding(
-             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8), // External padding for space around TextFormField
+             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
              child: TextFormField(
                textAlign: TextAlign.start,
                controller: textEditingController,
@@ -1532,10 +1509,10 @@ class _CreateOrderState extends State<CreateOrder>
                decoration: InputDecoration(
                  filled: true,
                  fillColor: Colors.grey[100],
-                 contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Internal padding for text area
-                 border: OutlineInputBorder( // Add an outline border to make the padding more visible
+                 contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                 border: OutlineInputBorder(
                    borderRadius: BorderRadius.circular(8.0),
-                   borderSide: BorderSide.none, // Optional: Remove border for a cleaner look
+                   borderSide: BorderSide.none,
                  ),
                  hintText: 'Search Product',
                  hintStyle: TextStyles.body,
@@ -1778,7 +1755,7 @@ class _CreateOrderState extends State<CreateOrder>
                       color: MaterialStateProperty.resolveWith<Color>((states) {
                         if (states.contains(MaterialState.hovered)) {
                           return Colors.blue.shade500.withOpacity(
-                              0.8); // Add some opacity to the dark blue
+                              0.8);
                         } else {
                           return Colors.white.withOpacity(0.9);
                         }

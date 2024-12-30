@@ -176,32 +176,25 @@ class _ComUIState extends State<ComUI> {
         if(constraints.maxHeight >= 630){
           return Container(
             constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
-            // 80% of screen width
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: constraints.maxHeight * 0.1),
-                // 10% of screen height
                 Align(
                   alignment: const Alignment(-0.14, 0.0),
                   child: Text(
                     'Sign Up to Get Started!',
-                    // style: TextStyles.Login,
                     style: TextStyles.login1(context),
                   ),
                 ),
                 SizedBox(height: constraints.maxHeight * 0.03),
-                // 5% of screen height
                 Align(
                   alignment: const Alignment(-0.05, 0.0),
                   child: Text(
                     'Simplify your orders and take control with ease.',
-                    // style: TextStyles.,
                     style: TextStyles.loginSub(context),
                   ),
                 ),
-                // SizedBox(height: constraints.maxHeight * 0.03),
-                // 5% of screen height
                 Align(
                   alignment: const Alignment(0.9, 0.4),
                   child: Column(
@@ -543,32 +536,26 @@ class _ComUIState extends State<ComUI> {
           return SingleChildScrollView(
             child:  Container(
               constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.8),
-              // 80% of screen width
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(height: constraints.maxHeight * 0.1),
-                  // 10% of screen height
+
                   Align(
                     alignment: const Alignment(-0.14, 0.0),
                     child: Text(
                       'Sign Up to Get Started!',
-                      // style: TextStyles.Login,
                       style: TextStyles.login1(context),
                     ),
                   ),
                   SizedBox(height: constraints.maxHeight * 0.03),
-                  // 5% of screen height
                   Align(
                     alignment: const Alignment(-0.05, 0.0),
                     child: Text(
                       'Simplify your orders and take control with ease.',
-                      // style: TextStyles.,
                       style: TextStyles.loginSub(context),
                     ),
                   ),
-                  // SizedBox(height: constraints.maxHeight * 0.03),
-                  // 5% of screen height
                   Align(
                     alignment: const Alignment(0.9, 0.4),
                     child: Column(
@@ -708,9 +695,7 @@ class _ComUIState extends State<ComUI> {
                                 LengthLimitingTextInputFormatter(10),
                               ],
                               onFieldSubmitted: (value) async {
-                                print('username');
-                                String? role =
-                                await checkLogin();
+                                String? role = await checkLogin();
                                 if (role != null) {
                                   if(role == 'Employee'){
                                     context.go('/Home');
@@ -725,7 +710,6 @@ class _ComUIState extends State<ComUI> {
                                           Text("Please enter password")),
                                     );
                                   }
-
                                 }
                               },
                             ),

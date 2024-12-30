@@ -75,7 +75,7 @@ dependencies:
   adaptive_scrollbar: ^2.1.2
   google_fonts: ^6.2.1
 #  responsive_framework: ^1.5.1
-  responsive_framework: ^0.1.0
+  #responsive_framework: ^0.1.0
   #dropdown_search: ^6.0.0
   #syncfusion_flutter_datagrid: ^26.2.14
   #syncfusion_flutter_core: ^26.2.14

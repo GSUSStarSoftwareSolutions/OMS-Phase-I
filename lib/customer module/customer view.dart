@@ -213,9 +213,8 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
   void _updateSearch(String searchText) {
     setState(() {
       _searchText = searchText;
-      currentPage = 1; // Reset to first page when searching
+      currentPage = 1;
       _filterAndPaginateProducts();
-// _clearSearch();
     });
   }
 
@@ -307,17 +306,12 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
               height: 42,
               decoration: BoxDecoration(
                 color: Colors.blue[800],
-                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-                // color: Color.fromRGBO(224, 59, 48, 1.0),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
-                  // Radius for top-left corner
                   topRight: Radius.circular(8),
-                  // No radius for top-right corner
                   bottomLeft: Radius.circular(8),
-                  // Radius for bottom-left corner
                   bottomRight:
-                  Radius.circular(8), // No radius for bottom-right corner
+                  Radius.circular(8),
                 ),
               ),
               child:  _buildMenuItem(
@@ -348,13 +342,12 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
   @override
   void dispose() {
     _searchDebounceTimer
-        ?.cancel(); // Cancel the timer when the widget is disposed
+        ?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    //String? role = Provider.of<UserRoleProvider>(context).role;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -366,8 +359,8 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
           return Stack(
             children: [
               Container(
-                color: Colors.white, // White background color
-                height: 60.0, // Total height including bottom shadow
+                color: Colors.white,
+                height: 60.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -379,7 +372,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                           child: Image.asset(
                             "images/Final-Ikyam-Logo.png",
                             height: 35.0,
-                            // Adjusted to better match proportions
                           ),
                         ),
                         const Spacer(),
@@ -389,7 +381,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                             Padding(
                               padding:
                               EdgeInsets.only(right: 10, top: 10),
-                              // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
                           ],
@@ -401,8 +392,8 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                     ),
                     const Divider(
                       height: 3.0,
-                      thickness: 3.0, // Thickness of the shadow
-                      color: Color(0x29000000), // Shadow color (#00000029)
+                      thickness: 3.0,
+                      color: Color(0x29000000),
                     ),
                   ],
                 ),
@@ -414,7 +405,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                   right:0,
                   bottom: 0,child:   SingleChildScrollView(
                   child: Align(
-                    // Added Align widget for the left side menu
                     alignment: Alignment.topLeft,
                     child: Padding(
                       padding: const EdgeInsets.only(top: 2),
@@ -466,7 +456,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
 
               Positioned(
                 left:201,
-                // left: constraints.maxWidth <= 600 ? 101: 201,
                 top: 60,
                 right: 0,
                 bottom: 0,
@@ -502,7 +491,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                           height: 640,
                                           width: maxWidth * 0.8,
                                           decoration: BoxDecoration(
-                                            //   border: Border.all(color: Colors.grey),
                                             color: Colors.white,
                                             borderRadius: BorderRadius.circular(2),
                                             boxShadow: [
@@ -561,7 +549,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                                         _goToPreviousPage,
                                                         onNextPage:
                                                         _goToNextPage,
-                                                        // onLastPage: _goToLastPage,
                                                       ),
                                                     ],
                                                   ),
@@ -588,7 +575,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      // crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Padding(
@@ -610,7 +596,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                               height: 640,
                                               width: 1100,
                                               decoration: BoxDecoration(
-                                                //   border: Border.all(color: Colors.grey),
                                                 color: Colors.white,
                                                 borderRadius: BorderRadius.circular(2),
                                                 boxShadow: [
@@ -669,7 +654,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                                             _goToPreviousPage,
                                                             onNextPage:
                                                             _goToNextPage,
-                                                            // onLastPage: _goToLastPage,
                                                           ),
                                                         ],
                                                       ),
@@ -712,14 +696,11 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
-//    const SizedBox(height: 8),
                 Row(
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-//  const SizedBox(height: 8),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: ConstrainedBox(
@@ -728,7 +709,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                               maxHeight: 39,
                             ),
                             child: Container(
-// width: constraints.maxWidth * 0.252, // reduced width
                               height: 35, // reduced height
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -743,12 +723,11 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                     const TextStyle(fontSize: 13, color: Colors.grey),
                                     contentPadding:
                                     const EdgeInsets.only(bottom: 20, left: 10),
-                                    // adjusted padding
                                     border: InputBorder.none,
                                     suffixIcon: Padding(
-                                      padding: const EdgeInsets.only(left: 10, right: 5), // Adjust image padding
+                                      padding: const EdgeInsets.only(left: 10, right: 5),
                                       child: Image.asset(
-                                        'images/search.png', // Replace with your image asset path
+                                        'images/search.png',
                                       ),
                                     )
                                 ),
@@ -759,92 +738,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                         ),
                       ],
                     ),
-//                     Spacer(),
-//                     Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-// // const SizedBox(height: 8),
-//                         Padding(
-//                           padding: const EdgeInsets.all(8.0),
-//                           child: ConstrainedBox(
-//                             constraints: BoxConstraints(
-//                               maxWidth: constraints.maxWidth * 0.12,
-//                               // reduced width
-//                               maxHeight: 30, // reduced height
-//                             ),
-//                             child: Container(
-//                               height: 35,
-//                               decoration: BoxDecoration(
-//                                 color: Colors.white,
-//                                 borderRadius: BorderRadius.circular(2),
-//                                 border: Border.all(color: Colors.grey),
-//                               ),
-//                               child: DropdownButtonFormField2<String>(
-//                                 decoration: const InputDecoration(
-//                                   contentPadding:
-//                                   EdgeInsets.only(bottom: 15, left: 10),
-//                                   // adjusted padding
-//                                   border: InputBorder.none,
-//                                   filled: true,
-//                                   fillColor: Colors.white,
-//                                   hintText: 'Category',
-//                                   hintStyle: TextStyle(color: Colors.grey),
-//                                 ),
-//                                 value: dropdownValue1,
-//                                 onChanged: (String? newValue) {
-//                                   setState(() {
-//                                     dropdownValue1 = newValue;
-//                                     status = newValue ?? '';
-//                                     _filterAndPaginateProducts();
-//                                   });
-//                                 },
-//                                 items: <String>[
-//                                   'Status',
-//                                   'Not Started',
-//                                   'Created',
-//                                   'Picked',
-//                                   'Delivered',
-//                                 ].map<DropdownMenuItem<String>>((String value) {
-//                                   return DropdownMenuItem<String>(
-//                                     value: value,
-//                                     child: Text(value,
-//                                         style: TextStyle(
-//                                             color: value == 'Status'
-//                                                 ? Colors.grey
-//                                                 : Colors.black,
-//                                             fontSize: 13)),
-//                                   );
-//                                 }).toList(),
-//                                 iconStyleData: const IconStyleData(
-//                                   icon: Icon(
-//                                     Icons.keyboard_arrow_down,
-//                                     color: Colors.indigo,
-//                                     size: 16,
-//                                   ),
-//                                   iconSize: 16,
-//                                 ),
-//                                 buttonStyleData: const ButtonStyleData(
-//                                   height: 50, // Button height
-//                                   padding: EdgeInsets.only(left: 10, right: 10), // Button padding
-//                                 ),
-//                                 dropdownStyleData: DropdownStyleData(
-//                                   decoration: BoxDecoration(
-//                                     borderRadius: BorderRadius.circular(7), // Rounded corners
-//                                     color: Colors.white, // Dropdown background color
-//                                   ),
-//                                   maxHeight: 200, // Max height for dropdown items
-//                                   width: constraints.maxWidth * 0.12, // Dropdown width
-//                                   offset:  const Offset(0, -10),
-//                                 ),
-//                                 isExpanded: true,
-//                                 // focusColor: Color(0xFFF0F4F8),
-//                               ),
-//                             ),
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-
                   ],
                 ),
               ],
@@ -860,7 +753,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
       var height = MediaQuery.of(context).size.height;
-// Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
             top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
@@ -888,10 +780,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
                                   column,
@@ -919,8 +808,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-// double padding = constraints.maxWidth * 0.065;
-
       return Column(
         children: [
           Container(
@@ -933,7 +820,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
                 columnSpacing: 35,
-// List.generate(5, (index)
                 columns:
                 columns.map((column) {
                   return DataColumn(
@@ -942,10 +828,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
                                   column,
@@ -978,11 +861,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                   });
                                 },
                               ),
-//SizedBox(width: 50,),
-//Padding(
-//  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-//  child:
-// ),
                             ],
                           ),
                         ),
@@ -1003,7 +881,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                           color: MaterialStateProperty.resolveWith<Color>((states) {
                             if (states.contains(MaterialState.hovered)) {
                               return Colors.blue.shade500.withOpacity(
-                                  0.8); // Add some opacity to the dark blue
+                                  0.8);
                             } else {
                               return Colors.white.withOpacity(0.9);
                             }
@@ -1012,7 +890,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                             DataCell(
                               SizedBox(
                                 width: columnWidths[0],
-                                // Same dynamic width as column headers
                                 child: Text(
                                   detail.orderId.toString(),
                                   style: TextStyles.body,
@@ -1068,11 +945,10 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
       var height = MediaQuery.of(context).size.height;
-// Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
             top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+        child: CustomLoadingIcon(),
       );
     }
 
@@ -1097,10 +973,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
                                   column,
@@ -1127,7 +1000,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
       );
     }
     return LayoutBuilder(builder: (context, constraints) {
-// double padding = constraints.maxWidth * 0.065;
       double right = MediaQuery.of(context).size.width * 0.92;
 
       return Column(
@@ -1143,7 +1015,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
                 columnSpacing: 35,
-// List.generate(5, (index)
                 columns:
                 columns.map((column) {
                   return DataColumn(
@@ -1152,10 +1023,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                         Container(
                           padding: null,
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
-//crossAxisAlignment: CrossAxisAlignment.end,
-//   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
                                   column,
@@ -1188,11 +1056,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                                   });
                                 },
                               ),
-//SizedBox(width: 50,),
-//Padding(
-//  padding:  EdgeInsets.only(left: columnWidths[index]-50,),
-//  child:
-// ),
                             ],
                           ),
                         ),
@@ -1213,7 +1076,7 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                           color: MaterialStateProperty.resolveWith<Color>((states) {
                             if (states.contains(MaterialState.hovered)) {
                               return Colors.blue.shade500.withOpacity(
-                                  0.8); // Add some opacity to the dark blue
+                                  0.8);
                             } else {
                               return Colors.white.withOpacity(0.9);
                             }
@@ -1222,7 +1085,6 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
                             DataCell(
                               SizedBox(
                                 width: columnWidths[0],
-                                // Same dynamic width as column headers
                                 child: Text(
                                   detail.orderId.toString(),
                                   style: TextStyles.body,
@@ -1315,18 +1177,15 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
     filteredData = productList.where((product) {
       final matchesSearchText =
           product.orderId!.toLowerCase().contains(_searchText.toLowerCase()) || product.contactPerson!.toLowerCase().contains(_searchText.toLowerCase()) ;
-// print('-----');
-// print(product.orderDate);
       String orderYear = '';
       if (product.orderDate.contains('/')) {
         final dateParts = product.orderDate.split('/');
         if (dateParts.length == 3) {
-          orderYear = dateParts[2]; // Extract the year
+          orderYear = dateParts[2];
         }
       }
-// final orderYear = element.orderDate.substring(5,9);
       if (status.isEmpty && selectDate.isEmpty) {
-        return matchesSearchText; // Include all products that match the search text
+        return matchesSearchText;
       }
       if (status == 'Status' && selectDate == 'Select Year') {
         return matchesSearchText;
@@ -1339,27 +1198,25 @@ class _CustomerDetailsState extends State<CustomerDetails> with SingleTickerProv
       }
       if (status == 'Status' && selectDate.isNotEmpty) {
         return matchesSearchText &&
-            orderYear == selectDate; // Include all products
+            orderYear == selectDate;
       }
       if (status.isNotEmpty && selectDate == 'Select Year') {
         return matchesSearchText &&
-            product.deliveryStatus == status; // Include all products
+            product.deliveryStatus == status;
       }
       if (status.isEmpty && selectDate.isNotEmpty) {
         return matchesSearchText &&
-            orderYear == selectDate; // Include all products
+            orderYear == selectDate;
       }
 
       if (status.isNotEmpty && selectDate.isEmpty) {
         return matchesSearchText &&
-            product.deliveryStatus == status; // Include all products
+            product.deliveryStatus == status;
       }
       return matchesSearchText &&
           (product.deliveryStatus == status && orderYear == selectDate);
-//  return false;
     }).toList();
     totalPages = (filteredData.length / itemsPerPage).ceil();
-//totalPages = (productList.length / itemsPerPage).ceil();
     setState(() {
       currentPage = 1;
     });
