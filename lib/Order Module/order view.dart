@@ -164,7 +164,11 @@ class _OrderView2State extends State<OrderView2>
         throw Exception('Failed to load data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching customer data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+            Text('Error fetching customer data: $e')),
+      );
     } finally {
       setState(() {
         isLoading = false;
@@ -215,33 +219,42 @@ class _OrderView2State extends State<OrderView2>
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 25,
-              ),
-              content: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Order Placed'),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    context.go('/Customer_Order_List'); // Close the dialog
-                  },
-                  child: const Text('OK'),
+        if(responseData['status'] == 'success'){
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 25,
                 ),
-              ],
-            );
-          },
-        );
+                content: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Order Placed'),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      context.go('/Customer_Order_List'); // Close the dialog
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }else{
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                Text('Failed to save data ${response.statusCode}')),
+          );
+        }
+
       } else {
         print('API call failed with status code: ${response.statusCode}');
       }
@@ -255,137 +268,6 @@ class _OrderView2State extends State<OrderView2>
   int totalPages = 0;
   bool isLoading = false;
 
-  Future<void> fetchProducts1(int page, int itemsPerPage) async {
-    if (isLoading) return;
-    if (!mounted) return;
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '$apicall/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
-        ),
-        headers: {
-          "Content-type": "application/json",
-          "Authorization": 'Bearer $token',
-        },
-      );
-      // if(token == " ")
-      // {
-      //   showDialog(
-      //     barrierDismissible: false,
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return
-      //         AlertDialog(
-      //           shape: RoundedRectangleBorder(
-      //             borderRadius: BorderRadius.circular(15.0),
-      //           ),
-      //           contentPadding: EdgeInsets.zero,
-      //           content: Column(
-      //             mainAxisSize: MainAxisSize.min,
-      //             children: [
-      //               Padding(
-      //                 padding: const EdgeInsets.all(16.0),
-      //                 child: Column(
-      //                   children: [
-      //                     // Warning Icon
-      //                     Icon(Icons.warning, color: Colors.orange, size: 50),
-      //                     SizedBox(height: 16),
-      //                     // Confirmation Message
-      //                     Text(
-      //                       'Session Expired',
-      //                       style: TextStyle(
-      //                         fontSize: 16,
-      //                         fontWeight: FontWeight.bold,
-      //                         color: Colors.black,
-      //                       ),
-      //                     ),
-      //                     Text("Please log in again to continue",style: TextStyle(
-      //                       fontSize: 12,
-      //
-      //                       color: Colors.black,
-      //                     ),),
-      //                     SizedBox(height: 20),
-      //                     // Buttons
-      //                     Row(
-      //                       mainAxisAlignment: MainAxisAlignment.center,
-      //                       children: [
-      //                         ElevatedButton(
-      //                           onPressed: () {
-      //                             // Handle Yes action
-      //                             context.go('/');
-      //                             // Navigator.of(context).pop();
-      //                           },
-      //                           style: ElevatedButton.styleFrom(
-      //                             backgroundColor: Colors.white,
-      //                             side: BorderSide(color: Colors.blue),
-      //                             shape: RoundedRectangleBorder(
-      //                               borderRadius: BorderRadius.circular(10.0),
-      //                             ),
-      //                           ),
-      //                           child: Text(
-      //                             'ok',
-      //                             style: TextStyle(
-      //                               color: Colors.blue,
-      //                             ),
-      //                           ),
-      //                         ),
-      //                       ],
-      //                     ),
-      //                   ],
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         );
-      //     },
-      //   ).whenComplete(() {
-      //     _hasShownPopup = false;
-      //   });
-      //
-      // }
-      // else{
-      //   if (response.statusCode == 200) {
-      //     final jsonData = jsonDecode(response.body);
-      //     List<detail> products = [];
-      //     if (jsonData != null) {
-      //       if (jsonData is List) {
-      //         products = jsonData.map((item) => detail.fromJson(item)).toList();
-      //       } else if (jsonData is Map && jsonData.containsKey('body')) {
-      //         products = (jsonData['body'] as List)
-      //             .map((item) => detail.fromJson(item))
-      //             .toList();
-      //         totalItems =
-      //             jsonData['totalItems'] ?? 0; // Get the total number of items
-      //       }
-      //
-      //       if (mounted) {
-      //         setState(() {
-      //           totalPages = (products.length / itemsPerPage).ceil();
-      //           print('pages');
-      //           print(totalPages);
-      //           productList = products;
-      //           print(productList);
-      //           _filterAndPaginateProducts();
-      //         });
-      //       }
-      //     }
-      //   } else {
-      //     throw Exception('Failed to load data');
-      //   }
-      // }
-    } catch (e) {
-      print('Error decoding JSON: $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
 
   final Map<String, bool> _isHovered = {
     'Home': false,
@@ -480,8 +362,7 @@ class _OrderView2State extends State<OrderView2>
   @override
   void initState() {
     super.initState();
-    print(userId ?? '');
-    print(widget.orderId ?? '');
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,

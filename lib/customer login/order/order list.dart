@@ -106,10 +106,8 @@ class _CusOrderPageState extends State<CusOrderPage>
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        // Warning Icon
                         const Icon(Icons.warning, color: Colors.orange, size: 50),
                         const SizedBox(height: 16),
-                        // Confirmation Message
                         const Text(
                           'Session Expired',
                           style: TextStyle(
@@ -132,9 +130,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Handle Yes action
                                 context.go('/');
-                                // Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
@@ -368,8 +364,8 @@ class _CusOrderPageState extends State<CusOrderPage>
             children: [
               Container(
                 width: maxWidth,
-                color: Colors.white, // White background color
-                height: 60.0, // Total height including bottom shadow
+                color: Colors.white,
+                height: 60.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -381,7 +377,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                           child: Image.asset(
                             "images/Final-Ikyam-Logo.png",
                             height: 35.0,
-                            // Adjusted to better match proportions
                           ),
                         ),
                         const Spacer(),
@@ -390,7 +385,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                             Padding(
                               padding:
                                   EdgeInsets.only(right: 10, top: 10),
-                              // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
                           ],
@@ -402,8 +396,8 @@ class _CusOrderPageState extends State<CusOrderPage>
                     ),
                     const Divider(
                       height: 3.0,
-                      thickness: 3.0, // Thickness of the shadow
-                      color: Color(0x29000000), // Shadow color (#00000029)
+                      thickness: 3.0,
+                      color: Color(0x29000000),
                     ),
                   ],
                 ),
@@ -416,7 +410,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                   bottom: 0,
                   child: SingleChildScrollView(
                     child: Align(
-                      // Added Align widget for the left side menu
                       alignment: Alignment.topLeft,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 2),
@@ -573,7 +566,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                                                     onPreviousPage:
                                                         _goToPreviousPage,
                                                     onNextPage: _goToNextPage,
-                                                    // onLastPage: _goToLastPage,
                                                   ),
                                                 ],
                                               ),
@@ -620,7 +612,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                                           onPressed: () {
                                             context.go('/Cus_Create_Order',
                                                 extra: {'testing': 'hi'});
-                                            //context.go('/Home/Orders/Create_Order');
                                           },
                                           style: OutlinedButton.styleFrom(
                                             backgroundColor: Colors.blue[800],
@@ -649,7 +640,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                                             height: 640,
                                             width: 1100,
                                             decoration: BoxDecoration(
-                                              //   border: Border.all(color: Colors.grey),
                                               color: Colors.white,
                                               borderRadius:
                                                   BorderRadius.circular(2),
@@ -657,7 +647,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                                                 BoxShadow(
                                                   color: Colors.grey
                                                       .withOpacity(0.1),
-                                                  // Soft grey shadow
                                                   spreadRadius: 3,
                                                   blurRadius: 3,
                                                   offset: const Offset(0, 3),
@@ -711,7 +700,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                                                               _goToPreviousPage,
                                                           onNextPage:
                                                               _goToNextPage,
-                                                          // onLastPage: _goToLastPage,
                                                         ),
                                                       ],
                                                     ),
@@ -786,7 +774,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                                       padding: const EdgeInsets.only(
                                           left: 10, right: 5),
                                       child: Image.asset(
-                                        'images/search.png', // Replace with your image asset path
+                                        'images/search.png',
                                       ),
                                     )),
                                 onChanged: _updateSearch,
@@ -813,7 +801,7 @@ class _CusOrderPageState extends State<CusOrderPage>
       return Padding(
         padding: EdgeInsets.only(
             top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+        child: CustomLoadingIcon(),
       );
     }
 
@@ -983,7 +971,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                         DataCell(
                           SizedBox(
                             width: columnWidths[0],
-                            // Same dynamic width as column headers
                             child: Text(
                               detail.orderId.toString(),
                               style: TextStyles.body,
@@ -1049,7 +1036,7 @@ class _CusOrderPageState extends State<CusOrderPage>
       return Padding(
         padding: EdgeInsets.only(
             top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+        child: CustomLoadingIcon(),
       );
     }
 
@@ -1150,7 +1137,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                 showCheckboxColumn: false,
                 headingRowHeight: 40,
                 columnSpacing: 35,
-// List.generate(5, (index)
                 columns: columns.map((column) {
                   return DataColumn(
                     label: Stack(
@@ -1208,7 +1194,7 @@ class _CusOrderPageState extends State<CusOrderPage>
                       color: MaterialStateProperty.resolveWith<Color>((states) {
                         if (states.contains(MaterialState.hovered)) {
                           return Colors.blue.shade500.withOpacity(
-                              0.8); // Add some opacity to the dark blue
+                              0.8);
                         } else {
                           return Colors.white.withOpacity(0.9);
                         }
@@ -1217,7 +1203,6 @@ class _CusOrderPageState extends State<CusOrderPage>
                         DataCell(
                           SizedBox(
                             width: columnWidths[0],
-                            // Same dynamic width as column headers
                             child: Text(
                               detail.orderId.toString(),
                               style: TextStyles.body,

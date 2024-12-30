@@ -9,10 +9,8 @@ import 'package:btb/customer%20module/customer%20view.dart';
 import 'package:btb/login/login.dart';
 import 'package:btb/Order%20Module/firstpage.dart';
 import 'package:btb/dashboard/dashboard.dart';
-import 'package:btb/sample/notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'Product/product list.dart';
 import 'admin/Create_users.dart';
 import 'admin/sign up.dart';
@@ -22,12 +20,7 @@ import 'customer login/order/order view screen.dart';
 import 'customer module/customer list.dart';
 
 void main() async {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => MenuProvider(),
-      child: MyApp(),
-    ),
-  );
+  runApp(MyApp(),);
 }
 
 abstract class PageName {

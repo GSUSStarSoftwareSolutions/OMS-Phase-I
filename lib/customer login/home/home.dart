@@ -113,7 +113,7 @@ class _DashboardPage1State extends State<DashboardPage1>
       //https://ordermanagement-industrious-dugong-ig.cfapps.us10-001.hana.ondemand.com/api/order_master/get_all_ordermaster
       final response = await http.get(
         Uri.parse(
-          '$apicall/$companyName/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage', // Changed limit to 10
+          '$apicall/$companyName/order_master/get_all_ordermaster?page=$page&limit=$itemsPerPage',
         ),
         headers: {
           "Content-type": "application/json",
@@ -137,11 +137,9 @@ class _DashboardPage1State extends State<DashboardPage1>
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        // Warning Icon
                         const Icon(Icons.warning,
                             color: Colors.orange, size: 50),
                         const SizedBox(height: 16),
-                        // Confirmation Message
                         const Text(
                           'Session Expired',
                           style: TextStyle(
@@ -164,9 +162,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Handle Yes action
                                 context.go('/');
-                                // Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
@@ -228,34 +224,6 @@ class _DashboardPage1State extends State<DashboardPage1>
           throw Exception('Failed to load data');
         }
       }
-      // else {
-      //   if (response.statusCode == 200) {
-      //     final jsonData = jsonDecode(response.body);
-      //     List<ors.detail> products = [];
-      //     if (jsonData is List) {
-      //       products =
-      //           jsonData.map((item) => ors.detail.fromJson(item)).toList();
-      //     } else if (jsonData is Map && jsonData.containsKey('body')) {
-      //       final body = jsonData['body'];
-      //       if (body != null) {
-      //         products = (body as List)
-      //             .map((item) => ors.detail.fromJson(item))
-      //             .toList();
-      //         totalItems =
-      //             jsonData['totalItems'] ?? 0; // Get the total number of items
-      //       } else {}
-      //     } else {}
-      //     if (mounted) {
-      //       setState(() {
-      //         totalPages = (products.length / itemsPerPage).ceil();
-      //         productList = products;
-      //         _filterAndPaginateProducts();
-      //       });
-      //     }
-      //   } else {
-      //     throw Exception('Failed to load data');
-      //   }
-      // }
     } catch (e) {
       if (mounted) {
         if (context.findAncestorWidgetOfExactType<Scaffold>() != null) {
@@ -301,11 +269,9 @@ class _DashboardPage1State extends State<DashboardPage1>
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        // Warning Icon
                         const Icon(Icons.warning,
                             color: Colors.orange, size: 50),
                         const SizedBox(height: 16),
-                        // Confirmation Message
                         const Text(
                           'Session Expired',
                           style: TextStyle(
@@ -328,9 +294,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Handle Yes action
                                 context.go('/');
-                                // Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
@@ -406,9 +370,8 @@ class _DashboardPage1State extends State<DashboardPage1>
   void _updateSearch(String searchText) {
     setState(() {
       _searchText = searchText;
-      currentPage = 1; // Reset to first page when searching
+      currentPage = 1;
       _filterAndPaginateProducts();
-      // _clearSearch();
     });
   }
 
@@ -442,19 +405,12 @@ class _DashboardPage1State extends State<DashboardPage1>
         String separator = product.deliveredDate!.contains('/') ? '/' : '-';
         final dateParts = product.deliveredDate!.split(separator);
         if (dateParts.length == 3) {
-          orderYear = dateParts[2]; // Extract the year
-          //Extract the day
+          orderYear = dateParts[2];
         }
       }
-      // print(product.deliveredDate);
-      // if (product.deliveredDate!.contains('/')) {
-      //   final dateParts = product.deliveredDate!.split('/');
-      //   if (dateParts.length == 3) {
-      //     orderYear = dateParts[0]; // Extract the year
-      //   }
-      // }
+
       if (status.isEmpty && selectDate.isEmpty) {
-        return matchesSearchText; // Include all products that match the search text
+        return matchesSearchText;
       }
       if (status == 'Delivery Status' && selectDate == 'Select Year') {
         return matchesSearchText;
@@ -467,29 +423,26 @@ class _DashboardPage1State extends State<DashboardPage1>
       }
       if (status == 'Delivery Status' && selectDate.isNotEmpty) {
         return matchesSearchText &&
-            orderYear == selectDate; // Include all products
+            orderYear == selectDate;
       }
       if (status.isNotEmpty && selectDate == 'Select Year') {
         return matchesSearchText &&
-            product.deliveryStatus == status; // Include all products
+            product.deliveryStatus == status;
       }
       if (status.isEmpty && selectDate.isNotEmpty) {
         return matchesSearchText &&
-            orderYear == selectDate; // Include all products
+            orderYear == selectDate;
       }
 
       if (status.isNotEmpty && selectDate.isEmpty) {
         return matchesSearchText &&
-            product.deliveryStatus == status; // Include all products
+            product.deliveryStatus == status;
       }
       return matchesSearchText &&
           (product.deliveryStatus == status && orderYear == selectDate);
-      //  return false;
     }).toList();
     totalPages = (filteredData1.length / itemsPerPage).ceil();
     setState(() {
-      // print('fileterpaginate');
-      // print(_filteredData);
       currentPage = 1;
     });
   }
@@ -503,7 +456,6 @@ class _DashboardPage1State extends State<DashboardPage1>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-// Define the shake animation (values will oscillate between -5.0 and 5.0)
     _shakeAnimation = Tween<double>(begin: 0, end: 5)
         .chain(CurveTween(curve: Curves.elasticIn))
         .animate(_controller)
@@ -547,10 +499,8 @@ class _DashboardPage1State extends State<DashboardPage1>
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      // Warning Icon
                       const Icon(Icons.warning, color: Colors.orange, size: 50),
                       const SizedBox(height: 16),
-                      // Confirmation Message
                       const Text(
                         'Session Expired',
                         style: TextStyle(
@@ -567,15 +517,12 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // Buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              // Handle Yes action
                               context.go('/');
-                              // Navigator.of(context).pop();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
@@ -618,7 +565,7 @@ class _DashboardPage1State extends State<DashboardPage1>
   @override
   void dispose() {
     _searchDebounceTimer?.cancel();
-    _controller.dispose(); // Cancel the timer when the widget is disposed
+    _controller.dispose();
     super.dispose();
   }
 
@@ -634,8 +581,8 @@ class _DashboardPage1State extends State<DashboardPage1>
           return Stack(
             children: [
               Container(
-                color: Colors.white, // White background color
-                height: 60.0, // Total height including bottom shadow
+                color: Colors.white,
+                height: 60.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -647,7 +594,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                           child: Image.asset(
                             "images/Final-Ikyam-Logo.png",
                             height: 35.0,
-                            // Adjusted to better match proportions
                           ),
                         ),
                         const Spacer(),
@@ -656,7 +602,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                             SizedBox(width: 10),
                             Padding(
                               padding: EdgeInsets.only(right: 10, top: 10),
-                              // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
                           ],
@@ -668,8 +613,8 @@ class _DashboardPage1State extends State<DashboardPage1>
                     ),
                     const Divider(
                       height: 3.0,
-                      thickness: 3.0, // Thickness of the shadow
-                      color: Color(0x29000000), // Shadow color (#00000029)
+                      thickness: 3.0,
+                      color: Color(0x29000000),
                     ),
                   ],
                 ),
@@ -682,7 +627,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                   bottom: 0,
                   child: SingleChildScrollView(
                     child: Align(
-                      // Added Align widget for the left side menu
                       alignment: Alignment.topLeft,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 2),
@@ -734,7 +678,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                 right: 0,
                 bottom: 40,
                 child: Column(
-                  //mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 30),
@@ -774,7 +717,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                         padding: const EdgeInsets.only(
                                             left: 1, right: 1, top: 5),
                                         child: Container(
-                                          //   color: Colors.grey[50],
                                           child: Column(
                                             children: [
                                               Row(
@@ -809,15 +751,8 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                       200),
                                                           child: InkWell(
                                                             onTap: () {
-                                                              // context.go('/Open_Order');
-                                                              // Navigator.push(
-                                                              //   context,
-                                                              //   MaterialPageRoute(
-                                                              //       builder: (context) =>
-                                                              //           OpenorderList()),
-                                                              // );
+
                                                             },
-                                                            // splashColor: Colors.grey.withOpacity(0.2),
                                                             child: Container(
                                                               height: 115,
                                                               width: maxWidth *
@@ -867,12 +802,10 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                         ),
                                                                         color: const Color(0xffffac8c)
                                                                             .withOpacity(0.2),
-                                                                        // Set the background color to match the border
                                                                         boxShadow: [
                                                                           BoxShadow(
                                                                             color:
                                                                                 const Color(0xffffac8c).withOpacity(0.1),
-                                                                            // Soft grey shadow
                                                                             spreadRadius:
                                                                                 1,
                                                                             blurRadius:
@@ -962,8 +895,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                       200),
                                                           child: InkWell(
                                                             onTap: () {
-                                                              // context.go(
-                                                              //     '/Picked_order');
                                                             },
                                                             child: Container(
                                                               height: 115,
@@ -1102,7 +1033,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                       200),
                                                           child: InkWell(
                                                             onTap: () {
-                                                              //context.go('/Order_Complete');
                                                             },
                                                             child: Container(
                                                               height: 115,
@@ -1153,7 +1083,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           BoxShadow(
                                                                             color:
                                                                                 const Color(0xFF0388AB).withOpacity(0.1),
-                                                                            // Soft grey shadow
                                                                             spreadRadius:
                                                                                 1,
                                                                             blurRadius:
@@ -1204,7 +1133,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                                 TextStyle(
                                                                               fontSize: maxWidth * 0.01,
                                                                               color: const Color(0xFF455A64),
-                                                                              // Dark grey-blue
                                                                               fontWeight: FontWeight.w500,
                                                                               letterSpacing: 0.5,
                                                                             ),
@@ -1245,7 +1173,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                       200),
                                                           child: InkWell(
                                                             onTap: () {
-                                                              //  context.go('/Pay_Complete');
                                                             },
                                                             child: Container(
                                                               height: 115,
@@ -1375,7 +1302,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                             height: 650,
                                             width: maxWidth,
                                             decoration: BoxDecoration(
-                                              //   border: Border.all(color: Colors.grey),
                                               color: Colors.white,
                                               borderRadius:
                                                   BorderRadius.circular(2),
@@ -1383,7 +1309,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                 BoxShadow(
                                                   color: Colors.grey
                                                       .withOpacity(0.1),
-                                                  // Soft grey shadow
                                                   spreadRadius: 3,
                                                   blurRadius: 3,
                                                   offset: const Offset(0, 3),
@@ -1391,7 +1316,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                               ],
                                             ),
                                             child: SizedBox(
-                                              //width: maxWidth * 0.8,
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
@@ -1434,13 +1358,10 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                   itemsPerPage
                                                               ? totalPages
                                                               : 1,
-                                                          //totalPages//totalPages,
-                                                          // onFirstPage: _goToFirstPage,
                                                           onPreviousPage:
                                                               _goToPreviousPage,
                                                           onNextPage:
                                                               _goToNextPage,
-                                                          // onLastPage: _goToLastPage,
                                                         ),
                                                       ],
                                                     ),
@@ -1474,7 +1395,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                     left: 1, right: 1, top: 5),
                                                 child: SizedBox(
                                                   width: 1200,
-                                                  //   color: Colors.grey[50],
                                                   child: Row(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
@@ -1554,11 +1474,9 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                                   width: 1.5,
                                                                                 ),
                                                                                 color: const Color(0xffffac8c).withOpacity(0.2),
-                                                                                // Set the background color to match the border
                                                                                 boxShadow: [
                                                                                   BoxShadow(
                                                                                     color: const Color(0xffffac8c).withOpacity(0.1),
-                                                                                    // Soft grey shadow
                                                                                     spreadRadius: 1,
                                                                                     blurRadius: 3,
                                                                                     offset: const Offset(0, 1),
@@ -1633,8 +1551,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           200),
                                                               child: InkWell(
                                                                 onTap: () {
-                                                                  // context.go(
-                                                                  //     '/Picked_order');
                                                                 },
                                                                 child:
                                                                     Container(
@@ -1685,7 +1601,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             boxShadow: [
                                                                               BoxShadow(
                                                                                 color: const Color(0xFF9F86FF).withOpacity(0.1),
-                                                                                // Soft grey shadow
                                                                                 spreadRadius: 1,
                                                                                 blurRadius: 3,
                                                                                 offset: const Offset(0, 1),
@@ -1761,7 +1676,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           200),
                                                               child: InkWell(
                                                                 onTap: () {
-                                                                  //context.go('/Order_Complete');
                                                                 },
                                                                 child:
                                                                     Container(
@@ -1812,7 +1726,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             boxShadow: [
                                                                               BoxShadow(
                                                                                 color: const Color(0xFF0388AB).withOpacity(0.1),
-                                                                                // Soft grey shadow
                                                                                 spreadRadius: 1,
                                                                                 blurRadius: 3,
                                                                                 offset: const Offset(0, 1),
@@ -1892,7 +1805,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           200),
                                                               child: InkWell(
                                                                 onTap: () {
-                                                                  //  context.go('/Pay_Complete');
                                                                 },
                                                                 child:
                                                                     Container(
@@ -1943,7 +1855,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                             boxShadow: [
                                                                               BoxShadow(
                                                                                 color: const Color(0xFF418CFC33).withOpacity(0.1),
-                                                                                // Soft grey shadow
                                                                                 spreadRadius: 1,
                                                                                 blurRadius: 3,
                                                                                 offset: const Offset(0, 1),
@@ -2074,13 +1985,10 @@ class _DashboardPage1State extends State<DashboardPage1>
                                                                           itemsPerPage
                                                                       ? totalPages
                                                                       : 1,
-                                                                  //totalPages//totalPages,
-                                                                  // onFirstPage: _goToFirstPage,
                                                                   onPreviousPage:
                                                                       _goToPreviousPage,
                                                                   onNextPage:
                                                                       _goToNextPage,
-                                                                  // onLastPage: _goToLastPage,
                                                                 ),
                                                               ],
                                                             ),
@@ -2121,17 +2029,12 @@ class _DashboardPage1State extends State<DashboardPage1>
               height: 42,
               decoration: BoxDecoration(
                 color: Colors.blue[800],
-                // border: Border(  left: BorderSide(    color: Colors.blue,    width: 5.0,  ),),
-                // color: Color.fromRGBO(224, 59, 48, 1.0),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
-                  // Radius for top-left corner
                   topRight: Radius.circular(8),
-                  // No radius for top-right corner
                   bottomLeft: Radius.circular(8),
-                  // Radius for bottom-left corner
                   bottomRight:
-                      Radius.circular(8), // No radius for bottom-right corner
+                      Radius.circular(8),
                 ),
               ),
               child: _buildMenuItem(
@@ -2207,7 +2110,6 @@ class _DashboardPage1State extends State<DashboardPage1>
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 30),
                   child: Container(
@@ -2226,11 +2128,9 @@ class _DashboardPage1State extends State<DashboardPage1>
                           hintStyle: TextStyles.body,
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 3, horizontal: 5),
-                          // adjusted padding
                           border: InputBorder.none,
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(left: 10, right: 5),
-                            // Adjust image padding
                             child: Image.asset(
                               'images/search.png', // Replace with your image asset path
                             ),
@@ -2242,165 +2142,6 @@ class _DashboardPage1State extends State<DashboardPage1>
               ],
             ),
             const SizedBox(height: 8),
-            // Row(
-            //   children: [
-            //     Column(
-            //       crossAxisAlignment: CrossAxisAlignment.start,
-            //       children: [
-            //         //  const SizedBox(height: 8),
-            //         Padding(
-            //           padding: const EdgeInsets.only(left: 30),
-            //           child: Container(
-            //             width: 150, // reduced width
-            //             height: 35, // reduced height
-            //             decoration: BoxDecoration(
-            //               color: Colors.white,
-            //               borderRadius: BorderRadius.circular(2),
-            //               border: Border.all(color: Colors.grey),
-            //             ),
-            //             child: DropdownButtonFormField2<String>(
-            //               decoration: const InputDecoration(
-            //                 contentPadding: EdgeInsets.only(
-            //                     bottom: 15, left: 9), // Custom padding
-            //                 border: InputBorder.none, // No default border
-            //                 filled: true,
-            //                 fillColor: Colors.white, // Background color
-            //               ),
-            //               isExpanded: true,
-            //               // Ensures dropdown takes full width
-            //               value: dropdownValue1,
-            //               onChanged: (String? newValue) {
-            //                 setState(() {
-            //                   dropdownValue1 = newValue;
-            //                   status = newValue ?? '';
-            //                   _filterAndPaginateProducts();
-            //                 });
-            //               },
-            //               items: <String>[
-            //                 'Delivery Status',
-            //                 'Not Started',
-            //                 'In Progress',
-            //                 'Delivered',
-            //               ].map<DropdownMenuItem<String>>((String value) {
-            //                 return DropdownMenuItem<String>(
-            //                   value: value,
-            //                   child: Text(
-            //                     value,
-            //                     style: TextStyle(
-            //                       fontSize: 13,
-            //                       color: value == 'Delivery Status'
-            //                           ? Colors.grey
-            //                           : Colors.black,
-            //                     ),
-            //                   ),
-            //                 );
-            //               }).toList(),
-            //               iconStyleData: const IconStyleData(
-            //                 icon: Icon(
-            //                   Icons.arrow_drop_down_circle_rounded,
-            //                   color: Colors.indigo,
-            //                   size: 16,
-            //                 ),
-            //                 iconSize: 16,
-            //               ),
-            //               buttonStyleData: const ButtonStyleData(
-            //                 height: 50, // Button height
-            //                 padding: EdgeInsets.only(
-            //                     left: 10, right: 10), // Button padding
-            //               ),
-            //               dropdownStyleData: DropdownStyleData(
-            //                 decoration: BoxDecoration(
-            //                   borderRadius: BorderRadius.circular(7),
-            //                   // Rounded corners
-            //                   color: Colors.white, // Dropdown background color
-            //                 ),
-            //                 maxHeight: 200, // Max height for dropdown items
-            //                 width: maxWidth1 * 0.1, // Dropdown width
-            //                 offset: const Offset(0, -20),
-            //               ),
-            //             ),
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //     // const SizedBox(width: 16),
-            //     Column(
-            //       crossAxisAlignment: CrossAxisAlignment.start,
-            //       children: [
-            //         // const SizedBox(height: 8),
-            //         Padding(
-            //           padding: const EdgeInsets.all(8.0),
-            //           child: Container(
-            //             width: 150, // reduced width
-            //             height: 35, // reduced height
-            //             decoration: BoxDecoration(
-            //               color: Colors.white,
-            //               borderRadius: BorderRadius.circular(2),
-            //               border: Border.all(color: Colors.grey),
-            //             ),
-            //             child: DropdownButtonFormField2<String>(
-            //               decoration: const InputDecoration(
-            //                 contentPadding:
-            //                 EdgeInsets.only(bottom: 15, left: 10),
-            //                 // adjusted padding
-            //                 border: InputBorder.none,
-            //                 filled: true,
-            //                 fillColor: Colors.white,
-            //               ),
-            //               //icon: Container(),
-            //               value: dropdownValue2,
-            //               onChanged: (String? newValue) {
-            //                 setState(() {
-            //                   selectDate = newValue ?? '';
-            //                   dropdownValue2 = newValue;
-            //                   _filterAndPaginateProducts();
-            //                 });
-            //               },
-            //               items: <String>['Select Year', '2023', '2024', '2025']
-            //                   .map<DropdownMenuItem<String>>((String value) {
-            //                 return DropdownMenuItem<String>(
-            //                   value: value,
-            //                   child: Text(
-            //                     value,
-            //                     style: TextStyle(
-            //                       fontSize: 13,
-            //                       color: value == 'Select Year'
-            //                           ? Colors.grey
-            //                           : Colors.black,
-            //                     ),
-            //                   ),
-            //                 );
-            //               }).toList(),
-            //               iconStyleData: const IconStyleData(
-            //                 icon: Icon(
-            //                   Icons.arrow_drop_down_circle_rounded,
-            //                   color: Colors.indigo,
-            //                   size: 16,
-            //                 ),
-            //                 iconSize: 16,
-            //               ),
-            //               buttonStyleData: const ButtonStyleData(
-            //                 height: 50, // Button height
-            //                 padding: EdgeInsets.only(
-            //                     left: 10, right: 10), // Button padding
-            //               ),
-            //               dropdownStyleData: DropdownStyleData(
-            //                 decoration: BoxDecoration(
-            //                   borderRadius: BorderRadius.circular(7),
-            //                   // Rounded corners
-            //                   color: Colors.white, // Dropdown background color
-            //                 ),
-            //                 maxHeight: 200, // Max height for dropdown items
-            //                 width: maxWidth1 * 0.1, // Dropdown width
-            //                 offset: const Offset(0, -20),
-            //               ),
-            //             ),
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ],
-            // ),
           ],
         ),
       );
@@ -2421,12 +2162,11 @@ class _DashboardPage1State extends State<DashboardPage1>
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // const SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.only(top: 20, left: 30),
                       child: Container(
-                        width: maxWidth1 * 0.2, // reduced width
-                        height: 35, // reduced height
+                        width: maxWidth1 * 0.2,
+                        height: 35,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(2),
@@ -2438,16 +2178,14 @@ class _DashboardPage1State extends State<DashboardPage1>
                           decoration: InputDecoration(
                               hintText: 'Search by Order ID',
                               hintStyle: TextStyles.body,
-                              //hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 3, horizontal: 5),
-                              // adjusted padding
                               border: InputBorder.none,
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.only(
-                                    left: 10, right: 5), // Adjust image padding
+                                    left: 10, right: 5),
                                 child: Image.asset(
-                                  'images/search.png', // Replace with your image asset path
+                                  'images/search.png',
                                 ),
                               )),
                           onChanged: _updateSearch,
@@ -2456,89 +2194,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                     ),
                   ],
                 ),
-                // Spacer(),
-                // Padding(
-                //   padding: const EdgeInsets.only(right: 30),
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       //  const SizedBox(height: 8),
-                //       Padding(
-                //         padding: const EdgeInsets.only(left: 30,top: 20),
-                //         child: Container(
-                //           width: maxWidth1 * 0.1, // reduced width
-                //           height: 35, // reduced height
-                //           decoration: BoxDecoration(
-                //             color: Colors.white,
-                //             borderRadius: BorderRadius.circular(2),
-                //             border: Border.all(color: Colors.grey),
-                //           ),
-                //           child: DropdownButtonFormField2<String>(
-                //             decoration: const InputDecoration(
-                //               contentPadding: EdgeInsets.only(
-                //                   bottom: 15, left: 9), // Custom padding
-                //               border: InputBorder.none, // No default border
-                //               filled: true,
-                //               fillColor: Colors.white, // Background color
-                //             ),
-                //             isExpanded: true,
-                //             // Ensures dropdown takes full width
-                //             value: dropdownValue1,
-                //             onChanged: (String? newValue) {
-                //               setState(() {
-                //                 dropdownValue1 = newValue;
-                //                 status = newValue ?? '';
-                //                 _filterAndPaginateProducts();
-                //               });
-                //             },
-                //             items: <String>[
-                //               'Delivery Status',
-                //               'Not Started',
-                //               'In Progress',
-                //               'Delivered',
-                //             ].map<DropdownMenuItem<String>>((String value) {
-                //               return DropdownMenuItem<String>(
-                //                 value: value,
-                //                 child: Text(
-                //                   value,
-                //                   style: TextStyle(
-                //                     fontSize: 13,
-                //                     color: value == 'Delivery Status'
-                //                         ? Colors.grey
-                //                         : Colors.black,
-                //                   ),
-                //                 ),
-                //               );
-                //             }).toList(),
-                //             iconStyleData: const IconStyleData(
-                //               icon: Icon(
-                //                 Icons.keyboard_arrow_down,
-                //                 color: Colors.indigo,
-                //                 size: 16,
-                //               ),
-                //               iconSize: 16,
-                //             ),
-                //             buttonStyleData: const ButtonStyleData(
-                //               height: 50, // Button height
-                //               padding: EdgeInsets.only(
-                //                   left: 10, right: 10), // Button padding
-                //             ),
-                //             dropdownStyleData: DropdownStyleData(
-                //               decoration: BoxDecoration(
-                //                 borderRadius: BorderRadius.circular(7),
-                //                 // Rounded corners
-                //                 color: Colors.white, // Dropdown background color
-                //               ),
-                //               maxHeight: 200, // Max height for dropdown items
-                //               width: maxWidth1 * 0.1, // Dropdown width
-                //               offset: const Offset(0, -20),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
               ],
             ),
           ],
@@ -2551,7 +2206,6 @@ class _DashboardPage1State extends State<DashboardPage1>
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
       var height = MediaQuery.of(context).size.height;
-      // Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
             top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
@@ -2624,18 +2278,18 @@ class _DashboardPage1State extends State<DashboardPage1>
       } else {
         filteredData1.sort((a, b) {
           if (columnIndex == 0) {
-            return b.orderId!.compareTo(a.orderId!); // Reverse the comparison
+            return b.orderId!.compareTo(a.orderId!);
           } else if (columnIndex == 1) {
             return b.contactPerson!
-                .compareTo(a.contactPerson!); // Reverse the comparison
+                .compareTo(a.contactPerson!);
           } else if (columnIndex == 2) {
             return b.createdDate!
-                .compareTo(a.createdDate!); // Reverse the comparison
+                .compareTo(a.createdDate!);
           } else if (columnIndex == 3) {
-            return b.total.compareTo(a.total); // Reverse the comparison
+            return b.total.compareTo(a.total);
           } else if (columnIndex == 4) {
             return b.deliveryStatus
-                .compareTo(a.deliveryStatus); // Reverse the comparison
+                .compareTo(a.deliveryStatus);
           } else {
             return 0;
           }
@@ -2663,18 +2317,13 @@ class _DashboardPage1State extends State<DashboardPage1>
                     label: Stack(
                       children: [
                         SizedBox(
-                          //   padding: EdgeInsets.only(left: 5,right: 5),
                           width: columnWidths[columns.indexOf(column)],
-                          // Dynamic width based on user interaction
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            //crossAxisAlignment: CrossAxisAlignment.end,
-                            //   mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(column,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyles.subhead),
-                              //  if (columns.indexOf(column) > 0)
                               IconButton(
                                 icon:
                                     _sortOrder[columns.indexOf(column)] == 'asc'
@@ -2702,8 +2351,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                   });
                                 },
                               ),
-                              //SizedBox(width: 50,),
-                              // ),
                             ],
                           ),
                         ),
@@ -2719,17 +2366,14 @@ class _DashboardPage1State extends State<DashboardPage1>
                         itemsPerPage,
                         filteredData1.length -
                             (currentPage - 1) * itemsPerPage), (index) {
-                  // final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
                   final detail = filteredData1
                       .skip((currentPage - 1) * itemsPerPage)
                       .elementAt(index);
-                  // final isSelected = _selectedProduct == detail;
-                  //final product = filteredData[(currentPage - 1) * itemsPerPage + index];
                   return DataRow(
                     color: MaterialStateProperty.resolveWith<Color>((states) {
                       if (states.contains(MaterialState.hovered)) {
                         return Colors.blue.shade500.withOpacity(
-                            0.8); // Add some opacity to the dark blue
+                            0.8);
                       } else {
                         return Colors.white.withOpacity(0.9);
                       }
@@ -2738,7 +2382,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                       DataCell(
                         SizedBox(
                           width: columnWidths[0],
-                          // Same dynamic width as column headers
                           child: Text(
                             detail.orderId.toString(),
                             style: TextStyles.body,
@@ -2782,68 +2425,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                         ),
                       ),
                     ],
-                    // onSelectChanged: (selected) {
-                    //   if (selected != null && selected) {
-                    //     final orderId = detail
-                    //         .orderId; // Capture the orderId of the selected row
-                    //     final detail1 = filteredData.firstWhere(
-                    //         (element) => element.orderId == orderId);
-                    //     //final detail1 = filteredData.skip((currentPage - 1) * itemsPerPage).elementAt(index);
-                    //     //final detail = filteredData[(currentPage - 1) * itemsPerPage + index];
-                    //
-                    //     if (filteredData1.length <= 9) {
-                    //       //fetchOrders();
-                    //       PaymentMap = {
-                    //         'paymentmode': detail.paymentMode,
-                    //         'paymentStatus': detail.paymentStatus,
-                    //         'paymentdate': detail.paymentDate,
-                    //         'paidamount': detail.paidAmount,
-                    //       };
-                    //
-                    //       context.go('/Order_Placed_List', extra: {
-                    //         'product': detail1,
-                    //         'item': [], // pass an empty list of maps
-                    //         'arrow': 'Home',
-                    //         'status': detail.deliveryStatus,
-                    //         'paymentStatus': PaymentMap,
-                    //         'body': {},
-                    //         // 'status': detail.deliveryStatus,
-                    //         'itemsList': [], // pass an empty list of maps
-                    //         'orderDetails': filteredData
-                    //             .map((detail) => ors.OrderDetail(
-                    //                   orderId: detail.orderId,
-                    //                   orderDate: detail.orderDate, items: [],
-                    //                   // Add other fields as needed
-                    //                 ))
-                    //             .toList(),
-                    //       });
-                    //     } else {
-                    //       PaymentMap = {
-                    //         'paymentmode': detail.paymentMode,
-                    //         'paymentStatus': detail.paymentStatus,
-                    //         'paymentdate': detail.paymentDate,
-                    //         'paidamount': detail.paidAmount,
-                    //       };
-                    //       context.go('/Order_Placed_List', extra: {
-                    //         'product': detail1,
-                    //         'arrow': 'Home',
-                    //         'item': [], // pass an empty list of maps
-                    //         'status': detail.deliveryStatus,
-                    //         'paymentStatus': PaymentMap,
-                    //         'body': {},
-                    //         'itemsList': [], // pass an empty list of maps
-                    //         'orderDetails': filteredData
-                    //             .map((detail) => ors.OrderDetail(
-                    //                   orderId: detail.orderId,
-                    //                   orderDate: detail.orderDate, items: [],
-                    //                   // Add other fields as needed
-                    //                 ))
-                    //             .toList(),
-                    //       });
-                    //
-                    //     }
-                    //   }
-                    // }
+
                   );
                 })),
           ),
@@ -2856,11 +2438,10 @@ class _DashboardPage1State extends State<DashboardPage1>
     if (isLoading) {
       var width = MediaQuery.of(context).size.width;
       var height = MediaQuery.of(context).size.height;
-      // Show loading indicator while data is being fetched
       return Padding(
         padding: EdgeInsets.only(
             top: height * 0.100, bottom: height * 0.100, left: width * 0.300),
-        child: CustomLoadingIcon(), // Replace this with your custom GIF widget
+        child: CustomLoadingIcon(),
       );
     }
     if (filteredData1.isEmpty) {
@@ -2928,18 +2509,18 @@ class _DashboardPage1State extends State<DashboardPage1>
       } else {
         filteredData1.sort((a, b) {
           if (columnIndex == 0) {
-            return b.orderId!.compareTo(a.orderId!); // Reverse the comparison
+            return b.orderId!.compareTo(a.orderId!);
           } else if (columnIndex == 1) {
             return b.contactPerson!
-                .compareTo(a.contactPerson!); // Reverse the comparison
+                .compareTo(a.contactPerson!);
           } else if (columnIndex == 2) {
             return b.createdDate!
-                .compareTo(a.createdDate!); // Reverse the comparison
+                .compareTo(a.createdDate!);
           } else if (columnIndex == 3) {
-            return b.total.compareTo(a.total); // Reverse the comparison
+            return b.total.compareTo(a.total);
           } else if (columnIndex == 4) {
             return b.deliveryStatus
-                .compareTo(a.deliveryStatus); // Reverse the comparison
+                .compareTo(a.deliveryStatus);
           } else {
             return 0;
           }
@@ -2974,7 +2555,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                               Text(column,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyles.subhead),
-                              //  if (columns.indexOf(column) > 0)
                               IconButton(
                                 icon:
                                     _sortOrder[columns.indexOf(column)] == 'asc'
@@ -3002,8 +2582,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                                   });
                                 },
                               ),
-                              //SizedBox(width: 50,),
-                              // ),
                             ],
                           ),
                         ),
@@ -3027,7 +2605,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                     color: MaterialStateProperty.resolveWith<Color>((states) {
                       if (states.contains(MaterialState.hovered)) {
                         return Colors.blue.shade500.withOpacity(
-                            0.8); // Add some opacity to the dark blue
+                            0.8);
                       } else {
                         return Colors.white.withOpacity(0.9);
                       }
@@ -3036,7 +2614,6 @@ class _DashboardPage1State extends State<DashboardPage1>
                       DataCell(
                         SizedBox(
                           width: columnWidths[0],
-                          // Same dynamic width as column headers
                           child: Text(
                             detail.orderId.toString(),
                             style: TextStyles.body,
@@ -3056,7 +2633,7 @@ class _DashboardPage1State extends State<DashboardPage1>
                         SizedBox(
                           width: columnWidths[2],
                           child: Text(
-                            detail.orderDate!,
+                            detail.orderDate,
                             style: TextStyles.body,
                           ),
                         ),

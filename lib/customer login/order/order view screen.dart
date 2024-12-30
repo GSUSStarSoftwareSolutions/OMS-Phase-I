@@ -183,7 +183,7 @@ class _OrderViewState extends State<OrderView>
 
 
     final url =
-        '$apicall/order_master/add_order_master'; // Replace with your API endpoint
+        '$apicall/order_master/add_order_master';
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
@@ -212,35 +212,41 @@ class _OrderViewState extends State<OrderView>
       if (response.statusCode == 200) {
 
         final responseData = json.decode(response.body);
-
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 25,
-              ),
-              content: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Order Placed'),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    context.go('/Customer_Order_List'); // Close the dialog
-                  },
-                  child: const Text('OK'),
+        if(responseData['status'] == 'success'){
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 25,
                 ),
-              ],
-            );
-          },
-        );
-
+                content: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Order Placed'),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      context.go('/Customer_Order_List'); // Close the dialog
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }else{
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                Text('Failed to save data ${response.statusCode}')),
+          );
+        }
       } else {
         print('API call failed with status code: ${response.statusCode}');
         print('Response: ${response.body}');
@@ -362,7 +368,7 @@ class _OrderViewState extends State<OrderView>
   @override
   void dispose() {
     _searchDebounceTimer
-        ?.cancel(); // Cancel the timer when the widget is disposed
+        ?.cancel();
     super.dispose();
   }
 
@@ -379,8 +385,8 @@ class _OrderViewState extends State<OrderView>
           return Stack(
             children: [
               Container(
-                color: Colors.white, // White background color
-                height: 60.0, // Total height including bottom shadow
+                color: Colors.white,
+                height: 60.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -392,7 +398,6 @@ class _OrderViewState extends State<OrderView>
                           child: Image.asset(
                             "images/Final-Ikyam-Logo.png",
                             height: 35.0,
-                            // Adjusted to better match proportions
                           ),
                         ),
                         const Spacer(),
@@ -401,7 +406,6 @@ class _OrderViewState extends State<OrderView>
                             Padding(
                               padding:
                               EdgeInsets.only(right: 10, top: 10),
-                              // Adjust padding for better spacing
                               child: AccountMenu(),
                             ),
                           ],
@@ -425,7 +429,6 @@ class _OrderViewState extends State<OrderView>
                   right:0,
                   bottom: 0,child:   SingleChildScrollView(
                   child: Align(
-                    // Added Align widget for the left side menu
                     alignment: Alignment.topLeft,
                     child: Padding(
                       padding: const EdgeInsets.only(top: 2),
@@ -482,7 +485,6 @@ class _OrderViewState extends State<OrderView>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     if (constraints.maxWidth >= 1300) ...{
-                      //   double overallTotal = _selectedProducts.fold(0, (sum, product) {return sum + (product['qty'] * product['price']);});
                       Expanded(
                           child: SingleChildScrollView(
                             child: Column(
@@ -585,12 +587,12 @@ class _OrderViewState extends State<OrderView>
                                             rows: _selectedProducts.map((product) {
                                               int index = _selectedProducts.indexOf(product) + 1;
                                               return DataRow(cells: [
-                                                DataCell(Text('$index')), // Serial Number
-                                                DataCell(Text(product['productDescription'] ?? '')), // Product Name
-                                                DataCell(Text(product['categoryName'] ?? '')), // Category
-                                                DataCell(Text(product['baseUnit'] ?? '')), // Unit
-                                                DataCell(Text(product['standardPrice']?.toStringAsFixed(2) ?? '0.00')), // Price
-                                                DataCell(Text(product['qty'] ?? '0')), // Quantity
+                                                DataCell(Text('$index')),
+                                                DataCell(Text(product['productDescription'] ?? '')),
+                                                DataCell(Text(product['categoryName'] ?? '')),
+                                                DataCell(Text(product['baseUnit'] ?? '')),
+                                                DataCell(Text(product['standardPrice']?.toStringAsFixed(2) ?? '0.00')),
+                                                DataCell(Text(product['qty'] ?? '0')),
                                                 DataCell(Text(
                                                     (double.parse(product['qty']) * product['standardPrice'])
                                                         .toStringAsFixed(2))),
@@ -603,8 +605,6 @@ class _OrderViewState extends State<OrderView>
                                             const Spacer(),
                                             Padding(
                                               padding: const EdgeInsets.only(right: 10,bottom: 10),
-                                              //children: [
-
                                               child: Container(
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
@@ -624,7 +624,6 @@ class _OrderViewState extends State<OrderView>
                                                   ),
                                                 ),
                                               ),
-                                              // ],
                                             ),
                                           ],
                                         )
@@ -737,7 +736,7 @@ class _OrderViewState extends State<OrderView>
                                                       headingRowHeight: 50,
                                                       dataRowColor: MaterialStateProperty.resolveWith<Color>(
                                                             (Set<MaterialState> states) {
-                                                          return Colors.white; // Set row background to white
+                                                          return Colors.white;
                                                         },
                                                       ),
                                                       columns: [
@@ -787,7 +786,6 @@ class _OrderViewState extends State<OrderView>
                                                               Alignment.topRight,
                                                               child: Text(
                                                                 'Total: \₹${totalAmountController.text}',
-                                                                // Display the total
                                                                 style: TextStyles.subhead,
                                                               ),
                                                             ),
