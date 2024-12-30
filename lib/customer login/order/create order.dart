@@ -934,7 +934,7 @@ class _CreateOrderState extends State<CreateOrder>
                                                   Alignment.centerRight,
                                               // Align text to the right
                                               child: Text(
-                                                'Total: ₹${_calculateTotal().toStringAsFixed(2)}',
+                                                'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
                                                 style: TextStyles.subhead,
                                                 textAlign: TextAlign
                                                     .right, // Ensure right-aligned text
@@ -1423,7 +1423,7 @@ class _CreateOrderState extends State<CreateOrder>
                                                               Alignment.centerRight,
                                                               // Align text to the right
                                                               child: Text(
-                                                                'Total: ₹${_calculateTotal().toStringAsFixed(2)}',
+                                                                'Total: \₹${_calculateTotal().toStringAsFixed(2)}',
                                                                 style: TextStyles.subhead,
                                                                 textAlign: TextAlign
                                                                     .right, // Ensure right-aligned text

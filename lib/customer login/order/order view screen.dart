@@ -618,7 +618,7 @@ class _OrderViewState extends State<OrderView>
                                                     alignment:
                                                     Alignment.topRight,
                                                     child: Text(
-                                                      'Total: ₹${totalAmountController.text}',
+                                                      'Total: \₹${totalAmountController.text}',
                                                       style: TextStyles.subhead,
                                                     ),
                                                   ),
@@ -786,7 +786,7 @@ class _OrderViewState extends State<OrderView>
                                                               alignment:
                                                               Alignment.topRight,
                                                               child: Text(
-                                                                'Total: ₹${totalAmountController.text}',
+                                                                'Total: \₹${totalAmountController.text}',
                                                                 // Display the total
                                                                 style: TextStyles.subhead,
                                                               ),
